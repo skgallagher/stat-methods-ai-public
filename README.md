@@ -1,19 +1,69 @@
-# Statistical Methods for AI — Instructor Repo (Private)
+# Statistical Methods for AI
 
-This repo mirrors the structure of your existing course repo.
+Senior Undergraduate Special Topics  
+Department of Statistics
 
-## What lives where
-- **Student-facing** materials live in the top-level folders (e.g., `weeks/`, `labs/`, `lecture_drafts/`, `homeworks/`, etc.).
-- **Instructor-only** materials live in `instructor_only/` (solutions, rubrics, grading notes).
+---
 
-## Publishing to the public repo
-A GitHub Action publishes this repo to the public repo by syncing **everything** except excluded folders:
-- `instructor_only/`
-- `grades/`
-- (optionally) `exam/` (if you keep exams private)
+## Course Overview
 
-Workflow: `.github/workflows/publish_public.yml`
+This course examines modern artificial intelligence systems through the lens of statistical reasoning.
 
-## Official runtime
-- Google Colab (Chrome recommended)
-- Optional local: `python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`
+We emphasize:
+
+- Data-generating processes  
+- Evaluation as estimation  
+- Benchmark reliability  
+- Uncertainty quantification  
+- Generalization and distribution shift  
+- Interpretability and fairness  
+
+Image and text datasets serve as primary case studies.
+
+---
+
+## Official Computing Environment
+
+- **Runtime:** Google Colab  
+- **Language:** Python  
+- **Core libraries:** numpy, scikit-learn, torch, torchvision, transformers, matplotlib, plotly, seaborn  
+- GPU use is optional and limited.
+
+All assignments are solvable on CPU.
+
+---
+
+## Weekly Materials
+
+### Week 01 — Two Cultures & Images as Data
+
+Slides: `weeks/week01/slides.html`
+
+Lab:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](
+https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main/weeks/week01/lab.ipynb
+)
+
+---
+
+## Homework Submission
+
+- Submit **PDF** to Gradescope  
+- Optional: submit notebook for reproducibility  
+
+---
+
+## Repository Structure
+
+- `weeks/` — weekly materials (slides + labs)
+- `labs/` — lab templates
+- `homeworks/` — homework prompts
+- `code/` — shared utilities
+- `data/` — small datasets
+
+---
+
+## About This Course
+
+This course highlights what statistical thinking contributes to modern AI practice and research.
