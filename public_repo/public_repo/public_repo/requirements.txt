@@ -1,9 +1,0 @@
-numpy
-scikit-learn
-matplotlib
-plotly
-seaborn
-torch
-torchvision
-transformers
-datasets
