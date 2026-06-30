@@ -41,11 +41,15 @@ Slides: `weeks/week01/slides.html`
 
 Lab:
 
-[![Open Lab in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main/weeks/week01/lab.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](
+https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main/weeks/week01/lab.ipynb
+)
 
 Homework:
 
-[![Open HW01 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main/homeworks/hw01.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](
+https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main/homeworks/hw01.ipynb
+)
 
 ---
 

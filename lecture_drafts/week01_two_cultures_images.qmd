@@ -274,6 +274,74 @@ Questions to keep alive:
 
 ---
 
+## Indicator variables
+
+The expression
+
+$$
+I(\hat{y}_i = y_i)
+$$
+
+is an indicator variable.
+
+It equals:
+
+$$
+I(\hat{y}_i = y_i) =
+\begin{cases}
+1, & \text{if the model is correct on example } i\\
+0, & \text{if the model is wrong on example } i
+\end{cases}
+$$
+
+So validation accuracy is just the average of many 0/1 outcomes.
+
+---
+
+## Why an average estimates a probability
+
+For any event $A$:
+
+$$
+E[I(A)] = P(A)
+$$
+
+Why?
+
+$$
+E[I(A)] = 1\cdot P(A) + 0\cdot P(A^c) = P(A)
+$$
+
+For model accuracy, the event is:
+
+$$
+A = \{\hat{Y} = Y\}
+$$
+
+So averaging correctness indicators estimates the probability that the model is correct.
+
+---
+
+## Accuracy has sampling variability
+
+If the validation examples are treated as independent draws, then the correctness indicators are approximately Bernoulli:
+
+$$
+I(\hat{y}_i = y_i) \sim \text{Bernoulli}(p)
+$$
+
+Then:
+
+$$
+SE(\hat{p}) \approx \sqrt{\frac{\hat{p}(1-\hat{p})}{m}}
+$$
+
+This is the Week 1 version of a recurring course idea:
+
+> A benchmark score is an estimate with uncertainty.
+
+---
+
 ## Confusion matrix
 
 A confusion matrix is a map of model failure.
