@@ -191,7 +191,8 @@ const projectDocs = [
     label: "Project data downloads",
     href: courseLinks.projectDataBox,
     actionLabel: "Open Box folder",
-    status: "Four frozen course bundles with starter notebooks, cached AI outputs, provenance, and sealed holdouts"
+    openDate: "2027-03-14",
+    status: "Four frozen course bundles with starter notebooks, cached AI outputs, provenance, and sealed holdouts · opens with the Week 8 project launch"
   },
   {
     label: "Project statement",
