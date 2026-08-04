@@ -104,7 +104,7 @@ function renderProjectDocs() {
       <p>${doc.status}</p>
       <div class="pill-row">
         ${doc.href
-          ? `<a class="pill" href="${doc.href}">Open in GitHub</a>`
+          ? `<a class="pill" href="${doc.href}">${doc.actionLabel || "Open in GitHub"}</a>`
           : `<span class="pill pill-locked" aria-disabled="true">Coming soon</span>`}
       </div>
     </article>

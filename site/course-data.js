@@ -3,7 +3,8 @@ const courseLinks = {
   publicRepo: "https://github.com/skgallagher/stat-methods-ai-public",
   publicBlob: "https://github.com/skgallagher/stat-methods-ai-public/blob/main",
   publicRaw: "https://raw.githubusercontent.com/skgallagher/stat-methods-ai-public/main",
-  colabBase: "https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main"
+  colabBase: "https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main",
+  projectDataBox: "https://cmu.box.com/s/9jzjm8u9wc9kmkmewsoi9ciekbkf5c2k"
 };
 
 const siteSettings = {
@@ -186,6 +187,12 @@ const weeklyMaterials = [
 ];
 
 const projectDocs = [
+  {
+    label: "Project data downloads",
+    href: courseLinks.projectDataBox,
+    actionLabel: "Open Box folder",
+    status: "Four frozen course bundles with starter notebooks, cached AI outputs, provenance, and sealed holdouts"
+  },
   {
     label: "Project statement",
     href: null,
