@@ -188,17 +188,17 @@ const weeklyMaterials = [
 const projectDocs = [
   {
     label: "Project statement",
-    href: `${courseLinks.publicBlob}/projects/final_project.md`,
-    status: "Student-facing overview and deliverables"
+    href: null,
+    status: "Student-facing overview and deliverables · coming later"
   },
   {
     label: "Project rubric",
-    href: `${courseLinks.publicBlob}/projects/rubric.md`,
-    status: "Weights and evaluation criteria"
+    href: null,
+    status: "Weights and evaluation criteria · coming later"
   },
   {
     label: "Datasets and baselines",
-    href: `${courseLinks.publicBlob}/projects/datasets_and_baselines.md`,
-    status: "Supported choices and baseline cookbook"
+    href: null,
+    status: "Supported choices and baseline cookbook · coming later"
   }
 ];

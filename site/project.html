@@ -3,232 +3,157 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Final project overview, tracks, requirements, and milestones for Statistical Thinking for the AI Era.">
     <title>Final Project · Statistical Thinking for the AI Era</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <header class="site-header">
       <nav class="nav" aria-label="Main navigation">
-        <a class="brand" href="index.html">Statistical Thinking for the AI Era</a>
+        <a class="brand" href="index.html">
+          <span>Statistical Thinking</span>
+          <small>for the AI Era</small>
+        </a>
         <div class="nav-links">
           <a href="index.html">Home</a>
-          <a href="project.html" aria-current="page">Final Project</a>
-          <a href="modules.html">Modules</a>
-          <a href="index.html#syllabus">Syllabus</a>
-          <a href="index.html#calendar">Calendar</a>
-          <a href="index.html#schedule">Schedule</a>
-          <a href="index.html#materials">Materials</a>
+          <a href="modules.html">Weekly materials</a>
+          <a href="project.html" aria-current="page">Final project</a>
           <a href="#" data-public-repo>GitHub</a>
         </div>
       </nav>
     </header>
 
     <main>
-      <section class="hero">
-        <div class="hero-inner">
+      <section class="page-intro purple-intro">
+        <div class="wrap intro-grid">
           <div>
-            <p class="eyebrow">Final Project</p>
-            <h1>Statistical Evaluation of an AI System</h1>
-            <p class="hero-copy">
-              Teams of four will evaluate an AI system or an AI evaluation protocol. The goal is
-              not to produce the flashiest model; it is to make a defensible statistical claim.
+            <p class="eyebrow">Team evaluation study</p>
+            <h1>Final project</h1>
+            <p class="lede">
+              Evaluate an AI system or evaluation protocol and answer one practical question:
+              what should a statistically careful person conclude?
             </p>
-            <div class="actions">
-              <a class="button" href="#tracks">Choose a track</a>
-              <a class="button secondary" href="#deliverables">See deliverables</a>
-            </div>
           </div>
-          <aside class="signal-panel">
-            <p class="signal-title">Project Weights</p>
-            <table class="weight-table">
-              <tbody>
-                <tr><th>Checkpoints</th><td>50%</td></tr>
-                <tr><th>Video</th><td>20%</td></tr>
-                <tr><th>Oral discussion</th><td>20%</td></tr>
-                <tr><th>Written report</th><td>10%</td></tr>
-              </tbody>
-            </table>
+          <aside class="project-question">
+            <strong>The standard</strong>
+            <p>A defensible claim, not the flashiest model.</p>
           </aside>
         </div>
       </section>
 
-      <section class="section">
-        <div class="section-header">
-          <h2>Shared Requirements</h2>
-          <p class="muted">
-            Both tracks use the same statistical habits. Students should be able to explain each
-            design choice and defend the recommendation under questioning.
-          </p>
+      <nav class="jump-nav wrap" aria-label="Project page sections">
+        <a href="#overview">Overview</a>
+        <a href="#tracks">Choose a track</a>
+        <a href="#requirements">Requirements</a>
+        <a href="#deliverables">Milestones</a>
+        <a href="#files">Project files</a>
+      </nav>
+
+      <section class="section" id="overview" aria-labelledby="overview-title">
+        <div class="section-heading compact-heading">
+          <p class="eyebrow">At a glance</p>
+          <h2 id="overview-title">One study, built in stages</h2>
         </div>
-        <div class="grid three">
-          <article class="card accent">
-            <h3>Own The Baseline</h3>
-            <p>Build, explain, evaluate, and defend a simple baseline model as a real comparison point.</p>
+        <div class="stat-grid">
+          <article><strong>4</strong><span>students per team</span></article>
+          <article><strong>4</strong><span>supported project choices</span></article>
+          <article><strong>3</strong><span>graded checkpoints</span></article>
+          <article><strong>1</strong><span>evidence-backed recommendation</span></article>
+        </div>
+        <div class="requirement-strip">
+          <div><span>Baseline</span><strong>Own the comparison</strong></div>
+          <div><span>Uncertainty</span><strong>Quantify what the result supports</strong></div>
+          <div><span>Sensitivity</span><strong>Stress one consequential assumption</strong></div>
+        </div>
+      </section>
+
+      <section class="section" id="tracks" aria-labelledby="tracks-title">
+        <div class="section-heading compact-heading">
+          <p class="eyebrow">Choose one</p>
+          <h2 id="tracks-title">Project tracks</h2>
+          <p class="muted">Two image-deployment studies and two LLM-evaluation studies are supported equally.</p>
+        </div>
+        <div class="track-grid">
+          <article class="track-card industry">
+            <p class="track-type">Industry · Image</p>
+            <h3>ShopSmart Food Catalog</h3>
+            <p>Is an image classifier reliable enough to suggest food-marketplace categories?</p>
+            <ul><li>Food-101 subset</li><li>Confidence thresholds</li><li>Error consequences</li></ul>
           </article>
-          <article class="card purple">
-            <h3>Quantify Trust</h3>
-            <p>Use uncertainty or calibration evidence to show what the performance result can support.</p>
+          <article class="track-card industry">
+            <p class="track-type">Industry · Image</p>
+            <h3>ShopSmart Pet Catalog</h3>
+            <p>What does useful performance mean when visually similar pet categories have different error costs?</p>
+            <ul><li>Oxford-IIIT Pets subset</li><li>Coarse versus fine labels</li><li>Error severity</li></ul>
           </article>
-          <article class="card orange">
-            <h3>Stress The Claim</h3>
-            <p>Use robustness, ablation, or sensitivity analysis to test whether the conclusion survives.</p>
+          <article class="track-card research">
+            <p class="track-type">Research · LLM judge</p>
+            <h3>Judging Human Preferences</h3>
+            <p>Can simple baselines or an LLM judge predict human preference labels—and what do those labels measure?</p>
+            <ul><li>SHP subset</li><li>Length bias</li><li>Judge agreement</li></ul>
+          </article>
+          <article class="track-card research">
+            <p class="track-type">Research · LLM judge</p>
+            <h3>Judging Instruction Following</h3>
+            <p>How do rule checks, simple baselines, and LLM-as-judge scores compare on constrained tasks?</p>
+            <ul><li>IFEval-style subset</li><li>Rule checker</li><li>Prompt sensitivity</li></ul>
           </article>
         </div>
       </section>
 
-      <section class="section" id="tracks">
-        <div class="section-header">
-          <h2>Project Tracks</h2>
-          <p class="muted">
-            The course supports four choices equally: two industry-focused ShopSmart options and
-            two research-focused Judging the Judge options.
-          </p>
+      <section class="section" id="requirements" aria-labelledby="requirements-title">
+        <div class="section-heading compact-heading">
+          <p class="eyebrow">What every team does</p>
+          <h2 id="requirements-title">Required analysis</h2>
         </div>
-        <div class="grid two">
-          <article class="card accent project-track">
-            <div>
-              <p class="eyebrow">Industry Track</p>
-              <h3>ShopSmart Food Catalog</h3>
-              <p>
-                Evaluate whether an image classifier is reliable enough for food-related marketplace
-                category suggestions. The focus is deployment evidence, guardrails, confidence, and
-                error consequences.
-              </p>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Food-101 subset</span>
-              <span class="pill">image baseline</span>
-              <span class="pill">confidence thresholds</span>
-            </div>
-          </article>
-
-          <article class="card accent project-track">
-            <div>
-              <p class="eyebrow">Industry Track</p>
-              <h3>ShopSmart Pet Catalog</h3>
-              <p>
-                Evaluate fine-grained pet image classification where visually similar categories make
-                top-1 accuracy incomplete. Students may compare coarse and fine labels.
-              </p>
-            </div>
-            <div class="pill-row">
-              <span class="pill">Oxford-IIIT Pets subset</span>
-              <span class="pill">coarse vs. fine labels</span>
-              <span class="pill">error severity</span>
-            </div>
-          </article>
-
-          <article class="card purple project-track">
-            <div>
-              <p class="eyebrow">Research Track</p>
-              <h3>Judging Human Preferences</h3>
-              <p>
-                Evaluate whether simple baselines or an LLM judge can predict human preference labels,
-                and critique what those labels actually measure.
-              </p>
-            </div>
-            <div class="pill-row">
-              <span class="pill">SHP subset</span>
-              <span class="pill">length bias</span>
-              <span class="pill">LLM judge</span>
-            </div>
-          </article>
-
-          <article class="card purple project-track">
-            <div>
-              <p class="eyebrow">Research Track</p>
-              <h3>Judging Instruction Following</h3>
-              <p>
-                Compare deterministic rule checks, simple baselines, and LLM-as-judge scores on
-                constrained instruction-following tasks.
-              </p>
-            </div>
-            <div class="pill-row">
-              <span class="pill">IFEval-style subset</span>
-              <span class="pill">rule checker</span>
-              <span class="pill">judge prompt ablation</span>
-            </div>
-          </article>
+        <div class="checklist-grid">
+          <ol>
+            <li><span>1</span><div><strong>Frame the study</strong><small>Target population, unit, estimand, comparison, and decision.</small></div></li>
+            <li><span>2</span><div><strong>Explore the benchmark</strong><small>Measurement, labels, dependence, hard cases, and mismatch.</small></div></li>
+            <li><span>3</span><div><strong>Own a baseline</strong><small>Build and explain a simple, defensible comparison model.</small></div></li>
+          </ol>
+          <ol start="4">
+            <li><span>4</span><div><strong>Evaluate the AI system</strong><small>Use paired cases plus uncertainty or calibration evidence.</small></div></li>
+            <li><span>5</span><div><strong>Test sensitivity</strong><small>Vary one important assumption, threshold, prompt, or labeling choice.</small></div></li>
+            <li><span>6</span><div><strong>Recommend—carefully</strong><small>State limitations, guardrails, and what would change the conclusion.</small></div></li>
+          </ol>
         </div>
       </section>
 
-      <section class="section">
-        <div class="section-header">
-          <h2>Required Components</h2>
-          <p class="muted">Each team chooses a specific evaluation question within its track.</p>
+      <section class="section" id="deliverables" aria-labelledby="deliverables-title">
+        <div class="section-heading compact-heading">
+          <p class="eyebrow">Milestones</p>
+          <h2 id="deliverables-title">Deliverables</h2>
+          <p class="muted">The checkpoints carry most of the weight because they show process, judgment, and revision.</p>
         </div>
-        <div class="grid two">
-          <article class="card">
-            <h3>Analysis</h3>
-            <ul>
-              <li>Scenario framing and target population</li>
-              <li>Dataset and benchmark EDA</li>
-              <li>Baseline model ownership</li>
-              <li>AI system or judge evaluation</li>
-              <li>Uncertainty or calibration evidence</li>
-              <li>Robustness, ablation, or sensitivity analysis</li>
-            </ul>
-          </article>
-          <article class="card">
-            <h3>Reflection</h3>
-            <ul>
-              <li>Evidence-backed recommendation</li>
-              <li>Limitations and what would change the conclusion</li>
-              <li>Optional human evaluation protocol</li>
-              <li>Meta-evaluation of AI tools used in the analysis</li>
-              <li>Clear account of what the team verified independently</li>
-            </ul>
-          </article>
+        <div class="timeline">
+          <article><time>Week 9</time><div><h3>Checkpoint 1</h3><p>Question, target population, initial EDA, benchmark critique, and sensitivity plan.</p></div></article>
+          <article><time>Week 11</time><div><h3>Checkpoint 2</h3><p>Baseline, AI results, paired comparison, uncertainty or calibration, and first interpretation.</p></div></article>
+          <article><time>Week 13</time><div><h3>Ending artifact</h3><p>Sensitivity result, draft recommendation, report structure, and video outline.</p></div></article>
+          <article><time>Before Week 14</time><div><h3>Five-minute video</h3><p>Submitted before class so the instructor can prepare oral discussion questions.</p></div></article>
+          <article><time>Week 14</time><div><h3>Discussion + report</h3><p>Short accountability conversation and concise written record of the final analysis.</p></div></article>
+        </div>
+        <div class="weight-row" aria-label="Project grade weights">
+          <span><strong>50%</strong> checkpoints</span>
+          <span><strong>20%</strong> video</span>
+          <span><strong>20%</strong> discussion</span>
+          <span><strong>10%</strong> report</span>
         </div>
       </section>
 
-      <section class="section" id="deliverables">
-        <div class="section-header">
-          <h2>Deliverables</h2>
-          <p class="muted">
-            Checkpoints are the main grade because they show process, judgment, and revision.
-          </p>
+      <section class="section" id="files" aria-labelledby="files-title">
+        <div class="section-heading compact-heading">
+          <p class="eyebrow">Canonical documents</p>
+          <h2 id="files-title">Project files</h2>
         </div>
-        <div class="deadline-list">
-          <div>
-            <h3>Week 9 · Checkpoint 1</h3>
-            <p class="muted">Team, option, model/dataset, evaluation questions, initial EDA, benchmark critique, robustness or ablation plan.</p>
-          </div>
-          <div>
-            <h3>Week 11 · Checkpoint 2</h3>
-            <p class="muted">Baseline model, AI results, model comparison, uncertainty or calibration evidence, first client-facing interpretation.</p>
-          </div>
-          <div>
-            <h3>Week 13 · Ending Artifact</h3>
-            <p class="muted">Robustness/ablation, draft recommendation, draft report structure, and video outline.</p>
-          </div>
-          <div>
-            <h3>Sunday Before Week 14 · Video Due</h3>
-            <p class="muted">Five-minute recorded video due at 11:59pm, no exceptions, so the instructor can prepare oral discussion questions.</p>
-          </div>
-          <div>
-            <h3>Week 14 · Oral Discussion and Report</h3>
-            <p class="muted">Short accountability discussion plus concise written report recording the final analysis.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-header">
-          <h2>Canonical Project Files</h2>
-          <p class="muted">
-            Project handouts and checkpoint templates should live in the public GitHub repo.
-            This page links to those files instead of duplicating their full contents.
-          </p>
-        </div>
-        <div class="grid three" data-project-docs></div>
+        <div class="document-grid" data-project-docs></div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <div>
-        <p>Statistical Thinking for the AI Era · Final Project · Spring 2027</p>
-        <p class="footer-note">In the spirit of the class, this site has been developed using both human and AI tools.</p>
+      <div class="footer-grid">
+        <p><strong>Statistical Thinking for the AI Era</strong><br>Final project · Spring 2027</p>
+        <p class="footer-note">The public repository contains the canonical project documents.</p>
       </div>
     </footer>
     <script src="course-data.js"></script>

@@ -47,7 +47,7 @@ function sortedModules() {
 
 function moduleCard(item) {
   const releaseText = item.publishDate
-    ? `<p class="module-date">Publishes Sunday, ${item.publishDate}</p>`
+    ? `<p class="module-date">Publishes ${formatOpenDate(item.publishDate)}</p>`
     : "";
 
   return `
@@ -67,7 +67,7 @@ function renderMaterials() {
   const container = document.querySelector("[data-weekly-materials]");
   if (!container) return;
 
-  const latest = sortedModules().slice(0, 2);
+  const latest = sortedModules().slice(0, 1);
   container.innerHTML = latest.length
     ? latest.map(moduleCard).join("")
     : `<article class="card"><h3>Modules coming soon</h3><p>Weekly materials will appear here on Sundays during the semester.</p></article>`;
@@ -103,7 +103,9 @@ function renderProjectDocs() {
       <h3>${doc.label}</h3>
       <p>${doc.status}</p>
       <div class="pill-row">
-        <a class="pill" href="${doc.href}">Open in GitHub</a>
+        ${doc.href
+          ? `<a class="pill" href="${doc.href}">Open in GitHub</a>`
+          : `<span class="pill pill-locked" aria-disabled="true">Coming soon</span>`}
       </div>
     </article>
   `).join("");

@@ -4,9 +4,16 @@ This is a static, no-build course website.
 
 The site is intentionally linked to the GitHub repos rather than duplicating course materials. Weekly slides, labs, homework, and project handouts should live in the public repo after the instructor repo publishes. The website points to those canonical files.
 
+The information architecture is deliberately small. The persistent navigation
+has four choices: Home, Weekly materials, Final project, and GitHub. The homepage
+contains the current release and essential course information; the complete
+calendar lives with weekly materials; detailed project information lives on the
+project page.
+
 ## Files
 
-- `index.html` — course landing page
+- `index.html` — course landing page, current release, five-step workflow, and course essentials
+- `modules.html` — released materials and complete course calendar
 - `project.html` — final project overview
 - `styles.css` — site styling
 - `course-data.js` — central repo URLs and material links
@@ -17,6 +24,8 @@ The site is intentionally linked to the GitHub repos rather than duplicating cou
 When adding a new week, update `weeklyMaterials` in `course-data.js`.
 
 When adding canonical project files, update `projectDocs` in `course-data.js`.
+Until a file is actually public, give it a null `href`; the site will render a
+non-clickable “Coming soon” state rather than a broken link.
 
 ## Weekly Sunday Release
 

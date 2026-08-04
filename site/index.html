@@ -3,230 +3,171 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Statistical Thinking for the AI Era, a Spring 2027 course at Carnegie Mellon University.">
     <title>Statistical Thinking for the AI Era</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <header class="site-header">
       <nav class="nav" aria-label="Main navigation">
-        <a class="brand" href="index.html">Statistical Thinking for the AI Era</a>
+        <a class="brand" href="index.html">
+          <span>Statistical Thinking</span>
+          <small>for the AI Era</small>
+        </a>
         <div class="nav-links">
           <a href="index.html" aria-current="page">Home</a>
-          <a href="project.html">Final Project</a>
-          <a href="modules.html">Modules</a>
-          <a href="#syllabus">Syllabus</a>
-          <a href="#calendar">Calendar</a>
-          <a href="#schedule">Schedule</a>
-          <a href="#materials">Materials</a>
+          <a href="modules.html">Weekly materials</a>
+          <a href="project.html">Final project</a>
           <a href="#" data-public-repo>GitHub</a>
         </div>
       </nav>
     </header>
 
     <main>
-      <section class="hero">
-        <div class="hero-inner">
-          <div class="hero-text">
-            <p class="eyebrow">Spring 2027 · Department of Statistics & Data Science</p>
-            <h1>Statistical Thinking for the AI Era</h1>
-            <p class="hero-copy">
-              A project-centered course on evaluating AI systems with statistical reasoning:
-              baselines, benchmarks, uncertainty, calibration, robustness, human feedback, and
-              evidence-backed recommendations.
+      <section class="masthead">
+        <div class="wrap masthead-grid">
+          <div>
+            <p class="eyebrow">Spring 2027 · CMU Statistics &amp; Data Science</p>
+            <h1>Statistical Thinking<br>for the AI Era</h1>
+            <p class="lede">
+              Learn to evaluate AI systems with baselines, uncertainty, calibration,
+              sensitivity analysis, and evidence you can defend.
             </p>
-            <div class="actions">
-              <a class="button" href="project.html">View final project</a>
-              <a class="button secondary" href="modules.html">See weekly modules</a>
-            </div>
           </div>
-
-          <figure class="hero-figure">
-            <img src="assets/hero-stat-ai-v2.png" alt="An editorial statistical workflow groups repeated wildlife images by camera, samples from a population, compares simple and flexible boundaries, and surrounds a small black-box model with resampling distributions, paired errors, calibration, residuals, and confidence intervals.">
-          </figure>
-        </div>
-      </section>
-
-      <section class="section translation-section">
-        <div class="section-header">
-          <h2>Recurring Translation</h2>
-          <p class="muted">
-            The course repeatedly connects current AI language to older statistical ideas.
-          </p>
-        </div>
-        <div class="translation-grid" aria-label="Course translation examples">
-          <div class="translation-row">
-            <span>benchmark</span><b>→</b><span>sampling design</span>
-          </div>
-          <div class="translation-row">
-            <span>accuracy</span><b>→</b><span>estimate with uncertainty</span>
-          </div>
-          <div class="translation-row">
-            <span>confidence</span><b>→</b><span>calibration question</span>
-          </div>
-          <div class="translation-row">
-            <span>ablation</span><b>→</b><span>sensitivity analysis</span>
-          </div>
-          <div class="translation-row">
-            <span>human feedback</span><b>→</b><span>measurement protocol</span>
+          <div class="start-panel" aria-label="Course quick links">
+            <p class="start-label">Start here</p>
+            <a class="start-link teal" href="modules.html">
+              <span>Weekly materials</span>
+              <small>Lectures, labs, homework, and data</small>
+            </a>
+            <a class="start-link purple" href="project.html">
+              <span>Final project</span>
+              <small>Tracks, requirements, and milestones</small>
+            </a>
+            <a class="start-link ochre" href="#course-info">
+              <span>Course information</span>
+              <small>Format, grading, and learning goals</small>
+            </a>
           </div>
         </div>
       </section>
 
-      <section class="section">
-        <div class="section-header">
-          <h2>Course Focus</h2>
-          <p class="muted">
-            Modern AI creates new systems, scales, and interfaces. This course asks what a
-            statistically careful person should believe after seeing AI evaluation evidence.
-          </p>
+      <section class="section" aria-labelledby="current-week-title">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">Current release</p>
+            <h2 id="current-week-title">This week</h2>
+          </div>
+          <a class="text-link" href="modules.html">View all weekly materials →</a>
         </div>
-        <div class="grid three">
-          <article class="card accent">
-            <h3>Start With A Baseline</h3>
-            <p>Before trusting the AI system, build and understand a simple model that keeps the comparison honest.</p>
-          </article>
-          <article class="card purple">
-            <h3>Evaluate The Evidence</h3>
-            <p>Accuracy is an estimate. Confidence needs checking. Benchmarks measure some populations and miss others.</p>
-          </article>
-          <article class="card orange">
-            <h3>Defend A Recommendation</h3>
-            <p>Students use statistical evidence to decide whether to deploy, trust, revise, or reject an AI evaluation claim.</p>
-          </article>
+        <div class="current-module" data-weekly-materials></div>
+      </section>
+
+      <section class="workflow-band" aria-labelledby="workflow-title">
+        <div class="wrap">
+          <div class="section-heading compact-heading">
+            <p class="eyebrow">The recurring workflow</p>
+            <h2 id="workflow-title">Five moves, every week</h2>
+            <p class="muted">The method changes. The statistical habits do not.</p>
+          </div>
+          <ol class="workflow" aria-label="Five-stage course workflow">
+            <li>
+              <span class="step-number">1</span>
+              <strong>Research a hypothesis</strong>
+              <small>Population, unit, estimand, comparison, decision.</small>
+            </li>
+            <li>
+              <span class="step-number">2</span>
+              <strong>Explore the evidence</strong>
+              <small>Measurement, dependence, hard cases, mismatch.</small>
+            </li>
+            <li>
+              <span class="step-number">3</span>
+              <strong>Model and compare</strong>
+              <small>Own a baseline. Compare fairly. Quantify uncertainty.</small>
+            </li>
+            <li>
+              <span class="step-number">4</span>
+              <strong>Test sensitivity</strong>
+              <small>Change one consequential assumption on purpose.</small>
+            </li>
+            <li>
+              <span class="step-number">5</span>
+              <strong>Decide—carefully</strong>
+              <small>Recommend within the limits of the evidence.</small>
+            </li>
+          </ol>
         </div>
       </section>
 
-      <section class="section" id="syllabus">
-        <div class="section-header">
-          <h2>Syllabus Snapshot</h2>
-          <p class="muted">
-            A concise version of the course policies and expectations. The full syllabus will live
-            in the public GitHub repo once finalized.
-          </p>
+      <section class="section" aria-labelledby="translation-title">
+        <div class="section-heading compact-heading">
+          <p class="eyebrow">A recurring translation</p>
+          <h2 id="translation-title">AI language, statistical questions</h2>
         </div>
-        <div class="grid two">
-          <article class="card accent">
+        <div class="translation-grid" aria-label="Translations between AI and statistical language">
+          <div><span>benchmark</span><b>→</b><strong>sampling design</strong></div>
+          <div><span>accuracy</span><b>→</b><strong>estimate + uncertainty</strong></div>
+          <div><span>confidence</span><b>→</b><strong>calibration question</strong></div>
+          <div><span>ablation</span><b>→</b><strong>sensitivity analysis</strong></div>
+          <div><span>human feedback</span><b>→</b><strong>measurement protocol</strong></div>
+        </div>
+      </section>
+
+      <section class="section course-info" id="course-info" aria-labelledby="course-info-title">
+        <div class="section-heading compact-heading">
+          <p class="eyebrow">Course information</p>
+          <h2 id="course-info-title">The essentials</h2>
+        </div>
+        <div class="info-grid">
+          <article>
             <h3>Format</h3>
             <ul>
               <li>Tuesday/Thursday meetings</li>
               <li>Lecture plus guided lab or project studio</li>
-              <li>Python in Google Colab, CPU-only by default</li>
-              <li>AI tools permitted, but students must verify and critique their use</li>
+              <li>Python in Google Colab; CPU-only by default</li>
             </ul>
           </article>
-          <article class="card purple">
+          <article>
             <h3>Assessment</h3>
             <ul>
-              <li>7 homework grades, lowest 1 dropped</li>
-              <li>No homework in Week 6 so students can study for the midterm</li>
+              <li>Seven homeworks; lowest score dropped</li>
               <li>Closed-book, no-AI midterm in Week 7</li>
-              <li>Final project with checkpoints, video, oral discussion, and short report</li>
+              <li>Team project with checkpoints and oral discussion</li>
             </ul>
           </article>
-          <article class="card orange">
-            <h3>Final Project</h3>
+          <article>
+            <h3>AI use</h3>
             <ul>
-              <li>Teams of 4</li>
-              <li>Industry track: ShopSmart image deployment evaluation</li>
-              <li>Research track: Judging the Judge for LLM evaluation</li>
-              <li>Baseline ownership is required</li>
-            </ul>
-          </article>
-          <article class="card">
-            <h3>Learning Goals</h3>
-            <ul>
-              <li>Evaluate AI benchmarks as statistical evidence</li>
-              <li>Quantify uncertainty or calibration in model outputs</li>
-              <li>Analyze robustness, ablation, and distribution shift</li>
-              <li>Use AI tools responsibly in statistical work</li>
+              <li>AI tools are part of the course</li>
+              <li>Prompts, outputs, and revisions are documented</li>
+              <li>Generation may be delegated; judgment may not</li>
             </ul>
           </article>
         </div>
       </section>
 
-      <section class="section" id="schedule">
-        <div class="section-header">
-          <h2>Project-First Structure</h2>
-          <p class="muted">
-            The first half builds shared tools. The second half uses structured project studios
-            to apply those tools to image systems and LLM evaluation.
-          </p>
-        </div>
-        <div class="course-map" aria-label="Course schedule map">
-          <div class="map-row">
-            <div class="week-label">Weeks 1-3</div>
-            <div class="map-cell"><strong>Models and Representations</strong><small>logistic regression, perceptrons, neural nets, images, text</small></div>
-            <div class="map-cell"><strong>AI Workflow</strong><small>verification, prompting, reproducibility, AI-tool critique</small></div>
+      <section class="section course-path" aria-labelledby="course-path-title">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow">Course path</p>
+            <h2 id="course-path-title">From foundations to a defensible recommendation</h2>
           </div>
-          <div class="map-row">
-            <div class="week-label">Weeks 4-6</div>
-            <div class="map-cell"><strong>Evaluation as Estimation</strong><small>benchmarks, accuracy, confidence intervals, calibration</small></div>
-            <div class="map-cell"><strong>Midterm Study</strong><small>no homework in Week 6; midterm in Week 7</small></div>
-          </div>
-          <div class="map-row">
-            <div class="week-label">Weeks 8-11</div>
-            <div class="map-cell"><strong>Generalization</strong><small>distribution shift, robustness, ablation, decision costs</small></div>
-            <div class="map-cell"><strong>Project Checkpoints</strong><small>Week 9 and Week 11 project homework submissions</small></div>
-          </div>
-          <div class="map-row">
-            <div class="week-label">Weeks 12-14</div>
-            <div class="map-cell"><strong>Human Evaluation</strong><small>feedback as data, rubrics, agreement, measurement bias</small></div>
-            <div class="map-cell"><strong>Synthesis</strong><small>video, oral discussion, final report, recommendation</small></div>
-          </div>
+          <a class="text-link" href="modules.html#calendar">See the full calendar →</a>
         </div>
-      </section>
-
-      <section class="section" id="calendar">
-        <div class="section-header">
-          <h2>Calendar</h2>
-          <p class="muted">
-            Draft calendar for Spring 2027. Dates will be adjusted once the official CMU calendar
-            and room schedule are finalized.
-          </p>
-        </div>
-        <div class="calendar-list">
-          <div><strong>Week 1 · Jan 19</strong><span>Logistic regression to neural networks</span></div>
-          <div><strong>Week 2 · Jan 26</strong><span>Representation: images, text, and features</span></div>
-          <div><strong>Week 3 · Feb 2</strong><span>Using AI in a statistical workflow</span></div>
-          <div><strong>Week 4 · Feb 9</strong><span>Benchmarks are sampling designs</span></div>
-          <div><strong>Week 5 · Feb 16</strong><span>Accuracy is an estimate</span></div>
-          <div><strong>Week 6 · Feb 23</strong><span>Calibration and confidence; no homework</span></div>
-          <div><strong>Week 7 · Mar 2</strong><span>Midterm and synthesis</span></div>
-          <div><strong>Mar 7-13</strong><span>Spring Break</span></div>
-          <div><strong>Week 8 · Mar 16</strong><span>Distribution shift and project launch</span></div>
-          <div><strong>Week 9 · Mar 23</strong><span>Robustness and ablation; project checkpoint 1</span></div>
-          <div><strong>Week 10 · Mar 30</strong><span>Model comparison under realistic decision costs</span></div>
-          <div><strong>Week 11 · Apr 6</strong><span>Calibration in the wild; project checkpoint 2</span></div>
-          <div><strong>Week 12 · Apr 13</strong><span>Human evaluation as experimental design</span></div>
-          <div><strong>Week 13 · Apr 20</strong><span>Statistical argument and client recommendation</span></div>
-          <div><strong>Week 14 · Apr 27</strong><span>Project videos, oral discussions, and synthesis</span></div>
-        </div>
-      </section>
-
-      <section class="section" id="materials">
-        <div class="section-header">
-          <h2>Materials</h2>
-          <p class="muted">Latest released modules appear here. The full modules page lists weeks newest first.</p>
-        </div>
-        <div class="grid two">
-          <div data-weekly-materials></div>
-          <article class="card">
-            <h3>Final Project</h3>
-            <p>Teams evaluate an AI system or an AI evaluation protocol using statistical evidence.</p>
-            <div class="pill-row">
-              <a class="pill" href="project.html">Project overview</a>
-              <a class="pill" href="modules.html">All modules</a>
-              <a class="pill" href="#" data-public-repo>Public repo</a>
-            </div>
-          </article>
+        <div class="phase-grid">
+          <article><span>Weeks 1–3</span><strong>Models, representations, and AI workflow</strong></article>
+          <article><span>Weeks 4–7</span><strong>Benchmarks, estimation, calibration, and midterm</strong></article>
+          <article><span>Weeks 8–11</span><strong>Distribution shift, robustness, and project launch</strong></article>
+          <article><span>Weeks 12–14</span><strong>Human evaluation, recommendations, and synthesis</strong></article>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <div>
-        <p>Statistical Thinking for the AI Era · Carnegie Mellon University · Spring 2027</p>
-        <p class="footer-note">In the spirit of the class, this site has been developed using both human and AI tools.</p>
+      <div class="footer-grid">
+        <p><strong>Statistical Thinking for the AI Era</strong><br>Carnegie Mellon University · Spring 2027</p>
+        <p class="footer-note">Developed with both human and AI tools—and checked by a human.</p>
       </div>
     </footer>
     <script src="course-data.js"></script>
