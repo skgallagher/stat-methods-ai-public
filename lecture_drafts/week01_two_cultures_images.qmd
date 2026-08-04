@@ -1,40 +1,446 @@
 ---
-title: "Week 1 — Two Cultures & Images as Data"
+title: "Week 1 — Images as Data"
+subtitle: "Statistical Thinking for the AI Era"
 format:
   revealjs:
     slide-number: true
     transition: fade
     center: false
+    chalkboard: true
 ---
 
-## Course framing
-Statistical thinking for modern AI systems:
-- Data generating process (DGP)
-- Evaluation as estimation
-- Uncertainty for predictions
-- Generalization + shift
-- Benchmarks (and failure modes)
+## What this course is about
 
----
+Modern AI systems often look like black boxes.
 
-## Breiman: Two Cultures
-- **Data modeling**: specify a stochastic model, interpret parameters
-- **Algorithmic modeling**: optimize predictive performance
+Statistical thinking gives us ways to ask:
 
-This course bridges them, emphasizing what statistics adds:
-**bias, uncertainty, evaluation, and generalization.**
+- What population produced these data?
+- What assumptions are hiding in this model or benchmark?
+- How uncertain is the performance estimate?
+- When will the system fail outside the test set?
+- What evidence would convince us that it works?
 
 ---
 
-## Today’s questions
-1. What population produced this dataset?
-2. What are labels *really* measuring?
-3. What are good summaries (EDA) in high dimensions?
-4. What makes a benchmark “good”?
+## The course thesis
+
+Statistics for AI, and AI in service of learning statistics.
+
+By the end of the course, you should be able to evaluate AI outputs with enough statistical fluency to say:
+
+> "I think this system is wrong, and here is the evidence."
+
+---
+
+## The final project starts now
+
+Your final project will be a statistical evaluation study of an AI system.
+
+Every unit gives you one piece of that study:
+
+- Week 1: define the data and build baselines
+- Weeks 4-5: benchmark design and model comparison
+- Weeks 6-7: uncertainty and calibration
+- Weeks 8-9: robustness and distribution shift
+- Weeks 10-13: LLMs, fairness, and interpretability
+
+---
+
+## Breiman's "Two Cultures" as provocation
+
+Leo Breiman argued that statisticians had split into two modeling cultures.
+
+**Data modeling culture**
+
+- Start with a stochastic model for how data were generated
+- Estimate interpretable parameters
+- Ask whether assumptions are reasonable
+
+**Algorithmic modeling culture**
+
+- Treat the data mechanism as unknown
+- Optimize predictive performance
+- Let flexible algorithms find structure
+
+This is a useful opening argument.
+
+It is not the final map of the field.
+
+---
+
+## Kass's correction
+
+Robert Kass argues that the binary can be misleading.
+
+The problem is not simply:
+
+- statistical models versus machine learning algorithms
+- explanation versus prediction
+- interpretable versus black-box
+
+Real scientific and AI work often needs all of these at once:
+
+- domain knowledge
+- careful data collection
+- prediction
+- uncertainty
+- model criticism
+- communication of evidence
+
+---
+
+## A better Week 1 question
+
+Instead of asking "which culture are we in?", ask:
+
+> What kind of evidence does this problem require?
+
+For an AI system, we may need to know:
+
+- how well it predicts
+- where it fails
+- whether probabilities are calibrated
+- whether the benchmark is representative
+- whether the conclusion survives perturbations
+- whether the result supports a scientific or practical claim
+
+---
+
+## Week 1 contrast, dialed back
+
+How might different modeling instincts approach handwritten digit recognition?
+
+**Statistical instincts**
+
+- Ask where the images came from
+- Summarize the data before fitting a model
+- Fit an interpretable baseline
+- Quantify errors and inspect failures
+
+**Predictive modeling instincts**
+
+- Train a strong predictor
+- Compare validation accuracy
+- Improve the architecture or features
+- Ask whether added complexity improves performance
+
+The goal is not to pick a side.
+
+The goal is to learn what each move buys us.
+
+---
+
+## Images are data
+
+An MNIST image is a vector in 784 dimensions:
+
+$$
+x = (x_1, x_2, \ldots, x_{784})
+$$
+
+Each pixel is a feature.
+
+Each label is a measurement:
+
+$$
+y \in \{0,1,\ldots,9\}
+$$
+
+The statistical question is not just "can we predict the label?"
+
+It is also: what does this dataset represent?
+
+---
+
+## EDA in high dimensions
+
+We cannot inspect 784 variables one by one.
+
+Instead we use summaries:
+
+- class balance
+- mean image
+- pixel variance image
+- low-dimensional projections
+- examples near decision boundaries
+- confusion matrix after fitting a baseline
+
+EDA is not decoration. It shapes what conclusions we are allowed to draw.
+
+---
+
+## Mean image
+
+The mean image estimates:
+
+$$
+\hat{\mu}_j = \frac{1}{n}\sum_{i=1}^n x_{ij}
+$$
+
+for each pixel $j$.
+
+Interpretation:
+
+- Where does ink usually appear?
+- How centered and standardized are the digits?
+- What preprocessing has already been done for us?
+
+---
+
+## Variance image
+
+The variance image estimates:
+
+$$
+\hat{\sigma}^2_j = \frac{1}{n-1}\sum_{i=1}^n (x_{ij} - \hat{\mu}_j)^2
+$$
+
+Interpretation:
+
+- Which pixels vary across people and digit classes?
+- Where is the dataset nearly always blank?
+- What structure might a classifier exploit?
+
+---
+
+## PCA as statistical summary
+
+PCA finds directions of maximum variation.
+
+It does not "understand digits."
+
+It helps us ask:
+
+- Do some digits cluster naturally?
+- Which classes overlap?
+- Are there outliers or strange examples?
+- How much information is visible in two dimensions?
+
+---
+
+## Baseline 1: logistic regression
+
+For digit $k$, multinomial logistic regression models:
+
+$$
+P(Y=k \mid X=x) =
+\frac{\exp(\beta_{0k} + x^\top\beta_k)}
+{\sum_{\ell=0}^{9}\exp(\beta_{0\ell} + x^\top\beta_\ell)}
+$$
+
+This is a transparent baseline:
+
+- explicit probability model
+- linear decision boundaries in pixel space
+- coefficients we can inspect
+- assumptions we can question
+
+---
+
+## Baseline 2: random forest
+
+A random forest averages many decision trees.
+
+This is a flexible predictive baseline:
+
+- fewer explicit assumptions about functional form
+- nonlinear interactions between pixels
+- often strong off-the-shelf performance
+- harder to summarize as a single simple model
+
+The point is not that one is "statistical" and the other is "not statistical."
+
+The point is that they answer different questions more naturally.
+
+---
+
+## Accuracy is only the first estimate
+
+Validation accuracy is:
+
+$$
+\hat{p} = \frac{1}{m}\sum_{i=1}^m I(\hat{y}_i = y_i)
+$$
+
+Even in Week 1, treat it as an estimate, not a fact.
+
+Questions to keep alive:
+
+- How large is the validation set?
+- Which examples were easiest or hardest?
+- Are errors concentrated in particular classes?
+- Would the result transfer to another handwriting dataset?
+
+---
+
+## Indicator variables
+
+The expression
+
+$$
+I(\hat{y}_i = y_i)
+$$
+
+is an indicator variable.
+
+It equals:
+
+$$
+I(\hat{y}_i = y_i) =
+\begin{cases}
+1, & \text{if the model is correct on example } i\\
+0, & \text{if the model is wrong on example } i
+\end{cases}
+$$
+
+So validation accuracy is just the average of many 0/1 outcomes.
+
+---
+
+## Why an average estimates a probability
+
+For any event $A$:
+
+$$
+E[I(A)] = P(A)
+$$
+
+Why?
+
+$$
+E[I(A)] = 1\cdot P(A) + 0\cdot P(A^c) = P(A)
+$$
+
+For model accuracy, the event is:
+
+$$
+A = \{\hat{Y} = Y\}
+$$
+
+So averaging correctness indicators estimates the probability that the model is correct.
+
+---
+
+## Accuracy has sampling variability
+
+If the validation examples are treated as independent draws, then the correctness indicators are approximately Bernoulli:
+
+$$
+I(\hat{y}_i = y_i) \sim \text{Bernoulli}(p)
+$$
+
+Then:
+
+$$
+SE(\hat{p}) \approx \sqrt{\frac{\hat{p}(1-\hat{p})}{m}}
+$$
+
+This is the Week 1 version of a recurring course idea:
+
+> A benchmark score is an estimate with uncertainty.
+
+---
+
+## Confusion matrix
+
+A confusion matrix is a map of model failure.
+
+It asks:
+
+- Which true digits are confused with which predictions?
+- Are errors symmetric?
+- Are some classes systematically harder?
+- What examples should we inspect next?
+
+This is the beginning of evaluation as statistical investigation.
+
+---
+
+## MNIST as benchmark
+
+MNIST is useful because it is:
+
+- small
+- labeled
+- familiar
+- fast on CPU
+- simple enough for a first lab
+
+MNIST is limited because it is:
+
+- heavily curated
+- centered and standardized
+- not representative of all handwriting
+- mostly solved by modern methods
+
+---
+
+## Benchmark critique
+
+Before trusting a benchmark, ask:
+
+1. What population is it supposed to represent?
+2. How were examples sampled?
+3. How were labels produced?
+4. What preprocessing has already shaped the task?
+5. What deployment setting, if any, does it approximate?
+6. What kinds of failure are invisible in this benchmark?
+
+---
+
+## What statistical thinking adds
+
+In AI work, statistics is not just one family of models.
+
+It is the discipline of asking:
+
+- What is being estimated?
+- From what sample?
+- Under what assumptions?
+- With what uncertainty?
+- For what target population?
+- What conclusion is justified?
+
+Those questions start today.
+
+---
+
+## Reading for this week
+
+Required:
+
+- Leo Breiman (2001), "Statistical Modeling: The Two Cultures"
+
+Recommended:
+
+- Robert E. Kass (2021), "[The Two Cultures: Statistics and Machine Learning in Science](https://www.stat.cmu.edu/~kass/papers/KassOnBreiman.pdf)"
+
+As you read, do not treat the papers as two teams to choose between.
+
+Treat them as a debate about what statistical reasoning is for.
 
 ---
 
 ## Lab
+
 Open the lab notebook in `weeks/week01/lab.ipynb`.
 
-(When the public repo is live, you can link a Colab URL here.)
+Today you will:
+
+- load MNIST
+- summarize images as data
+- fit logistic regression and random forest baselines
+- compare accuracy and confusion matrices
+- write a short benchmark critique
+
+---
+
+## Exit ticket
+
+Write two sentences:
+
+1. One thing MNIST lets us learn about model evaluation.
+2. One thing MNIST cannot tell us about real-world AI reliability.
+
+---

@@ -35,22 +35,25 @@ All assignments are solvable on CPU.
 
 ## Weekly Materials
 
-### Week 01 — Two Cultures & Images as Data
+### Week 01 — Images as Data
 
 Slides: `weeks/week01/slides.html`
 
 Lab:
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](
-https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main/weeks/week01/lab.ipynb
-)
+[![Open Lab in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main/weeks/week01/lab.ipynb)
+
+Homework:
+
+[![Open HW01 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main/homeworks/hw01.ipynb)
 
 ---
 
 ## Homework Submission
 
-- Submit **PDF** to Gradescope  
-- Optional: submit notebook for reproducibility  
+- Complete homework in the provided Colab notebook.
+- Submit the completed notebook as a **PDF** to Gradescope.
+- Optional: submit the completed `.ipynb` for reproducibility.
 
 ---
 
@@ -58,7 +61,7 @@ https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob
 
 - `weeks/` — weekly materials (slides + labs)
 - `labs/` — lab templates
-- `homeworks/` — homework prompts
+- `homeworks/` — homework notebooks plus lightweight prompt pages
 - `code/` — shared utilities
 - `data/` — small datasets
 
