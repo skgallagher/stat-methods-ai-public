@@ -112,9 +112,52 @@ a:hover {
 .hero-figure img {
   aspect-ratio: 16 / 10;
   display: block;
-  height: 100%;
+  height: auto;
   object-fit: cover;
   width: 100%;
+}
+
+.hero-figure figcaption {
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  padding: 10px 12px 12px;
+}
+
+.hero-steps {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hero-steps li {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.hero-steps span {
+  align-items: center;
+  background: var(--accent);
+  border-radius: 999px;
+  color: white;
+  display: flex;
+  font-size: 0.64rem;
+  height: 1.35rem;
+  justify-content: center;
+  margin-bottom: 5px;
+  width: 1.35rem;
+}
+
+.hero-steps li:nth-child(3n + 2) span {
+  background: var(--accent-2);
+}
+
+.hero-steps li:nth-child(3n) span {
+  background: var(--accent-3);
 }
 
 .eyebrow {
@@ -510,5 +553,11 @@ p {
 
   .week-label {
     text-align: left;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
