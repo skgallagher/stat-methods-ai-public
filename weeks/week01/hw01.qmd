@@ -1,0 +1,124 @@
+---
+title: "Homework 1: From a Familiar Model to an AI Comparison"
+subtitle: "Statistical Thinking for the AI Era · Spring 2027"
+format: pdf
+---
+
+| | |
+|---|---|
+| **Out / due** | Tue Jan 19 / Tue Jan 26, 11:59pm |
+| **Points** | 100: Problem 1 (50), Problem 2 (30), Problem 3 (20) |
+| **Expected time** | About 4.5–5.5 hours after completing Lab 1; contact course staff if setup/debugging alone exceeds 30 minutes |
+| **Reading** | Breiman (2001), pp. 199–208 and one discussant; Bishop & Bishop neural-network sections as reference |
+| **AI policy** | No AI for Problem 1. AI is optional in Problem 2(a–d) and required for the 5-point attempt in Problem 2(e) and for Problem 3. Submit the AI-use record at the end. |
+| **Working file** | Complete all work in `hw01_starter.ipynb`; the PDF is a read-only prompt copy. |
+| **Submit** | Notebook PDF + completed `.ipynb` in one Gradescope submission. |
+
+## Connection to Lab 1
+
+Lab 1 fitted a logistic regression to documented image summaries and compared it with supplied vision-model predictions on the same camera-trap sequences. Reuse the lab code for loading data and fitting the baseline, plus its `paired_correctness_table()` and locked-error helper. Homework uses `homework_holdout` camera locations that were not displayed or analyzed in class.
+
+Use only `analysis` rows to fit. Lab contrasted a protected camera split, with no sequence or camera overlap, against a random-frame split that shared both. Homework asks why they target different claims and what the new-camera result supports.
+
+# Problem 1 - Likelihood, boundaries, and flexibility (50 points)
+
+Complete this problem without AI assistance. Show the mathematical steps that support each conclusion; isolated numerical answers receive little credit.
+
+**Notation.** The sigmoid function is
+
+$$\sigma(z)=\frac{1}{1+e^{-z}}.$$
+
+For $0<q<1$, the logit function is $\operatorname{logit}(q)=\log\{q/(1-q)\}$. The sigmoid and logit functions are inverses: $\operatorname{logit}\{\sigma(z)\}=z$.
+
+Each numbered item is a separate grading checkpoint. Show your setup and intended next step; correct partial work can earn substantial credit.
+
+a. **Bernoulli likelihood and intercept (13 points).** Let $Y_1,\ldots,Y_n$ be independent $\operatorname{Bernoulli}(p)$ observations and let $k=\sum_{i=1}^nY_i$.
+
+   **(i) Likelihood setup (3 points).** For $0<k<n$, write the likelihood $L(p)$ and log-likelihood $\ell(p)$, simplifying both in terms of $k$ and $n$.
+
+   **(ii) Maximize over $p$ (5 points).** Differentiate $\ell(p)$, solve the score equation for $p$, and justify that $\widehat p=k/n$ is a maximum using the second derivative or another clear argument.
+
+   **(iii) Transform to an intercept (3 points).** If $p=\sigma(\beta_0)$, use the inverse relationship above to derive the MLE of $\beta_0$.
+
+   **(iv) Check the endpoints (2 points).** Explain what happens to the finite MLE of $\beta_0$ when $k=0$ and when $k=n$.
+
+b. **No-hidden-layer network and logistic regression (13 points).** Consider a sigmoid network with no hidden layer,
+
+$$\widehat p_i=\sigma(w_0+x_i^Tw).$$
+
+   **(i) Model-class equivalence (4 points).** Apply the logit transformation to show that this model is exactly logistic regression. Identify the corresponding logistic-regression coefficients.
+
+   **(ii) Fitting equivalence (5 points).** Write the Bernoulli log-likelihood in terms of $\widehat p_i$. Then show that minimizing binary cross-entropy,
+
+$$-\sum_{i=1}^n\left\{y_i\log(\widehat p_i)+(1-y_i)\log(1-\widehat p_i)\right\},$$
+
+   is the same optimization problem as maximum likelihood for an unpenalized logistic regression.
+
+   **(iii) Separate architecture from fitting (4 points).** Give one architecture change that breaks equality of the model classes and one fitting change that can make the fitted coefficients differ from the unpenalized MLE. For each change, state which equivalence it breaks.
+
+c. **Perceptron boundary (10 points).** A perceptron uses the score
+
+$$s(x)=-1+2x_1-x_2$$
+
+and predicts $\widehat y=\mathbf 1\{s(x)>0\}$.
+
+   **(i) Boundary equation (2 points).** Set $s(x)=0$ and write the decision boundary as an equation for $x_2$ in terms of $x_1$.
+
+   **(ii) Draw and label (3 points).** Draw the boundary on labeled $x_1$ and $x_2$ axes and clearly label the side classified as 1. You may draw it on the computer or insert a clear photo of a hand-drawn graph in the notebook.
+
+   **(iii) Classify and place three points (3 points).** Compute the score and classification for $(0,0)$, $(1,0)$, and $(1,1)$, and add the three labeled points to your drawing. Note any point on the boundary and apply the strict inequality carefully.
+
+   **(iv) Positive rescaling (2 points).** Explain what happens to the boundary and classifications if every coefficient, including the intercept, is multiplied by a positive constant.
+
+d. **Bias, variance, and flexibility (14 points).** Fix a feature vector $x$. Let $p(x)=\Pr(Y=1\mid X=x)$ and let $\widehat p_D(x)$ be an estimated probability fitted using a random training dataset $D$. Assume the new response $Y$ and $D$ are conditionally independent given $x$.
+
+   In this problem, expected values involving only $\widehat p_D(x)$ average over repeated training datasets. The expected value of prediction error averages over both the repeated training datasets and the new response. We state the source of randomness in words rather than decorating $\mathbb E$ with subscripts.
+
+   **(i) First decomposition step (3 points).** Add and subtract $p(x)$ inside $Y-\widehat p_D(x)$, expand the square, and explain why the expected value of the cross-term is zero.
+
+   **(ii) Bias--variance step (2 points).** Decompose $\mathbb E[(p(x)-\widehat p_D(x))^2\mid x]$ into squared bias and variance. Combine your result with part (i) to show that
+
+$$
+\begin{aligned}
+\mathbb E\left[(Y-\widehat p_D(x))^2\mid x\right]
+&=p(x)(1-p(x)) \\
+&\quad+\left\{\mathbb E[\widehat p_D(x)\mid x]-p(x)\right\}^2 \\
+&\quad+\operatorname{Var}\{\widehat p_D(x)\mid x\}.
+\end{aligned}
+$$
+
+   At a particular $x$, suppose $p(x)=0.70$. Across repeated training datasets, a logistic regression has mean fitted probability $0.60$ and variance $0.006$, while a neural network has mean fitted probability $0.68$ and variance $0.020$.
+
+   **(iii) Compute both errors (3 points).** Compute the irreducible term and the expected squared prediction error for each method. Show the three terms in each calculation.
+
+   **(iv) Compare the methods (2 points).** State which method has lower bias and which has lower expected squared prediction error.
+
+   **(v) Interpret (4 points).** In 2-3 sentences, connect this result to Breiman's two cultures and explain why flexibility alone does not determine the better statistical analysis.
+
+# Problem 2 — Baseline and AI system on new cameras (30 points)
+
+Use the course Camera Traps subset. A frame is the scored observation and accuracy denominator, frames within a trigger sequence are dependent, and camera location defines the protected split and new-location target. Unless otherwise stated, report accuracy pooled over frames from the represented cameras; this weights cameras by their numbers of frames and is not an equally weighted average over cameras.
+
+a. **Prediction and baseline evaluation (6 points).** Before computing accuracies, record whether you expect performance on the homework cameras to be higher or lower than performance on the analysis cameras and give one statistical reason. Fit the lab's logistic baseline using only `analysis` rows. Report its in-sample analysis accuracy as a fit diagnostic and its `homework_holdout` accuracy as the new-camera evaluation, each with its denominator and observed majority-class reference. Compute that descriptive reference within each displayed split; do not describe it as a fitted rule or the in-sample accuracy as held-out performance.
+
+b. **Paired comparison (5 points).** Using supplied vision-model outputs, create one paired table on the held-out cameras: both correct, baseline only correct, AI only correct, both wrong. Do not run a formal comparison test yet.
+
+c. **Reproducible error inspection (8 points).** Select four errors using the lab's reproducible rule: one random error and one highest-confidence error from each system. Display the images with camera, sequence, day/night, label, prediction, and probability. Describe one apparent similarity or contrast among the selected cases and explain why these four deliberately selected errors cannot estimate how common that pattern is.
+
+d. **Five-sentence report (6 points).** Write a five-sentence provisional report: statistical baseline; observed performance; comparison with the AI system; population to which the comparison applies; most important limitation.
+
+e. **Ambitious AI-assisted attempt (5 points).** Attempting this part is required to earn these 5 points; improvement is not required. Before asking AI or running code, choose one substantial departure from the documented baseline: either fit a nonlinear classifier using the same image summaries or construct one additional feature from supplied metadata and refit the logistic model. Use AI to help with the attempt, preserve the relevant prompt or suggestion, keep the official split unchanged, and show enough code and output to reproduce successes or failures. In 2-3 sentences, state what changed, what happened on `homework_holdout`, and why an extension chosen after access to this holdout cannot replace the primary comparison without new untouched evidence.
+
+# Problem 3 — Use AI, then audit the explanation (20 points)
+
+a. **Generate and check an explanation (8 points).** Before using AI, choose one aspect of the explanation to watch closely: the observation unit, source of dependence, split, target population, or expected direction of bias. In one sentence, predict what the assistant might get wrong or leave out. Then ask an AI assistant to explain why a random frame split can exaggerate estimated camera-trap performance for new camera locations. Preserve your initial prompt and the assistant's complete first response.
+
+   Break the response into at least two **checkable claims**. A checkable claim is a short statement about what the data, split, or model does, or why an effect could occur, that course evidence could support, contradict, or qualify. For each claim, use the dataset documentation, lecture, split check, or your analysis to decide whether it is supported, needs revision, or is not established. Record the evidence and your correction or qualification in the notebook table.
+
+b. **Most important weakness or omission (4 points).** Choose the most important problem you found: an unsupported mechanism, language that is too broad, an imprecise target population, or a missing condition. In 1-2 sentences, explain what should change and why it matters for the new-camera claim. If the response is fully supported, identify its most important omitted qualification instead.
+
+c. **Statistical rewrite (6 points).** Rewrite the explanation as a statistician in 2-3 sentences. It must name the observational unit, source of dependence, target population, and expected direction of bias.
+
+## Required AI-use record (2 points)
+
+Complete the provided notebook table for Problems 2(e) and 3. Record the tool, purpose, **initial prompt only** (not later follow-ups or the whole conversation), what you checked, what changed after checking, and one decision you remained responsible for making.

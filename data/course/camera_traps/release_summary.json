@@ -1,0 +1,45 @@
+{
+  "selection_seed": 2027,
+  "n_images": 216,
+  "n_sequences": 72,
+  "n_cameras": 12,
+  "source": "Caltech Camera Traps via LILA BC",
+  "license": "Community Data License Agreement\u2014Permissive",
+  "vision_model": "MegaDetector v5a.0.0 with repeat-detection elimination",
+  "warning": "This fixed teaching subset is not a probability sample of all Caltech Camera Traps images or all wildlife cameras. MegaDetector training used Caltech Camera Traps, so its score is illustrative rather than an unbiased external benchmark.",
+  "splits": {
+    "analysis": {
+      "n_images": 108,
+      "n_sequences": 36,
+      "n_cameras": 6,
+      "animal_fraction": 0.5,
+      "night_fraction": 0.4444444444444444,
+      "baseline_accuracy": 0.5555555555555556,
+      "vision_accuracy": 0.9351851851851852,
+      "baseline_errors": 48,
+      "vision_errors": 7
+    },
+    "holdout_camera": {
+      "n_images": 54,
+      "n_sequences": 18,
+      "n_cameras": 3,
+      "animal_fraction": 0.5,
+      "night_fraction": 0.3888888888888889,
+      "baseline_accuracy": 0.5555555555555556,
+      "vision_accuracy": 0.9259259259259259,
+      "baseline_errors": 24,
+      "vision_errors": 4
+    },
+    "homework_holdout": {
+      "n_images": 54,
+      "n_sequences": 18,
+      "n_cameras": 3,
+      "animal_fraction": 0.5,
+      "night_fraction": 0.3333333333333333,
+      "baseline_accuracy": 0.3888888888888889,
+      "vision_accuracy": 0.7037037037037037,
+      "baseline_errors": 33,
+      "vision_errors": 16
+    }
+  }
+}

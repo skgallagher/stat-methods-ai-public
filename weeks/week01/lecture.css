@@ -1,0 +1,120 @@
+:root {
+  --course-accent: #c41230;
+  --course-accent-dark: #8f1025;
+  --course-accent-soft: #fae9ed;
+  --course-ink: #252525;
+  --course-muted: #667085;
+}
+
+.reveal h2 {
+  border-left: 0.16em solid var(--course-accent);
+  color: var(--course-ink);
+  padding-left: 0.38em;
+}
+
+.reveal strong,
+.reveal .accent {
+  color: var(--course-accent-dark);
+}
+
+.reveal blockquote {
+  background: var(--course-accent-soft);
+  border-left: 0.18em solid var(--course-accent);
+  box-shadow: none;
+  padding: 0.45em 0.7em;
+}
+
+.reveal .slide-number,
+#title-slide .subtitle {
+  color: var(--course-accent-dark);
+}
+
+.reveal .boundary-plot,
+.reveal .nn-diagram {
+  display: block;
+  margin: 0 auto;
+  max-height: 430px;
+  width: 100%;
+}
+
+.reveal .boundary-axis {
+  stroke: var(--course-ink);
+  stroke-width: 2.2;
+}
+
+.reveal .boundary-grid {
+  stroke: #d5d9df;
+  stroke-width: 1;
+}
+
+.reveal .boundary-positive {
+  fill: var(--course-accent-soft);
+}
+
+.reveal .boundary-line {
+  stroke: var(--course-accent);
+  stroke-width: 4.5;
+}
+
+.reveal .boundary-point {
+  fill: var(--course-ink);
+  stroke: white;
+  stroke-width: 2;
+}
+
+.reveal .boundary-point.positive {
+  fill: var(--course-accent);
+}
+
+.reveal .boundary-label,
+.reveal .nn-label {
+  fill: var(--course-ink);
+  font-family: sans-serif;
+  font-size: 19px;
+}
+
+.reveal .boundary-note,
+.reveal .nn-note {
+  fill: var(--course-accent-dark);
+  font-family: sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.reveal .nn-edge {
+  stroke: #98a2b3;
+  stroke-width: 2.5;
+}
+
+.reveal .nn-node {
+  fill: white;
+  stroke: var(--course-accent);
+  stroke-width: 3;
+}
+
+.reveal .nn-node.output {
+  fill: var(--course-accent-soft);
+}
+
+.reveal .compact-note {
+  color: var(--course-muted);
+  font-size: 0.72em;
+  margin-top: 0.25em;
+}
+
+.reveal .sequence-frame {
+  text-align: center;
+}
+
+.reveal .sequence-frame img {
+  border: 3px solid white;
+  box-shadow: 0 5px 15px rgb(37 37 37 / 18%);
+  height: 250px;
+  margin: 0;
+  object-fit: cover;
+  width: 100%;
+}
+
+.reveal .sequence-frame p {
+  margin: 0.15em 0 0;
+}

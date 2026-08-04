@@ -1,0 +1,431 @@
+---
+title: "Week 1A: From Regression to Neural Networks"
+subtitle: "Statistical continuity—and what changes"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+---
+
+## The course in one sentence
+
+We work as **statisticians studying AI systems**—and use AI tools as assistants whose work also requires evaluation.
+
+By the final project, every team must answer:
+
+> What does the evidence support, for which population, under which assumptions, and what should the client do?
+
+## The five-stage workflow
+
+1. Research question, hypotheses, and estimands
+2. EDA and data-quality assessment
+3. Modeling, inference, and evaluation
+4. Sensitivity analysis
+5. Decision, limitations, and future directions
+
+Week 1 begins in Stage 3 because regression is already familiar. The rest of the course builds the study around it.
+
+## Breiman's two cultures
+
+| Data-modeling culture | Algorithmic-modeling culture |
+|---|---|
+| Specify a stochastic model | Optimize predictive performance |
+| Interpret parameters and assumptions | Evaluate on held-out cases |
+| Ask what generated the data | Permit a complicated fitted function |
+
+Our position is not to choose a team. It is to evaluate predictive systems with statistical discipline.
+
+## Start with the model you know {.smaller}
+
+$$Y_i\mid x_i\sim\operatorname{Bernoulli}(p_i),\qquad
+\operatorname{logit}(p_i)=\beta_0+x_i^T\beta.$$
+
+This gives us three distinct pieces:
+
+- a probability model with an explicit feature set;
+- a likelihood and inferential assumptions;
+- a decision rule only after a threshold is chosen.
+
+We use
+
+$$\sigma(z)=\frac{1}{1+e^{-z}},\qquad
+\operatorname{logit}(q)=\log\!\left\{\frac{q}{1-q}\right\}.$$
+
+## The Bernoulli likelihood is still underneath
+
+For independent binary outcomes with a common probability $p$ and $k=\sum_i y_i$,
+
+$$L(p)=p^k(1-p)^{n-k},\qquad
+\ell(p)=k\log p+(n-k)\log(1-p).$$
+
+Differentiate:
+
+$$\ell'(p)=\frac{k}{p}-\frac{n-k}{1-p}
+=\frac{k-np}{p(1-p)}.$$
+
+The stationary point solves $k-np=0$.
+
+## The intercept-only MLE
+
+Therefore $\ell'(p)=0$ implies $\widehat p=k/n$, and
+
+$$\ell''(p)=-\frac{k}{p^2}-\frac{n-k}{(1-p)^2}<0$$
+
+confirms the interior solution is a maximum. If $p=\sigma(\beta_0)$, then $\widehat\beta_0=\operatorname{logit}(k/n)$.
+
+At the endpoints, $k=0$ sends $\widehat\beta_0$ toward $-\infty$ and
+$k=n$ sends it toward $+\infty$; there is no finite intercept MLE.
+
+Neural-network training will reuse this likelihood idea.
+
+## No hidden layer: exactly logistic regression {.smaller}
+
+$$\widehat p_i=\sigma(w_0+x_i^Tw)$$
+
+implies
+
+$$\operatorname{logit}(\widehat p_i)=w_0+x_i^Tw.$$
+
+The logit is one linear function of the original features: the same model class
+as logistic regression. For Bernoulli outcomes,
+
+$$
+-\ell(w_0,w)
+=-\sum_i\left\{y_i\log(\widehat p_i)
++(1-y_i)\log(1-\widehat p_i)\right\}
+=\text{binary cross-entropy}.
+$$
+
+With the same data, no penalty, and full optimization, this sigmoid network and logistic regression fit the same model.
+
+::: notes
+Layer names are inconsistent across books. In this course, always say whether a hidden layer is present. "No hidden layer" is unambiguous; "one hidden layer" means the representation in a later slide.
+:::
+
+## Two equivalences—two ways to break them {.smaller}
+
+1. **Model-class equivalence:** the logit is one linear function of the original
+   features. A nonlinear hidden layer breaks this statement.
+2. **Fitting equivalence:** minimizing binary cross-entropy reaches the same
+   optimizer as maximizing the unpenalized Bernoulli likelihood. A penalty or
+   early stopping can change the fitted coefficients without adding a hidden
+   layer.
+
+When claiming two procedures are “the same,” say whether you mean the functions
+they can represent or the estimate produced by a particular fitting procedure.
+
+## Check: same model class or same fit?
+
+A no-hidden-layer sigmoid model is fitted with an $L_2$ penalty.
+
+1. Is its model class still logistic regression?
+2. Must its coefficients equal the unpenalized logistic-regression MLE?
+3. Which of the two equivalences changed?
+
+Answer all three before discussing with a neighbor.
+
+## Model, estimate, metric, decision
+
+These are different objects:
+
+- **model:** $\widehat p(x)$;
+- **estimand:** population accuracy, sensitivity, or expected loss;
+- **estimate:** the value computed on evaluation data;
+- **decision rule:** classify, send for review, or collect more information.
+
+Changing a threshold changes the decision rule, not the fitted model.
+
+## Derive a logistic-regression boundary {.smaller}
+
+At threshold $c$,
+
+$$\widehat y=\mathbf 1\{\widehat p(x)\ge c\}
+=\mathbf 1\{\beta_0+x^T\beta\ge\operatorname{logit}(c)\},$$
+
+because the sigmoid is increasing. Therefore the boundary satisfies
+
+$$\beta_0+x^T\beta=\operatorname{logit}(c).$$
+
+Changing $c$ changes this decision boundary, not $\widehat p(x)$.
+
+## Worked boundary: draw the line and the side {.smaller}
+
+:::: {.columns}
+::: {.column width="38%"}
+At $c=0.5$, the boundary for
+
+$$\widehat p(x)=\sigma(-0.6+1.5x_1-0.5x_2)$$
+
+is
+
+$$x_2=3x_1-1.2.$$
+
+$(0,0)$ has score $-0.6$; $(1,0)$ has score $0.9$. The region **below** the line is classified as 1.
+
+<p class="compact-note">Parallel example: HW1 uses different coefficients.</p>
+:::
+
+::: {.column width="62%"}
+<svg class="boundary-plot" viewBox="0 0 700 400" role="img" aria-label="Decision boundary x2 equals 3 x1 minus 1.2, with the region below the line classified as one">
+  <polygon class="boundary-positive" points="129,350 650,42 650,350" />
+  <line class="boundary-grid" x1="60" y1="234" x2="650" y2="234" />
+  <line class="boundary-grid" x1="208" y1="30" x2="208" y2="350" />
+  <line class="boundary-axis" x1="60" y1="234" x2="665" y2="234" />
+  <line class="boundary-axis" x1="208" y1="360" x2="208" y2="22" />
+  <line class="boundary-line" x1="129" y1="350" x2="650" y2="42" />
+  <circle class="boundary-point" cx="208" cy="234" r="8" />
+  <circle class="boundary-point positive" cx="503" cy="234" r="8" />
+  <text class="boundary-label" x="219" y="222">(0,0): 0</text>
+  <text class="boundary-label" x="514" y="222">(1,0): 1</text>
+  <text class="boundary-note" x="475" y="310">classified as 1</text>
+  <text class="boundary-label" x="561" y="91">x₂ = 3x₁ − 1.2</text>
+  <text class="boundary-label" x="665" y="256">x₁</text>
+  <text class="boundary-label" x="181" y="25">x₂</text>
+  <text class="boundary-label" x="199" y="258">0</text>
+  <text class="boundary-label" x="494" y="258">1</text>
+  <text class="boundary-label" x="178" y="180">1</text>
+  <text class="boundary-label" x="170" y="122">2</text>
+</svg>
+:::
+::::
+
+## The perceptron: same boundary algebra {.smaller}
+
+$$\widehat y=\mathbf 1\{\beta_0+x^T\beta>0\}.$$
+
+To find its boundary:
+
+1. set the linear score equal to zero;
+2. solve for one coordinate in terms of the other;
+3. substitute a point not on the line to determine the side classified as 1.
+
+Multiplying every coefficient by a positive constant changes the score's scale, but not the boundary or classifications.
+
+Same linear score as logistic regression; fewer probability claims. What
+disappears when we retain only the classification boundary?
+
+::: notes
+In-class transfer: use $s(x)=2-x_1-2x_2$. Students should obtain $x_2=1-x_1/2$, then check $(0,0)$ to determine that the region below the line is classified as 1. Ask what disappears relative to logistic regression: likelihood, calibrated probability interpretation, coefficient uncertainty, and threshold flexibility.
+:::
+
+## Check: draw a different boundary {.smaller}
+
+:::: {.columns}
+::: {.column width="42%"}
+A perceptron predicts 1 when
+
+$$s(x)=2-x_1-2x_2>0.$$
+
+Before revealing the graph:
+
+1. derive the boundary;
+2. label the positive side;
+3. classify $(0,0)$, $(2,0)$, and $(0,2)$;
+4. multiply every coefficient by 5.
+
+<p class="compact-note">This is deliberately different from the HW1 boundary.</p>
+:::
+
+::: {.column width="58%"}
+::: {.fragment}
+<svg class="boundary-plot" viewBox="0 0 700 360" role="img" aria-label="Perceptron boundary x2 equals 1 minus one half x1, with the region below the line classified as one">
+  <polygon class="boundary-positive" points="60,109 650,278 650,320 60,320" />
+  <line class="boundary-grid" x1="60" y1="236" x2="650" y2="236" />
+  <line class="boundary-grid" x1="208" y1="25" x2="208" y2="320" />
+  <line class="boundary-axis" x1="60" y1="236" x2="665" y2="236" />
+  <line class="boundary-axis" x1="208" y1="330" x2="208" y2="18" />
+  <line class="boundary-line" x1="60" y1="109" x2="650" y2="278" />
+  <circle class="boundary-point positive" cx="208" cy="236" r="8" />
+  <circle class="boundary-point" cx="503" cy="236" r="8" />
+  <circle class="boundary-point" cx="208" cy="67" r="8" />
+  <text class="boundary-label" x="220" y="256">(0,0): 1</text>
+  <text class="boundary-label" x="514" y="224">(2,0): boundary → 0</text>
+  <text class="boundary-label" x="220" y="58">(0,2): 0</text>
+  <text class="boundary-note" x="442" y="308">classified as 1</text>
+  <text class="boundary-label" x="442" y="150">x₂ = 1 − x₁/2</text>
+  <text class="boundary-label" x="665" y="257">x₁</text>
+  <text class="boundary-label" x="181" y="23">x₂</text>
+</svg>
+:::
+:::
+::::
+
+## Basis expansion means choosing $f(x)$ {.smaller}
+
+:::: {.columns}
+::: {.column width="52%"}
+Replace $x$ with a specified transformation $f(x)$:
+
+$$
+f(x)=\left(x_1,x_2,x_1^2,x_1x_2,x_2^2\right).
+$$
+
+Then fit ordinary logistic regression on those transformed features:
+
+$$\operatorname{logit}(p_i)=\beta_0+\beta^T f(x_i).$$
+:::
+
+::: {.column width="48%"}
+This is a **quadratic** model, not an arbitrary function.
+
+The analyst chooses the transformation family—polynomials, splines, interactions, or something else. Fitting estimates coefficients *within* that family.
+
+Neural networks retain this architectural choice; they parameterize the transformations differently.
+:::
+::::
+
+## One hidden layer, two hidden units {.smaller}
+
+:::: {.columns}
+::: {.column width="43%"}
+One **layer** may contain several **units**. Here the width is two:
+
+$$
+\begin{aligned}
+h_1(x)&=g(w_{10}+x^Tw_1),\\
+h_2(x)&=g(w_{20}+x^Tw_2),\\
+\widehat p(x)&=\sigma(\alpha_0+\alpha_1h_1+\alpha_2h_2).
+\end{aligned}
+$$
+
+Set $g(z)=z^2$ and simple weights, for example, and the hidden units can be $x_1^2$ and $x_2^2$.
+:::
+
+::: {.column width="57%"}
+<svg class="nn-diagram" viewBox="0 0 720 390" role="img" aria-label="A neural network with two inputs, one hidden layer containing two square-activation units, and one probability output">
+  <line class="nn-edge" x1="105" y1="105" x2="345" y2="115" />
+  <line class="nn-edge" x1="105" y1="105" x2="345" y2="275" />
+  <line class="nn-edge" x1="105" y1="285" x2="345" y2="115" />
+  <line class="nn-edge" x1="105" y1="285" x2="345" y2="275" />
+  <line class="nn-edge" x1="455" y1="115" x2="625" y2="195" />
+  <line class="nn-edge" x1="455" y1="275" x2="625" y2="195" />
+  <circle class="nn-node" cx="85" cy="105" r="48" />
+  <circle class="nn-node" cx="85" cy="285" r="48" />
+  <circle class="nn-node" cx="400" cy="115" r="58" />
+  <circle class="nn-node" cx="400" cy="275" r="58" />
+  <circle class="nn-node output" cx="660" cy="195" r="48" />
+  <text class="nn-label" x="68" y="112">x₁</text>
+  <text class="nn-label" x="68" y="292">x₂</text>
+  <text class="nn-label" x="362" y="108">h₁</text>
+  <text class="nn-note" x="367" y="137">x₁²</text>
+  <text class="nn-label" x="362" y="268">h₂</text>
+  <text class="nn-note" x="367" y="297">x₂²</text>
+  <text class="nn-label" x="644" y="202">p̂</text>
+  <text class="nn-note" x="315" y="30">one hidden layer</text>
+  <text class="nn-label" x="35" y="370">inputs</text>
+  <text class="nn-label" x="337" y="370">two units</text>
+  <text class="nn-label" x="616" y="370">output</text>
+</svg>
+
+<p class="compact-note">You set the activation, width, and connectivity. Training learns weights within that specified family; the network is not free to represent “anything.”</p>
+:::
+::::
+
+## What stays—and what changes {.smaller}
+
+| Continuity | Change |
+|---|---|
+| fitted conditional function | learned representation |
+| regularization and validation | much greater flexibility |
+| prediction on new observations | weaker direct parameter interpretation |
+| probability and decision layers | classical standard errors do not arrive automatically |
+
+## Flexibility through bias and variance {.smaller}
+
+At fixed $x$, $D$ is random training data and $Y$ is an independent new response. The expected value averages over repeated $D$ and the new $Y$:
+
+$$
+\begin{aligned}
+\mathbb E[(Y-\widehat p_D(x))^2\mid x]
+&=\underbrace{p(x)(1-p(x))}_{\text{irreducible}}\\[0.25em]
+&\quad+\underbrace{\{\mathbb E[\widehat p_D(x)\mid x]-p(x)\}^2}_{\text{squared bias}}\\[0.25em]
+&\quad+\underbrace{\operatorname{Var}\{\widehat p_D(x)\mid x\}}_{\text{variance}}.
+\end{aligned}
+$$
+
+**HW1 derives this identity step by step.** For today, read it as a warning: a richer specified family may reduce bias while the fitting procedure increases variance.
+
+::: notes
+Notation note for class: subscripts on $\mathbb E$ are common in machine-learning
+writing. We will state the source of randomness in words and use ordinary
+$\mathbb E[\cdot]$. Bill Eddy's terminology reminder was to say **expected
+value**, not **expectation**.
+:::
+
+## Worked comparison: lower bias can still lose {.smaller}
+
+At one $x$, suppose $p(x)=0.40$. The irreducible term is $0.40(0.60)=0.24$.
+
+| Procedure | Mean fitted probability | Variance | Expected squared error |
+|---|---:|---:|---:|
+| Logistic | 0.35 | 0.010 | $0.24+0.05^2+0.010=0.2525$ |
+| Flexible net | 0.39 | 0.018 | $0.24+0.01^2+0.018=0.2581$ |
+
+The net has lower bias; logistic has lower expected squared error here. The
+comparison is about the entire fitting procedure under repeated training data,
+not flexibility in isolation.
+
+## Check: lower bias can still lose
+
+At one $x$, $p(x)=0.50$. Procedure A has mean fitted probability $0.45$ and
+variance $0.010$; Procedure B has mean $0.49$ and variance $0.016$.
+
+Compute the expected squared prediction error for each procedure. Which has
+lower bias? Which has lower expected error?
+
+## Flexibility creates an evaluation burden
+
+A flexible system can find signal that a linear model misses. It can also exploit:
+
+- camera backgrounds;
+- duplicated sequences;
+- preprocessing artifacts;
+- label conventions;
+- an unrepresentative benchmark.
+
+The more flexible the fitted function, the more consequential the study design.
+
+## Our image setting: Camera Traps {.smaller}
+
+Client decision: can an AI system reduce expert sorting work without silently discarding animal images?
+
+- scored observation and accuracy denominator: image frame;
+- dependence: trigger sequence;
+- protected split and new-location target: camera location;
+- statistical baseline: logistic regression on documented image summaries;
+- AI system: supplied vision-model probabilities.
+
+Our reported accuracy is pooled over frames, so represented cameras are weighted
+by their numbers of frames; it is not an equally weighted camera average.
+
+## Why keep the simple baseline?
+
+The baseline tells us:
+
+- what brightness, color, edges, and night conditions already explain;
+- whether the AI adds meaningful predictive information;
+- whether both systems exploit the same shortcut;
+- how expensive flexibility is to justify.
+
+It need not win to be useful.
+
+## Reading Breiman as a statistician in 2027
+
+For discussion:
+
+1. What did prediction culture correctly demand of statistics?
+2. Which statistical responsibilities remain after prediction becomes the goal?
+3. Where would each culture locate the Camera Traps failure caused by a random frame split?
+
+## Thursday
+
+We will:
+
+1. inspect frames and trigger sequences;
+2. fit the logistic baseline;
+3. compare it descriptively with supplied AI predictions;
+4. save the paired table that starts HW1.
+
+The lab result is a rehearsal, not the homework answer.

@@ -1,0 +1,393 @@
+---
+title: "Lab 1: A Statistical Baseline for Image Data"
+subtitle: "Week 1 · Guided in class · Camera Traps"
+format: html
+---
+
+**Lab role:** In the final ~55 minutes of class, we run the full statistical move together once. HW1 repeats it on held-out camera locations and asks for the independent interpretation.
+
+**Save before leaving:** `lab1_handoff.csv`, the error gallery, the completed claim-audit table, and the four-sentence handoff at the bottom.
+
+**Student working file:** `lab_starter.ipynb`. Use one shared pair copy and switch driver/navigator roles after the instructor run.
+
+## Course systems rehearsal — before lab or first 15 minutes
+
+Open `weeks/week00/hw00_colab_gradescope_check.ipynb`. Practice making a Drive copy, running code, writing one LaTeX response, inserting a handwritten image, and exporting the notebook. Submit the rehearsal PDF and `.ipynb` to the HW0 practice assignment before beginning HW1. This is a zero-point completion check, not an eighth homework.
+
+## Lecture bridge — 3 minutes
+
+Lecture separated four objects:
+
+1. fitted probability model;
+2. estimated performance on a population;
+3. decision threshold;
+4. action taken from the prediction.
+
+Write the four objects for the animal-present task before running code. A frame is the scored observation and the denominator of the pooled accuracy below. Trigger sequences induce dependence, while camera locations define the protected split and the new-location target. Thus the pooled accuracy weights represented cameras by their numbers of frames; it is not an equally weighted average over cameras.
+
+## Mathematical rehearsal — 5 minutes
+
+At a fixed $x$, let $m(x)=\mathbb E[Y\mid X=x]$ and let $\widehat f_D(x)$ be fitted using a random training dataset $D$. Let $Y$ be a new response conditionally independent of $D$. Expected values involving $\widehat f_D$ average over repeated training datasets; the full expected value also averages over the new $Y$. Work through the decomposition before opening the reveal.
+
+1. Add and subtract $m(x)$ inside $Y-\widehat f_D(x)$.
+2. Expand the square. Explain why the expected value of the cross-product is zero when the new $Y$ and training data $D$ are conditionally independent given $x$.
+3. Add and subtract $\mathbb E[\widehat f_D(x)\mid x]$ in the remaining model-error term.
+4. For a Bernoulli response, identify $\operatorname{Var}(Y\mid x)$.
+
+<details>
+<summary>Reveal after attempting the derivation</summary>
+
+$$\mathbb E[(Y-\widehat f_D)^2\mid x]
+=\operatorname{Var}(Y\mid x)
++\{\mathbb E(\widehat f_D\mid x)-m(x)\}^2
++\operatorname{Var}(\widehat f_D\mid x).$$
+
+The first cross-product vanishes because $\mathbb E[Y-m(x)\mid x]=0$ and the new response is conditionally independent of $D$. The usual identity $\mathbb E[(Z-a)^2]=\operatorname{Var}(Z)+\{\mathbb E(Z)-a\}^2$ gives the second step. For Bernoulli $Y$, $m(x)=p(x)$ and $\operatorname{Var}(Y\mid x)=p(x)\{1-p(x)\}$.
+
+</details>
+
+## Setup
+
+```{python}
+#| eval: false
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.model_selection import train_test_split
+
+meta = pd.read_csv("../../data/camera_traps/metadata.csv")
+features = pd.read_csv("../../data/camera_traps/image_features.csv")
+outputs = pd.read_csv("../../data/camera_traps/model_outputs.csv")
+splits = pd.read_csv("../../data/camera_traps/splits.csv")
+
+dat = meta.merge(features, on="image_id").merge(outputs, on="image_id").merge(splits, on="image_id")
+FEATURES = ["brightness", "edge_density", "green_fraction", "night_indicator"]
+```
+
+## Instructor run — 5 minutes
+
+The instructor displays six random frames, then all available adjacent frames (up to six) from one trigger sequence. As a class:
+
+- identify the outcome and ambiguous cases;
+- explain why adjacent frames should not cross a train/test boundary;
+- compute the observed majority-class reference on the analysis split.
+
+```{python}
+#| eval: false
+analysis = dat.query("split == 'analysis'").copy()
+holdout = dat.query("split == 'holdout_camera'").copy()
+analysis_majority_reference = analysis["animal_present"].value_counts(normalize=True).max()
+print("analysis observed majority-class reference:", analysis_majority_reference)
+
+def display_frames(rows, title):
+    ncols = 3
+    nrows = int(np.ceil(len(rows) / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(11, 3.4 * nrows))
+    axes = np.atleast_1d(axes).ravel()
+    for ax, (_, row) in zip(axes, rows.iterrows()):
+        ax.imshow(plt.imread(DATA_ROOT / row["image_path"]))
+        ax.set_title(
+            f"{row['image_id']} | truth={row['animal_present']}\n"
+            f"camera={row['camera_id']} | sequence={row['sequence_id']}"
+        )
+        ax.axis("off")
+    for ax in axes[len(rows):]:
+        ax.axis("off")
+    fig.suptitle(title)
+    plt.tight_layout()
+    plt.show()
+
+random_frames = analysis.sample(n=min(6, len(analysis)), random_state=SEED)
+sequence_sizes = analysis.groupby("sequence_id").size()
+largest_sequences = sequence_sizes[sequence_sizes.eq(sequence_sizes.max())].index
+example_sequence_id = sorted(largest_sequences)[0]
+sequence_frames = (
+    analysis.query("sequence_id == @example_sequence_id")
+            .sort_values("frame_index")
+            .head(6)
+)
+
+display_frames(random_frames, "Six random analysis frames")
+display_frames(sequence_frames, f"Adjacent frames: {example_sequence_id}")
+```
+
+## Baseline fit — 4 minutes
+
+Fit logistic regression to the documented summaries. One partner drives; the other checks that only analysis rows enter the fit. The coefficient signs describe changes in the fitted log-odds holding the other listed summaries fixed; they are not causal effects.
+
+```{python}
+#| eval: false
+baseline = LogisticRegression(max_iter=2000)
+baseline.fit(analysis[FEATURES], analysis["animal_present"])
+
+for d in [analysis, holdout]:
+    d["baseline_prob"] = baseline.predict_proba(d[FEATURES])[:, 1]
+    d["baseline_pred"] = (d["baseline_prob"] >= 0.5).astype(int)
+```
+
+## Pairs analyze results — 6 minutes
+
+Complete the supplied table with analysis and held-out-camera accuracy for the baseline and supplied vision model. The denominator is the number of frames. Include the denominator and the observed majority-class reference computed separately within each displayed split. This reference describes class balance after seeing the split's labels; it is not a fitted, deployable rule.
+
+Interpret two coefficient signs as features of the fitted prediction surface, holding the other listed summaries fixed. Then explain which performance number is merely an in-sample fit diagnostic and which describes frames from the represented held-out camera locations.
+
+```{python}
+#| eval: false
+def performance_rows(data, split_name):
+    majority_reference = data["animal_present"].value_counts(normalize=True).max()
+    rows = []
+    for system, prediction_col in {
+        "logistic baseline": "baseline_pred",
+        "vision model": "vision_pred",
+    }.items():
+        rows.append(
+            {
+                "split": split_name,
+                "system": system,
+                "n_frames": len(data),
+                "observed_majority_reference": majority_reference,
+                "frame_accuracy": accuracy_score(
+                    data["animal_present"], data[prediction_col]
+                ),
+            }
+        )
+    return pd.DataFrame(rows)
+
+performance_table = pd.concat(
+    [
+        performance_rows(analysis, "analysis (in-sample diagnostic)"),
+        performance_rows(holdout, "held-out cameras"),
+    ],
+    ignore_index=True,
+)
+
+coefficient_table = pd.DataFrame(
+    {
+        "feature": FEATURES,
+        "fitted_log_odds_coefficient": baseline.coef_[0],
+    }
+)
+
+def paired_correctness_table(data):
+    paired = data.assign(
+        baseline_correct=data["baseline_pred"].eq(data["animal_present"]),
+        ai_correct=data["vision_pred"].eq(data["animal_present"]),
+    )
+    return (
+        paired.groupby(["baseline_correct", "ai_correct"])
+              .size()
+              .reindex(
+                  pd.MultiIndex.from_product(
+                      [[True, False], [True, False]],
+                      names=["baseline_correct", "ai_correct"],
+                  ),
+                  fill_value=0,
+              )
+              .rename("n")
+              .reset_index()
+    )
+
+paired_table = paired_correctness_table(holdout)
+
+display(performance_table)
+display(coefficient_table)
+display(paired_table)
+
+assert set(analysis["camera_id"]).isdisjoint(set(holdout["camera_id"]))
+assert dat.groupby("sequence_id")["split"].nunique().max() == 1
+assert paired_table["n"].sum() == len(holdout)
+assert len(paired_table) == 4
+print("split checks passed")
+```
+
+## Instructor run: random-frame contrast — 2 minutes
+
+The instructor runs the contrast below. It deliberately allows cameras and trigger sequences to cross the random train/test boundary. Before running it, predict how its accuracy might compare with the camera-held-out accuracy and name one reason; the direction is not guaranteed in every finite dataset.
+
+```{python}
+#| eval: false
+comparison_pool = dat.query("split in ['analysis', 'holdout_camera']").copy()
+random_train, random_test = train_test_split(
+    comparison_pool,
+    test_size=0.20,
+    random_state=SEED,
+    stratify=comparison_pool["animal_present"],
+)
+random_model = LogisticRegression(max_iter=2000).fit(
+    random_train[FEATURES], random_train["animal_present"]
+)
+random_test_prediction = random_model.predict(random_test[FEATURES])
+
+random_frame_contrast = pd.DataFrame(
+    {
+        "design": ["random frame test", "held-out cameras"],
+        "n_test_frames": [len(random_test), len(holdout)],
+        "baseline_accuracy": [
+            accuracy_score(random_test["animal_present"], random_test_prediction),
+            accuracy_score(holdout["animal_present"], holdout["baseline_pred"]),
+        ],
+        "train_test_cameras_shared": [
+            len(set(random_train["camera_id"]) & set(random_test["camera_id"])),
+            0,
+        ],
+        "train_test_sequences_shared": [
+            len(set(random_train["sequence_id"]) & set(random_test["sequence_id"])),
+            0,
+        ],
+    }
+)
+random_frame_contrast
+```
+
+## Stop and discuss — 2 minutes
+
+Whole-class questions:
+
+- How does performance change from the analysis rows to the held-out cameras for each system?
+- Which explanations involve estimation variability and which involve a population difference? What can one split not distinguish?
+- Why does a more accurate AI system not make the baseline dispensable?
+
+Explain why the random-frame test accuracy and camera-held-out accuracy target different populations, using the observed camera and sequence overlap in the table.
+
+## Select errors — 3 minutes
+
+Switch driver and navigator. The code below chooses errors **before** displaying them: one reproducibly random error and one highest-confidence error from each system. Read the function together and identify where the rule is locked.
+
+```{python}
+#| eval: false
+def select_system_errors(data, system, seed=SEED):
+    columns = {
+        "baseline": ("baseline_prob", "baseline_pred"),
+        "vision": ("vision_prob", "vision_pred"),
+    }
+    prob_col, pred_col = columns[system]
+    errors = data.loc[data[pred_col].ne(data["animal_present"])].copy()
+    if len(errors) < 2:
+        raise ValueError(f"{system} needs at least two errors for the locked gallery")
+    errors["predicted_confidence"] = np.where(
+        errors[pred_col].eq(1), errors[prob_col], 1 - errors[prob_col]
+    )
+    errors = errors.sort_values(
+        ["predicted_confidence", "image_id"], ascending=[False, True]
+    )
+    highest = errors.head(1).assign(selection_rule="highest confidence")
+    random_case = errors.iloc[1:].sample(n=1, random_state=seed).assign(
+        selection_rule="reproducibly random"
+    )
+    selected = pd.concat([random_case, highest], ignore_index=True)
+    selected["system"] = system
+    selected["model_probability"] = selected[prob_col]
+    selected["model_prediction"] = selected[pred_col]
+    return selected
+
+selected_errors = pd.concat(
+    [
+        select_system_errors(holdout, "baseline"),
+        select_system_errors(holdout, "vision"),
+    ],
+    ignore_index=True,
+)
+
+gallery_fields = [
+    "selection_rule", "system", "image_id", "camera_id", "sequence_id",
+    "day_night", "animal_present", "model_prediction", "model_probability",
+]
+selected_errors[gallery_fields]
+```
+
+## Pairs inspect errors — 5 minutes
+
+Display exactly the cases selected above. Do not browse first and then invent a selection rule. Then change `seed` once and explain which selections can change and which cannot.
+
+Write one visible similarity or contrast and one fact these four purposively selected cases cannot establish about the target population.
+
+```{python}
+#| eval: false
+fig, axes = plt.subplots(2, 2, figsize=(11, 8))
+for ax, (_, row) in zip(axes.flat, selected_errors.iterrows()):
+    image_path = DATA_ROOT / row["image_path"]
+    ax.imshow(plt.imread(image_path))
+    ax.set_title(
+        f"{row['system']} | {row['selection_rule']}\n"
+        f"truth={row['animal_present']}, pred={row['model_prediction']}, "
+        f"p={row['model_probability']:.2f}"
+    )
+    ax.set_xlabel(
+        f"camera={row['camera_id']} | sequence={row['sequence_id']} | "
+        f"{row['day_night']}"
+    )
+    ax.set_xticks([])
+    ax.set_yticks([])
+plt.tight_layout()
+plt.show()
+```
+
+## Pairs audit an AI claim — 6 minutes
+
+An AI assistant gives this explanation:
+
+> “Random frame splits always cause leakage because the model memorizes each animal. Therefore, held-out-camera accuracy is unbiased for all wildlife cameras.”
+
+Do not rate the paragraph as a whole. Break it into checkable claims and complete the audit table. A checkable claim is a short statement that the displayed sequence, split check, documentation, or analysis could support, contradict, or qualify. Then rewrite the explanation in 2-3 sentences using **frame**, **sequence**, **camera**, and the expected direction of bias.
+
+Preserve the original paragraph, completed table, and rewrite. Verification means checking course evidence—not asking a second AI assistant.
+
+```{python}
+#| eval: false
+claim_audit = pd.DataFrame(
+    {
+        "claim": [
+            "Random frame splits always cause leakage.",
+            "The model memorizes each animal.",
+            "Held-out-camera accuracy is unbiased for all wildlife cameras.",
+        ],
+        "course_evidence": ["TODO", "TODO", "TODO"],
+        "verdict_supported_revise_or_not_established": ["TODO", "TODO", "TODO"],
+        "correction_or_qualification": ["TODO", "TODO", "TODO"],
+    }
+)
+claim_audit
+```
+
+## Ambitious-attempt rehearsal — 3 minutes
+
+In a different classification study, the locked logistic baseline has held-out
+accuracy $0.76$. After seeing that result, an AI assistant proposes a decision
+tree, which scores $0.81$ on the same holdout.
+
+Write two sentences:
+
+1. What can the analyst report honestly about the decision-tree attempt?
+2. Why should it not replace the primary baseline result without new held-out
+   evidence?
+
+Then list the four artifacts another analyst would need to reproduce the
+attempt. A lower decision-tree score would not make this exercise a failure.
+
+## Independent handoff — 6 minutes
+
+Reuse the exhaustive four-cell paired table from “Pairs analyze results,” save it, and interpret it independently. This is the same helper and table structure supplied in HW1.
+
+Write four sentences after the table:
+
+1. what the logistic regression models;
+2. what population the pooled frame accuracy describes;
+3. how the AI system compares descriptively;
+4. the largest remaining limitation.
+
+```{python}
+#| eval: false
+handoff = paired_table.copy()
+assert handoff["n"].sum() == len(holdout)
+assert len(handoff) == 4
+handoff.to_csv("lab1_handoff.csv", index=False)
+handoff
+```
+
+## Exit ticket — 2 minutes
+
+Complete: “The AI system's held-out-camera accuracy is an estimate of ______ for ______; it does not establish ______.”
+
+**HW1 begins here:** reuse the loader, baseline fit, and paired table on the homework camera locations. You must independently select and interpret errors. The required five-point ambitious attempt uses AI for a substantial baseline departure, but it remains exploratory and cannot replace the primary comparison. Today's result does not justify a claim about all wildlife cameras.
