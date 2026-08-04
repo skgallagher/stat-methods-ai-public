@@ -231,6 +231,10 @@ h3 {
   background: var(--lavender);
 }
 
+.ochre-intro {
+  background: var(--peach);
+}
+
 .intro-grid {
   align-items: center;
   display: grid;
@@ -245,7 +249,8 @@ h3 {
 }
 
 .release-note,
-.project-question {
+.project-question,
+.syllabus-status {
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(32, 37, 40, 0.13);
   border-radius: 12px;
@@ -253,7 +258,8 @@ h3 {
 }
 
 .release-note strong,
-.project-question strong {
+.project-question strong,
+.syllabus-status strong {
   color: var(--teal-dark);
   display: block;
   font-size: 0.78rem;
@@ -262,7 +268,8 @@ h3 {
 }
 
 .release-note p,
-.project-question p {
+.project-question p,
+.syllabus-status p {
   color: var(--muted);
   margin: 8px 0 0;
 }
@@ -600,6 +607,240 @@ h3 {
   text-decoration: none;
 }
 
+.syllabus-facts {
+  align-items: start;
+  display: grid;
+  gap: 38px;
+  grid-template-columns: minmax(300px, 0.72fr) minmax(0, 1.28fr);
+}
+
+.syllabus-facts dl {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin: 0;
+  overflow: hidden;
+}
+
+.syllabus-facts dl div {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 120px 1fr;
+  padding: 11px 14px;
+}
+
+.syllabus-facts dl div:first-child {
+  border-top: 0;
+}
+
+.syllabus-facts dt {
+  color: var(--teal);
+  font-size: 0.78rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.syllabus-facts dd {
+  color: var(--muted);
+  margin: 0;
+}
+
+.syllabus-copy {
+  display: grid;
+  gap: 15px;
+}
+
+.syllabus-copy p {
+  color: #3f474c;
+  font-size: 1.03rem;
+}
+
+.tinted-section {
+  background: #f0f1ed;
+  max-width: none;
+  padding-inline: max(24px, calc((100% - 1072px) / 2));
+}
+
+.objective-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.objective-grid article {
+  align-items: start;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 30px 1fr;
+  padding: 14px;
+}
+
+.objective-grid span {
+  align-items: center;
+  background: var(--lavender);
+  border-radius: 999px;
+  color: #55338e;
+  display: flex;
+  font-size: 0.76rem;
+  font-weight: 900;
+  height: 30px;
+  justify-content: center;
+}
+
+.objective-grid p {
+  color: var(--muted);
+}
+
+.info-grid article p {
+  color: var(--muted);
+  margin-top: 9px;
+}
+
+.syllabus-note {
+  background: var(--peach);
+  border-left: 5px solid var(--ochre);
+  border-radius: 9px;
+  margin-top: 24px;
+  padding: 15px 17px;
+}
+
+.syllabus-note p {
+  color: #66431e;
+  margin-top: 4px;
+}
+
+.table-wrap {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+table {
+  border-collapse: collapse;
+  min-width: 700px;
+  width: 100%;
+}
+
+th,
+td {
+  border-top: 1px solid var(--line);
+  padding: 11px 14px;
+  text-align: left;
+  vertical-align: top;
+}
+
+thead th {
+  background: var(--mint);
+  border-top: 0;
+  color: var(--teal-dark);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+tbody td {
+  background: var(--paper);
+  color: var(--muted);
+}
+
+tbody td:nth-child(2) {
+  color: var(--purple);
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.grade-notes {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 22px;
+}
+
+.grade-notes article {
+  border-top: 4px solid var(--teal);
+  padding-top: 12px;
+}
+
+.grade-notes article:nth-child(2),
+.grade-notes article:nth-child(4) {
+  border-color: var(--purple);
+}
+
+.grade-notes p {
+  color: var(--muted);
+  margin-top: 7px;
+}
+
+.policy-list {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.policy-list details {
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  padding: 0 16px;
+}
+
+.policy-list details:first-child {
+  border-top: 0;
+}
+
+.policy-list summary {
+  cursor: pointer;
+  font-weight: 820;
+  padding: 14px 0;
+}
+
+.policy-list details[open] summary {
+  color: var(--teal);
+}
+
+.policy-list details p {
+  color: var(--muted);
+  max-width: 900px;
+  padding: 0 0 16px;
+}
+
+.support-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.support-grid a {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  display: grid;
+  padding: 15px;
+}
+
+.support-grid a:hover {
+  background: var(--mint);
+  text-decoration: none;
+}
+
+.support-grid span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.emergency-note {
+  background: var(--peach);
+  border-radius: 8px;
+  color: #694315;
+  margin-top: 18px;
+  padding: 12px 14px;
+}
+
 .stat-grid {
   display: grid;
   gap: 10px;
@@ -845,7 +1086,10 @@ h3 {
   .phase-grid,
   .stat-grid,
   .weight-row,
-  .document-grid {
+  .document-grid,
+  .objective-grid,
+  .grade-notes,
+  .support-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -900,7 +1144,15 @@ h3 {
   .checklist-grid,
   .weight-row,
   .document-grid,
-  .requirement-strip {
+  .requirement-strip,
+  .objective-grid,
+  .grade-notes,
+  .support-grid,
+  .syllabus-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .syllabus-facts dl div {
     grid-template-columns: 1fr;
   }
 
