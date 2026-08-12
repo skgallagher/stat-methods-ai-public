@@ -1,0 +1,59 @@
+:root {
+  --course-accent: #c41230;
+  --course-accent-dark: #8f1025;
+  --course-accent-soft: #fae9ed;
+  --course-blue: #155a8a;
+  --course-blue-soft: #e8f4ff;
+  --course-ink: #252525;
+  --course-muted: #667085;
+}
+
+.reveal h2 {
+  border-left: 0.16em solid var(--course-accent);
+  color: var(--course-ink);
+  padding-left: 0.38em;
+}
+
+.reveal strong,
+.reveal .accent {
+  color: var(--course-accent-dark);
+}
+
+.reveal blockquote {
+  background: var(--course-accent-soft);
+  border-left: 0.18em solid var(--course-accent);
+  box-shadow: none;
+  padding: 0.45em 0.7em;
+}
+
+.reveal .slide-number,
+#title-slide .subtitle {
+  color: var(--course-accent-dark);
+}
+
+.reveal table {
+  font-size: 0.86em;
+}
+
+.reveal .compact-table table {
+  font-size: 0.73em;
+}
+
+.reveal .compact-table table td,
+.reveal .compact-table table th {
+  padding: 0.22em 0.35em;
+}
+
+.reveal th {
+  color: var(--course-accent-dark);
+}
+
+.reveal .math.display {
+  margin: 0.65em 0;
+}
+
+.reveal .compact-note {
+  color: var(--course-muted);
+  font-size: 0.72em;
+  margin-top: 0.25em;
+}

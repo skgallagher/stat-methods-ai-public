@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "release_status": "student_release",
-  "release_id": "spring27-week01-v1",
+  "release_id": "spring27-week02-v1",
   "delivery": "individual files from the public GitHub repository; no ZIP archive",
   "files": [
     {
@@ -1108,6 +1108,21 @@
       "path": "camera_traps/splits.csv",
       "bytes": 4443,
       "sha256": "174c0c7a45b09bdd49d775afd394bae2f1c25b99180fc74b2d20bb33dc42aede"
+    },
+    {
+      "path": "dynasent/forecaster_items.csv",
+      "bytes": 982,
+      "sha256": "c2d0b13a7089e666016a305329fcbe884b9cfbcc3cfed71a60db40899693bb54"
+    },
+    {
+      "path": "dynasent/homework_items.csv",
+      "bytes": 11056,
+      "sha256": "dc4db8e4124dbbf4caa85a169420812ec8a50ba36a111af3e0867a75f4b3bbf6"
+    },
+    {
+      "path": "dynasent/items.csv",
+      "bytes": 11020,
+      "sha256": "e1737554c3ab6d1b2e25ede2efc3b19a158ae366bda00fc202bd46a0db2b0a9b"
     }
   ]
 }

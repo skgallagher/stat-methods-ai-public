@@ -85,7 +85,7 @@ STARTER_LINES = {
         "# and locked-error helpers. Keep all requested output visible.",
     ],
     "hw02": [
-        "# HW2: rater summaries, Brier targets, and prompt comparison",
+        "# HW2: rater summaries, Brier targets, and aligned forecasters",
         "from course_helpers import expand_dynasent_raters, summarize_votes",
         "LABELS = ['negative', 'neutral', 'positive']",
         "def multiclass_brier(prob, outcome):",
@@ -93,17 +93,17 @@ STARTER_LINES = {
         "    return np.sum((prob - outcome) ** 2)",
         "dynasent_root = DATA_ROOT / 'dynasent'",
         "homework_items = pd.read_csv(dynasent_root / 'homework_items.csv')",
-        "prompt_items = pd.read_csv(dynasent_root / 'prompt_items.csv')",
+        "forecaster_items = pd.read_csv(dynasent_root / 'forecaster_items.csv')",
         "ratings = expand_dynasent_raters(homework_items)",
         "rater_summary = summarize_votes(ratings, homework_items)",
         "assert ratings.groupby('item_id').size().eq(5).all()",
         "assert np.allclose(rater_summary[[f'p_{label}' for label in LABELS]].sum(axis=1), 1)",
-        "# TODO Problem 1: construct one-hot majority targets and compare Brier scores.",
-        "# TODO Problem 2: make denominator-first vote-pattern and round tables.",
-        "prompt_comparison = pd.DataFrame(columns=[",
-        "    'item_id', 'sentence', 'p_negative', 'p_neutral', 'p_positive',",
-        "    'majority_label', 'prompt_a_label', 'prompt_b_label', 'changed'])",
-        "prompt_comparison",
+        "# Problem 1 is mathematical work; complete it in the response cells without AI.",
+        "# Problem 2 begins with rater_summary. Make denominator-first vote-pattern",
+        "# and round tables using the lab workflow, then add the requested figure.",
+        "# Problem 3 initially reveals only the IDs and sentences.",
+        "# Do not inspect the vote columns until the reveal cell in part (c).",
+        "forecaster_items[['item_id', 'sentence']]",
     ],
     "hw03": [
         "# HW3: design brief and workflow audit structures",
@@ -266,6 +266,21 @@ HW1_P3C_RESPONSE = "\n".join([
     "TODO — name the frame, dependence, target population, and expected direction of bias",
 ])
 
+HW2_P2D_RESPONSE = "\n".join([
+    "### Your response — Problem 2(d)",
+    "",
+    "**Chosen alternative before computing:**  ",
+    "TODO — choose exactly one of the two listed changes",
+    "",
+    "| Analysis | Outcome | Retained population | Round 1 estimate | Round 2 estimate | Round 2 minus Round 1 |",
+    "|---|---|---|---:|---:|---:|",
+    "| Primary | Majority-label accuracy | All 72 assigned items | TODO | TODO | TODO |",
+    "| Planned alternative | TODO | TODO | TODO | TODO | TODO |",
+    "",
+    "**Interpretation (2-3 sentences):**  ",
+    "TODO — state what changed and whether the substantive comparison survived",
+])
+
 HW1_AI_RECORD = "\n".join([
     "## Required AI-use record (2 points)",
     "",
@@ -277,10 +292,120 @@ HW1_AI_RECORD = "\n".join([
     "| Problem 3 | TODO | TODO | TODO | TODO | TODO | TODO |",
 ])
 
+HW2_AI_TABLE = "\n".join([
+    "",
+    "",
+    "| Assignment part | Tool or checkpoint | Purpose | Initial prompt only | What I checked | What changed after checking | Decision I remained responsible for |",
+    "|---|---|---|---|---|---|---|",
+    "| Problem 2(e) | TODO | TODO | TODO | TODO | TODO | TODO |",
+    "| Problem 3 | Cardiff revision `3216a57f`; DistilBERT revision `cf991100` | Generate two frozen probability forecasts | no natural-language prompt | TODO | TODO | TODO |",
+])
+
+HW2_P3A_CODE = "\n".join([
+    "# Fill one probability per sentence in the displayed row order before running either model.",
+    "student_forecasts = forecaster_items[['item_id', 'sentence']].copy()",
+    "student_forecasts['student_p_negative'] = [np.nan] * len(student_forecasts)",
+    "student_forecasts['student_p_neutral'] = [np.nan] * len(student_forecasts)",
+    "student_forecasts['student_p_positive'] = [np.nan] * len(student_forecasts)",
+    "# Replace all 30 np.nan entries with your own probabilities, then run this cell.",
+    "# Each row must contain three nonnegative numbers that sum to one.",
+    "student_forecasts",
+])
+
+HW2_P3B_CODE = "\n".join([
+    "%pip -q install 'transformers==5.13.0'",
+    "from transformers import pipeline",
+    "STUDENT_PROB_COLS = [f'student_p_{label}' for label in LABELS]",
+    "assert student_forecasts[STUDENT_PROB_COLS].notna().all().all(), (",
+    "    'Complete your own forecasts before running the models.'",
+    ")",
+    "assert np.allclose(student_forecasts[STUDENT_PROB_COLS].sum(axis=1), 1)",
+    "student_forecasts['student_label'] = (",
+    "    student_forecasts[STUDENT_PROB_COLS].idxmax(axis=1).str.removeprefix('student_p_')",
+    ")",
+    "MODEL_SPECS = {",
+    "    'cardiff': (",
+    "        'cardiffnlp/twitter-roberta-base-sentiment-latest',",
+    "        '3216a57f2a0d9c45a2e6c20157c20c49fb4bf9c7'),",
+    "    'distilbert': (",
+    "        'lxyuan/distilbert-base-multilingual-cased-sentiments-student',",
+    "        'cf991100d706c13c0a080c097134c05b7f436c45'),",
+    "}",
+    "def run_frozen_forecaster(short_name, sentences):",
+    "    model_id, revision = MODEL_SPECS[short_name]",
+    "    classifier = pipeline(",
+    "        'text-classification', model=model_id, revision=revision,",
+    "        top_k=None, device=-1)",
+    "    raw = classifier(sentences, truncation=True, batch_size=10)",
+    "    rows = []",
+    "    for result in raw:",
+    "        scores = {entry['label'].lower(): entry['score'] for entry in result}",
+    "        rows.append({",
+    "            **{f'{short_name}_p_{label}': scores[label] for label in LABELS},",
+    "            f'{short_name}_label': max(LABELS, key=scores.get),",
+    "        })",
+    "    return pd.DataFrame(rows)",
+    "model_outputs = forecaster_items[['item_id', 'sentence']].copy()",
+    "for short_name in MODEL_SPECS:",
+    "    model_outputs = pd.concat([",
+    "        model_outputs,",
+    "        run_frozen_forecaster(short_name, model_outputs['sentence'].tolist()),",
+    "    ], axis=1)",
+    "for short_name in MODEL_SPECS:",
+    "    cols = [f'{short_name}_p_{label}' for label in LABELS]",
+    "    assert np.allclose(model_outputs[cols].sum(axis=1), 1)",
+    "model_outputs['models_disagree'] = (",
+    "    model_outputs['cardiff_label'] != model_outputs['distilbert_label']",
+    ")",
+    "model_outputs",
+])
+
+HW2_P3C_CODE = "\n".join([
+    "# Reveal the five measurements only after locking all three forecasts.",
+    "target = forecaster_items.copy()",
+    "for label in LABELS:",
+    "    target[f'q_{label}'] = target[f'{label}_votes'] / 5",
+    "TARGET_COLS = [f'q_{label}' for label in LABELS]",
+    "assert target[[f'{label}_votes' for label in LABELS]].sum(axis=1).eq(5).all()",
+    "assert np.allclose(target[TARGET_COLS].sum(axis=1), 1)",
+    "target['majority_label'] = target[TARGET_COLS].idxmax(axis=1).str.removeprefix('q_')",
+    "comparison = (",
+    "    student_forecasts.merge(model_outputs, on=['item_id', 'sentence'], validate='one_to_one')",
+    "    .merge(target, on=['item_id', 'sentence'], validate='one_to_one')",
+    ")",
+    "soft_target = comparison[TARGET_COLS].to_numpy()",
+    "majority_target = np.column_stack([",
+    "    comparison['majority_label'].eq(label).astype(float) for label in LABELS",
+    "])",
+    "summary_rows = []",
+    "for forecaster in ['student', 'cardiff', 'distilbert']:",
+    "    prob_cols = [f'{forecaster}_p_{label}' for label in LABELS]",
+    "    probabilities = comparison[prob_cols].to_numpy()",
+    "    comparison[f'{forecaster}_brier_soft'] = ((probabilities - soft_target) ** 2).sum(axis=1)",
+    "    comparison[f'{forecaster}_brier_majority'] = ((probabilities - majority_target) ** 2).sum(axis=1)",
+    "    summary_rows.append({",
+    "        'forecaster': forecaster,",
+    "        'items': len(comparison),",
+    "        'mean_brier_vs_rater_proportions': comparison[f'{forecaster}_brier_soft'].mean(),",
+    "        'mean_brier_vs_majority_one_hot': comparison[f'{forecaster}_brier_majority'].mean(),",
+    "        'majority_matches': (comparison[f'{forecaster}_label'] == comparison['majority_label']).sum(),",
+    "    })",
+    "forecaster_summary = pd.DataFrame(summary_rows)",
+    "display(comparison)",
+    "forecaster_summary",
+])
+
 SPECIAL_RESPONSES = {
     ("hw01", "3", "a"): HW1_P3A_RESPONSE,
     ("hw01", "3", "b"): HW1_P3B_RESPONSE,
     ("hw01", "3", "c"): HW1_P3C_RESPONSE,
+    ("hw02", "2", "d"): HW2_P2D_RESPONSE,
+}
+
+SPECIAL_CODE_BEFORE_RESPONSE = {
+    ("hw02", "3", "a"): HW2_P3A_CODE,
+    ("hw02", "3", "b"): HW2_P3B_CODE,
+    ("hw02", "3", "c"): HW2_P3C_CODE,
 }
 
 FINAL = "\n".join([
@@ -339,6 +464,11 @@ def problem_cells(problem: str, hw_id: str) -> list[dict]:
         piece = piece.strip()
         letter = re.match(r"([a-e])\.", piece).group(1)
         cells.append(markdown_cell(piece))
+        special_code = SPECIAL_CODE_BEFORE_RESPONSE.get(
+            (hw_id, problem_number, letter)
+        )
+        if special_code:
+            cells.append(code_cell(special_code))
         response = SPECIAL_RESPONSES.get(
             (hw_id, problem_number, letter),
             RESPONSE.format(label=f"Problem {problem_number}({letter})"),
@@ -350,7 +480,7 @@ def problem_cells(problem: str, hw_id: str) -> list[dict]:
 def build_notebook(qmd_path: Path, hw_id: str, label: str) -> dict:
     preamble, problems = split_prompt(qmd_path.read_text())
     cells = [
-        markdown_cell(f"# {label} — Colab starter\n\nComplete HW0 before beginning HW1."),
+        markdown_cell(f"# {label} — Colab starter\n\nComplete the assigned preparation before beginning."),
         markdown_cell(WORKFLOW),
         code_cell(build_setup(DATA_GROUPS[hw_id])),
         markdown_cell(preamble),
@@ -360,6 +490,11 @@ def build_notebook(qmd_path: Path, hw_id: str, label: str) -> dict:
         cells.extend(problem_cells(problem, hw_id))
     if hw_id == "hw01":
         cells.append(markdown_cell(HW1_AI_RECORD))
+    if hw_id == "hw02":
+        for cell in cells:
+            if cell["cell_type"] == "markdown" and "## Required AI-use record" in "".join(cell["source"]):
+                cell["source"] = ("".join(cell["source"]) + HW2_AI_TABLE).splitlines(True)
+                break
     cells.append(markdown_cell(FINAL))
     for index, cell in enumerate(cells):
         cell["id"] = f"{hw_id}-{index:03d}"

@@ -1,0 +1,11 @@
+item_id,sentence,collection_round,negative_votes,neutral_votes,positive_votes
+r1-0101399,Took my parents for dinner this week and couldn't have been less impressed.,1,4,0,1
+r2-0019264,"I was so glad that this food tasted reheated and boiled days before, just what one pays premium for.",2,4,1,0
+r2-0019273,"Still, unfortunately, we can't tolerate such a long meal.",2,4,1,0
+r1-0100076,I had our ford fusion get a recall taken care here.,1,1,4,0
+r2-0019953,"How on earth does a Mexican restaurant cook rice and beans this way, I find it unusual.",2,1,4,0
+r1-0099714,"I think he was dancing with somebody, but I didn't care.",1,0,4,1
+r1-0099211,I literally have never waited more than 10 minutes in the waiting room.,1,0,1,4
+r2-0019787,There is nothing that can be done to make this place better.,2,1,0,4
+r2-0019433,"I got the bang bang burger and the sauces were both sweet, including the yogurt-based one, alas I have a sweet tooth.",2,0,1,4
+r1-0099908,This place kills it.,1,1,0,4

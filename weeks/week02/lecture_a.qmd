@@ -1,0 +1,603 @@
+---
+title: "Week 2A: Labels, Dependence, and Brier Score"
+subtitle: "What varies—and over which repetitions?"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+---
+
+## Recap: models, metrics, and units from Week 1 {.smaller}
+
+- A probability forecast is **not yet a decision**; a threshold or loss rule
+  turns probabilities into actions.
+- A baseline is part of the scientific comparison, not a ceremonial model to
+  discard.
+- The unit of analysis matters: repeated views or labels of one case do not
+  automatically create new independent cases.
+- A metric summarizes performance only relative to a target and an evaluation
+  population.
+
+**Today:** what changes when the target itself is produced by repeated human
+measurements?
+
+## Vote first—no discussion yet {.smaller}
+
+**1. Sentiment**
+
+> “I waited only twenty minutes this time.”
+
+Vote: **negative · neutral · positive**
+
+**2. Factual truth**
+
+> “The meeting is tomorrow.”
+
+Vote: **true · false · cannot tell**
+
+**3. Logical validity**
+
+> All poets are writers. Some writers teach. Therefore, some poets teach.
+
+Vote: **valid · invalid**
+
+What, exactly, did our show of hands measure?
+
+## A fixed category can hide variable judgments {.smaller}
+
+A dataset may record one category $Y$. But if we repeat the measurement on the
+same item $X=x$, the response can follow a distribution:
+
+$$Y\mid X=x\sim\operatorname{Categorical}\{q_1(x),\ldots,q_K(x)\}.$$
+
+The response probabilities depend on:
+
+- the item and its context;
+- the construct, question, and instructions;
+- the rater population or model.
+
+An aggregation rule then turns a sample of responses into one reported category.
+
+**Important:** this distribution describes judgments. A vote does not redefine
+factual truth or logical validity—but it does reveal a measurement problem.
+
+## DynaSent: five judgments per sentence {.smaller}
+
+DynaSent is a benchmark for classifying English sentences as **negative,
+neutral, or positive**. For every sentence $X=x$, it records
+
+$$L_1,\ldots,L_n,\qquad n=5.$$
+
+For a new judgment produced under the specified protocol, define the underlying
+response probabilities
+
+$$q_k(x)=P(L^\star=k\mid X=x),\qquad k\in\{-,0,+\}.$$
+
+This $q(x)$ is the population quantity sometimes called the “true” proportion:
+it is true **relative to the rater population and measurement protocol**.
+
+We do not observe $q(x)$ directly.
+
+::: notes
+[Sources]
+- Potts et al. (2021), DynaSent: https://aclanthology.org/2021.acl-long.186/
+:::
+
+## Five observed labels estimate the response distribution {.smaller}
+
+For class $k$, turn judgment $i$ into a zero-one indicator and average:
+
+$$T_{ik}=\mathbf 1\{L_i=k\},\qquad
+\widehat q_k(x)=\frac{1}{n}\sum_{i=1}^{n}T_{ik},\quad n=5.$$
+
+For example, five labels
+
+$$(-,-,-,0,+)$$
+
+give the empirical response proportions
+
+$$\widehat q(x)=\left(\frac35,\frac15,\frac15\right).$$
+
+Here $q(x)$ is the **underlying response distribution** and $\widehat q(x)$ is
+the **observed five-rater distribution**—an estimate, not the same quantity.
+
+::: notes
+[Sources]
+- Potts et al. (2021), DynaSent: https://aclanthology.org/2021.acl-long.186/
+:::
+
+## First, hold the sentence fixed {.smaller}
+
+Write response $i$ as
+
+$$Y_i=f_i(X,U_i),\qquad i=1,\ldots,n,$$
+
+Here $X$ is the sentence; $U_i$ is everything else that can vary for response
+$i$—rater, interpretation, attention, or model randomness.
+
+$$X=x,\qquad Y_i=f_i(x,U_i).$$
+
+Only the $U_i$'s vary. For two responses, the independence question is
+
+$$Y_1\perp\!\!\!\perp Y_2\mid X=x\;?$$
+
+> **Takeaway: Yes, under the stated model.** If $U_1\perp\!\!\!\perp U_2$ and
+> no other shared input remains, then $Y_1\perp\!\!\!\perp Y_2\mid X=x$.
+> Fixing $X$ removes only sentence-driven dependence.
+
+## Now let the sentence vary {.smaller}
+
+Draw one sentence, then collect every response:
+
+$$X\sim P_X,\qquad Y_i=f_i(X,U_i).$$
+
+Now $X$ varies too—and the same random $X$ enters every response:
+
+$$
+Y_1=f_1(X,U_1),\qquad Y_2=f_2(X,U_2).
+$$
+
+The marginal independence question is
+
+$$Y_1\perp\!\!\!\perp Y_2\;?$$
+
+> **Takeaway: Not necessarily.** Conditional independence can become marginal
+> dependence because both responses vary with the same $X$. An ambiguous item,
+> for example, can shift both response probabilities. Shared $X$ permits—but
+> does not guarantee—dependence.
+
+## Independence means factorization {.smaller}
+
+**Within a fixed sentence**
+
+$$
+Y_1\perp\!\!\!\perp Y_2\mid X=x
+\quad\Longleftrightarrow\quad
+\begin{aligned}
+&P(Y_1=y_1,Y_2=y_2\mid X=x)\\
+&=P(Y_1=y_1\mid X=x)P(Y_2=y_2\mid X=x)
+\end{aligned}
+$$
+
+**Across randomly drawn sentences**
+
+$$
+Y_1\perp\!\!\!\perp Y_2
+\quad\Longleftrightarrow\quad
+P(Y_1=y_1,Y_2=y_2)=P(Y_1=y_1)P(Y_2=y_2).
+$$
+
+These are two definitions for two different probability models. One
+factorization does not imply the other.
+
+## Covariance measures association {.smaller}
+
+For a chosen class $k$, use numeric indicators
+
+$$Y_i=\mathbf 1\{L_i=k\},\qquad i=1,2.$$
+
+Covariance measures whether two centered numeric responses tend to have the same
+sign:
+
+$$
+\operatorname{Cov}(Y_1,Y_2)
+=E\!\left[(Y_1-E[Y_1])(Y_2-E[Y_2])\right].
+$$
+
+- **positive:** the responses tend to be above or below their means together;
+- **zero:** the centered product has expected value zero;
+- **negative:** one tends to be above its mean when the other is below.
+
+Independence implies zero covariance, but zero covariance is weaker than
+independence in general.
+
+## Center each response within and between sentences {.smaller}
+
+To identify two sources of covariance, add and subtract the conditional mean:
+
+$$
+\begin{aligned}
+Y_1-E[Y_1]
+&=\underbrace{Y_1-E[Y_1\mid X]}_{\text{within-sentence residual}}\\
+&\quad+\underbrace{E[Y_1\mid X]-E[Y_1]}_{\text{between-sentence shift}}.
+\end{aligned}
+$$
+
+Likewise,
+
+$$
+\begin{aligned}
+Y_2-E[Y_2]
+&=\underbrace{Y_2-E[Y_2\mid X]}_{\text{within-sentence residual}}\\
+&\quad+\underbrace{E[Y_2\mid X]-E[Y_2]}_{\text{between-sentence shift}}.
+\end{aligned}
+$$
+
+## Why the covariance decomposition works {.smaller}
+
+Multiply the two centered-response decompositions and take expected values. The
+two cross-products disappear because conditional residuals have conditional
+expected value zero:
+
+$$E[Y_i-E[Y_i\mid X]\mid X]=0,\qquad i=1,2.$$
+
+What remains is **within-sentence covariance + between-sentence covariance**.
+
+## The law of total covariance keeps the questions straight {.smaller}
+
+For two measurements $Y_1$ and $Y_2$ made on a shared random sentence $X$,
+
+$$
+\operatorname{Cov}(Y_1,Y_2)
+=\underbrace{E\!\left[\operatorname{Cov}(Y_1,Y_2\mid X)\right]}_{\text{average within-sentence covariance}}
++\underbrace{\operatorname{Cov}\!\left(E[Y_1\mid X],E[Y_2\mid X]\right)}_{\text{association across sentences}}.
+$$
+
+The left side is marginal covariance over randomly drawn sentences. The two
+terms on the right describe two distinct sources of association.
+
+::: notes
+[Sources]
+- Law of total covariance: https://statproofbook.github.io/P/cov-tot
+:::
+
+## Within-sentence covariance is zero under conditional independence {.smaller}
+
+$$E[\operatorname{Cov}(Y_1,Y_2\mid X)]$$
+
+The term is exactly zero when the **average conditional covariance** is zero:
+
+$$E[\operatorname{Cov}(Y_1,Y_2\mid X)]=0.$$
+
+A stronger, easier-to-interpret condition is
+
+$$\operatorname{Cov}(Y_1,Y_2\mid X=x)=0\quad\text{for every }x.$$
+
+Conditional independence is sufficient for this:
+
+$$Y_1\perp\!\!\!\perp Y_2\mid X,$$
+
+but the reverse is not generally true: zero covariance is weaker than
+independence.
+
+## Within-sentence covariance can remain after fixing the sentence {.smaller}
+
+$$E[\operatorname{Cov}(Y_1,Y_2\mid X)]\ne0$$
+
+requires systematic positive or negative covariance **within fixed sentences**.
+
+For example:
+
+- one rater sees or discusses the other's answer;
+- both raters receive the same extra hint for that item;
+- one reported response is constructed using the other response.
+
+> **Takeaway:** sentence difficulty cannot explain this within-sentence
+> covariance because the sentence has already been held fixed. Look for another
+> shared part of the measurement process.
+
+## Across-sentence covariance is zero when probabilities are unassociated {.smaller}
+
+Because $Y_i=\mathbf1\{L_i=k\}$, define
+
+$$m_i(x)=E[Y_i\mid X=x]=P(L_i=k\mid X=x).$$
+
+The across-sentence part is
+
+$$\operatorname{Cov}(m_1(X),m_2(X)).$$
+
+**Concrete zero case:** draw either sentence type with equal probability.
+
+| Sentence type $X$ | $m_1(X)$ | $m_2(X)$ |
+|---|---:|---:|
+| clearly positive | 0.9 | 0.5 |
+| clearly negative | 0.1 | 0.5 |
+
+Rater 1's probability changes, but rater 2's does not:
+
+$$\operatorname{Cov}(m_1(X),m_2(X))=0.$$
+
+More generally, this covariance is zero whenever the centered product averages
+to zero. Either $m_i(x)$ being constant is an easy sufficient condition.
+
+## Across-sentence covariance is nonzero when probabilities change together {.smaller}
+
+Draw one of two sentence types with equal probability. Two raters work
+independently conditional on the type.
+
+| Sentence type $X$ | $m_1(X)$ | $m_2(X)$ |
+|---|---:|---:|
+| clearly positive | 0.9 | 0.9 |
+| clearly negative | 0.1 | 0.1 |
+
+The total-covariance identity gives
+
+$$
+\begin{aligned}
+\text{Within sentences:}\quad
+E[\operatorname{Cov}(Y_1,Y_2\mid X)]
+&=0,\\
+\text{Across sentences:}\quad
+\operatorname{Cov}(m_1(X),m_2(X))
+&=0.16,\\[2mm]
+\text{Total:}\quad \operatorname{Cov}(Y_1,Y_2)&=0+0.16=0.16.
+\end{aligned}
+$$
+
+Within sentences, independence makes the first piece zero. Across sentences,
+the probabilities change together. Thus the responses are marginally dependent
+entirely because the sentence varies.
+
+## Two covariance questions give four cases {.smaller}
+
+::: {.fragment}
+- **Within a fixed sentence:** are the two responses still associated?
+- **Across sentences:** do both raters tend to call the same sentences positive?
+:::
+
+::: {.fragment}
+| | **Across sentences: $0$** | **Across sentences: $\ne0$** |
+|:---:|:---:|:---:|
+| **Within sentences: $0$** | Independent raters;<br>no sentence pattern | Independent raters;<br>shared sentence pattern |
+| **Within sentences: $\ne0$** | Shared cue;<br>no sentence pattern | Shared cue;<br>shared sentence pattern |
+:::
+
+::: {.fragment}
+**Shared sentence pattern:** both raters are more likely to say positive for the
+same kinds of sentences.
+:::
+
+## Independent raters can show either pattern {.smaller .compact-table}
+
+Let $Y_i=1$ when rater $i$ says **positive**. Draw A or B with equal probability:
+
+> **A:** “The staff were kind and solved my problem.”  
+> **B:** “The staff were rude and ignored me.”
+
+| Rater behavior | A: $(m_1,m_2)$ | B: $(m_1,m_2)$ | Within | Across |
+|---|:---:|:---:|:---:|:---:|
+| Use sentence sentiment independently | $(.9,.9)$ | $(.1,.1)$ | $0$ | $>0$ |
+| Flip fair coins independently | $(.5,.5)$ | $(.5,.5)$ | $0$ | $0$ |
+
+**First row:** both probabilities are high for A and low for B.  
+**Second row:** neither probability changes with the sentence.
+
+## A shared cue gives the two bottom-row patterns {.smaller .compact-table}
+
+Now both raters receive the same randomly assigned cue—**“lean positive”** or
+**“lean negative”**—before answering. The cue links their responses even after
+we fix the sentence, so the within-sentence covariance is nonzero.
+
+| How the cue is used | $m_1(A),m_2(A)$ | $m_1(B),m_2(B)$ | Within | Across |
+|---|:---:|:---:|:---:|:---:|
+| Cue overrides the sentence | $(.5,.5)$ | $(.5,.5)$ | $\ne0$ | $0$ |
+| Cue nudges, but sentiment still matters | $(.8,.8)$ | $(.2,.2)$ | $\ne0$ | $>0$ |
+
+The shared cue explains the **within-sentence** association. Sentence A versus
+B explains the additional **across-sentence** association in the second row.
+
+## Frozen-model covariance comes from changing sentences {.smaller}
+
+For a fixed sentence $X=x$, the outputs $f_1(x)$ and $f_2(x)$ are constants:
+
+$$\operatorname{Cov}(f_1(X),f_2(X)\mid X=x)=0.$$
+
+::: {.fragment}
+For a random sentence $X$, both outputs change with the sentence, so
+$\operatorname{Cov}(f_1(X),f_2(X))$ can be nonzero.
+
+**Point:** frozen models have no repeated-response randomness after $X$ is
+fixed. Any covariance is **across sentences**.
+:::
+
+## Independent does not mean interchangeable {.smaller .compact-table}
+
+**Independent:** knowing rater 1's answer does not change the distribution of
+rater 2's answer.
+
+**Exchangeable:** swapping the rater names does not change the joint
+distribution.
+
+| Fixed-sentence example | Independent? | Exchangeable? |
+|---|:---:|:---:|
+| Expert and novice work separately but have different response probabilities | Yes | No |
+| Identical raters receive the same random cue | No | Yes |
+
+These are different modeling claims; neither implies the other.
+
+## Averaging labels does not erase dependence {.smaller}
+
+The observed class-$k$ proportion is
+
+$$\widehat q_k=\frac{1}{m}\sum_{i=1}^mT_{ik}.$$
+
+Its conditional variance is
+
+$$
+\begin{aligned}
+\operatorname{Var}(\widehat q_k\mid X=x)
+=\frac{1}{m^2}\Bigg[&\sum_i\operatorname{Var}(T_{ik}\mid x)\\
+&+2\sum_{i<j}\operatorname{Cov}(T_{ik},T_{jk}\mid x)\Bigg].
+\end{aligned}
+$$
+
+**Takeaway:** positive covariance limits how much averaging reduces variance.
+
+## Conditional iid is what gives the $1/m$ variance {.smaller}
+
+For one class $k$, let
+$T_{ik}=\mathbf 1\{\text{rater }i\text{ chooses }k\}$.
+
+The conditional iid model is
+
+$$
+T_{1k},\ldots,T_{mk}\mid X=x
+\ \overset{\text{iid}}{\sim}\
+\operatorname{Bernoulli}\!\left(q_k(x)\right).
+$$
+
+It gives
+
+$$
+E[\widehat q_k\mid x]=q_k(x),\qquad
+\operatorname{Var}(\widehat q_k\mid x)
+=\frac{q_k(x)(1-q_k(x))}{m}.
+$$
+
+> **Point:** the familiar $1/m$ reduction is a consequence of the conditional
+> iid model—not a consequence of averaging alone.
+
+## Break
+
+### Stretch. Breathe. Argue about whether “fine” is positive or neutral.
+
+When we return: **How should we score a probability forecast when labels can
+vary?**
+
+## Why score the full probability forecast? {.smaller}
+
+A model reports a distribution, not just a winning class:
+
+$$p=(0.60,\ 0.30,\ 0.10),$$
+
+- Accuracy treats $0.51$ and $0.99$ alike when they predict the same class.
+- Confident mistakes should cost more than cautious mistakes.
+- We may compare the forecast with a hard label or observed rater proportions.
+
+**Brier score compares the full forecast with a chosen target.**
+
+## Brier score is squared distance from the chosen target {.smaller}
+
+**Homework 2, Problem 1:** you will derive the expected value of this score.
+
+For DynaSent's three classes, let $p=(p_1,p_2,p_3)$ be the forecast and
+$t=(t_1,t_2,t_3)$ the chosen target. Then
+
+$$B(p,t)=\sum_{k=1}^3(p_k-t_k)^2.$$
+
+::: {.fragment}
+$$B(p,t)=0\quad\Longleftrightarrow\quad p=t.$$
+Larger values mean the forecast is farther from the target.
+:::
+
+::: {.fragment}
+One realized score measures the **total discrepancy**. It cannot tell whether
+that discrepancy came from forecast mismatch, label variability, or how the
+target was constructed.
+:::
+
+Expected Brier score separates the first two.
+
+## Expected Brier score exposes label variability {.smaller}
+
+Fix a sentence $X=x$. Let $T$ be one random one-hot label and define
+
+$$q_k(x)=P(T_k=1\mid X=x)=E[T_k\mid X=x].$$
+
+For a fixed forecast $p$,
+
+$$
+\begin{aligned}
+E[B(p,T)\mid x]
+&=\sum_k E[(p_k-T_k)^2\mid x]\\
+&=\underbrace{\sum_k(p_k-q_k)^2}_{\text{forecast mismatch}}
++\underbrace{\sum_k q_k(1-q_k)}_{\text{label variability}}.
+\end{aligned}
+$$
+
+The cross term vanishes because $E[T_k-q_k\mid x]=0$.
+
+::: notes
+[Sources]
+- Bishop & Bishop, *Deep Learning: Foundations and Concepts*, Chapter 5 and Exercise 5.1.
+:::
+
+## Label variability is largest when responses are evenly split {.smaller .compact-table}
+
+$$\sum_k q_k(1-q_k)=1-\sum_k q_k^2.$$
+
+| Response distribution $q$ | Variability | Meaning |
+|:---:|:---:|---|
+| $(1,0,0)$ | $0$ | Every repeated label is the same. |
+| $(0.8,0.2,0)$ | $0.32$ | Labels sometimes disagree. |
+| $(1/3,1/3,1/3)$ | $2/3$ | Responses are evenly split. |
+
+Even when $p=q$, the expected score is not generally zero: a newly generated
+label can still differ from the response distribution.
+
+## Averaging shrinks label variability by $1/m$ {.smaller}
+
+For $\widehat q=m^{-1}\sum_{i=1}^mT_i$, the conditional iid model gives
+
+$$
+\begin{aligned}
+E[B(p,\widehat q)\mid x]
+&=\sum_k(p_k-q_k)^2
+&&\text{forecast mismatch}\\[2mm]
+&\quad+\frac{1}{m}\sum_kq_k(1-q_k)
+&&\text{label variability}.
+\end{aligned}
+$$
+
+**Only the label-variability term shrinks; forecast mismatch is unchanged.**
+
+## Dependence changes how much averaging buys us {.smaller}
+
+Without conditional independence,
+
+$$
+\begin{aligned}
+\operatorname{Var}(\widehat q_k\mid x)
+&=\frac{1}{m^2}\sum_i\operatorname{Var}(T_{ik}\mid x)\\
+&\quad+\frac{2}{m^2}\sum_{i<j}\operatorname{Cov}(T_{ik},T_{jk}\mid x).
+\end{aligned}
+$$
+
+Positive covariance leaves more variability in the average than the iid formula
+predicts. Negative covariance leaves less.
+
+Therefore a soft-target Brier score is not “variability free.” Its expected
+variability depends on the rater design.
+
+## Hard and soft targets preserve different information {.smaller}
+
+Five votes $(4,1,0)$ in negative, neutral, positive order give
+
+$$t_{\text{hard}}=(1,0,0),\qquad
+t_{\text{soft}}=(0.8,0.2,0).$$
+
+**Hard target:** keeps only the majority class; the neutral vote disappears.
+
+**Soft target:** keeps all five vote fractions; it still reflects only five
+measurements.
+
+Neither is literal ground truth. Comparing both scores shows how much the
+evaluation depends on the target choice.
+
+## What we did today {.smaller}
+
+1. **Independence needs a repeated experiment:** say what is held fixed and
+   what is redrawn.
+2. **Dependence has two sources:** association within a sentence and across
+   changing sentences.
+3. **A shared sentence permits marginal dependence; it does not guarantee it.**
+4. **Expected Brier score separates** forecast mismatch from label variability.
+5. **The $1/m$ reduction requires conditional iid raters.** Dependence changes
+   how much averaging helps.
+
+## Reading map
+
+- **DynaSent:** Figure 1 and Sections 3.3–3.4 and 4.2–4.5.
+- **Shalizi:** “Some basic math about averaging” and “Exchangeable variables
+  and random limits for averages.”
+- **Technical bridge:** the short proof of the law of total covariance.
+- **Bishop & Bishop:** Chapter 5 and Exercise 5.1 for scoring-rule context.
+
+::: notes
+[Sources]
+- DynaSent: https://aclanthology.org/2021.acl-long.186/
+- Shalizi: https://www.stat.cmu.edu/~cshalizi/dm/20/lectures/06/lecture-06.html
+- Law of total covariance: https://statproofbook.github.io/P/cov-tot
+:::

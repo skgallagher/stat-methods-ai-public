@@ -1,0 +1,302 @@
+---
+title: "Homework 2: What Is the Target?"
+subtitle: "Statistical Thinking for the AI Era · Spring 2027"
+format: pdf
+---
+
+| | |
+|---|---|
+| **Out / due** | Tue Jan 26 / Tue Feb 2, 11:59pm |
+| **Points** | 100: Problem 1 (50), Problem 2 (30), Problem 3 (20) |
+| **Expected time** | About 5 hours after completing Lab 2; contact course staff if setup/debugging alone exceeds 30 minutes |
+| **Reading** | Plank, paper pp. 1–5; DynaSent Figure 1 and §§3.3–3.4, 4.2–4.5; Shalizi, “Some basic math about averaging” and “Exchangeable variables and random limits for averages”; the short Statistical Proof Book proof of the law of total covariance; Bishop & Bishop Chapter 5 and Exercise 5.1 as technical support |
+| **AI policy** | No AI for Problem 1. AI is optional in Problem 2(a–d) and required for the 5-point attempt in Problem 2(e) and for Problem 3. Submit the AI-use record at the end. |
+| **Working file** | Complete all work in `hw02_starter.ipynb`; the PDF is a read-only prompt copy. |
+| **Submit** | Notebook PDF + completed `.ipynb` in one Gradescope submission. |
+
+## Connection to Lab 2
+
+Lecture introduced labels as measurements produced by a protocol. Lab 2 used a
+DynaSent teaching subset to inspect disagreement, compare construction rounds,
+and construct hard and soft outcomes from five rater labels. This homework asks
+you to explain the theory behind that construction, examine what aggregation and
+item selection hide, and evaluate forecasts against targets made from new,
+disjoint DynaSent measurements.
+
+## The throughline: one sentence, five different objects
+
+The central question is **what, exactly, is the target?** Keep these objects
+separate throughout the homework:
+
+| Object | Role in this homework |
+|---|---|
+| $L_i$ | one rater's categorical measurement of a sentence |
+| $q$ | the response distribution induced by the working population and labeling model |
+| $\widehat q$ | the empirical soft target constructed from the observed rater measurements |
+| $Y_{\mathrm{maj}}$ | the hard target constructed by majority vote |
+| $p$ | a forecaster's probability report, made before observing the measurements |
+
+The working model does not declare one observed label to be revealed truth.
+Instead, it lets us ask what repeated labels estimate, what majority vote
+discards, and how a constructed target shapes model evaluation.
+
+You may reuse the lab's rater-expansion, vote-summary, Brier-score, and
+denominator-first table code. The homework uses different items and asks for a
+new statistical argument. As self-checks, every item must have exactly five
+votes, the three rater proportions must sum to one, and every unnormalized
+three-class Brier score must lie between 0 and 2.
+
+# Problem 1 — A label is a random outcome (50 points)
+
+Complete this problem without AI assistance. Show the mathematical steps that
+support each conclusion; isolated numerical answers receive little credit.
+Parts (a)(i)–(iii) begin with Bishop & Bishop Exercise 5.1 and extend it to the
+Brier score used in lecture and lab.
+
+**Notation and working model.** Fix a sentence $x$. Let $L$ be a random label
+generated according to the working model
+
+$$
+L\mid x\sim \operatorname{Categorical}
+  (q_{\mathrm{neg}},q_{\mathrm{neu}},q_{\mathrm{pos}}).
+$$
+
+Thus $q_k=P(L=k\mid x)$ is the conditional probability of label $k$ under the
+working model, and the three probabilities are nonnegative and sum to one.
+For each class $k$, define the indicator
+
+$$T_k=\mathbf 1\{L=k\},$$
+
+which equals one when $L=k$ and zero otherwise. The vector
+$T=(T_{\mathrm{neg}},T_{\mathrm{neu}},T_{\mathrm{pos}})$ is the one-hot
+encoding of $L$: exactly one component equals one. For example, a positive
+label gives $T=(0,0,1)$. Suppose we must choose a probability vector
+$p=(p_{\mathrm{neg}},p_{\mathrm{neu}},p_{\mathrm{pos}})$ to report before
+observing $L$. In this derivation, $p$ is a fixed candidate report; the
+expectation is over the random label $L\mid x$. The three-class Brier score is
+
+$$B(p,T)=\sum_{k=1}^{3}(p_k-T_k)^2.$$
+
+Each numbered item is a separate grading checkpoint. Show your setup and
+intended next step; correct partial work can earn substantial credit.
+
+a. **One categorical label and its expected Brier score (20 points).**
+
+   **(i) Categorical label and indicators (4 points).** Write the three possible
+   values of $L$ and the corresponding one-hot vectors $T$. Explain why the
+   three indicators cannot be treated as independent Bernoulli random
+   variables even though each indicator is zero or one.
+
+   **(ii) Expected value of an indicator (4 points).** Use the definition of
+   expected value for a zero-one variable to complete
+
+$$
+\begin{aligned}
+E[T_k\mid x]
+  &=1\cdot P(T_k=1\mid x)+0\cdot P(T_k=0\mid x)\\
+  &=\underline{\hspace{4cm}}.
+\end{aligned}
+$$
+
+   Then use $T_k=\mathbf 1\{L=k\}$ to show that
+   $E[T_k\mid x]=P(L=k\mid x)=q_k$.
+
+   **(iii) One-class squared loss (6 points).** Hold $p_k$ fixed and show that
+
+$$
+E[(p_k-T_k)^2\mid x]
+  =(p_k-q_k)^2+q_k(1-q_k).
+$$
+
+   **(iv) Sum, interpret, and minimize (6 points).** Show that summing part (iii)
+   over the three classes gives
+
+$$
+E[B(p,T)\mid x]
+  =\sum_{k=1}^{3}(p_k-q_k)^2+\sum_{k=1}^{3}q_k(1-q_k).
+$$
+
+   In 1–2 sentences, explain what each of the two sums represents and identify
+   which one depends on the candidate report $p$. Find the value of $p$ that
+   minimizes the expected Brier score under this model, and explain what your
+   answer means in context.
+
+b. **Repeated labels estimate class probabilities (15 points).** For the same
+sentence $x$, suppose we observe $m$ conditionally independent labels
+$L_1,\ldots,L_m$ from the working categorical model with common probability
+vector $q$. Define
+
+$$
+T_{ik}=\mathbf 1\{L_i=k\},\qquad
+N_k=\sum_{i=1}^{m}T_{ik},\qquad
+\widehat q_k=\frac{N_k}{m}.
+$$
+
+   **(i) Structural identities (3 points).** Show that
+   $\sum_{k=1}^{3}N_k=m$ and $\sum_{k=1}^{3}\widehat q_k=1$.
+
+   **(ii) Mean and variance (6 points).** Use indicator expectations and the
+   conditional independence assumption to show that
+
+$$
+E[\widehat q_k\mid x]=q_k,
+\qquad
+\operatorname{Var}(\widehat q_k\mid x)=\frac{q_k(1-q_k)}{m}.
+$$
+
+   **(iii) Dependence across classes (4 points).** For $j\ne k$, use the fact
+   that $T_{ij}T_{ik}=0$ to show that
+
+$$
+\operatorname{Cov}(\widehat q_j,\widehat q_k\mid x)
+=-\frac{q_jq_k}{m}.
+$$
+
+   In one sentence, explain why the covariance is negative.
+
+   **(iv) More labels (2 points).** In one sentence, explain what changes—and
+   what does not change—as $m$ increases.
+
+c. **Expected Brier score for an empirical soft target (15 points).** Continue
+to use the model and notation from part (b), and treat $p$ as a fixed candidate
+report.
+
+   **(i) One class (6 points).** Use the mean and variance from part (b) to show
+   that
+
+$$
+E[(p_k-\widehat q_k)^2\mid x]
+=(p_k-q_k)^2+\frac{q_k(1-q_k)}{m}.
+$$
+
+   **(ii) Sum and compare (5 points).** Sum over the three classes. Then compare
+   the result with part (a), where the Brier score was computed against one
+   random categorical label. In 1–2 sentences, explain what the factor $1/m$
+   tells you.
+
+   **(iii) Minimize and take a limit (4 points).** Find the candidate report $p$
+   that minimizes the expected Brier score for any positive integer $m$. Then
+   find the limit of the expected score as $m\to\infty$ and explain it in one
+   sentence.
+
+# Problem 2 — A benchmark label is constructed, not found (30 points)
+
+Use the 72 items in `homework_items.csv`. Work at the **sentence level**: five
+rater rows are repeated measurements of one item, not five independent
+evaluation cases. The majority label is an aggregation rule applied to those
+measurements; it is not an additional observation.
+
+a. **Where disagreement occurs (6 points).** Describe the distribution of vote
+patterns overall and separately for Rounds 1 and 2. Include one table with the
+item count, round total, and within-round proportion for every
+round-by-pattern combination, plus one figure showing the same comparison. In
+1–2 sentences, describe the main pattern. Keep every denominator visible.
+
+b. **Performance by vote pattern (7 points).** For `5-0`, `4-1`, and `3-2`
+items, report the number of items, number correctly classified under the
+majority label, and majority-label accuracy. In 2–3 sentences, describe the
+comparison and explain why rater disagreement is not automatically “bad data.”
+Do not add confidence intervals; interval construction begins in Week 4.
+
+c. **Rounds are construction processes, not treatments (7 points).** Compare
+Round 1 and Round 2 using majority-label accuracy. Report the item count, number
+correct, accuracy, and Round 2 minus Round 1 difference. Then write 3–4
+sentences that:
+
+1. state what the assigned data show;
+2. use one specific detail from the assigned DynaSent documentation to explain
+   how the rounds were constructed;
+3. give two plausible explanations for the observed difference; and
+4. explain why the comparison does not identify a causal effect of collection
+   round.
+
+d. **One planned sensitivity analysis (5 points).** Before computing the
+alternative result, choose and record **one** of these changes:
+
+- keep all items and replace majority-label accuracy with mean Brier score
+  against the rater proportions; or
+- keep majority-label accuracy and exclude all `3-2` items.
+
+   Complete the starter comparison table with each analysis's outcome, retained
+   population, round estimates, and Round 2 minus Round 1 difference. In 2–3
+   sentences, state what changed and whether the substantive comparison
+   survived.
+
+e. **Red-team the leaderboard with AI (5 points).** Attempting this part is
+required to earn these 5 points; successfully increasing accuracy is not
+required. Tell an AI assistant that its job is to make the fixed model's reported
+majority-label accuracy look better **without changing the model**. Ask it for
+one transparent, superficially defensible rule that filters items using only
+sentence text or rater-disagreement information. The rule may not use model
+probabilities, model predictions, correctness, or the result of part (d), and
+you may not revise it after seeing the answer.
+
+   Preserve the initial prompt, state the rule and predicted direction before
+   computing, then apply it once. Report the item count, number correct, and
+   accuracy before and after filtering. In 1–2 sentences, explain what changed,
+   why the model itself did not improve, and why this would be a questionable
+   way to build a benchmark. Connect your explanation to the throughline: the
+   selection rule changed which measured items became the evaluation target.
+
+# Problem 3 — Three forecasters, one measured target (20 points)
+
+Use the ten purposefully selected DynaSent test sentences in
+`forecaster_items.csv`. These cases were selected to make disagreement visible;
+they are a demonstration, not a probability sample. The five DynaSent labels
+are the measurements. You and the two frozen classifiers are **forecasters** of
+a target constructed from those measurements:
+
+- [`cardiffnlp/twitter-roberta-base-sentiment-latest`](https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest),
+  revision `3216a57f`;
+- [`lxyuan/distilbert-base-multilingual-cased-sentiments-student`](https://huggingface.co/lxyuan/distilbert-base-multilingual-cased-sentiments-student),
+  revision `cf991100`.
+
+The starter notebook downloads the public checkpoints and runs them locally;
+no paid API is required. Do not inspect the five-rater vote columns before
+completing part (a).
+
+a. **Be the first forecaster (4 points).** Before running either model, report
+your own probability vector over `negative`, `neutral`, and `positive` for every
+sentence. Each row must be nonnegative and sum to one. Add your highest-
+probability label and identify the two sentences for which you were least
+certain, with one short text-based reason for each.
+
+b. **Run two frozen models (5 points).** Run the supplied checkpoint cell and
+preserve the raw probability output. Complete the supplied ten-row table with
+both models' three probabilities, highest-probability labels, and a
+`models_disagree` indicator. Show that both probability vectors sum to one for
+every row and report the number of disagreements out of ten. Do not interpret
+that fraction as a population estimate.
+
+c. **Compare two constructed targets (5 points).** Reveal the vote counts and
+construct both $\widehat q$, the three rater proportions, and
+$Y_{\mathrm{maj}}$, its one-hot majority-vote version. For you and each model,
+report the mean Brier score against **each** target and the number of
+highest-probability labels matching the majority; keep the denominator of ten
+visible. Briefly explain what information is lost when $\widehat q$ is replaced
+by $Y_{\mathrm{maj}}$ and why neither target becomes literal ground truth.
+
+d. **Measurement audit and synthesis (4 points).** Select one case where the
+models disagree and quote only the shortest phrase needed to identify its
+ambiguity. For that case, report $\widehat q$, $Y_{\mathrm{maj}}$, and the three
+forecasters' highest-probability labels. Explain what the soft target records
+that the majority target discards. Use one specific fact from each linked model
+   card as a plausible—not proven—explanation for the differing forecasts.
+
+   Finally, organize the data as one row per sampled sentence $X_j$, with the
+   student and two model forecasts in three aligned columns. Explain (i) under
+   what sampling conditions the sentence-level rows could be iid, (ii) why the
+   three forecasts within a row are not justified as independent, identically
+   distributed rater draws, and (iii) why the student and two models are not
+   exchangeable. Your explanation should use the fact that all three columns
+   respond to the same random sentence, while fixed model outputs are
+   deterministic conditional on $X_j=x_j$.
+
+## Required AI-use record (2 points)
+
+Complete the AI-use table in the starter notebook for Problems 2(e) and 3. For Problem 2(e), record
+the **initial prompt only** rather than the whole conversation. For Problem 3,
+record both checkpoint IDs and revisions; write “no natural-language prompt”
+for the prompt field. For both uses, record the purpose, what you checked, what
+changed, and one decision you retained. Preserve Problem 3's raw probabilities
+separately.

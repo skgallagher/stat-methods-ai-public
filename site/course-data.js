@@ -10,7 +10,7 @@ const courseLinks = {
 const siteSettings = {
   // Use "scheduled" when the course is live. Preview shows one chosen week.
   moduleReleaseMode: "preview",
-  previewWeek: 1
+  previewWeek: 2
 };
 
 const weeklyMaterials = [
@@ -55,10 +55,37 @@ const weeklyMaterials = [
     week: 2,
     label: "Week 2",
     publishDate: "2027-01-24",
-    title: "Representation: Images, Text, and Features",
-    description: "Images as arrays, text as tokens, feature construction, and EDA for represented data.",
+    title: "Data as Measurement: Labels and Disagreement",
+    description: "Use repeated DynaSent judgments to study label distributions, conditional and marginal dependence, hard and soft targets, and Brier score.",
     links: [
-      { label: "Materials", href: `${courseLinks.publicBlob}/weeks/week02/` }
+      { label: "Lecture A", href: `${courseLinks.publicBlob}/weeks/week02/lecture_a.html` },
+      { label: "Lecture B", href: `${courseLinks.publicBlob}/weeks/week02/lecture_b.html` },
+      { label: "Data release", href: `${courseLinks.publicBlob}/data/course/dynasent/README.md` },
+      {
+        label: "Lab notebook",
+        href: `${courseLinks.publicBlob}/weeks/week02/lab.ipynb`,
+        openDate: "2027-01-28"
+      },
+      {
+        label: "Open lab in Colab",
+        href: `${courseLinks.colabBase}/weeks/week02/lab.ipynb`,
+        openDate: "2027-01-28"
+      },
+      {
+        label: "HW2 PDF",
+        href: `${courseLinks.publicBlob}/weeks/week02/hw02.pdf`,
+        openDate: "2027-01-28"
+      },
+      {
+        label: "HW2 notebook",
+        href: `${courseLinks.publicBlob}/weeks/week02/hw02_starter.ipynb`,
+        openDate: "2027-01-28"
+      },
+      {
+        label: "Open HW2 in Colab",
+        href: `${courseLinks.colabBase}/weeks/week02/hw02_starter.ipynb`,
+        openDate: "2027-01-28"
+      }
     ]
   },
   {

@@ -1,0 +1,297 @@
+---
+title: "Week 2B: From Probability Model to Label Audit"
+subtitle: "Applying dependence and Brier-score ideas to DynaSent"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+---
+
+## Recap: the three claims from Lecture 2A {.smaller}
+
+1. A recorded category can hide a **distribution of possible responses**.
+2. Dependence means different things within a fixed sentence and across random
+   sentences.
+3. Expected Brier score separates **forecast mismatch** from **label
+   variability**.
+
+Today we will repeat each idea with concrete sentences and numbers, then use the
+same workflow in the lab.
+
+## First hold one sentence fixed {.smaller}
+
+For one fixed sentence:
+
+> “The service was fine.”
+
+- Repeat the measurement by drawing new raters.
+- The sentence stays fixed; rater responses vary.
+
+**Question:** are responses independent conditional on this sentence?
+
+**Answer:** not necessarily. Conditional independence is a modeling assumption;
+separate raters make it plausible, but a shared discussion, instructions, or context
+could make their responses dependent.
+
+## Then let the sentence change {.smaller}
+
+Across a benchmark:
+
+- Draw a new sentence $X$.
+- Collect multiple responses to that sentence.
+- Repeat with another sentence.
+
+**Question:** are the responses independent across randomly sampled sentences?
+
+**Answer:** not generally. Even if responses are independent conditional on each
+sentence, the shared random sentence $X$ can make them marginally dependent.
+
+**Different repeated experiment, different independence claim.**
+
+## Three categories create two kinds of dependence {.smaller}
+
+For rater $i$, write the one-hot response as
+
+$$T_i=(T_{i-},T_{i0},T_{i+}),\qquad T_{i-}+T_{i0}+T_{i+}=1.$$
+
+**Between raters:** for a fixed sentence, we might assume
+
+$$T_1\perp T_2\mid X=x.$$
+
+**Within one rater:** the three indicators cannot be independent. If
+$q(x)=(.20,.50,.30)$, then
+
+$$\operatorname{Cov}(T_{i0},T_{i+}\mid X=x)=0-(.50)(.30)=-.15.$$
+
+Independent raters do **not** imply independent category indicators.
+
+## A changing sentence can create positive or negative dependence {.smaller .compact-table}
+
+Suppose A and B are equally likely and two raters are independent conditional on
+the sentence.
+
+| Sentence $X$ | $q_0(X)$ | $q_+(X)$ |
+|---|:---:|:---:|
+| A: clear praise | $.15$ | $.80$ |
+| B: mixed review | $.65$ | $.20$ |
+
+Across sentences,
+
+$$\operatorname{Cov}(T_{1+},T_{2+})=\operatorname{Var}\{q_+(X)\}=.09,$$
+
+while
+
+$$\operatorname{Cov}(T_{10},T_{2+})=\operatorname{Cov}\{q_0(X),q_+(X)\}=-.075.$$
+
+The sign depends on which response probabilities move together across $X$.
+
+## Keep five votes attached to one sentence {.smaller}
+
+For one DynaSent sentence $j$:
+
+> “I waited only twenty minutes this time.”
+
+$$
+(L_{j1},\ldots,L_{j5})=(-,-,-,0,0)
+$$
+
+$$
+N_j=(3,2,0),\qquad \widehat q_j=(.60,.40,0),\qquad
+\text{majority}_j=-.
+$$
+
+- **One** sentence is the evaluation unit.
+- **Five** labels are its repeated measurements.
+- The vote counts, fractions, and majority are summaries of that same record.
+
+The lab begins by constructing this sentence-level representation.
+
+## The protocol changes what the label measures {.smaller}
+
+Text:
+
+> “The camera is tiny, but the battery lasts all day.”
+
+**Protocol A:** label the overall sentiment.
+
+**Protocol B:** label mixed praise and criticism as neutral unless one side
+clearly dominates.
+
+The text did not change. The measurement rule did—and the response distribution
+can change with it.
+
+Before averaging votes, ask whether all raters received the same question,
+instructions, and context.
+
+## DynaSent has two item-construction processes {.smaller .compact-table}
+
+| Round | How sentences entered validation |
+|---|---|
+| 1 | Naturally occurring Yelp sentences selected because an initial model found them challenging |
+| 2 | Workers edited Yelp prompts to fool a newer model trained using Round 1 |
+
+Both rounds then used five-person validation.
+
+Round 2 is not a randomized treatment applied to Round 1 sentences. A round
+comparison is descriptive: it compares two constructed item populations.
+
+You will compare the rounds descriptively in the lab, then explain how their
+construction affects the target in Homework 2, Problem 2.
+
+::: notes
+[Sources]
+- Potts et al. (2021), DynaSent: https://aclanthology.org/2021.acl-long.186/
+:::
+
+## Keep the five votes visible during EDA {.smaller .compact-table}
+
+For each sentence, compute
+
+$$N_k=\sum_{i=1}^5T_{ik},\qquad \widehat q_k=N_k/5.$$
+
+| Votes $(N_-,N_0,N_+)$ | Majority | What the majority hides |
+|:---:|:---:|---|
+| $(5,0,0)$ | negative | unanimous judgment |
+| $(3,2,0)$ | negative | a nearby neutral boundary |
+| $(3,0,2)$ | negative | polarized sentiment judgments |
+
+All three have the same majority class. They are not the same measurement
+outcome.
+
+In the lab, these patterns guide which sentences you inspect closely.
+
+## Read a 3–2 split with the sentence {.smaller}
+
+Suppose the votes are $(3,2,0)$ for
+
+> “I waited only twenty minutes this time.”
+
+The count tells us **that** raters disagreed. The sentence can suggest **why**:
+
+- “only” may signal improvement;
+- twenty minutes may still be a complaint;
+- “this time” invokes missing prior context.
+
+This is purposeful case inspection. It suggests mechanisms; it does not estimate
+how common each mechanism is.
+
+## Worked Brier example: hold the forecast fixed {.smaller}
+
+Use class order negative, neutral, positive. Five votes are
+
+$$N=(0,2,3),$$
+
+and the model forecast is
+
+$$p=(0.10,0.35,0.55).$$
+
+The same measurements produce two targets:
+
+$$t_{\text{hard}}=(0,0,1),\qquad
+t_{\text{soft}}=(0,0.40,0.60).$$
+
+**Next:** score the same forecast against each target.
+
+## Against the hard target, the score is $0.335$
+
+$$
+\begin{aligned}
+B(p,t_{\text{hard}})
+&=(.10-0)^2+(.35-0)^2+(.55-1)^2\\
+&=.010+.1225+.2025\\
+&=0.335.
+\end{aligned}
+$$
+
+The majority rule turns the target into “positive with probability 1.” It
+discards both neutral votes.
+
+## Against the soft target, the score is $0.015$
+
+$$
+\begin{aligned}
+B(p,t_{\text{soft}})
+&=(.10-0)^2+(.35-.40)^2+(.55-.60)^2\\
+&=.010+.0025+.0025\\
+&=0.015.
+\end{aligned}
+$$
+
+The forecast did not change. The soft target preserved the observed $2/5$–$3/5$
+split.
+
+## What did the lower Brier score mean? {.smaller}
+
+It did **not** show that the model suddenly improved.
+
+It showed that the model forecast was much closer to the empirical vote
+distribution than to the one-hot majority target.
+
+Report:
+
+1. what information the hard target discarded;
+2. how many measurements formed the soft target;
+3. whether conclusions about model performance changed.
+
+Neither target is automatically “the truth.”
+
+The lab repeats this comparison on the data; Homework 2, Problem 1 explains its
+expected value.
+
+## Align the forecasters by sentence {.smaller .compact-table}
+
+For every sampled sentence $X_j$, record all three forecasts on the same row:
+
+| Sentence | Model A | Model B | Student |
+|---|:---:|:---:|:---:|
+| $X_1$: clear praise | $p_A(X_1)$ | $p_B(X_1)$ | $p_S(X_1)$ |
+| $X_2$: mixed review | $p_A(X_2)$ | $p_B(X_2)$ | $p_S(X_2)$ |
+| $\vdots$ | $\vdots$ | $\vdots$ | $\vdots$ |
+
+The **rows** may be iid if the sentences $X_1,X_2,\ldots$ are sampled iid and
+each forecasting procedure stays fixed.
+
+The three entries within a row are **not three iid rater draws**:
+
+- not identically distributed: A, B, and the student use different procedures;
+- not justified as independent: all three forecasts are functions of the same
+  sentence $X_j$.
+
+They are paired comparisons on each sentence. Homework 2, Problem 3 asks you to
+use this structure with actual forecasts.
+
+## The lab repeats this workflow in six moves {.smaller}
+
+1. Make personal sentiment measurements before seeing the votes.
+2. Construct vote fractions and agreement patterns.
+3. Inspect random, unanimous, and 3–2 cases with their sentences.
+4. Compare the two construction rounds descriptively.
+5. Score one forecast against hard and soft targets.
+6. State which iid and exchangeability assumptions are—or are not—justified.
+
+Every highlighted work box in the notebook requires a response or code edit.
+
+## Homework formalizes the same examples {.smaller}
+
+- **Problem 1:** derive expected Brier score for one label and for an averaged
+  soft target.
+- **Problem 2:** explain how aggregation and item selection construct a
+  benchmark target.
+- **Problem 3:** compare three forecasters against two measured targets and
+  explain why they are not iid, interchangeable raters.
+
+**Recurring distinction:** a label, an average of labels, and a majority target
+are different statistical objects.
+
+## What we did today {.smaller}
+
+1. Repeated conditional versus marginal dependence with concrete sentences.
+2. Identified the sentence—not each vote—as the evaluation unit.
+3. Used vote patterns to study disagreement.
+4. Computed hard- and soft-target Brier scores step by step.
+5. Connected target construction to the lab and Homework 2.
+
+**Next:** open the lab notebook and make your own measurements before viewing
+the DynaSent votes.

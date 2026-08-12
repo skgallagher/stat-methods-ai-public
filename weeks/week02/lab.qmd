@@ -1,0 +1,183 @@
+---
+title: "Lab 2: When a Label Is a Measurement"
+subtitle: "Week 2 · DynaSent"
+format: html
+---
+
+## The question
+
+Sentiment labels can look like facts attached to sentences. DynaSent instead
+records several people's judgments. In this lab we ask:
+
+> What changes when we treat a label as a measurement rather than truth?
+
+DynaSent is a sentiment-analysis benchmark with two construction rounds. Each
+sentence in our frozen teaching subset has five judgments: `negative`,
+`neutral`, or `positive`. The notebook loads this subset directly from the
+course GitHub repository; no local files or uploads are needed.
+
+## 1. Label six sentences yourself
+
+Read six sentences before revealing the DynaSent judgments. For each sentence,
+record your label and a confidence from 0.50 to 1.00. These are your judgments,
+not attempts to guess the majority.
+
+Afterward, reveal the five-vote counts. Identify one sentence for which the
+judgments capture something your single label does not.
+
+::: {.callout-warning title="✍️ Your turn"}
+Edit `YOUR_LABELS` and `YOUR_CONFIDENCE` before revealing the five DynaSent
+judgments.
+:::
+
+## 2. Build the item-level table
+
+For every sentence, construct:
+
+- the proportion of the five votes in each class;
+- the majority label; and
+- an agreement pattern: `5–0`, `4–1`, or `3–2`.
+
+This pattern notation relies on a deliberate restriction of the teaching
+subset: each sentence received votes in no more than two of the three sentiment
+categories. Thus a five-vote split such as `3–1–1` cannot occur here. This is
+not a general property of multiclass labeling data.
+
+::: {.callout-warning title="✍️ Your turn"}
+Calculate the summary for one row by hand, trace three important choices in the
+supplied code, run the structural checks, and answer the highlighted
+interpretation questions. The supplied code runs as written so that you can
+preview or restart the whole notebook without first filling blanks.
+:::
+
+## 3. Random and high-disagreement examples
+
+Compare two explicitly selected sets:
+
+- **random:** three items sampled with `random_state=2027`;
+- **high disagreement:** three randomly sampled `3–2` items, again with
+  `random_state=2027`.
+
+Display the actual sentences and vote counts. Describe a recurring source of
+ambiguity, if one appears. The point is not that all `3–2` items share one
+mechanism.
+
+The columns displayed here come from the `summary` table constructed in Section
+2: the original sentence, its three vote counts, and its agreement pattern. The
+notebook supplies the selection and formatting code. Your task is to read the
+two sets, identify the two labels involved in each `3–2` split, and compare the
+language of the examples. Sentences are shown in a wide, wrapped column so that
+the complete text remains visible.
+
+::: {.callout-warning title="✍️ Your turn"}
+Read all six sentences, identify the two labels involved in each `3–2` split,
+compare the two sets, and answer the highlighted interpretation question.
+:::
+
+## 4. How did the construction process change?
+
+The word *round* refers to a round of dataset construction, not a second rating
+of the same sentences. Both rounds used the same five-person validation task,
+but their sentences came from different processes.
+
+::: {.callout-note title="🔎 Context"}
+Round 1 consists of naturally occurring Yelp sentences selected because an
+initial model found them challenging. In Round 2, crowdworkers edited Yelp
+prompts to fool a newer model trained using Round 1; five raters then validated
+the resulting sentences.
+
+The 72-row teaching set has 36 items from each round and uses agreement-pattern
+quotas that roughly mirror the eligible pools. It is a designed teaching subset,
+not a simple random sample of all DynaSent sentences.
+:::
+
+::: {.callout-warning title="✍️ Your turn"}
+Make a denominator-visible table of agreement pattern by construction round,
+with both counts and row percentages. Describe the pattern. Then explain why
+“raters became more certain in Round 2” is too strong and give one plausible
+alternative explanation.
+:::
+
+## 5. One forecast, two targets
+
+Each row includes a frozen model probability vector
+
+$$p=(p_{\text{neg}},p_{\text{neutral}},p_{\text{positive}}).$$
+
+We score the same forecast against two different targets:
+
+- **hard target:** a one-hot vector for the majority label;
+- **soft target:** the three observed vote proportions.
+
+In the class order negative, neutral, positive, write the target vector as
+
+$$t=(t_1,t_2,t_3),$$
+
+where $t_k$ is the target value for class $k$. For example, votes of
+$(4,1,0)$ give a negative majority label, so
+
+$$t_{\text{hard}}=(1,0,0)$$
+
+and
+
+$$t_{\text{soft}}=(0.8,0.2,0).$$
+
+For either choice of $t$, the unnormalized three-class Brier score is
+
+$$B(p,t)=\sum_{k=1}^3(p_k-t_k)^2.$$
+
+The notebook creates the columns `hard_brier` and `soft_brier` at the point
+where this formula is applied. Scikit-learn's `label_binarize` constructs the
+hard target. We calculate the score directly because support for multiclass
+Brier scoring varies across scikit-learn versions, and the soft target is a
+vector of empirical proportions rather than one observed class.
+
+Inspect one sentence whose two scores differ substantially. Explain what the
+majority target discards and why a lower soft-target score does not prove that
+the soft target is universally correct.
+
+## 6. What assumptions would justify averaging raters?
+
+Before asking whether measurements are independent, name the random experiment:
+
+- For one fixed sentence, condition on $X=x$ and ask how raters were assigned.
+- Across random sentences, draw one $X$ and give that shared item to every
+  forecaster. Their response tendencies may move together across $X$; sharing
+  $X$ makes this possible, not automatic.
+
+The law of total covariance keeps the questions separate:
+
+$$
+\operatorname{Cov}(A,B)
+=E[\operatorname{Cov}(A,B\mid X)]
++\operatorname{Cov}(E[A\mid X],E[B\mid X]).
+$$
+
+The first term is within-sentence association. The second is association across
+sentences. Either can be zero while the other is not.
+
+Exchangeability is a different question: would swapping two rater identities
+leave the response model unchanged?
+
+::: {.callout-note title="🔎 Worked case"}
+For a fixed sentence, an expert and four novices may work independently. They
+are not exchangeable across all five if expertise changes response
+probabilities, though the four novices might be exchangeable among themselves.
+:::
+
+::: {.callout-warning title="✍️ Your turn"}
+Complete two rows: five separate crowd ratings conditional on one fixed
+sentence, and a student plus two frozen classifiers marginally over one randomly
+drawn shared sentence. Treat independence and exchangeability separately.
+:::
+
+## Exit ticket
+
+In one or two sentences, state:
+
+1. what the empirical vote proportions measure; and
+2. one choice made when those measurements become a benchmark target.
+
+**HW2 begins here:** it asks you to formalize the distinction among an
+individual label, an empirical vote distribution, a majority target, and a
+forecast.

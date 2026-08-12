@@ -1,0 +1,73 @@
+item_id,sentence,collection_round,negative_votes,neutral_votes,positive_votes,model_p_negative,model_p_neutral,model_p_positive,model_label
+r1-0076532,"Secondly, the poutine was mediocre, crazy wasn't too thick and didn't have much flavour.",1,4,1,0,0.9200347065925598,0.07327146828174591,0.006693790666759014,negative
+r1-0009071,When I ordered food to go last night.,1,0,3,2,0.036804504692554474,0.8861071467399597,0.0770883709192276,neutral
+r1-0029430,There are some rental companies I actually avoid because of their aggressive insurance sales routine.,1,4,1,0,0.8529422879219055,0.13682681322097778,0.01023087091743946,negative
+r2-0012866,Very cute and healthy chinese restaurant.,2,0,1,4,0.0037588300183415413,0.014083386398851871,0.982157826423645,positive
+r2-0001575,Her hair was so blonde it made her face look pale.,2,3,2,0,0.7112144827842712,0.2746894359588623,0.014095967635512352,negative
+r2-0012855,I bought a new pet and hit it.,2,1,4,0,0.02791033685207367,0.47481682896614075,0.4972728490829468,positive
+r1-0035549,Let's make a deal....Right!,1,2,3,0,0.018662700429558754,0.5331200957298279,0.4482172727584839,neutral
+r1-0086652,Topping it off you will get to here some wonderful 1990's hits.,1,0,1,4,0.003268586937338114,0.050392091274261475,0.9463393092155457,positive
+r1-0012758,Best way to get here is to go southbound on the I-17 frontage road from Greenway until you run into Country Gables.,1,0,5,0,0.01947825960814953,0.7633159756660461,0.21720577776432037,neutral
+r2-0012954,The Valrhona chocolate was memorable.,2,0,0,5,0.003125601215288043,0.02980971708893776,0.9670646786689758,positive
+r2-0017065,The rooftop patio is good and I liked it.,2,0,0,5,0.003691435093060136,0.022240759804844856,0.9740678668022156,positive
+r1-0025131,Check in was smooth.,1,0,1,4,0.014110819436609745,0.21199029684066772,0.7738988995552063,positive
+r1-0072601,"Before you hit the track, they make you watch a safety/ instructional video.",1,0,5,0,0.09389441460371017,0.8757985830307007,0.030307022854685783,neutral
+r2-0018476,They sucked and that is a nice word.,2,5,0,0,0.9052708148956299,0.07160788029432297,0.023121297359466553,negative
+r1-0083308,Le pedimos que sea paciente ya que el dia de su consulta tal vez tenga que esperar.,1,0,5,0,0.045153241604566574,0.8776605725288391,0.07718615978956223,neutral
+r1-0041697,The film on the beer glass!,1,1,4,0,0.014995413832366467,0.7203800678253174,0.26462456583976746,neutral
+r2-0009635,It was the worst food ever.,2,5,0,0,0.9512871503829956,0.04109581932425499,0.007616983726620674,negative
+r2-0002076,I walked in Rose Nail hoping to get a decent pedi and I did!,2,0,1,4,0.01664542779326439,0.13567359745502472,0.8476809859275818,positive
+r2-0010688,I was able to order a drink right away.,2,0,2,3,0.009520875290036201,0.36233440041542053,0.6281447410583496,positive
+r1-0038495,FYI This restaurant currently has a C rating as of mid December.,1,4,1,0,0.00694715790450573,0.844601571559906,0.1484512835741043,neutral
+r1-0002179,It's way too squishy!,1,4,1,0,0.023019248619675636,0.0690709725022316,0.9079098105430603,positive
+r2-0010220,"Ye,s the fresh rolls are Amazing, and I always ask for extra to take home.",2,0,0,5,0.005183027591556311,0.02504250593483448,0.9697744250297546,positive
+r1-0056515,The reason I order various rolls is to try one them another.,1,0,5,0,0.019227320328354836,0.6631341576576233,0.3176385462284088,neutral
+r1-0017342,"One thing I did notice was one of the ""managers"" only seemed to find time to touch on the tables of high profile clients while standing around the rest of the time instead of making rounds and touching more tables.",1,4,1,0,0.4146117568016052,0.5579735040664673,0.027414774522185326,neutral
+r2-0001321,"For groups, over 6, I'd go elsewhere. if that is allowed",2,3,2,0,0.20907801389694214,0.7198135256767273,0.07110850512981415,neutral
+r2-0017498,"Parking costs $10 and on top of that, $5 in monthly pest control charges need to be paid.",2,3,2,0,0.7634129524230957,0.22066333889961243,0.01592377759516239,negative
+r2-0004506,The cupboard was too small.,2,5,0,0,0.4894358217716217,0.4664904773235321,0.04407369717955589,negative
+r2-0005507,"I am really getting into the craft beer scene, so I asked for a Yuengling draft. It was bad.",2,4,1,0,0.8732941150665283,0.11211401224136353,0.014591905288398266,negative
+r1-0076771,I'm only 2 weeks in at CEG and I already got a job as a blackjack dealer.,1,0,2,3,0.0560477189719677,0.49092763662338257,0.4530247151851654,neutral
+r2-0008202,They respect your privacy here.,2,0,0,5,0.028490711003541946,0.6354523301124573,0.33605697751045227,neutral
+r1-0069005,Love Pizza Hut crust.,1,0,0,5,0.004315218422561884,0.01964513026177883,0.9760396480560303,positive
+r1-0019051,"Boy, did Stephen er Steven know his stuff!",1,0,0,5,0.05467898026108742,0.2617732584476471,0.6835477352142334,positive
+r1-0043900,They interviewed the first maid and all good.,1,0,1,4,0.016786279156804085,0.5107401013374329,0.4724736213684082,neutral
+r2-0006259,"The team seems still super nice, they seem to recall the regulars.",2,0,0,5,0.0067184180952608585,0.03676079586148262,0.9565207958221436,positive
+r1-0018945,"So when we were invited to a birthday party here, I was not looking forward to it.",1,4,1,0,0.8660852313041687,0.12363024055957794,0.010284490883350372,negative
+r1-0048372,Next thing we see is all the TV's tuned into the game.,1,0,2,3,0.02752629853785038,0.9003573656082153,0.07211629301309586,neutral
+r2-0005187,The room has a tropical atmosphere and is very airy and spacious.,2,0,1,4,0.0026436413172632456,0.05342620238661766,0.9439301490783691,positive
+r1-0041627,"I've read about this place, never took the time to stop in.",1,0,5,0,0.46908193826675415,0.49603572487831116,0.03488236665725708,neutral
+r2-0010501,The table next to us seemed to feel sorry for the server.,2,3,2,0,0.7778970003128052,0.20817171037197113,0.013931258581578732,negative
+r2-0007564,Awsome performance love this show. very interesting,2,0,0,5,0.004281781613826752,0.009320261888206005,0.986397922039032,positive
+r2-0016984,We will be returning ASAP.,2,0,1,4,0.010156746953725815,0.40565624833106995,0.5841870307922363,positive
+r2-0013293,My hubby and I hadn't been to the restaurant since it was closed.,2,0,5,0,0.4265724718570709,0.5248761177062988,0.04855140298604965,neutral
+r1-0052573,I'm a recent Las Vegas transplant and I was looking for a good place for Pho.,1,0,5,0,0.02089793235063553,0.6740274429321289,0.3050746023654938,neutral
+r1-0078884,Ask them for a custom wrap.,1,0,5,0,0.05226454883813858,0.8918219208717346,0.055913496762514114,neutral
+r2-0001200,It arrived with ease.,2,0,1,4,0.007309142500162125,0.1205349862575531,0.8721558451652527,positive
+r2-0007174,"In the store, the price is worth to pay.",2,0,0,5,0.03414264693856239,0.6553462743759155,0.31051111221313477,neutral
+r1-0016605,- Student discount (show your student ID) - Tuesdays are CHEAP (it's like $5 for a ticket or something?),1,0,1,4,0.014048491604626179,0.4497252404689789,0.5362262725830078,positive
+r2-0013971,lobster is a delicacy,2,0,0,5,0.017774630337953568,0.11683963984251022,0.8653857111930847,positive
+r2-0010763,The location is prime.,2,0,0,5,0.029392903670668602,0.5872957706451416,0.38331133127212524,neutral
+r1-0057697,"Every last one of them is either Fair Trade, Rainforest Alliance, or Direct Trade.",1,0,4,1,0.28315451741218567,0.6600419282913208,0.05680358409881592,neutral
+r2-0014074,Always consistent quality and super smooth. i recommend,2,0,0,5,0.008033963851630688,0.02113945782184601,0.9708266258239746,positive
+r1-0049636,"What I ordered: Salmon Rillettes $17.50 Steak Frites $36.50 Sauteed Spinach $7.50 1 Bottle of Cabernet - France 2007 $48 There are no bread plates, so you just eat off the table.",1,2,3,0,0.1502940058708191,0.81126868724823,0.03843729570508003,neutral
+r1-0054152,Went in for an injury around 3pm on a Tuesday afternoon for a Walk-In Clinic appointment.,1,0,3,2,0.022985834628343582,0.9445710778236389,0.032443102449178696,neutral
+r2-0017297,"He's delighted by the peg board at each table waiting for him to invent his own fun, only because he acts like a five year old.",2,0,1,4,0.01641368679702282,0.11738353222608566,0.8662027716636658,positive
+r1-0054049,"There was a tattered, torn and dirty Lee's bahn mi paper bag on the ground.",1,3,2,0,0.720695972442627,0.2679715156555176,0.011332501657307148,negative
+r2-0006413,I bought a new toy and throw it in the sea.,2,0,5,0,0.26273247599601746,0.5543273687362671,0.18294017016887665,neutral
+r2-0001771,There were too many people in the shop and I felt akward.,2,5,0,0,0.5690072178840637,0.4035988450050354,0.027393875643610954,negative
+r1-0038841,"Not necessarily a complaint, but they don't serve beverages here or at least I wasn't offered.",1,4,1,0,0.7570133209228516,0.22999517619609833,0.012991489842534065,negative
+r1-0085111,Papa johns on anthem is closed.,1,3,2,0,0.6253272891044617,0.35321715474128723,0.021455585956573486,negative
+r1-0012385,"But when we overpaid him, he called the next day and told us we had a $200 refund coming because the move took less time than anticipated.",1,0,0,5,0.4526040852069855,0.49284985661506653,0.054546065628528595,neutral
+r1-0067694,"I can't really remember, though.",1,1,4,0,0.20098797976970673,0.7507467269897461,0.048265356570482254,neutral
+r2-0010059,Looking at their menu.,2,0,5,0,0.02312709577381611,0.891414999961853,0.08545798063278198,neutral
+r1-0083656,When they priced out very similar vehicles the best they could do was $525 a month.,1,0,3,2,0.6962629556655884,0.2857588231563568,0.01797814667224884,negative
+r2-0007988,Great locally owned business.,2,0,0,5,0.004996416158974171,0.03365257382392883,0.9613510370254517,positive
+r1-0030181,"Came here because they had been advertising wing night and although we have our usual wing spot, we decided to give this place a try.",1,0,2,3,0.01144125871360302,0.48014742136001587,0.5084112882614136,positive
+r1-0063857,We have been here three times in the last month and it is always the same lady bar tending.,1,0,4,1,0.4564829170703888,0.499844491481781,0.04367256909608841,neutral
+r2-0008285,Very rude and unattentive.,2,5,0,0,0.8897177577018738,0.09918949753046036,0.011092819273471832,negative
+r2-0001973,I won 5 dollars after spending 500 on lottery tickets.,2,2,3,0,0.013066677376627922,0.36259347200393677,0.6243398785591125,positive
+r2-0000237,This place is just as AWESOME as it's sister store on Blue Diamond. We went to Blue Diamond's sister store.,2,0,0,5,0.00277766864746809,0.009097537957131863,0.9881247282028198,positive
+r2-0017932,I do not understand why it takes over 2 weeks to review the records of a completely healthy potential patient. It pisses me off.,2,4,0,1,0.9362519979476929,0.058158114552497864,0.0055898642167449,negative
+r2-0016050,"the palce is good, they help to wash the car at a price",2,0,0,5,0.014513874426484108,0.12135014683008194,0.8641359806060791,positive
+r1-0094345,I can't stress this enough.,1,0,5,0,0.25668996572494507,0.20509353280067444,0.5382165312767029,positive
