@@ -1,14 +1,19 @@
 # Student release data
 
 This directory contains frozen, licensed, privacy-reviewed teaching subsets.
-The Spring 2027 Week 1 release currently includes `camera_traps/`: 216 resized
-Caltech Camera Traps images in 72 complete trigger sequences from 12 camera
-locations. See `camera_traps/README.md` and `release_summary.json` for source,
-license, selection, model-output, and split details.
+The current preview release includes:
+
+- `camera_traps/`: 216 resized Caltech Camera Traps images in 72 complete
+  trigger sequences from 12 camera locations;
+- `cfpb/`: 100 public CFPB complaint narratives for Week 2 text EDA; and
+- `dynasent/`: disjoint DynaSent v1.1 lab, homework, and forecaster subsets.
+
+See each dataset directory's README for its source, license, construction, and
+interpretation limits.
 
 Do **not** copy `data/smoke/` here: those files are synthetic tests and are not
-student data. Later releases will add `cfpb`, `dynasent`, `nhanes`, and
-`designed_eval` after their separate release gates pass.
+student data. Later releases will add `nhanes` and `designed_eval` after their
+separate release gates pass.
 
 After changing an approved release, rebuild the download manifest with:
 
