@@ -13,6 +13,12 @@ and the probability report from the pinned
 `cardiffnlp/twitter-roberta-base-sentiment-latest` checkpoint at revision
 `3216a57f2a0d9c45a2e6c20157c20c49fb4bf9c7`.
 
+The lab and homework extracts are further restricted to items whose five votes
+occupy no more than two of the three sentiment categories. Consequently their
+agreement patterns can be summarized as `5–0`, `4–1`, or `3–2`. This restriction
+is specific to these teaching extracts; DynaSent and multiclass labeling data in
+general can contain votes spread across all three categories.
+
 The lab and homework samples are deterministic teaching extracts, not
 probability samples from a target population. The forecaster cases were chosen
 to produce useful model disagreement and must not be used to estimate an
