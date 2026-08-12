@@ -1,0 +1,73 @@
+item_id,sentence,collection_round,negative_votes,neutral_votes,positive_votes,model_p_negative,model_p_neutral,model_p_positive,model_label
+r2-0012467,The food is cooked the right way.,2,0,0,5,0.01727849803864956,0.36390364170074463,0.6188178658485413,positive
+r1-0039600,They are consistent.,1,1,0,4,0.022492077201604843,0.5448410511016846,0.4326668679714203,neutral
+r1-0059157,The Mediterranean Greek Salad with grilled chicken for $11 was my order.,1,0,4,1,0.007089839782565832,0.22213783860206604,0.7707723379135132,positive
+r2-0004651,The hardware store was offering free tools at least.,2,0,2,3,0.01882033608853817,0.7411379814147949,0.24004165828227997,neutral
+r2-0017643,I almost took tempura home to go after dinner! so amazing,2,0,0,5,0.007273966912180185,0.020506491884589195,0.9722195863723755,positive
+r2-0013198,That is as close to seriously top notch whiskey as my toddler is to an accountant.,2,4,0,1,0.12852221727371216,0.45658859610557556,0.4148891866207123,neutral
+r1-0086998,Maybe that's the case.,1,0,5,0,0.13881705701351166,0.7819777727127075,0.07920511811971664,neutral
+r1-0035806,"I curled up and when I woke up forty minutes later, I had my answer.",1,1,4,0,0.01867198944091797,0.7761264443397522,0.20520161092281342,neutral
+r2-0002427,A terribly underappreciated experience!,2,2,0,3,0.03195485845208168,0.054462023079395294,0.9135830998420715,positive
+r2-0001655,We went to a sit down restaurant. The service and food were exceptional.,2,0,0,5,0.003553390735760331,0.022989224642515182,0.9734573364257812,positive
+r1-0028032,The most painful part was trying not to laugh when they did my toes.,1,4,1,0,0.8685296177864075,0.11305898427963257,0.018411457538604736,negative
+r1-0007291,"However, if I were to not buy Trane this is the company I would use.",1,0,0,5,0.35481882095336914,0.5940218567848206,0.0511593297123909,neutral
+r2-0009639,15 minutes into the first and only drink the bartender put the bill in front of me and asked me to close out. He is terrible.,2,5,0,0,0.910133421421051,0.08313728868961334,0.006729321554303169,negative
+r1-0057791,"Fortunately, National Specialty - a compounding pharmacy - is locally located.",1,0,3,2,0.012666585855185986,0.21046946942806244,0.7768639326095581,positive
+r2-0011707,you look very okayish,2,0,2,3,0.008729563094675541,0.07168566435575485,0.9195848107337952,positive
+r2-0018457,"They obviously missed our order, and then they tried to hurry it.",2,5,0,0,0.9042951464653015,0.09001892805099487,0.005685898475348949,negative
+r2-0003340,Used to be a lot more than that.,2,0,5,0,0.18713796138763428,0.7372146844863892,0.07564730197191238,neutral
+r2-0010230,I will be coming back soon.,2,0,1,4,0.006338086910545826,0.31979718804359436,0.6738647222518921,positive
+r1-0028100,They drive over an hour to get here and must pass at least a thousand chiropractors in the process.,1,2,3,0,0.48625433444976807,0.46093443036079407,0.052811235189437866,negative
+r2-0010204,we both had our different delicious pies,2,0,1,4,0.004947235342115164,0.05831803381443024,0.9367347955703735,positive
+r1-0064061,"The room was quiet and private, and they gave each person a free movie pass!",1,0,0,5,0.004515729378908873,0.2577047348022461,0.7377795577049255,positive
+r2-0005539,Came with a good banana bread.,2,0,0,5,0.0069047752767801285,0.1425701230764389,0.8505250811576843,positive
+r2-0014220,DONE DONE DONE Going somewhere else. This place sucks.,2,5,0,0,0.9531517028808594,0.041265957057476044,0.0055824024602770805,negative
+r1-0010356,"I further asked what I was to do in the meantime, particularly since I have animals and she told me that's not her problem.",1,3,2,0,0.15356196463108063,0.7833928465843201,0.06304521858692169,neutral
+r1-0065340,It's the meat I liked the least.,1,4,0,1,0.5824953317642212,0.3744799494743347,0.04302463307976723,negative
+r1-0025810,I love Ethiopian food and was excited to try this restaurant.,1,0,0,5,0.0023060922976583242,0.008331460878252983,0.9893624186515808,positive
+r1-0090153,Next got a flat tire right outside and nobody could help us when our lug nuts were stuck except to tell us to use WD40 after about an hour we realized that fix a flat was a thing so we bought that just to get a quick fix to get out of there,1,4,1,0,0.8285272717475891,0.1551462560892105,0.016326459124684334,negative
+r2-0002831,"The menu of tapas is extensive, with excellent vegetarian options.",2,0,0,5,0.0023706539068371058,0.019777826964855194,0.9778515696525574,positive
+r2-0006405,The Valet (Dennis) staff at the front entrance was really rude.,2,5,0,0,0.9119445085525513,0.08208020776510239,0.005975313019007444,negative
+r2-0006974,They were excited about getting their food and paid for everything online.,2,0,1,4,0.017204757779836655,0.21346895396709442,0.7693263292312622,positive
+r1-0021125,However Id put -5 stars if I could for just one of their rules!!,1,3,0,2,0.11835125833749771,0.4551812410354614,0.4264674484729767,neutral
+r1-0014616,"I'll admit, the added weight of backpacking did aggravate my knee again, so I need to be better about doing my exercises again.",1,0,5,0,0.5010565519332886,0.43496471643447876,0.06397870928049088,negative
+r1-0075796,But when I got home!,1,0,3,2,0.008945029228925705,0.42735856771469116,0.5636963844299316,positive
+r1-0052020,I am here at a trade show and decided to go back to Lupo for dinner.,1,0,4,1,0.010554422624409199,0.8784521818161011,0.1109934151172638,neutral
+r1-0047342,All u can eat sushi !,1,0,1,4,0.09627871215343475,0.6521401405334473,0.2515811324119568,neutral
+r2-0004367,they don't use the conventional Clamato juice,2,1,4,0,0.23621715605258942,0.7194145917892456,0.0443681962788105,neutral
+r1-0027511,And definitely paid for the burrito.,1,0,5,0,0.017844701185822487,0.3859866261482239,0.5961686372756958,positive
+r2-0016987,Television for those guys who want to stay up to date on their games that they bet on daily,2,0,4,1,0.038489893078804016,0.7949522733688354,0.16655787825584412,neutral
+r1-0034243,Am i here for pho or Markham's next top model?,1,0,4,1,0.036320194602012634,0.8851871490478516,0.07849261164665222,neutral
+r2-0010511,The rain was too hard on me.,2,4,1,0,0.827766478061676,0.14830780029296875,0.02392571046948433,negative
+r1-0006461,Can not wait for another layover in Charlotte to try more things out.,1,1,0,4,0.002556859515607357,0.03196101635694504,0.9654821157455444,positive
+r1-0007316,I am writing what I heard and experienced right after it happen.,1,0,3,2,0.05383457615971565,0.8866035342216492,0.059561897069215775,neutral
+r2-0017259,i recommend this company.,2,0,0,5,0.010055151768028736,0.14571210741996765,0.8442327380180359,positive
+r1-0021019,Service on the other hand need improvement.,1,4,1,0,0.46135932207107544,0.4515204429626465,0.0871201604604721,negative
+r2-0010093,Glad we tried apps first. They were good.,2,0,0,5,0.006567374337464571,0.03778500854969025,0.9556476473808289,positive
+r2-0013361,My boyfriend asked for more olives and the guy refused him one more olive!,2,5,0,0,0.6005083918571472,0.3537925183773041,0.045699115842580795,negative
+r1-0052860,I think its kind of pan seared.,1,0,3,2,0.35409873723983765,0.626389741897583,0.019511479884386063,neutral
+r1-0010274,And the day of we didn't have them remake it because my husband didn't want to leave again during the game to go get it ... and they were so busy I don't think they wanted to remake it anyways.,1,3,2,0,0.7195580005645752,0.2611739933490753,0.01926795206964016,negative
+r2-0003899,Will definitely order out again because it was a fine meal.,2,0,0,5,0.003776378696784377,0.01771477237343788,0.9785088896751404,positive
+r2-0011798,There are good sides at the steakhouse.,2,0,0,5,0.009158861823379993,0.1294427216053009,0.8613983988761902,positive
+r1-0005484,They said the crab dip resembled a kind of Japanese-lasagna type dish with tortilla chips?,1,1,4,0,0.12325893342494965,0.8391942381858826,0.037546783685684204,neutral
+r1-0043331,Then there was a sugar scrub followed by a cucumber lotion something or other.,1,0,4,1,0.05853378772735596,0.8582574129104614,0.08320878446102142,neutral
+r2-0005278,Cannot find better tikka masala,2,0,0,5,0.35708481073379517,0.4623359739780426,0.180579274892807,neutral
+r1-0081251,I am a musician and it does nothing for your restaurant.,1,3,2,0,0.78360915184021,0.2009975016117096,0.01539330929517746,negative
+r1-0082906,I'm thinking a 1 oz (maybe a 2 oz) scoop at the most.,1,0,5,0,0.0230629313737154,0.8430705070495605,0.13386650383472443,neutral
+r2-0000521,I have to give it to Bobby Flay for a great experience in Las Vegas!,2,0,0,5,0.003232907736673951,0.01781812682747841,0.9789490103721619,positive
+r2-0011593,"And then there is the joyous happy hour, with watery drinks.",2,2,0,3,0.00424616364762187,0.025563327595591545,0.9701905250549316,positive
+r1-0049557,Then I tried the fried rice.,1,0,5,0,0.02034897170960903,0.8262810707092285,0.15336991846561432,neutral
+r1-0044950,I arrived 15 mins early.,1,0,4,1,0.12494490295648575,0.8011786341667175,0.07387641072273254,neutral
+r1-0031462,I started going to the Rainbow location almost 2 years ago.,1,0,3,2,0.005267067812383175,0.7612164616584778,0.23351645469665527,neutral
+r2-0005611,Portions were large for a fine dining establishment. It was terrible.,2,4,1,0,0.8923875689506531,0.09436947107315063,0.01324301678687334,negative
+r2-0017803,She has mad artistic skills in drawing cartoons on your nails. so good,2,0,0,5,0.010228746570646763,0.03201434761285782,0.9577569365501404,positive
+r2-0000840,Advantage rent a car was the best experience in car renting.,2,0,0,5,0.0036688183899968863,0.0267266146838665,0.9696046113967896,positive
+r2-0017040,I have ordered a cake and received it after two days.,2,0,4,1,0.006317920051515102,0.6042652130126953,0.38941690325737,neutral
+r1-0075940,"When I was applying to live here the management staff were so accommodating, helpful, and nice!",1,0,1,4,0.005520964972674847,0.026380307972431183,0.9680987000465393,positive
+r1-0084308,This is especially true when the car you are looking at is in another state.,1,0,5,0,0.2402661293745041,0.7004222273826599,0.05931160971522331,neutral
+r2-0000863,"That sounds really awesome that you did that, despite Co-vid",2,0,2,3,0.0030285341199487448,0.011678238399326801,0.9852932095527649,positive
+r1-0064606,I called the day before and made a service appt to replace a headlight on my Altima.,1,0,5,0,0.1382693201303482,0.7945459485054016,0.06718475371599197,neutral
+r2-0012867,Definitely recommend that you check out this spot and get a breakfast sandwich!,2,0,0,5,0.0022640249226242304,0.023871606215834618,0.9738644361495972,positive
+r2-0003617,Dessert: the boys had Nanaimo bars which they said didn't taste fresh and it was the sweetest one they ever had. quite surprising right,2,2,0,3,0.010609825141727924,0.08368807286024094,0.9057020545005798,positive
+r1-0043604,We told him a birthday and graduation.,1,0,2,3,0.014237452298402786,0.8101397752761841,0.17562271654605865,neutral
+r2-0004688,It's a great place to finally catch Herpes.,2,4,0,1,0.005126680713146925,0.04145398363471031,0.9534193873405457,positive
