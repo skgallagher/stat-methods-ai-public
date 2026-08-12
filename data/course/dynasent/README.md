@@ -20,6 +20,8 @@ is specific to these teaching extracts; DynaSent and multiclass labeling data in
 general can contain votes spread across all three categories.
 
 The lab and homework samples are deterministic teaching extracts, not
-probability samples from a target population. The forecaster cases were chosen
-to produce useful model disagreement and must not be used to estimate an
+probability samples from a target population. Each contains 36 items per round
+and uses agreement-pattern quotas that roughly track the eligible pools while
+ensuring that `5–0`, `4–1`, and `3–2` all appear. The forecaster cases were
+chosen to produce useful model disagreement and must not be used to estimate an
 unselected benchmark-wide rate.
