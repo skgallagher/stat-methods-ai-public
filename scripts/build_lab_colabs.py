@@ -160,7 +160,11 @@ def build_lab(qmd: Path, week: str) -> dict:
                     cells.append(md(HANDOFF))
                     response_added.add(key)
 
-    if not any("### Independent handoff" in "".join(cell["source"]) for cell in cells):
+    has_handoff = any(
+        re.search(r"^#{2,3} .*handoff", "".join(cell["source"]), flags=re.I | re.M)
+        for cell in cells
+    )
+    if not has_handoff:
         cells.append(md(HANDOFF))
     cells.append(md(FINAL))
     for index, cell in enumerate(cells):
