@@ -4,13 +4,17 @@ const courseLinks = {
   publicBlob: "https://github.com/skgallagher/stat-methods-ai-public/blob/main",
   publicRaw: "https://raw.githubusercontent.com/skgallagher/stat-methods-ai-public/main",
   colabBase: "https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main",
+  // GitHub Pages serves the public repo, so HTML slides render in the browser.
+  pagesBase: "https://skgallagher.github.io/stat-methods-ai-public",
   projectDataBox: "https://cmu.box.com/s/9jzjm8u9wc9kmkmewsoi9ciekbkf5c2k"
 };
 
 const siteSettings = {
   // Use "scheduled" when the course is live. Preview shows one chosen week.
-  moduleReleaseMode: "preview",
-  previewWeek: 2
+  // Beta shows Weeks 1 through betaThroughWeek with every link open, for testers.
+  moduleReleaseMode: "beta",
+  previewWeek: 2,
+  betaThroughWeek: 4
 };
 
 const weeklyMaterials = [
@@ -21,8 +25,8 @@ const weeklyMaterials = [
     title: "Logistic Regression to Neural Networks",
     description: "Build a one-hidden-layer network from familiar statistical pieces, then compare a baseline and a vision system on genuinely new cameras.",
     links: [
-      { label: "Lecture A", href: `${courseLinks.publicBlob}/weeks/week01/lecture_a.html` },
-      { label: "Lecture B", href: `${courseLinks.publicBlob}/weeks/week01/lecture_b.html` },
+      { label: "Lecture A", href: `${courseLinks.pagesBase}/weeks/week01/lecture_a.html` },
+      { label: "Lecture B", href: `${courseLinks.pagesBase}/weeks/week01/lecture_b.html` },
       { label: "Data release", href: `${courseLinks.publicBlob}/data/course/camera_traps/README.md` },
       {
         label: "Lab notebook",
@@ -58,8 +62,8 @@ const weeklyMaterials = [
     title: "Data as Measurement: Labels and Disagreement",
     description: "Use repeated DynaSent judgments to study label distributions, conditional and marginal dependence, hard and soft targets, and Brier score.",
     links: [
-      { label: "Lecture A", href: `${courseLinks.publicBlob}/weeks/week02/lecture_a.html` },
-      { label: "Lecture B", href: `${courseLinks.publicBlob}/weeks/week02/lecture_b.html` },
+      { label: "Lecture A", href: `${courseLinks.pagesBase}/weeks/week02/lecture_a.html` },
+      { label: "Lecture B", href: `${courseLinks.pagesBase}/weeks/week02/lecture_b.html` },
       { label: "Data release", href: `${courseLinks.publicBlob}/data/course/dynasent/README.md` },
       {
         label: "Lab notebook",
@@ -95,8 +99,8 @@ const weeklyMaterials = [
     title: "Evaluation Design: Estimands, Splits, and AI-Assisted Workflow",
     description: "Turn a vague question about an AI system into an estimand, comparisons, and a data split, then audit an AI-generated analysis plan using CFPB complaints.",
     links: [
-      { label: "Lecture A", href: `${courseLinks.publicBlob}/weeks/week03/lecture_a.html` },
-      { label: "Lecture B", href: `${courseLinks.publicBlob}/weeks/week03/lecture_b.html` },
+      { label: "Lecture A", href: `${courseLinks.pagesBase}/weeks/week03/lecture_a.html` },
+      { label: "Lecture B", href: `${courseLinks.pagesBase}/weeks/week03/lecture_b.html` },
       { label: "CFPB data release", href: `${courseLinks.publicBlob}/data/course/cfpb/README.md` },
       { label: "GitHub issues data release", href: `${courseLinks.publicBlob}/data/course/github_issues/README.md` },
       {
@@ -130,10 +134,37 @@ const weeklyMaterials = [
     week: 4,
     label: "Week 4",
     publishDate: "2027-02-07",
-    title: "Benchmarks Are Sampling Designs",
-    description: "Benchmark design, leakage, label quality, target populations, and what test sets can support.",
+    title: "How Precise Is a Benchmark Score?",
+    description: "Treat a benchmark score as an estimate with a standard error, choose an interval that behaves near 100% accuracy, and account for photos that come in bursts.",
     links: [
-      { label: "Materials", href: `${courseLinks.publicBlob}/weeks/week04/` }
+      { label: "Lecture A", href: `${courseLinks.pagesBase}/weeks/week04/lecture_a.html` },
+      { label: "Lecture B", href: `${courseLinks.pagesBase}/weeks/week04/lecture_b.html` },
+      { label: "Data release", href: `${courseLinks.publicBlob}/data/course/camera_traps/README.md` },
+      {
+        label: "Lab notebook",
+        href: `${courseLinks.publicBlob}/weeks/week04/lab_starter.ipynb`,
+        openDate: "2027-02-11"
+      },
+      {
+        label: "Open lab in Colab",
+        href: `${courseLinks.colabBase}/weeks/week04/lab_starter.ipynb`,
+        openDate: "2027-02-11"
+      },
+      {
+        label: "HW4 PDF",
+        href: `${courseLinks.publicBlob}/weeks/week04/hw04.pdf`,
+        openDate: "2027-02-11"
+      },
+      {
+        label: "HW4 notebook",
+        href: `${courseLinks.publicBlob}/weeks/week04/hw04_starter.ipynb`,
+        openDate: "2027-02-11"
+      },
+      {
+        label: "Open HW4 in Colab",
+        href: `${courseLinks.colabBase}/weeks/week04/hw04_starter.ipynb`,
+        openDate: "2027-02-11"
+      }
     ]
   },
   {

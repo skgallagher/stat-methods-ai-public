@@ -1,0 +1,142 @@
+---
+title: "Homework 4: How Precise Is a Benchmark Score?"
+subtitle: "Statistical Evaluation of AI · Spring 2027"
+format:
+  pdf:
+    geometry:
+      - top=0.8in
+      - bottom=1in
+      - left=1in
+      - right=1in
+---
+
+**Do not use AI for Problem 1.** Work the derivations yourself. AI is allowed in Problem 2 and required in Problem 3.
+
+| | |
+|---|---|
+| **Out / due** | Tue Feb 9 / Tue Feb 16, 11:59pm |
+| **Points** | 100: Problem 1 (70), Problem 2 (20), Problem 3 (10) |
+| **Expected time** | About 4 hours after Lab 4. Contact course staff if setup or debugging alone takes more than 30 minutes. |
+| **Reading** | Miller (2024), ["Adding Error Bars to Evals"](https://arxiv.org/abs/2411.00640), Sections 1–2 |
+| **AI policy** | No AI for Problem 1. AI is allowed in Problem 2 and required in Problem 3. Submit the AI-use record at the end. |
+| **Working file** | `hw04_starter.ipynb`. The PDF is a read-only copy of the prompt. |
+| **Submit** | Notebook PDF and completed `.ipynb` in one Gradescope submission. |
+
+## Connection to Lab 4
+
+In Lab 4 you compared the Wald, Wilson, and Clopper–Pearson intervals, checked how often each covers the truth by simulation, and computed a sequence bootstrap for the vision model's accuracy on the Camera Traps analysis cameras and the lab's held-out cameras. You may reuse the lab's `sequence_bootstrap()` function and its checks.
+
+This homework uses the `homework_holdout` cameras from HW1, which were not used in lab. The outcome throughout is whether the supplied vision model is correct on a frame, so accuracy is pooled over frames, as in HW1.
+
+Problems 2 and 3 use your results from Problem 1, so do Problem 1 first.
+
+As a self-check, your sequence bootstrap should report how many sequences it resamples. That number should equal the number of distinct `sequence_id` values in the rows you give it.
+
+# Problem 1 - Intervals by hand (70 points, no AI)
+
+Show your work. A correct number without the steps behind it earns little credit.
+
+Throughout, $z = z_{1-\alpha/2}$ is the $1-\alpha/2$ quantile of the standard normal distribution. For a two-sided 95% interval, $\alpha = 0.05$ and $z = z_{0.975} = 1.96$.
+
+a. **Wald and Wilson intervals (24 points).** A classifier is correct on $k = 48$ of $n = 50$ independent test images, so $\hat p = 0.96$.
+
+   **(i) (3 points)** Compute the 95% Wald interval $\hat p \pm z\sqrt{\hat p(1-\hat p)/n}$. What is wrong with it here?
+
+   **(ii) (10 points)** The Wilson interval keeps every value of $p$ that is close enough to $\hat p$, where "close enough" uses the standard error at $p$ instead of at $\hat p$:
+   $$|\hat p - p| \le z\sqrt{\frac{p(1-p)}{n}}.$$
+   Square both sides and rearrange to show that the endpoints of the interval solve
+   $$\left(1+\frac{z^2}{n}\right)p^2-\left(2\hat p+\frac{z^2}{n}\right)p+\hat p^2=0.$$
+   Then use the quadratic formula to show that the interval can be written as $\tilde p \pm h$, where
+   $$\tilde p=\frac{\hat p+z^2/(2n)}{1+z^2/n}
+   \qquad\text{and}\qquad
+   h=\frac{z}{1+z^2/n}\sqrt{\frac{\hat p(1-\hat p)}{n}+\frac{z^2}{4n^2}}.$$
+
+   **(iii) (3 points)** Compute the 95% Wilson interval for 48 of 50. Compare its center $\tilde p$ and its $\pm$ term $h$ with the center and $\pm$ term of the Wald interval from (i).
+
+   **(iv) (8 points)** Now study what happens as $n$ grows.
+
+   1. Show that $\tilde p$ is a weighted average of $\hat p$ and $1/2$,
+      $$\tilde p = w_1\,\hat p + w_2\cdot\tfrac12,
+      \qquad w_1=\frac{n}{n+z^2},\quad w_2=\frac{z^2}{n+z^2},$$
+      and check that $w_1 + w_2 = 1$. Use this to explain why the Wilson center is pulled toward $1/2$, and why the pull is strongest when $n$ is small. (4 points)
+   2. Hold $z$ fixed and treat $\hat p$ as a fixed number in $(0,1)$. Find the limits of $\tilde p$ and of $h$ as $n \to \infty$. (3 points)
+   3. Show that the ratio of the Wilson $\pm$ term $h$ to the Wald $\pm$ term $z\sqrt{\hat p(1-\hat p)/n}$ goes to 1 as $n \to \infty$. Hint: divide $h$ by the Wald term, then simplify the two factors separately. In one sentence, say what this means for when the two intervals agree. (1 point)
+
+b. **Zero errors (14 points).** A system makes no errors on $n = 45$ independent night frames. Let $q$ be its true error rate on frames like these.
+
+   **(i) (4 points)** Write the probability of seeing no errors in 45 frames as a function of $q$. A one-sided 95% upper bound for $q$ is the largest $q$ for which this probability is at least 0.05. Solve for this bound exactly and compute it. (This is the one-sided Clopper–Pearson bound from Lab 4.)
+
+   **(ii) (3 points)** Use $\log(0.05) \approx -3$ and $\log(1-q) \approx -q$ for small $q$ to show that the bound is approximately $3/n$. Compute $3/45$ and compare it with your exact answer.
+
+   **(iii) (2 points)** Compute the 95% Wald interval for the error rate using $\hat q = 0/45$. Why is it useless here?
+
+   **(iv) (2 points)** Using the rule of three, how many independent, error-free frames would you need before the upper bound falls below 1%? Below 0.1%?
+
+   **(v) (3 points)** A report says, "The system made no errors at night, so its night error rate is zero." In 2 sentences, use your answers to (i) and (iv) to explain what the data do and do not support.
+
+c. **Frames that share a sequence (32 points).** In Week 2 you used the law of total covariance for two raters labeling the same sentence. The same identity applies to frames from the same camera-trap sequence.
+
+   Suppose a test set has $G$ sequences with $m$ frames each, so $n = Gm$. Sequence $g$ has its own accuracy $P_g$, a random variable with mean $p$ and variance $\tau^2$. Given $P_g$, the $m$ frames in sequence $g$ are independent with $Y_{gi} \mid P_g \sim \operatorname{Bernoulli}(P_g)$, where $Y_{gi} = 1$ if the system is correct on frame $i$. Frames in different sequences are independent.
+
+   **(i) (6 points)** Two rules from probability help here. The **law of iterated expectations** says
+   $$E[Y] = E\bigl[\,E[Y \mid P]\,\bigr].$$
+   The **law of total variance** is the Week 2 law of total covariance with both variables equal to $Y$:
+   $$\operatorname{Var}(Y) = E\bigl[\operatorname{Var}(Y \mid P)\bigr] + \operatorname{Var}\bigl(E[Y \mid P]\bigr).$$
+
+   1. Use the law of iterated expectations to show that $E[Y_{gi}] = p$. (2 points)
+   2. Use the law of total variance to show that $\operatorname{Var}(Y_{gi}) = p(1-p)$. You will need $E[Y_{gi} \mid P_g] = P_g$, $\operatorname{Var}(Y_{gi} \mid P_g) = P_g(1-P_g)$, and $E[P_g^2] = \tau^2 + p^2$. (3 points)
+   3. Notice that $\tau^2$ cancels. In one sentence, explain why the variance of a single frame does not depend on how much accuracy varies across sequences. (1 point)
+
+   **(ii) (8 points)** Now take two different frames $i \ne k$ in the same sequence.
+
+   1. Use the law of total covariance to show that $\operatorname{Cov}(Y_{gi}, Y_{gk}) = \tau^2$. This is the same calculation as Week 2's two raters labeling one sentence. Given $P_g$, the two frames are independent, so $\operatorname{Cov}(Y_{gi}, Y_{gk} \mid P_g) = 0$. (5 points)
+   2. The **within-sequence correlation** is
+      $$\rho = \operatorname{Corr}(Y_{gi}, Y_{gk}) = \frac{\operatorname{Cov}(Y_{gi}, Y_{gk})}{\sqrt{\operatorname{Var}(Y_{gi})\operatorname{Var}(Y_{gk})}}.$$
+      Use part (i) to show that $\rho = \tau^2 / \{p(1-p)\}$. (3 points)
+
+   **(iii) (10 points)** Let $\hat p$ be the average of all $n$ frame outcomes. You will show that
+   $$\operatorname{Var}(\hat p)=\frac{p(1-p)}{n}\,\bigl[1+(m-1)\rho\bigr].$$
+
+   1. Let $S_g = \sum_{i=1}^m Y_{gi}$ be the number of correct frames in sequence $g$, so $\hat p = \frac{1}{n}\sum_{g=1}^G S_g$. Explain why $\operatorname{Var}(\hat p) = \frac{1}{n^2}\sum_{g=1}^G \operatorname{Var}(S_g)$. (3 points)
+   2. The variance of a sum is the sum of the variances plus the covariances of every pair:
+      $$\operatorname{Var}(S_g) = \sum_{i=1}^m \operatorname{Var}(Y_{gi}) + \sum_{i \ne k} \operatorname{Cov}(Y_{gi}, Y_{gk}).$$
+      There are $m(m-1)$ ordered pairs with $i \ne k$. Use parts (i) and (ii) to show that $\operatorname{Var}(S_g) = m\,p(1-p) + m(m-1)\tau^2$. (4 points)
+   3. Combine steps 1 and 2 with $n = Gm$ and $\tau^2 = \rho\,p(1-p)$ to get the formula above. (3 points)
+
+   **(iv) (4 points)** The factor $1+(m-1)\rho$ is called the **design effect**, and $n/[1+(m-1)\rho]$ is the **effective sample size**. Compute both for $m = 3$, $\rho = 0.4$, and $n = 54$. In one sentence, say what happens to the coverage of a frame-level Wilson interval if $\rho > 0$ and you ignore it.
+
+   **(v) (4 points)** Return to part (b). Suppose the 45 night frames came from 15 sequences of 3 frames with $\rho = 0.4$. Plug the effective sample size into the rule of three to get a rough upper bound, and compare it with your answer in (b)(ii).
+
+   **Note.** The same structure shows up in the final project. In the Instruction Following track, each prompt has several instruction checks, so the prompt plays the role of the sequence. Checks on the same prompt are correlated, and a bootstrap for the pass rate should resample whole prompts.
+
+# Problem 2 - Apply Problem 1 to new cameras (20 points)
+
+Use the `homework_holdout` rows. The outcome is whether the vision model is correct on each frame. AI help with code is allowed. Record any substantial help in the AI-use table.
+
+a. **Which interval would you report? (4 points).** Use `proportion_confint()` to compute the 95% Wilson interval (`method="wilson"`) and the 95% Clopper–Pearson interval (`method="beta"`) for the vision model's accuracy. The wildlife team's report needs one interval. In two sentences, say which you would report and why, using what the coverage simulation in Lab 4 showed.
+
+b. **Estimate the design effect (8 points).** Run the lab's `sequence_bootstrap()` with `B = 2000` and `seed = 2027`, and report its 95% percentile interval.
+
+   1. Estimate the design effect as the bootstrap variance divided by $\hat p(1-\hat p)/n$, and the effective sample size as $n$ divided by the design effect.
+   2. Every sequence here has $m = 3$ frames. Solve the design-effect formula from Problem 1(c) for $\rho$, and estimate $\rho$ from your design effect.
+   3. In 2 sentences, explain why the sequence bootstrap interval is wider than the Wilson interval, using your estimate of $\rho$.
+
+c. **What the interval does not cover (8 points).**
+
+   1. Report the result in two sentences using this template (3 points):
+
+      > On [population], the estimated [quantity] was [estimate] ([interval type] 95% CI [limits]). [The main limitation, in plain words.]
+
+   2. In HW1 you compared accuracy on the analysis cameras with accuracy on these homework cameras. These rows come from only three cameras. In 2–3 sentences, explain why neither interval accounts for differences between cameras, and what data you would need to put an interval on accuracy at a new camera. (5 points)
+
+# Problem 3 - Use AI to review a bootstrap (10 points)
+
+The starter notebook includes `ai_bootstrap_attempt()`, which an AI assistant wrote when asked for one draw of a sequence bootstrap. It runs without errors. The notebook also includes `supplied_checks()`, a few tests that any correct sequence bootstrap should pass.
+
+a. **Review and fix (4 points).** Give the function to an AI assistant and ask it to review the code. Preserve your prompt and its first response. Then run `supplied_checks()` on the function. In your own words, say what is wrong, if anything, and whether the AI found it. Get a corrected version, from the AI or by writing it yourself, and run `supplied_checks()` on it.
+
+b. **How wrong was it? (4 points)** Use your design effect from Problem 2(b) to estimate how the width of the original function's interval compares with the width of a correct sequence bootstrap interval. In 1–2 sentences, explain why code that runs without errors can still report the wrong standard error.
+
+## Required AI-use record (2 points)
+
+Complete the AI-use table in the notebook for Problems 2 and 3. Record the tool, its purpose, your **initial prompt only**, what you checked, what changed after checking, and one decision you made yourself.

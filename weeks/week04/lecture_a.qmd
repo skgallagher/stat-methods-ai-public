@@ -1,0 +1,573 @@
+---
+title: "Week 4A: How Precise Is a Benchmark Score?"
+subtitle: "Benchmarks have uncertainty"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+## Recap: Week 3 designed the evaluation {.smaller}
+
+- We turned "is the AI better?" into an estimand, a comparison, a data split, and a decision rule.
+- The plan ends with a number: an accuracy on held-out cases.
+
+**Today:** how much should anyone trust that number?
+
+## A leaderboard {.smaller}
+
+| Model | Accuracy on 1,000 test questions |
+|---|---:|
+| Model A | 86.4% |
+| Model B | 85.9% |
+
+"Model A is better." Is it?
+
+**Discuss with a neighbor:** what else would you need to know before deciding?
+
+::: notes
+Collect answers before moving on. Ones to steer toward:
+
+- how many questions, and how precise each score is (its standard error);
+- whether both models answered the same questions (pairing, Week 5);
+- what kinds of questions are in the benchmark, how they were chosen, and whether they match the use you care about;
+- whether the labels are trustworthy (Week 2);
+- whether running the same model again gives a different score (randomness in outputs);
+- whether either model saw these questions during training (contamination, leakage).
+
+Today takes the first one seriously.
+:::
+
+## Each score has a standard error {.smaller}
+
+If the 1,000 questions are a random sample of questions, each score has a **standard error**:
+
+$$\operatorname{SE}(\hat p) = \sqrt{\frac{\hat p(1-\hat p)}{n}} = \sqrt{\frac{0.864 \times 0.136}{1000}} = 0.011,$$
+
+about **1.1 percentage points**. A 95% interval is about $\pm 2.1$ points around each score.
+
+The gap between the models, 0.5 points, is less than half of one standard error.
+
+Today is about the precision of **one** score.
+
+<p class="compact-note">Comparing two models properly needs paired methods, because both answered the same questions. That is Week 5.</p>
+
+## A benchmark is a sample {.smaller}
+
+- The benchmark score is a **statistic**: a function of the data, here the test questions and the system's answers to them.
+- In regression, we usually treat the inputs $X$ as **fixed** and study how $Y$ varies given $X$.
+- In a benchmark, the test questions **are** the $X$'s, and they are not fixed: they are a sample from a population of questions.
+- So the score's **sampling distribution** comes from which questions were drawn. A different sample of questions would give a different score, and the standard error is the spread of those scores.
+- The score **estimates** the system's accuracy on the population of questions the benchmark is meant to represent.
+
+**Today's source of variation:** which questions landed in the test set.
+
+<p class="compact-note">Other sources come later in the course: disputed labels (Week 2), random variation in model outputs, and a benchmark population that differs from yours (Week 9).</p>
+
+## A score's sampling distribution {.smaller}
+
+Suppose a model's true accuracy is 0.86. Draw 5,000 benchmarks of 1,000 questions each and score the model on each.
+
+```{python}
+#| fig-width: 9
+#| fig-height: 2.6
+import numpy as np
+import matplotlib.pyplot as plt
+
+rng = np.random.default_rng(2027)
+scores = rng.binomial(1000, 0.86, size=5000) / 1000
+se = np.sqrt(0.86 * 0.14 / 1000)
+
+fig, ax = plt.subplots(figsize=(9, 2.6))
+counts, edges, _ = ax.hist(scores, bins=np.arange(0.815, 0.905, 0.002), color="#155a8a", alpha=0.8)
+top = counts.max()
+ax.axvline(0.86, color="#252525", linewidth=1.5)
+for side in [-1, 1]:
+    ax.axvline(0.86 + side * 1.96 * se, color="#c41230", linestyle="--", linewidth=1.3)
+ax.annotate("", xy=(0.86 + se, top * 1.08), xytext=(0.86, top * 1.08),
+            arrowprops=dict(arrowstyle="<->", color="#252525", linewidth=1.3))
+ax.text(0.86 + se / 2, top * 1.13, "1 SE = 0.011", ha="center", fontsize=10)
+ax.text(0.86 + 1.96 * se + 0.001, top * 0.95, "+1.96 SE", color="#c41230", fontsize=9)
+ax.text(0.86 - 1.96 * se - 0.001, top * 0.95, "−1.96 SE", color="#c41230", fontsize=9, ha="right")
+ax.set_ylim(0, top * 1.25)
+ax.set_xlabel("benchmark score from one draw of 1,000 questions")
+ax.set_yticks([])
+ax.spines[["top", "right", "left"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+The **standard deviation** of these scores is 0.011: that is the **standard error**, and it matches $\sqrt{0.86 \times 0.14 / 1000}$. About 95% of scores land within $\pm 1.96$ standard errors of the truth (dashed lines), though the full range is about $\pm 4$.
+
+<p class="compact-note">Not to be confused with $\sigma = \sqrt{p(1-p)} \approx 0.35$, the standard deviation of one question's 0/1 outcome. The standard error is $\sigma/\sqrt{n}$.</p>
+
+## Same idea, two vocabularies {.smaller .compact-table}
+
+| In statistics | In ML papers | What it means |
+|---|---|---|
+| standard error | "uncertainty," "$\pm$" after a score | how much the score would change with a different sample of test items |
+| 95% confidence interval | error bars, **if** they span about $\pm 1.96$ standard errors | a range from a procedure that captures the true accuracy in 95% of repeated samples |
+| sampling distribution | variation across test sets or runs | all the scores we could have gotten |
+
+Error bars are not always 95% intervals. In ML papers they may show
+
+- $\pm 1$ standard deviation across training runs,
+- $\pm 1$ standard error, which covers only about 68% for a roughly normal estimate, or
+- a 95% confidence interval.
+
+When you read "error bars," always ask: **error bars for what, and how wide?**
+
+## A false friend: the model's "confidence" {.smaller}
+
+For one photo, **[MegaDetector]{style="color:#155a8a"}** reports a **confidence** of 0.87 that an animal is present. That is the word ML uses for this number.
+
+- That is a **predicted probability for one photo**: how sure the model is that an animal is present.
+- **Statistical confidence** is about the **benchmark score**: how precisely we know the model's accuracy across photos.
+
+The two are unrelated. A model can be "99% confident" on every photo while its accuracy is known only roughly, because it was tested on just 20 photos.
+
+<p class="compact-note">Whether a model's confidence values mean what they say is a separate question, calibration, in Week 6.</p>
+
+## Error bars in AI evaluations {.smaller}
+
+- Many leaderboards report a single number, with no error bars.
+- When AI papers do show error bars, they often come from **retraining or rerunning with different random seeds**. That measures how much the score changes from run to run, not how much it would change with a different sample of test questions.
+- Miller (2024), "Adding Error Bars to Evals," argues that eval scores should come with standard errors. It treats test questions as drawn from an unseen **super-population**, uses clustered standard errors when questions share a passage (Thursday), and compares models with paired differences (Week 5).
+
+**Discuss:** a team reports 86.4% $\pm$ 0.3% across five random seeds on a 1,000-question benchmark. What does the $\pm$ 0.3% leave out?
+
+::: notes
+Reference: Evan Miller, "Adding Error Bars to Evals: A Statistical Approach to Language Model Evaluations," arXiv:2411.00640 (2024). The seed-to-seed spread ignores test-set sampling, which here is about plus or minus 2.1 points, seven times larger. Both kinds of variation can matter, and they answer different questions.
+:::
+
+## Our running example: the wildlife team {.smaller}
+
+:::: {.columns}
+::: {.column width="52%"}
+- Motion-triggered cameras take a burst of three photos, a **sequence**, whenever something moves.
+- A team is considering **[MegaDetector]{style="color:#155a8a"}** to sort the photos. Photos it calls empty may never be looked at.
+- The costly mistake is calling a photo empty when an animal is there.
+
+The team's two questions:
+
+1. How often is **[MegaDetector]{style="color:#155a8a"}** right on photos like ours?
+2. How sure can we be about that number?
+:::
+
+::: {.column width="48%"}
+![](assets/cct_deer.jpg){fig-alt="A mule deer walking through dry brush, photographed by a motion-triggered camera at 5:12 PM"}
+
+<p class="compact-note">Frame 1 of 3 in one burst. **[MegaDetector]{style="color:#155a8a"}** gives this photo a 0.98 probability of an animal.</p>
+:::
+::::
+
+::: notes
+Image: Caltech Camera Traps via LILA BC (Community Data License Agreement, Permissive), course image cct0049, an analysis camera.
+:::
+
+## Many benchmark scores are an accuracy {.smaller}
+
+Let $Y_i = 1$ if the system gets item $i$ right and $0$ if not. The score is
+
+$$\hat p = \frac{1}{n}\sum_{i=1}^n Y_i = \frac{k}{n},$$
+
+the share of the $n$ items it gets right.
+
+- An accuracy is an **average of 0/1 outcomes**, so it is an estimated proportion.
+- If items are independent and each is right with the same probability $p$, then $k \sim \operatorname{Binomial}(n, p)$, and $\hat p$ estimates $p$. In Week 1 this was the Bernoulli MLE.
+
+So "how precise is the benchmark score?" becomes **"how precise is an estimated proportion?"**
+
+## Exploratory data analysis: which population? {.smaller}
+
+An interval around the wildlife team's accuracy could describe:
+
+- more photos from the same sequences;
+- more sequences at the same cameras;
+- photos from other cameras like these;
+- cameras the team will put out next year.
+
+These are different populations with different amounts of uncertainty. An interval is only as good as the sampling story behind it.
+
+## Which interval do we choose? {.smaller}
+
+Once we know which population the score describes, we still have to choose **how** to build the interval. Several methods give a "95% interval" for an accuracy. We compare three:
+
+1. **Wald**, the textbook normal approximation;
+2. **Wilson**, which judges each candidate accuracy by its own standard error;
+3. **Clopper–Pearson**, the exact interval built from the binomial.
+
+We judge them on two things:
+
+- **Does it keep its promise?** A 95% interval should contain the true accuracy about 95% of the time.
+- **How wide is it?** A narrower interval is more useful, as long as it keeps the promise.
+
+## Wald: the normal approximation {.smaller}
+
+By the central limit theorem, when $n$ is large,
+
+$$\hat p \;\approx\; N\!\left(p,\ \frac{p(1-p)}{n}\right).$$
+
+We do not know $p$, so the **Wald interval** plugs in $\hat p$ for $p$ in the standard error:
+
+$$\operatorname{SE}(\hat p) \approx \sqrt{\frac{\hat p(1-\hat p)}{n}}, \qquad \hat p \pm z\,\operatorname{SE}(\hat p),$$
+
+where $z = z_{0.975} = 1.96$ for a 95% interval.
+
+For Model A: $0.864 \pm 1.96 \times 0.0108 = 0.864 \pm 0.021$.
+
+The normal approximation works well when $n$ is large and $\hat p$ is not near 0 or 1. Benchmarks for good AI systems often have $\hat p$ near 1, and subgroups often have small $n$.
+
+## Check: the standard error {.smaller}
+
+A benchmark has 400 questions, and a model gets 80% right.
+
+1. What is the standard error of its score?
+2. What is the 95% Wald interval?
+3. How many questions would you need to cut the standard error in half?
+
+::: notes
+1. sqrt(0.8 × 0.2 / 400) = 0.02.
+2. 0.80 ± 0.039, or about [0.761, 0.839].
+3. Four times as many, 1,600, because the standard error shrinks like 1/sqrt(n). Precision is expensive.
+:::
+
+## Wald near the boundary {.smaller}
+
+Suppose a system gets **19 of 20** right, so $\hat p = 0.95$ and $\operatorname{SE} = 0.049$:
+
+$$0.95 \pm 0.096 = [0.854,\ 1.046].$$
+
+Three problems:
+
+1. It can go past 1 (or below 0).
+2. With zero errors, $\operatorname{SE} = 0$ and the interval collapses to a single point.
+3. It covers the truth less often than it claims.
+
+Near the boundary, the sampling distribution of $\hat p$ is lopsided, but the Wald interval is symmetric.
+
+## Wilson: judge each $p$ by its own standard error {.smaller}
+
+Keep every candidate accuracy $p$ with $\;|\hat p - p| \le z\sqrt{p(1-p)/n}$, using the standard error **at $p$**.
+
+```{python}
+#| fig-width: 9
+#| fig-height: 2.3
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import norm
+
+z = norm.ppf(0.975)
+p_hat, n = 0.95, 20
+p = np.linspace(0.6, 0.999, 400)
+distance = np.abs(p_hat - p)
+allowed = z * np.sqrt(p * (1 - p) / n)
+inside = distance <= allowed
+
+fig, ax = plt.subplots(figsize=(9, 2.3))
+ax.fill_between(p, 0, 0.42, where=inside, color="#155a8a", alpha=0.15, label="kept: Wilson interval [0.764, 0.991]")
+ax.plot(p, distance, color="#252525", linewidth=2, label="distance |p̂ − p|, with p̂ = 0.95")
+ax.plot(p, allowed, color="#c41230", linewidth=2, label="bound: 1.96 × SE at p")
+ax.set_xlabel("candidate accuracy p")
+ax.set_ylabel("distance")
+ax.set_ylim(0, 0.42)
+ax.legend(frameon=False, fontsize=9, loc="upper right")
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+19 of 20 correct. **[Black:]{style="color:#252525"}** distance from $\hat p = 0.95$ to each $p$. **[Red:]{style="color:#c41230"}** the bound, 1.96 SE at that $p$. Wilson keeps $p$ where black is below red; the endpoints are where they cross.
+
+<p class="compact-note">In HW4 Problem 1 you derive the interval from this bound.</p>
+
+## Wilson for 19 of 20 {.smaller}
+
+| | Center | $\pm$ term | Interval |
+|---|---:|---:|---:|
+| Wald | 0.950 | 0.096 | [0.854, 1.046] |
+| Wilson | 0.878 | 0.114 | [0.764, 0.991] |
+
+The Wilson center moved toward 1/2, and the interval stays inside $[0, 1]$.
+
+## Shrinkage: the Wilson center pulls toward 1/2 {.smaller}
+
+The Wilson center is a weighted average of $\hat p$ and 1/2, with $w_1 = n/(n+z^2)$ and $w_2 = z^2/(n+z^2)$:
+$$\tilde p = w_1\,\hat p + w_2\cdot\tfrac12.$$
+An estimator that pulls raw estimates toward a central value is a **shrinkage** estimator.
+
+```{python}
+#| fig-width: 9
+#| fig-height: 1.8
+n_show = 20
+k_all = np.arange(0, n_show + 1)
+raw = k_all / n_show
+center = (k_all + z**2 / 2) / (n_show + z**2)
+
+fig, ax = plt.subplots(figsize=(9, 1.8))
+for k in k_all:
+    ax.plot([raw[k], center[k]], [1, 0], color="#9a9a9a", linewidth=1)
+ax.scatter(raw, np.ones_like(raw), color="#252525", s=25, zorder=3)
+ax.scatter(center, np.zeros_like(center), color="#c41230", s=25, zorder=3)
+ax.set_yticks([0, 1])
+ax.set_yticklabels(["Wilson center p̃", "raw accuracy p̂"])
+ax.set_xlabel("accuracy, for every possible result with n = 20")
+ax.set_xlim(-0.02, 1.02)
+ax.set_ylim(-0.3, 1.3)
+ax.spines[["top", "right", "left"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+Why shrink? 20 of 20 correct gives $\hat p = 1$, but 20 photos cannot show a model is perfect. Shrinking gives up a little bias for less variance.
+
+## How strong is the pull toward 1/2? {.smaller}
+
+The weight on 1/2 is $w_2 = z^2/(n + z^2)$:
+
+| $n$ | Weight on 1/2 |
+|---:|---:|
+| 20 | 0.161 |
+| 100 | 0.037 |
+| 1,000 | 0.004 |
+
+Small samples are pulled a lot, and large samples barely at all. When data are scarce, the estimate leans on the central value. When data are plentiful, the data speak for themselves. In HW4 you show the pull vanishes as $n$ grows.
+
+<p class="compact-note">Shrinkage returns in the project. Per-class accuracies from small classes are noisy, and shrinking them toward the overall accuracy is often better than reporting each one raw.</p>
+
+## An aside: adding imaginary photos {.smaller .compact-table}
+
+With $z = 1.96$, the Wilson center is $\;\tilde p = \dfrac{k + 1.92}{n + 3.84}$.
+
+- **Numerator:** + 1.92, about **2 correct** photos.
+- **Denominator:** + 3.84, about **4 photos** in all (2 correct, 2 incorrect).
+
+Other estimators add different amounts:
+
+| Add before counting | Estimate for 19 of 20 | Name |
+|---|---:|---|
+| nothing | 19/20 = 0.950 | the usual accuracy |
+| ½ correct, ½ incorrect | 19.5/21 = 0.929 | Jeffreys |
+| 1 correct, 1 incorrect | 20/22 = 0.909 | Laplace's rule of succession |
+| 1.92 correct, 1.92 incorrect | 20.92/23.84 = 0.878 | Wilson center = Agresti–Coull center |
+| 2 correct, 2 incorrect | 21/24 = 0.875 | "plus four" (Wilson, rounded) |
+
+<p class="compact-note">If you have seen Bayesian statistics, each row is a Bayes estimator. The connection stops at the center. The Wilson interval is not a Bayesian interval, because it comes from inverting a frequentist test.</p>
+
+::: notes
+Is the Wilson center the Bayes estimator? Yes, in the decision-theory sense. The Bayes risk of an estimator is r(pi, a) = integral of R(p, a) pi(p) dp, and the Bayes estimator minimizes it. Under squared-error loss the Bayes estimator is the posterior mean. With a Beta(z^2/2, z^2/2) prior and k of n correct, the posterior is Beta(k + z^2/2, n - k + z^2/2), whose mean is (k + z^2/2)/(n + z^2), the Wilson center. Each row of the table is the posterior mean for a Beta(a, a) prior, with a equal to the number added to each column.
+
+Caveats if a student asks: a different loss gives a different estimator (absolute-error loss gives the posterior median), and the Wilson "prior" is set by the confidence level, not by anyone's beliefs. As a unique Bayes rule under a proper prior, the Wilson center is admissible under squared-error loss.
+
+Minimax (Wasserman, All of Statistics, Ch. 12): with a Beta(a, a) prior the risk of the posterior mean is [n p(1-p) + a^2 (1-2p)^2] / (n + 2a)^2, which is constant in p when a = sqrt(n)/2. So (k + sqrt(n)/2)/(n + sqrt(n)) is minimax.
+
+Stein: when many proportions are estimated at once, shrinking them can beat the raw estimates. Further reading: Efron and Morris, "Stein's Paradox in Statistics," Scientific American (1977), which shrinks baseball batting averages toward the league average. The same move applies to per-class accuracies in the Food and Pets project tracks.
+
+Do not teach priors and posteriors here. Students may not have seen Bayesian statistics.
+:::
+
+## Clopper–Pearson: the exact interval {.smaller}
+
+- Built directly from the binomial: keep every $p$ under which seeing $k$ correct would not be too surprising, with at most 2.5% in each tail.
+- No normal approximation.
+- **Guaranteed** to cover the truth at least 95% of the time, for every $p$.
+- The cost: it is conservative, so it is usually wider.
+
+| 19 of 20 | Interval |
+|---|---:|
+| Wilson | [0.764, 0.991] |
+| Clopper–Pearson | [0.751, 0.999] |
+
+In code: `proportion_confint(k, n, method="beta")`.
+
+## What "95%" promises {.smaller}
+
+A 95% interval method should contain the true accuracy in about 95% of repeated test sets.
+
+For a binomial count we can compute that **coverage** exactly, for every possible true accuracy $p$: add up the probabilities of the counts $k$ whose interval contains $p$.
+
+## Coverage when $n = 20$ {.smaller}
+
+```{python}
+#| fig-width: 9
+#| fig-height: 3.6
+from scipy.stats import binom
+from statsmodels.stats.proportion import proportion_confint
+
+n = 20
+counts = np.arange(0, n + 1)
+true_p = np.linspace(0.5, 0.995, 500)
+
+def coverage_curve(lower, upper):
+    curve = []
+    for p in true_p:
+        covers = (lower <= p) & (p <= upper)
+        curve.append(binom.pmf(counts, n, p)[covers].sum())
+    return np.array(curve)
+
+p_hats = counts / n
+wald_pm = z * np.sqrt(p_hats * (1 - p_hats) / n)
+curves = {
+    "Wald": coverage_curve(p_hats - wald_pm, p_hats + wald_pm),
+    "Wilson": coverage_curve(*proportion_confint(counts, n, method="wilson")),
+    "Clopper–Pearson": coverage_curve(*proportion_confint(counts, n, method="beta")),
+}
+colors = {"Wald": "#9aa4b2", "Wilson": "#155a8a", "Clopper–Pearson": "#c41230"}
+
+fig, ax = plt.subplots(figsize=(9, 3.6))
+for name in curves:
+    ax.plot(true_p, curves[name], color=colors[name], linewidth=1.6, label=name)
+ax.axhline(0.95, color="#252525", linestyle="--", linewidth=1)
+ax.set_ylim(0.5, 1.0)
+ax.set_xlabel("true accuracy p")
+ax.set_ylabel("coverage")
+ax.legend(frameon=False, ncol=3, loc="lower left")
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+Wald often falls far below 95%, especially near 1. Wilson wiggles around 95%. Clopper–Pearson never drops below 95%.
+
+::: {.fragment}
+**Why the waves?** With $n = 20$ there are only 21 possible results, so only 21 possible intervals. As $p$ slides along, coverage drops suddenly each time $p$ crosses one of their endpoints, then drifts as the binomial probabilities shift.
+:::
+
+::: notes
+Optional reading: Brown, Cai, and DasGupta (2001), "Interval Estimation for a Binomial Proportion," made this picture famous. They call the jagged pattern the result of "lucky" and "unlucky" values of p, and show Wald's coverage can stay poor even for large n. At p = 0.95 the exact coverages are about 0.64 (Wald), 0.93 (Wilson), and 0.98 (Clopper–Pearson). Wald's minimum over this range is about 0.10, off the bottom of the plot.
+:::
+
+## What a 95% interval does and does not mean {.smaller}
+
+**It does mean:** the procedure that built it captures the true accuracy in about 95% of repeated samples of test items.
+
+**It does not mean:**
+
+- there is a 95% probability that the true accuracy is inside *this particular* interval (once computed, the interval either contains it or does not);
+- that 95% of photos, or 95% of model runs, fall inside it;
+- anything about problems the sample cannot see, like disputed labels, leakage, or a different population.
+
+::: notes
+If students push on the second bullet, point to the Bayes aside: a credible interval does carry a probability statement, but it requires a prior. The Wilson center matches a Bayes estimate; the Wilson interval is still a frequentist procedure.
+:::
+
+## Which interval should the team report? {.smaller}
+
+| | Coverage | Width |
+|---|---|---|
+| Wald | can be far too low near 0 or 1 | narrowest, but misleading |
+| Wilson | close to 95% on average | moderate |
+| Clopper–Pearson | at least 95% | widest |
+
+There is no universal answer. A guarantee matters most when an overconfident claim is costly, for example before the team stops checking photos the model calls empty.
+
+In HW4 you make this call for the wildlife team.
+
+## When the model makes no mistakes {.smaller}
+
+**No mistakes on 60 independent photos.** With true error rate $q$, which values of $q$ are still believable?
+
+**Try it:** use the binomial to write $P(\text{no mistakes})$ as a function of $q$.
+
+::: {.fragment}
+The number of mistakes is $K \sim \operatorname{Binomial}(60, q)$, so $\;P(K = 0) = \binom{60}{0} q^0 (1-q)^{60} = (1-q)^{60}.$
+:::
+
+::: {.fragment}
+Keep every $q$ under which seeing no mistakes is not too surprising, $P(K = 0) \ge 0.05$.
+
+```{python}
+#| fig-width: 9
+#| fig-height: 1.9
+q = np.linspace(0, 0.15, 300)
+prob_zero = (1 - q) ** 60
+q_bound = 1 - 0.05 ** (1 / 60)
+
+fig, ax = plt.subplots(figsize=(9, 1.9))
+ax.fill_between(q, 0, 1, where=q <= q_bound, color="#155a8a", alpha=0.15, label="kept values of q")
+ax.plot(q, prob_zero, color="#252525", linewidth=2, label="P(no mistakes in 60) = (1 − q)^60")
+ax.axhline(0.05, color="#c41230", linestyle="--", linewidth=1.2, label="0.05")
+ax.set_xlabel("true error rate q")
+ax.set_ylabel("probability")
+ax.set_ylim(0, 1)
+ax.legend(frameon=False, fontsize=9, loc="upper right")
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+:::
+
+## Solving for the bound {.smaller}
+
+**Try it:** find the largest $q$ with $(1-q)^{60} \ge 0.05$.
+
+::: {.fragment}
+The bound is where the curve crosses 0.05:
+$$(1-q)^{60} = 0.05 \quad\Longrightarrow\quad q = 1 - 0.05^{1/60} = 0.049.$$
+:::
+
+::: {.fragment}
+- This is the **one-sided Clopper–Pearson** bound when there are no errors.
+- The **rule of three** approximates it by $3/n = 3/60 = 0.050$. In HW4 you show why.
+:::
+
+::: {.fragment}
+"No mistakes" means "the error rate is probably below about 5%," not "the error rate is 0."
+:::
+
+## Better systems are harder to verify {.smaller .compact-table}
+
+To show the error rate is below a target $q_0$, the rule of three needs $3/n < q_0$, so $n > 3/q_0$ error-free photos.
+
+| To show the error rate is below | Error-free, independent photos needed |
+|---:|---:|
+| 10% | 30 |
+| 2% | 150 |
+| 0.5% | 600 |
+| 0.05% | 6,000 |
+
+- Every 10-fold stronger claim needs 10 times the data.
+- A better system makes fewer mistakes, so backing up its claim takes **more** data, not less.
+- These counts assume independent photos. With bursts of three, the team needs even more (Lecture B).
+
+<p class="compact-note">Self-driving cars face the same arithmetic. Kalra and Paddock (RAND, 2016) estimated that showing a fatality rate better than human drivers would take hundreds of millions of miles of driving.</p>
+
+## Check {.smaller}
+
+A sorting model makes **no mistakes on 120 independent photos**.
+
+1. Give a rough 95% upper bound on its error rate.
+2. A manager says, "It never makes mistakes." What would you tell them?
+3. On another set, the model gets 112 of 120 right. Which interval would you report, and why?
+
+::: notes
+1. 3/120 = 0.025; the exact bound is 1 − 0.05^(1/120) = 0.0247.
+2. The data rule out error rates much above 2.5%, but they cannot show the rate is zero, and they describe only photos like these.
+3. With p-hat = 0.93 and n = 120, Wilson and Clopper–Pearson are close. Either is defensible with a reason about coverage versus width.
+:::
+
+## One assumption we have not questioned {.smaller}
+
+Every interval today assumed the items are **independent**.
+
+Camera traps take bursts of three nearly identical photos. Are those three pieces of evidence, or closer to one?
+
+**Thursday:** what happens when benchmark items come in clusters.
+
+## What we did today {.smaller}
+
+1. A benchmark's test questions are a sample, so its score changes from sample to sample: it has a sampling distribution and a **standard error**.
+2. "Uncertainty," "error bars," and "confidence" mean different things in statistics and ML. Ask what source of variation they measure.
+3. Many benchmark scores are accuracies, so the question becomes how precise an estimated proportion is.
+4. Wald breaks near 0 and 1. Wilson judges each $p$ by its own standard error and shrinks toward 1/2. Clopper–Pearson guarantees coverage but is wider.
+5. Zero mistakes still leaves an upper bound of about $3/n$, so the better the system, the more data it takes to verify.
+6. All of these assume independent items.
+
+**Reading:** Miller (2024), ["Adding Error Bars to Evals"](https://arxiv.org/abs/2411.00640), Sections 1–2. Section 2.2 previews Thursday.

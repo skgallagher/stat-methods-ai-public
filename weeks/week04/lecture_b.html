@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="lecture_b_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lecture_b_files/libs/quarto-html/tabby.min.js"></script>
+<script src="lecture_b_files/libs/quarto-html/popper.min.js"></script>
+<script src="lecture_b_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="lecture_b_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lecture_b_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="lecture_b_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.38">
+
+  <meta name="author" content="Shannon Gallagher">
+  <title>Week 4B: Benchmark Items Come in Clusters</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="lecture_b_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="lecture_b_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="lecture_b_files/libs/revealjs/dist/theme/quarto-0427d8d92a431aa6a6430e53ec02a470.css">
+  <link rel="stylesheet" href="lecture.css">
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+  <link href="lecture_b_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="lecture_b_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="lecture_b_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="lecture_b_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Week 4B: Benchmark Items Come in Clusters</h1>
+  <p class="subtitle">Lecture bridge and guided lab</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Shannon Gallagher 
+</div>
+</div>
+</div>
+
+</section>
+<section id="recap" class="slide level2 smaller">
+<h2>Recap</h2>
+<ul>
+<li>Many benchmark scores are an accuracy, which is an estimated proportion.</li>
+<li>Wald breaks near 0 and 1. Wilson and Clopper–Pearson behave better.</li>
+<li>Every one of them assumes the items in the benchmark, each photo or each test question, are <strong>independent</strong>.</li>
+</ul>
+<p><strong>Today:</strong> what happens when they are not.</p>
+</section>
+<section id="benchmark-items-often-come-in-clusters" class="slide level2 smaller compact-table">
+<h2>Benchmark items often come in clusters</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Benchmark</th>
+<th>One scored item</th>
+<th>Cluster</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Camera traps</td>
+<td>one photo</td>
+<td>the burst of three photos, and the camera</td>
+</tr>
+<tr class="even">
+<td>Reading comprehension (for example, <a href="https://rajpurkar.github.io/SQuAD-explorer/">SQuAD</a>)</td>
+<td>one question</td>
+<td>the passage it asks about</td>
+</tr>
+<tr class="odd">
+<td>Instruction following (project track)</td>
+<td>one instruction check</td>
+<td>the prompt</td>
+</tr>
+<tr class="even">
+<td>Human preferences (project track)</td>
+<td>one judgment</td>
+<td>the response pair, and the Reddit post</td>
+</tr>
+</tbody>
+</table>
+<p>Items in the same cluster tend to be easy or hard together. A hard passage makes all its questions harder, and a hidden animal is hidden in all three photos.</p>
+
+<img data-src="assets/cct_burst.jpg" style="width:88.0%" class="r-stretch quarto-figure-center"><p class="caption">One burst from the wildlife team’s cameras: the same half-hidden deer, one second apart.</p></section>
+<section id="two-levels-of-randomness" class="slide level2 smaller">
+<h2>Two levels of randomness</h2>
+<p>A reading benchmark has <span class="math inline">G</span> passages with <span class="math inline">m</span> questions each. A grader scores each answer from 0 to 100; call the score <span class="math inline">Y</span>.</p>
+<ol type="1">
+<li><strong>Which passage?</strong> Passage <span class="math inline">g</span> has its own mean score <span class="math inline">\mu_g</span>, because some passages are harder than others. Across passages, <span class="math inline">\mu_g</span> has mean <span class="math inline">\mu</span> and variance <span class="math inline">\tau^2</span>.</li>
+<li><strong>Which answers?</strong> Given <span class="math inline">\mu_g</span>, the scores for the questions about passage <span class="math inline">g</span> are independent, <span class="math inline">Y \mid \mu_g \sim N(\mu_g, \sigma^2)</span>.</li>
+</ol>
+<p>What is the average score of a randomly chosen question?</p>
+<div class="fragment">
+<p>Average within a passage first, then across passages: <span class="math display">E[Y] = E\bigl[E[Y \mid \mu_g]\bigr] = E[\mu_g] = \mu.</span> This is the <strong>law of iterated expectations</strong>.</p>
+</div>
+</section>
+<section id="how-much-does-one-score-vary" class="slide level2 smaller">
+<h2>How much does one score vary?</h2>
+<p>A score varies because answers vary within a passage, and because passages differ.</p>
+<div class="fragment">
+<p>The <strong>law of total variance</strong> adds the two parts: <span class="math display">\operatorname{Var}(Y) = \underbrace{E\bigl[\operatorname{Var}(Y \mid \mu_g)\bigr]}_{\text{within a passage: } \sigma^2} + \underbrace{\operatorname{Var}\bigl(E[Y \mid \mu_g]\bigr)}_{\text{between passages: } \tau^2} = \sigma^2 + \tau^2.</span></p>
+</div>
+<div class="fragment">
+<p>If <span class="math inline">\sigma = 16</span> and <span class="math inline">\tau = 8</span>, then <span class="math inline">\operatorname{Var}(Y) = 256 + 64 = 320</span>. One fifth of the variance comes from which passage the question is about.</p>
+</div>
+</section>
+<section id="are-two-questions-about-one-passage-independent" class="slide level2 smaller">
+<h2>Are two questions about one passage independent?</h2>
+<p>Given the passage, yes. But the passage itself is random.</p>
+<div class="fragment">
+<p>Split the covariance the same way, with the <strong>law of total covariance</strong> from Week 2:</p>
+<p><span class="math display">\operatorname{Cov}(Y_1, Y_2) = \underbrace{E\bigl[\operatorname{Cov}(Y_1, Y_2 \mid \mu_g)\bigr]}_{\text{within a passage: } 0} + \underbrace{\operatorname{Cov}(\mu_g,\, \mu_g)}_{\tau^2} = \tau^2.</span></p>
+<p>Both scores rise and fall with the passage’s difficulty. Their correlation is the share of the variance that comes from the passage, <span class="math display">\rho = \frac{\tau^2}{\sigma^2 + \tau^2} = \frac{64}{320} = 0.2.</span></p>
+</div>
+</section>
+<section id="two-questions-one-passage" class="slide level2 smaller">
+<h2>Two questions, one passage</h2>
+<p>For the total of <span class="math inline">m = 2</span> scores from one passage:</p>
+<p><span class="math display">\operatorname{Var}(Y_1 + Y_2) = \operatorname{Var}(Y_1) + \operatorname{Var}(Y_2) + 2\operatorname{Cov}(Y_1, Y_2) = 2(\sigma^2 + \tau^2) + 2\tau^2.</span></p>
+<p>The <span class="math inline">2\tau^2</span> is extra variance that an independence assumption ignores. With <span class="math inline">\sigma = 16</span> and <span class="math inline">\tau = 8</span>, that is <span class="math inline">640 + 128 = 768</span> instead of 640, or 20% more.</p>
+</section>
+<section id="the-design-effect" class="slide level2 smaller">
+<h2>The design effect</h2>
+<p>With <span class="math inline">m</span> items per cluster and <span class="math inline">n</span> items in all, the mean score <span class="math inline">\bar Y</span> has</p>
+<p><span class="math display">\operatorname{Var}(\bar Y) = \frac{\sigma^2 + \tau^2}{n}\,\bigl[1 + (m-1)\rho\bigr].</span></p>
+<ul>
+<li><strong>Design effect:</strong> <span class="math inline">1 + (m-1)\rho</span>.</li>
+<li><strong>Effective sample size:</strong> <span class="math inline">n</span> divided by the design effect.</li>
+</ul>
+<p>Worked example: 100 passages with 4 questions each and <span class="math inline">\rho = 0.2</span>. The design effect is <span class="math inline">1 + 3(0.2) = 1.6</span>, so 400 questions carry about as much information as <strong>250</strong> independent ones. An interval that ignores this and claims 95% actually covers about <strong>88%</strong> of the time.</p>
+<p class="compact-note">
+The same design effect applies to an accuracy. In HW4 you derive it for camera-trap photos.
+</p>
+</section>
+<section id="what-rho-does-to-400-questions" class="slide level2 smaller">
+<h2>What <span class="math inline">\rho</span> does to 400 questions</h2>
+<div id="6e60e10e" class="cell" data-fig-height="3.6" data-fig-width="10" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_b_files/figure-revealjs/cell-2-output-1.png" width="951" height="335"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>At <span class="math inline">\rho = 0</span> the 400 questions are independent. At <span class="math inline">\rho = 1</span> every question about a passage gets the same score, so the benchmark holds only 100 pieces of information, one per passage. With more questions per passage, the same <span class="math inline">\rho</span> costs even more. With <span class="math inline">m = 20</span> and <span class="math inline">\rho = 0.1</span>, the design effect is 2.9.</p>
+</section>
+<section id="fixing-the-coverage" class="slide level2 smaller">
+<h2>Fixing the coverage</h2>
+<p>The interval on the last slide misses because its standard error pretends the 400 questions are independent. The bootstrap estimates the sampling distribution by <strong>resampling the data the same way they were sampled</strong>. The benchmark sampled passages, and each passage brought its questions with it.</p>
+<div id="d0a6b015" class="cell" data-fig-height="2.9" data-fig-width="9" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_b_files/figure-revealjs/cell-3-output-1.png" width="854" height="269"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Resampling whole passages reproduces the spread of the true sampling distribution. Resampling single questions is too narrow, the same mistake as the naive interval.</p>
+</section>
+<section id="the-cluster-bootstrap-step-by-step" class="slide level2 smaller">
+<h2>The cluster bootstrap, step by step</h2>
+<ol type="1">
+<li>Draw <span class="math inline">G</span> clusters, with replacement, from the <span class="math inline">G</span> clusters you have.</li>
+<li>Keep every item in each drawn cluster.</li>
+<li>Recompute the mean score.</li>
+<li>Repeat 2,000 times. The middle 95% of those means is the interval.</li>
+</ol>
+<p>Resampling whole clusters keeps the “easy or hard together” pattern in every bootstrap sample.</p>
+<p><strong>Estimating the design effect from data:</strong> divide the bootstrap variance by <span class="math inline">s^2/n</span>, the variance if the questions were independent (<span class="math inline">s^2</span> is the sample variance of the scores). For example, if the bootstrap variance is 1.28 and <span class="math inline">s^2/n = 320/400 = 0.80</span>, the design effect is 1.6. With <span class="math inline">m = 4</span>, solving <span class="math inline">1 + 3\rho = 1.6</span> gives <span class="math inline">\hat\rho = 0.2</span>.</p>
+</section>
+<section id="writing-the-result" class="slide level2 smaller">
+<h2>Writing the result</h2>
+<blockquote>
+<p>On [population], the estimated [quantity] was [estimate] ([interval type] 95% CI [limits]). [The main limitation, in plain words.]</p>
+</blockquote>
+<p>For the reading benchmark:</p>
+<blockquote>
+<p>On questions about these 100 passages, the estimated mean score was 72 (passage-bootstrap 95% CI 70 to 74). All 100 passages come from one encyclopedia.</p>
+</blockquote>
+<p>For the wildlife team, every interval describes photos from <strong>these cameras</strong>. A new camera is outside that population.</p>
+</section>
+<section id="how-many-photos-should-the-team-label" class="slide level2 smaller">
+<h2>How many photos should the team label?</h2>
+<p>The team wants its 95% interval for accuracy, which is near 0.9, to reach no more than 3 points on either side: <span class="math display">z\sqrt{\frac{p(1-p)}{n}} \le 0.03.</span></p>
+<p>With independent photos, solving for <span class="math inline">n</span> gives <span class="math display">n \ge \frac{z^2\,p(1-p)}{0.03^2} = \frac{3.84 \times 0.09}{0.0009} \approx 385.</span></p>
+<p>With bursts of three photos and <span class="math inline">\rho = 0.4</span>, the design effect is <span class="math inline">1 + 2(0.4) = 1.8</span>. Each photo is worth only <span class="math inline">1/1.8</span> of an independent one, so the team needs 1.8 times as many, about <strong>690 photos, or 230 sequences</strong>.</p>
+</section>
+<section id="does-your-project-have-clusters" class="slide level2 smaller compact-table">
+<h2>Does your project have clusters?</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Track</th>
+<th>One scored item</th>
+<th>Clusters?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Food tagging</td>
+<td>one image</td>
+<td>No.&nbsp;Nothing links images, so treat them as independent.</td>
+</tr>
+<tr class="even">
+<td>Pet tagging</td>
+<td>one image</td>
+<td>No, same as Food.</td>
+</tr>
+<tr class="odd">
+<td>Human preferences</td>
+<td>one judge verdict</td>
+<td>Yes, if you judge each pair in both orders, since the two verdicts share a pair. A few pairs also come from the same Reddit post.</td>
+</tr>
+<tr class="even">
+<td>Instruction following</td>
+<td>one instruction check</td>
+<td>Yes. Each response gets several checks, and each prompt has several responses.</td>
+</tr>
+</tbody>
+</table>
+<p>For Food and Pets, today’s other lessons matter more. Per-class and per-breed counts are small, so those intervals are wide, and cat-or-dog accuracy is near 1, where Wald fails.</p>
+<p>Before computing an interval, ask what was sampled. If items share a source, resample the source.</p>
+</section>
+<section id="todays-lab" class="slide level2 smaller">
+<h2>Today’s lab</h2>
+<ol type="1">
+<li>Look at the photos, and see how a burst is three near-copies.</li>
+<li>Compare Wald, Wilson, and Clopper–Pearson.</li>
+<li>Check by simulation whether each interval keeps its promise.</li>
+<li>A camera with no mistakes.</li>
+<li>Look at the mistakes: is the model wrong, or the label?</li>
+<li>The sequence bootstrap and the design effect.</li>
+<li>Night photos: how much do we actually know?</li>
+</ol>
+<p>You will end with the result you would report to the wildlife team.</p>
+</section>
+<section id="hw4-handoff" class="slide level2 smaller">
+<h2>HW4 handoff</h2>
+<ul>
+<li><strong>Problem 1:</strong> derive the Wilson interval, the zero-error bound, and the design effect.</li>
+<li><strong>Problem 2:</strong> apply them to the homework cameras, and decide which interval to report.</li>
+<li><strong>Problem 3:</strong> use AI to review and test a bootstrap function, and find what is wrong.</li>
+</ul>
+<p>Do Problem 1 first. Problems 2 and 3 use its results.</p>
+</section>
+<section id="what-we-did-today" class="slide level2 smaller">
+<h2>What we did today</h2>
+<ol type="1">
+<li>Benchmark items often come in clusters, and items in a cluster tend to be right or wrong together.</li>
+<li>The law of total covariance turns that into a within-cluster correlation <span class="math inline">\rho</span>.</li>
+<li>The design effect <span class="math inline">1 + (m-1)\rho</span> tells us how much an independence assumption understates the variance.</li>
+<li>The cluster bootstrap resamples whole clusters.</li>
+<li>No interval can reach beyond the population it sampled.</li>
+</ol>
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="lecture_b_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="lecture_b_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="lecture_b_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="lecture_b_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="lecture_b_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="lecture_b_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="lecture_b_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="lecture_b_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="lecture_b_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

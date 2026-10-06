@@ -10,6 +10,9 @@ function setRepoLinks() {
 
 function isReleased(item, today = new Date()) {
   if (siteSettings.moduleReleaseMode === "all") return true;
+  if (siteSettings.moduleReleaseMode === "beta") {
+    return item.week <= siteSettings.betaThroughWeek;
+  }
   if (siteSettings.moduleReleaseMode === "preview") {
     return item.week === siteSettings.previewWeek;
   }
@@ -26,7 +29,7 @@ function formatOpenDate(dateString) {
 }
 
 function materialLink(link, today = new Date()) {
-  if (!link.openDate) {
+  if (!link.openDate || siteSettings.moduleReleaseMode === "beta") {
     return `<a class="pill" href="${link.href}">${link.label}</a>`;
   }
 
@@ -86,6 +89,8 @@ function renderModulesPage() {
   if (modeLabel) {
     if (siteSettings.moduleReleaseMode === "preview") {
       modeLabel.textContent = `Preview mode: showing Week ${siteSettings.previewWeek}. Lab and homework links remain gated by their opening dates.`;
+    } else if (siteSettings.moduleReleaseMode === "beta") {
+      modeLabel.textContent = `Beta preview: showing Weeks 1–${siteSettings.betaThroughWeek} with every link open.`;
     } else if (siteSettings.moduleReleaseMode === "all") {
       modeLabel.textContent = "Preview mode: showing all scheduled modules.";
     } else {
