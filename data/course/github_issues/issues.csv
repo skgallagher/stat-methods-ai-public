@@ -1,0 +1,121 @@
+issue_number,title,created_date,created_year,module_label,reporter_group,source_url
+10408,Feature importance random forest,2018-01-05,2018,module:ensemble,reporter_ce36a26885,https://github.com/scikit-learn/scikit-learn/issues/10408
+10454,dysfunctional n_jobs=-1 in sklearn.model_selection.GridSearchCV,2018-01-11,2018,module:model_selection,reporter_844f41deda,https://github.com/scikit-learn/scikit-learn/issues/10454
+10525,Improve RidgeCV exception message when called with `store_cv_values=False`,2018-01-24,2018,module:linear_model,reporter_da6b366171,https://github.com/scikit-learn/scikit-learn/issues/10525
+10717,Add the prior_class distribution as an argument for DecisionTreeClassifier,2018-02-27,2018,module:tree,reporter_8f58360a44,https://github.com/scikit-learn/scikit-learn/issues/10717
+10850,Random initialisation of GMM should consider data magnitude,2018-03-21,2018,module:cluster,reporter_d3b837158f,https://github.com/scikit-learn/scikit-learn/issues/10850
+10980,linear_kernel should have an optional dense_output parameter,2018-04-15,2018,module:metrics,reporter_083594bca1,https://github.com/scikit-learn/scikit-learn/issues/10980
+11400,Regression Tree Linear Regression at Leaf Nodes,2018-07-02,2018,module:tree,reporter_ae360ecafe,https://github.com/scikit-learn/scikit-learn/issues/11400
+11447,Avoid np.asarray call in check_array for duck-typed arrays,2018-07-05,2018,module:utils,reporter_1d9d872e2f,https://github.com/scikit-learn/scikit-learn/issues/11447
+11681,Optimizing assert_all_finite check,2018-07-25,2018,module:utils,reporter_b257490eb3,https://github.com/scikit-learn/scikit-learn/issues/11681
+11826,Index structure creation for knn-classifier...,2018-08-15,2018,module:cluster,reporter_82dd0ac60d,https://github.com/scikit-learn/scikit-learn/issues/11826
+11997,Handle missing values in OrdinalEncoder,2018-09-04,2018,module:preprocessing,reporter_d3b837158f,https://github.com/scikit-learn/scikit-learn/issues/11997
+12482,RandomForestClassifier parallel issues with CPU usage decreasing over run,2018-10-29,2018,module:ensemble,reporter_d81745b22d,https://github.com/scikit-learn/scikit-learn/issues/12482
+12845,LogisticRegressionCV failure when not all classes appear in each fold,2018-12-20,2018,module:linear_model,reporter_07dc0439b4,https://github.com/scikit-learn/scikit-learn/issues/12845
+12939,RandomizedSearchCV: warnings cannot be suppressed,2019-01-08,2019,module:model_selection,reporter_5a956f7a87,https://github.com/scikit-learn/scikit-learn/issues/12939
+13401,"Agglomeration clustering always returns two different clusters, even if data points are same",2019-03-06,2019,module:cluster,reporter_5bcc24df1b,https://github.com/scikit-learn/scikit-learn/issues/13401
+13619,Shuffled GroupKFold,2019-04-11,2019,module:model_selection,reporter_7b6382b63b,https://github.com/scikit-learn/scikit-learn/issues/13619
+13658,Modify check_estimator to handle fit() additional keywords?,2019-04-16,2019,module:utils,reporter_d4c343f94b,https://github.com/scikit-learn/scikit-learn/issues/13658
+14256,Kappa score cannot return 1,2019-07-04,2019,module:metrics,reporter_5cc39632af,https://github.com/scikit-learn/scikit-learn/issues/14256
+14497,wrong input into entropy function,2019-07-28,2019,module:cluster,reporter_69274fc542,https://github.com/scikit-learn/scikit-learn/issues/14497
+15019,cross_val_score threshold adjustment,2019-09-19,2019,module:model_selection,reporter_3247200754,https://github.com/scikit-learn/scikit-learn/issues/15019
+15124,LabelEncoder encodes multiple classes to the same number.,2019-10-03,2019,module:preprocessing,reporter_25742d0e49,https://github.com/scikit-learn/scikit-learn/issues/15124
+15150,Feature importances and node impurity of an ExtraTreesRegressor are NaN after fitting the model,2019-10-07,2019,module:tree,reporter_3f31c59817,https://github.com/scikit-learn/scikit-learn/issues/15150
+15275,Feature Importance - Isolation Regression Forest,2019-10-16,2019,module:ensemble,reporter_85c7d81507,https://github.com/scikit-learn/scikit-learn/issues/15275
+15422,warm_start for LinearSVC,2019-10-31,2019,module:linear_model,reporter_11dd65a4e3,https://github.com/scikit-learn/scikit-learn/issues/15422
+15741,[DOC] sklearn.utils.deprecated yields indentations in HTML output,2019-11-29,2019,module:utils,reporter_12b7d44d73,https://github.com/scikit-learn/scikit-learn/issues/15741
+15910,Crossvalidation on estimator fails when using option multioutput = 'raw_values' in make_scorer function,2019-12-17,2019,module:model_selection,reporter_64987b5a9c,https://github.com/scikit-learn/scikit-learn/issues/15910
+16016,Make HistGradientBoostingRegressor/Classifer use _openmp_effective_n_threads to set the default maximum number of threads to use,2020-01-03,2020,module:ensemble,reporter_d725ec937e,https://github.com/scikit-learn/scikit-learn/issues/16016
+16080,Missing argument `ensure_2d=False` in call to check_array(),2020-01-09,2020,module:metrics,reporter_0b448a600d,https://github.com/scikit-learn/scikit-learn/issues/16080
+16151,"Agglomerative clustering ValueError: Precomputed metric requires shape (n_queries, n_indexed). Got (7, 57) for 50 indexed.",2020-01-18,2020,module:cluster,reporter_99e2d93774,https://github.com/scikit-learn/scikit-learn/issues/16151
+16186,Possible unnecessary iterations in Newton-CG algoithm,2020-01-23,2020,module:utils,reporter_234619b581,https://github.com/scikit-learn/scikit-learn/issues/16186
+16279,Multinomial LogisticRegressionCV test with solver newton-cg fails on MacOS with dev version of numpy,2020-01-29,2020,module:linear_model,reporter_069dc2b78b,https://github.com/scikit-learn/scikit-learn/issues/16279
+16327,ColumnTransformer performance very slow when columns specification a very large list of column names,2020-01-30,2020,module:utils,reporter_d81745b22d,https://github.com/scikit-learn/scikit-learn/issues/16327
+16436,_get_estimators_indices() in BaseBagging class does not generate indices properly,2020-02-13,2020,module:ensemble,reporter_ddae023ae5,https://github.com/scikit-learn/scikit-learn/issues/16436
+16446,DBSCAN defining clusters with a single point,2020-02-14,2020,module:cluster,reporter_25f0c77199,https://github.com/scikit-learn/scikit-learn/issues/16446
+16519,Make colorbar in plot_confusion_matrix optional,2020-02-21,2020,module:metrics,reporter_2031dbf5bc,https://github.com/scikit-learn/scikit-learn/issues/16519
+16563,cross_val_score and StratifiedKFold give different result,2020-02-27,2020,module:model_selection,reporter_df59a1d8f1,https://github.com/scikit-learn/scikit-learn/issues/16563
+16594,Documentation is wrong about KMeans.inertia_,2020-02-28,2020,module:cluster,reporter_36a32395fc,https://github.com/scikit-learn/scikit-learn/issues/16594
+16597,FunctionTransformer example is obsolete,2020-02-29,2020,module:preprocessing,reporter_3fdb4e718b,https://github.com/scikit-learn/scikit-learn/issues/16597
+16653,check_is_fitted and validate_date are a performance bottlenck for ensembles prediction,2020-03-06,2020,module:utils,reporter_df7a8153f4,https://github.com/scikit-learn/scikit-learn/issues/16653
+16924,Matthews correlation coefficient metric throws misleading division by zero RuntimeWarning,2020-04-14,2020,module:metrics,reporter_1ff4d88730,https://github.com/scikit-learn/scikit-learn/issues/16924
+16943,tree.plot_tree() does not visualize properly if also using seaborn.set_style(),2020-04-16,2020,module:tree,reporter_db4780a80a,https://github.com/scikit-learn/scikit-learn/issues/16943
+16958,xfail_checks tag only works with parametrize_with_checks,2020-04-18,2020,module:utils,reporter_b6630bd581,https://github.com/scikit-learn/scikit-learn/issues/16958
+16980,StratifiedKFold doesnt work with bytes classes,2020-04-21,2020,module:model_selection,reporter_2e9d142026,https://github.com/scikit-learn/scikit-learn/issues/16980
+17070,RandomForestClassifier class_weight parameter is inverted,2020-04-28,2020,module:ensemble,reporter_8a43912edd,https://github.com/scikit-learn/scikit-learn/issues/17070
+17125,LogisticRegression memory consumption goes crazy on 0.22+,2020-05-04,2020,module:linear_model,reporter_8fca5f88ea,https://github.com/scikit-learn/scikit-learn/issues/17125
+17168,[RFC] Registry for scorers,2020-05-09,2020,module:metrics,reporter_589f3c0739,https://github.com/scikit-learn/scikit-learn/issues/17168
+17230,sklearn.cluster.KMeans 0.23 is extra slower compared to 0.22.2,2020-05-15,2020,module:cluster,reporter_fdac21297d,https://github.com/scikit-learn/scikit-learn/issues/17230
+17554,Cython code for PolynomialFeatures should use int64s for indices.,2020-06-10,2020,module:preprocessing,reporter_dcd991118e,https://github.com/scikit-learn/scikit-learn/issues/17554
+17955,HistGradientBoostingRegressor and quantile loss function,2020-07-20,2020,module:ensemble,reporter_92a794cfa1,https://github.com/scikit-learn/scikit-learn/issues/17955
+17978,predict_proba() for linear models with log loss can return NaNs with large model coefficients,2020-07-23,2020,module:linear_model,reporter_bc236996c5,https://github.com/scikit-learn/scikit-learn/issues/17978
+18005,check_estimator and binary_only tag,2020-07-27,2020,module:utils,reporter_589f3c0739,https://github.com/scikit-learn/scikit-learn/issues/18005
+18147,GroupShuffleSplit with optional shuffle,2020-08-13,2020,module:model_selection,reporter_bc271afb14,https://github.com/scikit-learn/scikit-learn/issues/18147
+18153,In a DecisionTreeClassifier min_samples_split does not take sample_weight into account.,2020-08-13,2020,module:tree,reporter_b505cce019,https://github.com/scikit-learn/scikit-learn/issues/18153
+18524,sklearn.metrics.silhouette_samples does not work with sparse matrices,2020-10-02,2020,module:metrics,reporter_8827bc2f62,https://github.com/scikit-learn/scikit-learn/issues/18524
+18552,add separator argument to OneHotEncoder get_feature_names method,2020-10-07,2020,module:preprocessing,reporter_79a2172cf5,https://github.com/scikit-learn/scikit-learn/issues/18552
+18584,Set `utils.extmath.randomized_svd` parameter `random_state` default value to `None`,2020-10-09,2020,module:utils,reporter_e298482795,https://github.com/scikit-learn/scikit-learn/issues/18584
+18648,check_is_fitted gives false positive when extracted from ensemble classifier,2020-10-19,2020,module:ensemble,reporter_fdbc585d2a,https://github.com/scikit-learn/scikit-learn/issues/18648
+18660,"check_array(X, dtype='numeric') converts all data to strings if X contains any strings",2020-10-20,2020,module:utils,reporter_585d056c46,https://github.com/scikit-learn/scikit-learn/issues/18660
+18996,Incorrect warning when clustering boolean data,2020-12-12,2020,module:cluster,reporter_c7c0e0f5b3,https://github.com/scikit-learn/scikit-learn/issues/18996
+19038,KDTree should support Haversine Metric,2020-12-18,2020,module:tree,reporter_105461351b,https://github.com/scikit-learn/scikit-learn/issues/19038
+19105,docstring for `precompute` parameter is incorrect w.r.t. handling of sparse matrices,2021-01-05,2021,module:linear_model,reporter_c383b7fc4f,https://github.com/scikit-learn/scikit-learn/issues/19105
+19152,roc_auc_score does not support average=None eventhough stated in the documentation,2021-01-11,2021,module:metrics,reporter_30cd807658,https://github.com/scikit-learn/scikit-learn/issues/19152
+19286,"Have `handle_unknown=""ignore""` by default in OneHotEncoder",2021-01-27,2021,module:preprocessing,reporter_bec4c72af0,https://github.com/scikit-learn/scikit-learn/issues/19286
+19294,decision_path method for GradientBoosting,2021-01-28,2021,module:ensemble,reporter_b544f3b053,https://github.com/scikit-learn/scikit-learn/issues/19294
+19404,Cluster shape in agglomerative clustering,2021-02-08,2021,module:cluster,reporter_1b9bb9e239,https://github.com/scikit-learn/scikit-learn/issues/19404
+19518,StandardScalar.inverse_transform accepts 1d arrays,2021-02-21,2021,module:preprocessing,reporter_c9824be36a,https://github.com/scikit-learn/scikit-learn/issues/19518
+19578,LinearRegression fits wrongly on csr sparse matrix with sample weights,2021-02-26,2021,module:linear_model,reporter_4db1c31b60,https://github.com/scikit-learn/scikit-learn/issues/19578
+19681,utils.gen_batches missing from documentation,2021-03-15,2021,module:utils,reporter_7448650923,https://github.com/scikit-learn/scikit-learn/issues/19681
+19726,BUG: Regression with StandardScaler due to #19527,2021-03-19,2021,module:preprocessing,reporter_e6e1ddd17c,https://github.com/scikit-learn/scikit-learn/issues/19726
+20090,"ColumnTransformer give ""TypeError: invalid type promotion""",2021-05-13,2021,module:preprocessing,reporter_98ed9e3d62,https://github.com/scikit-learn/scikit-learn/issues/20090
+20177,custom index sampling for RandomForest _generate_sample_indices,2021-06-01,2021,module:ensemble,reporter_c8d789141f,https://github.com/scikit-learn/scikit-learn/issues/20177
+20224,AttributError when accessing `coef_` after constructor for `ElasticNet` subclasses,2021-06-08,2021,module:linear_model,reporter_2d8eb8eb17,https://github.com/scikit-learn/scikit-learn/issues/20224
+20256,"train_test_split() stratify parameter does not work with test_size, train_size integer",2021-06-13,2021,module:model_selection,reporter_85f8835e14,https://github.com/scikit-learn/scikit-learn/issues/20256
+20341,Confusion_matrix: drilldown to underlying data.,2021-06-23,2021,module:metrics,reporter_b487c4f37d,https://github.com/scikit-learn/scikit-learn/issues/20341
+20576,`tree.export_text`: add `class_names` argument to mirror `plot_tree`,2021-07-20,2021,module:tree,reporter_b75ee25e57,https://github.com/scikit-learn/scikit-learn/issues/20576
+20971,incompatible HTML representation for RandomizedSearchCV,2021-09-08,2021,module:model_selection,reporter_c7a4daa986,https://github.com/scikit-learn/scikit-learn/issues/20971
+21521,Add option to choose OOB scorer in RandomForest,2021-11-01,2021,module:ensemble,reporter_1380762c3e,https://github.com/scikit-learn/scikit-learn/issues/21521
+21708,KBinsDiscretizer inverse_transform() method produces NaN output values,2021-11-19,2021,module:preprocessing,reporter_6ac34f54bb,https://github.com/scikit-learn/scikit-learn/issues/21708
+22107,Silhouette fails for precomputed integer distances,2021-12-31,2021,module:metrics,reporter_3b1d4d80ff,https://github.com/scikit-learn/scikit-learn/issues/22107
+22160,Major Bug with SpectralClustering,2022-01-09,2022,module:cluster,reporter_0580fd28ec,https://github.com/scikit-learn/scikit-learn/issues/22160
+22243,Clarification of stopping criteria `tol` of iterative solvers,2022-01-19,2022,module:linear_model,reporter_2f64bd3235,https://github.com/scikit-learn/scikit-learn/issues/22243
+22413,ValueError when a key present in class_weight is not found in labels,2022-02-08,2022,module:tree,reporter_04ffa64dc9,https://github.com/scikit-learn/scikit-learn/issues/22413
+22575,label_ranking_average_precision_score does not allow csr_matrix for y_true input,2022-02-22,2022,module:metrics,reporter_d23c4d586d,https://github.com/scikit-learn/scikit-learn/issues/22575
+22716,RandomizedSearchCV's training time too much longer than cross_validate function sum of training times,2022-03-07,2022,module:model_selection,reporter_d05c9d6a01,https://github.com/scikit-learn/scikit-learn/issues/22716
+22753,[MAINT] Modularize Tree code and Splitter utility functions,2022-03-10,2022,module:tree,reporter_fee4c30517,https://github.com/scikit-learn/scikit-learn/issues/22753
+22922,QuantileRegressor unable to allocate memory for large datasets,2022-03-23,2022,module:linear_model,reporter_8c24f97574,https://github.com/scikit-learn/scikit-learn/issues/22922
+22979,Bug in train_test_split,2022-03-28,2022,module:model_selection,reporter_712ddd46e2,https://github.com/scikit-learn/scikit-learn/issues/22979
+23025,LabelEncoder based on value_counts,2022-04-01,2022,module:preprocessing,reporter_af48b2d20b,https://github.com/scikit-learn/scikit-learn/issues/23025
+23130,Macro Average F1 Score Computation Bug,2022-04-14,2022,module:metrics,reporter_4945447dec,https://github.com/scikit-learn/scikit-learn/issues/23130
+23141,MiniBatchKMeans returns fewer clusters than requested,2022-04-15,2022,module:cluster,reporter_12fdc7d316,https://github.com/scikit-learn/scikit-learn/issues/23141
+23313,Problem with maximal `int` value in `train_test_split`,2022-05-09,2022,module:model_selection,reporter_160a60ca63,https://github.com/scikit-learn/scikit-learn/issues/23313
+23699,Remove sklearn.utils.fixes.loguniform for 1.3 release,2022-06-20,2022,module:utils,reporter_433b6fcb28,https://github.com/scikit-learn/scikit-learn/issues/23699
+23963,MinMaxScaler on Loaded DataFrame fails with TypeError : NoneType,2022-07-20,2022,module:preprocessing,reporter_1c7d55f1f4,https://github.com/scikit-learn/scikit-learn/issues/23963
+23970,Test Failed on CICD Pipeline with varied LinearRegression predictions,2022-07-21,2022,module:linear_model,reporter_cf014958e4,https://github.com/scikit-learn/scikit-learn/issues/23970
+24124,RandomForestClassifier RAM memory increase on newer versions,2022-08-05,2022,module:ensemble,reporter_784a310be8,https://github.com/scikit-learn/scikit-learn/issues/24124
+24148,DOC LeaveOneGroupOut description confusing,2022-08-09,2022,module:model_selection,reporter_86a17a248b,https://github.com/scikit-learn/scikit-learn/issues/24148
+24176,AgglomerativeClustering's distance_threshold is misleading,2022-08-12,2022,module:cluster,reporter_f9fdfefdf7,https://github.com/scikit-learn/scikit-learn/issues/24176
+24381,Inconsistency in AUC ROC and AUPR API,2022-09-07,2022,module:metrics,reporter_3ff39616ce,https://github.com/scikit-learn/scikit-learn/issues/24381
+24615,Inconsistent Results For Logistic Regressions across multiple computers,2022-10-10,2022,module:linear_model,reporter_6864df7d9e,https://github.com/scikit-learn/scikit-learn/issues/24615
+24686,Path to HDBSCAN Inclusion,2022-10-17,2022,module:cluster,reporter_011c626361,https://github.com/scikit-learn/scikit-learn/issues/24686
+25150,Improving IsolationForest predict time,2022-12-09,2022,module:tree,reporter_aefb132ccc,https://github.com/scikit-learn/scikit-learn/issues/25150
+25550,OneHotEncoder `drop_idx_` attribute description in presence of infrequent categories,2023-02-06,2023,module:preprocessing,reporter_fbe36a817d,https://github.com/scikit-learn/scikit-learn/issues/25550
+25588,Broken estimator_ attribute on some ensemble models,2023-02-10,2023,module:ensemble,reporter_98f221e46e,https://github.com/scikit-learn/scikit-learn/issues/25588
+25798,"`check_array` can call `array.astype(None)`, raising ValueError if pandas extension types are present in a pd.DataFrame `array`",2023-03-09,2023,module:utils,reporter_b37b8abb10,https://github.com/scikit-learn/scikit-learn/issues/25798
+26193,Thresholds can exceed 1 in `roc_curve` while providing probability estimate,2023-04-17,2023,module:metrics,reporter_3fdb4e718b,https://github.com/scikit-learn/scikit-learn/issues/26193
+26295,[MAINT] Remove deprecated implementation of properties in extension class in `tree/`,2023-04-28,2023,module:tree,reporter_fee4c30517,https://github.com/scikit-learn/scikit-learn/issues/26295
+26308,Use scipy.stats.yeojohnson PowerTransformer,2023-04-30,2023,module:preprocessing,reporter_880ea90a6f,https://github.com/scikit-learn/scikit-learn/issues/26308
+26428,`HistGradientBoosting` should shuffle features when exploring for new splits,2023-05-24,2023,module:ensemble,reporter_3fdb4e718b,https://github.com/scikit-learn/scikit-learn/issues/26428
+26848,Ridge and RidgeCV has different result even if alpha is the same,2023-07-17,2023,module:linear_model,reporter_2deaf281d0,https://github.com/scikit-learn/scikit-learn/issues/26848
+26887,infinity in split nodes,2023-07-24,2023,module:tree,reporter_69d3d2919d,https://github.com/scikit-learn/scikit-learn/issues/26887
+29459,"MAINT, RFC Simplify the Cython code in `sklearn/tree/` by splitting the ""Splitter"" and ""Partitioner"" code",2024-07-10,2024,module:tree,reporter_fee4c30517,https://github.com/scikit-learn/scikit-learn/issues/29459
+30717,MNT Make binary display method parameters' order consistent,2025-01-25,2025,module:model_selection,reporter_86a17a248b,https://github.com/scikit-learn/scikit-learn/issues/30717
+31604,`_safe_indexing` fails with pyarrow==16.0.0,2025-06-20,2025,module:utils,reporter_f794507bf7,https://github.com/scikit-learn/scikit-learn/issues/31604
+31907,HDBSCAN modifies input precomputed distance matrix,2025-08-09,2025,module:cluster,reporter_e1e1314b18,https://github.com/scikit-learn/scikit-learn/issues/31907
+32125,Tree module - Broken test: test fails when changing random_state=0 to =1,2025-09-07,2025,module:tree,reporter_583cfebb47,https://github.com/scikit-learn/scikit-learn/issues/32125
+32175,Unexpected behavior of tree splits: missing values handling is buggy?,2025-09-12,2025,module:ensemble,reporter_583cfebb47,https://github.com/scikit-learn/scikit-learn/issues/32175
+32556,Weighted MAPE behaviour on 0,2025-10-23,2025,module:metrics,reporter_c9b106186a,https://github.com/scikit-learn/scikit-learn/issues/32556
+32589,OneHotEncoder handle_unknown='warn' behaves like 'ignore' instead of 'infrequent_if_exist',2025-10-27,2025,module:preprocessing,reporter_594d7ad45c,https://github.com/scikit-learn/scikit-learn/issues/32589
+32700,"Gradient Boosting: Tree splitting criterion`""friedman_mse""` isn't different from normal `""mse""`",2025-11-12,2025,module:tree,reporter_583cfebb47,https://github.com/scikit-learn/scikit-learn/issues/32700
+32767,ElasticNetCV alpha_grid does not take positive constraint into account,2025-11-23,2025,module:linear_model,reporter_38d38e68f2,https://github.com/scikit-learn/scikit-learn/issues/32767

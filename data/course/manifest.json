@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "release_status": "student_release",
-  "release_id": "spring27-week02-v1",
+  "release_id": "spring27-week03-draft-v2",
   "delivery": "individual files from the public GitHub repository; no ZIP archive",
   "files": [
     {
@@ -1110,6 +1110,16 @@
       "sha256": "174c0c7a45b09bdd49d775afd394bae2f1c25b99180fc74b2d20bb33dc42aede"
     },
     {
+      "path": "cfpb/complaints.csv",
+      "bytes": 630972,
+      "sha256": "a139eece809804b1e0ef4610542b8942e8565ab077a6061567abcbb5431990c6"
+    },
+    {
+      "path": "cfpb/release_summary.json",
+      "bytes": 716,
+      "sha256": "cf547d3021049e1a201a092993fca156b7e23078f32f494fbaa035631601161f"
+    },
+    {
       "path": "dynasent/forecaster_items.csv",
       "bytes": 982,
       "sha256": "c2d0b13a7089e666016a305329fcbe884b9cfbcc3cfed71a60db40899693bb54"
@@ -1123,6 +1133,16 @@
       "path": "dynasent/items.csv",
       "bytes": 11020,
       "sha256": "e1737554c3ab6d1b2e25ede2efc3b19a158ae366bda00fc202bd46a0db2b0a9b"
+    },
+    {
+      "path": "github_issues/issues.csv",
+      "bytes": 21719,
+      "sha256": "9c1bd5f60bb1330ed8438859f4b0521811398cc7817da951f7429c60b66f6583"
+    },
+    {
+      "path": "github_issues/release_summary.json",
+      "bytes": 693,
+      "sha256": "5449009ef71d1a16202c1338ea09566ea6c7cf47cd3d8d02dd5fe84b3013ee8f"
     }
   ]
 }

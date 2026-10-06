@@ -196,7 +196,7 @@ b. **Performance by vote pattern (7 points).** For `5-0`, `4-1`, and `3-2`
 items, report the number of items, number correctly classified under the
 majority label, and majority-label accuracy. In 2–3 sentences, describe the
 comparison and explain why rater disagreement is not automatically “bad data.”
-Do not add confidence intervals; interval construction begins in Week 4.
+Do not add confidence intervals; most interval construction comes in Week 4.
 
 c. **Rounds are construction processes, not treatments (7 points).** Compare
 Round 1 and Round 2 using majority-label accuracy. Report the item count, number

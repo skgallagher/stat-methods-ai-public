@@ -1,0 +1,400 @@
+---
+title: "Week 3B: From a Plausible Plan to a Trustworthy Test"
+subtitle: "Following the evidence"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+execute:
+  warning: false
+  message: false
+---
+
+## Last time: design the evaluation before fitting {.smaller}
+
+In Lecture A, we:
+
+- defined one prediction and the cases the conclusion should describe;
+- separated the **signal check** from the **model-upgrade check**;
+- chose accuracy and average recall for different statistical purposes;
+- treated the data split as a choice about the future distribution;
+- used paired comparisons because both methods predict the same requests;
+- recorded these decisions in a design brief.
+
+Today we use EDA and a plausible analysis plan to see whether those decisions
+survive contact with the data.
+
+## Start with the claim, not the code {.smaller}
+
+Our help-desk question from Lecture A was:
+
+> For later email requests in four queues, how much more often does a language
+> model predict the recorded queue than a simple word model?
+
+That one sentence fixes several choices:
+
+- one prediction is made for one email request;
+- the target is the recorded queue;
+- the cases of interest arrive later;
+- the complex model is compared with the simple model;
+- the result is a difference in accuracy.
+
+## A plausible AI-generated plan {.smaller}
+
+> Randomly split all available requests. Remove rare words using the full
+> file. Try several queue groupings and model settings. Report the setup with
+> the highest test accuracy and use the language model if it wins.
+
+Nothing here looks absurd. That is why it needs an audit.
+
+Before discussing code, underline every phrase that quietly makes a study
+decision.
+
+## Use EDA to follow the study from data to claim {.smaller .compact-table}
+
+| Stage | What EDA should make visible |
+|---|---|
+| Cases | who entered the file—and who did not |
+| Outcome | how queue labels were produced and how common they are |
+| Structure | time order, repeated people, templates, and near-duplicates |
+| Features | vocabulary, missing text, and changes in wording |
+| Evaluation | which cases, metrics, and comparisons answer the question |
+| Claim | which future requests the result can reasonably describe |
+
+EDA exposes mismatches early. A later modeling step cannot make email-only
+data represent phone calls.
+
+## Use three plain questions for every weak choice {.smaller}
+
+| Question | Example answer |
+|---|---|
+| What could go wrong? | Similar requests may appear in training and test. |
+| Why does that matter here? | The test should represent later, genuinely new requests. |
+| How would we change it? | Split by time and check repeated groups. |
+
+Avoid stopping at a label such as “bias” or “leakage.” State the path from the
+choice to the misleading result.
+
+::: notes
+[Further reading] This follows the Cochrane Handbook's risk-of-bias framework:
+ask structured questions, judge how a design choice could affect the result,
+and justify the response.
+https://training.cochrane.org/handbook/current/chapter-08
+:::
+
+## One split can answer the wrong question {.smaller}
+
+```{python}
+#| echo: false
+#| fig-width: 8
+#| fig-height: 3.7
+import matplotlib.pyplot as plt
+import numpy as np
+
+fig, axes = plt.subplots(2, 1, figsize=(8, 3.7), sharex=True)
+years = np.array([2022, 2023, 2024, 2025])
+
+axes[0].scatter([2022, 2023, 2024, 2025], [1, 1, 1, 1],
+                s=240, c=["#155a8a", "#c41230", "#155a8a", "#c41230"])
+axes[0].set_title("Random rows: every year contributes to both sides")
+axes[0].text(2025.1, 1, " training / test mixed", va="center", fontsize=10)
+
+axes[1].scatter([2022, 2023, 2024], [1, 1, 1], s=240, color="#155a8a")
+axes[1].scatter([2025], [1], s=240, color="#c41230")
+axes[1].set_title("Time split: earlier requests train; later requests test")
+axes[1].text(2025.1, 1, " test", va="center", fontsize=10)
+
+for ax in axes:
+    ax.set_yticks([])
+    ax.set_ylim(.75, 1.25)
+    ax.spines[["top", "right", "left"]].set_visible(False)
+axes[1].set_xticks(years)
+plt.tight_layout()
+plt.show()
+```
+
+If the claim is about later requests, the time split rehearses that future use.
+
+## Time order and repeated groups are separate checks {.smaller}
+
+Suppose one template appears in both 2023 and 2025. A time split respects the
+calendar but still lets closely related text cross the boundary.
+
+```python
+shared = set(training["similarity_group"]) & set(test["similarity_group"])
+print("groups in both sets:", len(shared))
+assert len(shared) == 0
+```
+
+The code makes the rule checkable. It does not explain why the rule is right;
+that explanation comes from the intended use.
+
+## Why repeated groups can make a test look easier {.smaller}
+
+Imagine each customer group uses a distinctive signature:
+
+| Group | Training request | Test request |
+|---|---|---|
+| 17 | “acct-reset-17 password failed” | “acct-reset-17 login failed” |
+| 42 | “vpn-device-42 cannot connect” | “vpn-device-42 offline” |
+
+With a random-row split, the model can learn the group fingerprint and see it
+again at test time. A group-held-out split removes that shortcut.
+
+This is **duplicate contamination**: closely related cases cross the split and
+make the test less like genuinely new cases.
+
+## A small simulation makes the shortcut visible {.smaller}
+
+Imagine simulated data with repeated requests from the same customer groups.
+Each group uses a stable identifying phrase, and that phrase partly predicts
+its queue. The two test designs represent different future settings:
+
+```{python}
+#| echo: false
+#| fig-width: 7.5
+#| fig-height: 3.2
+results = {"Random rows\n(groups overlap)": 0.91,
+           "Groups held out\n(no overlap)": 0.64}
+fig, ax = plt.subplots(figsize=(7.5, 3.2))
+bars = ax.bar(results.keys(), results.values(), color=["#c41230", "#155a8a"])
+ax.set_ylim(0, 1)
+ax.set_ylabel("test accuracy")
+ax.spines[["top", "right"]].set_visible(False)
+for bar, value in zip(bars, results.values()):
+    ax.text(bar.get_x() + bar.get_width()/2, value + .025,
+            f"{value:.2f}", ha="center")
+plt.tight_layout()
+plt.show()
+```
+
+These are illustrative results, not a universal law. If future requests come
+from the **same customer groups**, random rows may be the better representation
+of future use. If the model must serve **new groups**, holding out groups is the
+relevant test. Neither split is inherently more valid; each targets a different
+future distribution.
+
+## Learn text features from training only {.smaller}
+
+**Vocabulary learned before the split**
+
+```{mermaid}
+flowchart LR
+  A[All text] --> B[Learn word weights]
+  B --> C[Split]
+  C --> D[Fit and test]
+```
+
+**Vocabulary learned from training only**
+
+```{mermaid}
+flowchart LR
+  A[Split] --> B[Learn words and model]
+  B --> C[Apply to validation]
+```
+
+The first order lets validation or test words influence what the model keeps.
+
+## A pipeline keeps the order together {.smaller}
+
+A scikit-learn **pipeline** is one object that learns the text conversion and
+the classifier in the correct order.
+
+```python
+from sklearn.pipeline import make_pipeline
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+
+def make_model(min_df):
+    return make_pipeline(
+        TfidfVectorizer(min_df=min_df),
+        LogisticRegression(max_iter=2000),
+    )
+
+model = make_model(min_df=2)
+model.fit(training["text"], training["label"])
+prediction = model.predict(validation["text"])
+```
+
+`min_df` stands for **minimum document frequency**. Here, one document is one
+request, so `min_df=2` keeps a word only if it appears in at least two training
+requests.
+
+## Validation chooses; test evaluates {.smaller}
+
+```python
+candidate_values = [1, 2, 5]
+validation_scores = []
+
+for value in candidate_values:
+    model = make_model(min_df=value)
+    model.fit(training["text"], training["label"])
+    prediction = model.predict(validation["text"])
+    validation_scores.append(accuracy_score(validation["label"], prediction))
+
+selected_value = candidate_values[np.argmax(validation_scores)]
+assert selected_value in candidate_values
+```
+
+The candidate list should be fixed before the scores are known. After choosing,
+we refit the selected plan and open the test set once.
+
+## “Open once” is a workflow rule {.smaller}
+
+Before test evaluation, save:
+
+- the rows assigned to each set;
+- the allowed settings and tie-breaking rule;
+- the main metric;
+- the two comparisons;
+- the practical threshold;
+- the code checks that must pass.
+
+After test evaluation, do not quietly revise these choices. New questions may
+be studied, but they need to be labeled as follow-up work with new evidence.
+
+## Read a difference and its interval together {.smaller}
+
+Suppose the simple model is 71% accurate and the baseline is 40%
+accurate on the same test cases.
+
+$$
+\text{observed improvement}=71\%-40\%=31\text{ percentage points}.
+$$
+
+If an uncertainty interval for the improvement is 21 to 40 points:
+
+- the observed difference is 31 points;
+- the whole interval is above zero;
+- the simple model passes the signal check in this evaluation;
+- the result still applies only to the cases the test set can represent.
+
+An interval cannot compensate for a poor split or missing kinds of cases.
+
+## Why the comparison is paired {.smaller}
+
+For each test case, record whether each method is correct:
+
+```{python}
+#| echo: true
+simple_correct   = np.array([1, 1, 0, 1, 0, 1])
+baseline_correct = np.array([1, 0, 0, 0, 0, 1])
+
+case_difference = simple_correct - baseline_correct
+observed_difference = case_difference.mean()
+observed_difference
+```
+
+Both methods predict the same cases, so we resample whole cases and keep the
+two outcomes together. This is a **paired bootstrap**. It mimics drawing a new
+set of cases while preserving the comparison within each case.
+
+## Keep a record of the design decisions {.smaller .compact-table}
+
+| What EDA or the study question reveals | Design decision | What to record |
+|---|---|---|
+| The target is later requests | split in time order | requests by year and set |
+| Templates or people appear repeatedly | keep each group in one set | number of groups shared across sets |
+| Vocabulary is a learned feature | learn it from training only | pipeline settings and training vocabulary |
+| Test feedback could influence selection | choose on validation; evaluate test once | frozen choices and final test output |
+
+A useful record says what changed, why it changed, and what evidence shows that
+the final analysis followed the decision. “Leakage addressed” does not say
+enough.
+
+## EDA cannot create observations we do not have {.smaller}
+
+After every design change, ask:
+
+> Which kinds of requests are absent from the observed data?
+
+Examples:
+
+- only public text is available;
+- short or sensitive requests were removed;
+- only requests with one staff-assigned queue remain;
+- the teaching sample contains selected categories in fixed numbers.
+
+No split, model, or uncertainty interval can establish performance for cases
+that were never observed. Narrow the target population or collect data from
+the missing cases.
+
+## Stronger AI prompts are stronger study plans {.smaller}
+
+**Weak request**
+
+> Determine whether the language model is better.
+
+**Specified request**
+
+> Compare the language model with the fixed simple model on the locked later
+> test set. Use accuracy, report the paired difference and interval, and do not
+> change categories or settings after seeing test results. State that the tool
+> only recommends a queue for staff review.
+
+The second prompt improves the analysis because it supplies missing decisions,
+not because it sounds more polished.
+
+## Two AI answers are a comparison, not an experiment {.smaller}
+
+If a detailed prompt produces a better plan than a weak prompt, we may describe
+the differences in those two answers.
+
+We cannot conclude that every difference was caused by the prompt because AI
+systems can vary from one response to another.
+
+A stronger test of the prompt effect would use:
+
+- many fresh conversations for each prompt;
+- the same model and settings;
+- a rule for scoring plan quality;
+- a comparison of the two distributions of scores.
+
+For Homework 3, the goal is careful auditing—not a full prompt experiment.
+
+## Keep a short AI-use record {.smaller}
+
+Record enough for another person to understand the workflow:
+
+| Item | Example |
+|---|---|
+| Tool | name and version, when available |
+| Purpose | draft a simulation or analysis plan |
+| Initial prompt | exact request that began the work |
+| Output used | code scaffold, explanation, or plan |
+| Checks | fixed seed, overlap check, assertions, rerun |
+| Human decision | split, metric, threshold, final claim |
+
+The record shows what was delegated and what was verified.
+
+## Ready for the lab
+
+In the CFPB lab, you will:
+
+1. read one complete plan;
+2. find two problems in a weak plan;
+3. compare a time split with a random-row split;
+4. fit a small TF-IDF logistic-regression model;
+5. state what the EDA and modeling workflow reveal—and what the data still
+   cannot support.
+
+The lab uses only 2022 and 2023. Homework keeps the later choices and final
+results for you.
+
+## Keep this map beside the homework {.smaller}
+
+```{mermaid}
+flowchart LR
+  A[Problem 1<br/>design in words] --> B[Problem 2<br/>use EDA and run code]
+  B --> C[Problem 3<br/>compare AI plans]
+```
+
+- **Problem 1:** define the label, cases described, comparisons, split, and claim.
+- **Problem 2:** document each design choice with EDA, code, or output, then
+  open the test once.
+- **Problem 3:** check whether a detailed prompt produces a more usable plan
+  and retain responsibility for the final decisions.
+
+The same five questions from Lecture A apply to all three problems.

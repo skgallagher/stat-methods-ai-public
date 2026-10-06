@@ -1,0 +1,26 @@
+{
+  "release_id": "cfpb-week3-v2-2026-09-01",
+  "source": "CFPB Consumer Complaint Database API",
+  "license": "CC0",
+  "rows": 400,
+  "years": [
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "products": [
+    "Checking or savings account",
+    "Debt collection",
+    "Mortgage",
+    "Student loan",
+    "Vehicle loan or lease"
+  ],
+  "rows_per_product_year": 20,
+  "duplicate_rows": 14,
+  "similarity_groups": 393,
+  "api_last_updated": [
+    "2026-09-01T12:00:00-05:00"
+  ],
+  "sampling_note": "Product-by-year stratified teaching extract; not a probability sample and not representative of natural product prevalence. Candidate pools combine the first and last 100 public narratives in each product-year cell."
+}

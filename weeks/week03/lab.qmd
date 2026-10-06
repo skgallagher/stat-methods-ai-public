@@ -1,0 +1,220 @@
+---
+title: "Lab 3: Plan It, Then Check It"
+subtitle: "Week 3 · Guided in class · CFPB complaint routing"
+format: html
+---
+
+**Today:** We will read through one complete evaluation plan, find two problems
+in a weak plan, and run a small practice analysis. We will use the CFPB
+complaint data again in Homework 3.
+
+In this lab, we use 2022 for training and 2023 to practice choosing a model.
+We leave 2024 and 2025 untouched because you will use them in Homework 3.
+
+## Read through a complete plan — 10 minutes
+
+Imagine a tool that reads a public complaint narrative and recommends one of
+five CFPB product categories. An analyst reviews the recommendation before
+making the final choice.
+
+Here are the decisions behind the plan:
+
+1. **What is the model trying to predict?** For each complaint, the model
+   predicts the product category recorded by the CFPB. That category is the
+   decision stored in the data. It does not prove that every complaint has one
+   objectively correct category.
+2. **Who does the result describe?** The teaching file contains public
+   narratives from five product categories. It does not represent complaints
+   without public narratives, and the five categories are equally common here
+   even though they may not be equally common outside this file.
+3. **What comparisons do we need?** First, logistic regression must do better
+   than a rule that ignores the complaint text. Then a transformer must do
+   enough better than logistic regression to justify trying it in a pilot.
+4. **Why do we need three data sets?** We use the training data to fit each
+   model. We use the validation data to choose settings. We use the test data
+   once, after every choice has been made, to estimate performance on new data.
+5. **How will we compare the methods?** Every method predicts the same
+   complaints. We compare their predictions complaint by complaint and report
+   an interval for each difference in accuracy. Before seeing the test results,
+   we also decide how much better the transformer must be to justify a pilot.
+6. **What decision can this study support?** At most, the results could support
+   a pilot in which a person reviews each recommendation. They could not
+   justify automatic routing, prove that the recorded category is correct, or
+   show that better routing improves complaint outcomes.
+
+Now make three choices of your own. Different answers can work; give one short
+reason for each.
+
+| Your choice | Answer and reason |
+|---|---|
+| Accuracy or average recall across the five products? | TODO |
+| What minimum transformer improvement would justify a pilot? | TODO |
+| Can versions of the same complaint appear in both sets? | TODO |
+
+## Find two problems in a weak plan — 6 minutes
+
+An AI assistant received only “determine whether the transformer is better” and
+proposed:
+
+> Randomly split all years, remove short narratives and rare words using the
+> complete dataset, try several category groupings, and report whichever
+> result is best. Deploy the transformer if it wins.
+
+With a partner, pick the two parts of this plan that worry you most. For each
+one, say what could go wrong and how you would change it.
+
+| Part of the plan | What could go wrong? | How would you change it? |
+|---|---|---|
+| TODO | TODO | TODO |
+| TODO | TODO | TODO |
+
+What important problem would remain even after those changes? TODO
+
+## Check two ways to split the data — 10 minutes
+
+The code below uses only the 2022 and 2023 rows. Complaints in the same
+`similarity_group` have the same or very similar text. Before running the code,
+predict which split will put a similarity group in both sets.
+
+```{python}
+#| eval: false
+from sklearn.model_selection import train_test_split
+
+cfpb_root = DATA_ROOT / "cfpb"
+complaints = pd.read_csv(cfpb_root / "complaints.csv")
+complaints["date_received"] = pd.to_datetime(complaints["date_received"])
+assert complaints["complaint_id"].is_unique
+assert len(complaints) == 400
+
+development = complaints.query("received_year in [2022, 2023]").copy()
+time_train = development.query("received_year == 2022").copy()
+time_validation = development.query("received_year == 2023").copy()
+
+row_train, row_validation = train_test_split(
+    development,
+    test_size=0.50,
+    random_state=SEED,
+    stratify=development["product"],
+)
+
+def shared_similarity_groups(left, right):
+    return set(left["similarity_group"]) & set(right["similarity_group"])
+
+development_counts = pd.crosstab(
+    development["received_year"], development["product"]
+)
+split_check = pd.DataFrame([
+    {
+        "split": "2022 train / 2023 practice validation",
+        "training_rows": len(time_train),
+        "validation_rows": len(time_validation),
+        "shared_similarity_groups": len(shared_similarity_groups(
+            time_train, time_validation
+        )),
+    },
+    {
+        "split": "random rows from 2022-2023",
+        "training_rows": len(row_train),
+        "validation_rows": len(row_validation),
+        "shared_similarity_groups": len(shared_similarity_groups(
+            row_train, row_validation
+        )),
+    },
+])
+
+display(development_counts)
+display(split_check)
+
+# TODO: add an assertion that both time-based sets contain all five products.
+# TODO: add an assertion that the time-based sets contain 100 rows each.
+```
+
+Fill in only the results you need:
+
+| Result | Value |
+|---|---:|
+| Complaints for each product in each year | TODO |
+| Shared groups in the time split | TODO |
+| Shared groups in the random-row split | TODO |
+
+If the intended use is complaints received **after 2023**, which split is the
+better practice test? What did the duplicate check show? TODO
+
+## Fit one practice model — 10 minutes
+
+We will use 2022 to fit three versions of logistic regression and 2023 to
+choose among them. Homework 3 makes a new choice using 2024, so the numbers
+below are not homework answers.
+
+```{python}
+#| eval: false
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+from sklearn.pipeline import make_pipeline
+
+PRACTICE_C_VALUES = [0.25, 1.0, 4.0]
+
+def make_practice_model(C):
+    return make_pipeline(
+        TfidfVectorizer(min_df=2, ngram_range=(1, 2)),
+        LogisticRegression(C=C, max_iter=2000, random_state=SEED),
+    )
+
+practice_rows = []
+for C in PRACTICE_C_VALUES:
+    model = make_practice_model(C)
+    model.fit(time_train["narrative"], time_train["product"])
+    prediction = model.predict(time_validation["narrative"])
+    practice_rows.append({
+        "C": C,
+        "2023_accuracy": accuracy_score(time_validation["product"], prediction),
+    })
+
+practice_results = pd.DataFrame(practice_rows)
+selected_C = float(
+    practice_results.sort_values(
+        ["2023_accuracy", "C"], ascending=[False, True]
+    ).iloc[0]["C"]
+)
+baseline_accuracy = time_validation["product"].value_counts(
+    normalize=True
+).max()
+
+display(practice_results)
+print("Selected C:", selected_C)
+print("Baseline accuracy:", baseline_accuracy)
+
+# TODO: add an assertion that selected_C came from PRACTICE_C_VALUES.
+```
+
+| Result | Value |
+|---|---:|
+| Baseline accuracy from always predicting the most common product | TODO |
+| Selected `C` and its accuracy | TODO |
+
+Complete two sentences:
+
+- On the 2023 practice rows, the selected model ________.  
+- TF-IDF belongs inside the pipeline because ________.
+
+## Before you leave — 7 minutes
+
+### Independent handoff response
+
+Complete this individually.
+
+1. In one sentence, say what the simple model and the transformer each need to
+   beat. TODO
+2. What problem did the split or pipeline code help with? TODO
+3. What problem with public narratives is still there? TODO
+4. When the case changes to GitHub issues in Homework 3, which two choices must
+   you make again? TODO
+
+## Exit ticket — 2 minutes
+
+What result or decision did we intentionally leave for Homework 3?
+
+**For Homework 3:** In Problem 1, you make similar choices for GitHub issues.
+In Problem 2, you train with 2022–2023, choose a model with 2024, and test it
+once with 2025. Nothing in this lab reveals those 2024 or 2025 results.

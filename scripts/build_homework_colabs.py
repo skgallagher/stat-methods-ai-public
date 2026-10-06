@@ -23,8 +23,8 @@ HOMEWORKS = [
 DATA_GROUPS = {
     "hw01": ["camera_traps"],
     "hw02": ["dynasent"],
-    "hw03": ["cfpb"],
-    "hw04": ["camera_traps", "nhanes"],
+    "hw03": ["cfpb", "github_issues"],
+    "hw04": ["camera_traps"],
     "hw05": ["cfpb"],
     "hw06": ["cfpb"],
     "hw07": ["designed_eval"],
@@ -106,39 +106,61 @@ STARTER_LINES = {
         "forecaster_items[['item_id', 'sentence']]",
     ],
     "hw03": [
-        "# HW3: design brief and workflow audit structures",
-        "design_brief = {",
-        "    'research_question': '', 'hypothesis': '',",
-        "    'observed_population': '', 'target_population': '',",
-        "    'observation_and_grouping_unit': '', 'primary_estimand': '',",
-        "    'baseline_and_ai_system': '', 'analysis_validation_holdout_roles': '',",
-        "    'metric_and_practical_difference': '', 'decision_informed': '',",
-        "    'claim_not_supported': ''}",
-        "workflow_audit = pd.DataFrame(columns=[",
-        "    'step', 'action', 'information_used', 'threat',",
-        "    'expected_direction', 'locked_repair'])",
-        "plan_audit = pd.DataFrame(index=[",
-        "    'target', 'unit/split', 'baseline', 'uncertainty', 'claim'],",
-        "    columns=['weak_prompt_plan', 'specified_prompt_plan', 'your_evaluation'])",
+        "# HW3: inspect the design before fitting any model",
+        "issues_root = DATA_ROOT / 'github_issues'",
+        "github_issues = pd.read_csv(issues_root / 'issues.csv', parse_dates=['created_date'])",
+        "assert github_issues['issue_number'].is_unique",
+        "assert len(github_issues) == 120",
+        "print('Real scikit-learn issue-triage extract:')",
+        "display(github_issues.head(3))",
+        "display(github_issues['module_label'].value_counts().rename('n').to_frame())",
+        "print('Issues by year and module (use this EDA when planning the split):')",
+        "display(pd.crosstab(github_issues['created_year'], github_issues['module_label']))",
+        "print('Date range:', github_issues['created_date'].min().date(),",
+        "      'to', github_issues['created_date'].max().date())",
+        "print('Unique reporter groups:', github_issues['reporter_group'].nunique())",
+        "print('The balanced extract does not preserve natural module prevalence.')",
+        "",
+        "# Problem 2 returns to the CFPB data from Lab 3.",
+        "cfpb_root = DATA_ROOT / 'cfpb'",
+        "complaints = pd.read_csv(cfpb_root / 'complaints.csv')",
+        "complaints['date_received'] = pd.to_datetime(complaints['date_received'])",
+        "assert complaints['complaint_id'].is_unique",
+        "assert len(complaints) == 400",
+        "assert complaints.groupby(['received_year', 'product']).size().eq(20).all()",
+        "print(f'Loaded {len(complaints)} public-narrative complaints.')",
+        "display(complaints[['complaint_id', 'narrative', 'product',",
+        "                    'date_received', 'similarity_group', 'n_words']].head(3))",
+        "# Problem 2 code appears under the relevant subparts below.",
     ],
     "hw04": [
-        "# HW4: interval arithmetic and complete-sequence resampling",
+        "# HW4 setup: vision-model correctness on the homework cameras",
+        "# Problem 1 needs no code. Problems 2 and 3 use the objects defined here.",
         "from statsmodels.stats.proportion import proportion_confint",
-        "x, n = 184, 200",
-        "p_hat = x / n",
-        "wald = (p_hat - 1.96*np.sqrt(p_hat*(1-p_hat)/n),",
-        "        p_hat + 1.96*np.sqrt(p_hat*(1-p_hat)/n))",
-        "wilson = proportion_confint(x, n, method='wilson')",
+        "from scipy.stats import norm",
+        "camera_root = DATA_ROOT / 'camera_traps'",
+        "meta = pd.read_csv(camera_root / 'metadata.csv')",
+        "outputs = pd.read_csv(camera_root / 'model_outputs.csv')",
+        "splits = pd.read_csv(camera_root / 'splits.csv')",
+        "camera = meta.merge(outputs, on='image_id').merge(splits, on='image_id')",
+        "camera['correct'] = camera['vision_pred'].eq(camera['animal_present']).astype(int)",
+        "hw = camera.query(\"split == 'homework_holdout'\").copy()",
+        "print(f\"{len(hw)} frames, {hw['sequence_id'].nunique()} sequences, \"",
+        "      f\"{hw['camera_id'].nunique()} cameras\")",
+        "assert hw.groupby('sequence_id').size().eq(3).all()",
+        "",
+        "# Lab 4 function, reused as allowed. It returns all B bootstrap estimates.",
         "def sequence_bootstrap(data, statistic, B=2000, seed=2027):",
+        "    \"\"\"Resample whole trigger sequences with replacement; return the B estimates.\"\"\"",
         "    rng = np.random.default_rng(seed)",
-        "    ids = data['sequence_id'].unique()",
-        "    estimates = []",
-        "    for _ in range(B):",
-        "        sampled_ids = rng.choice(ids, len(ids), replace=True)",
-        "        sampled = pd.concat([data.query('sequence_id == @sid') for sid in sampled_ids])",
-        "        estimates.append(statistic(sampled))",
-        "    return np.quantile(estimates, [0.025, 0.975])",
-        "# Problem 3 release files include ai_bootstrap_attempt.py and supplied_checks().",
+        "    ids = np.sort(data['sequence_id'].unique())",
+        "    groups = {sid: g for sid, g in data.groupby('sequence_id')}",
+        "    estimates = np.empty(B)",
+        "    for b in range(B):",
+        "        draw = rng.choice(ids, size=len(ids), replace=True)",
+        "        sample = pd.concat([groups[s] for s in draw], ignore_index=True)",
+        "        estimates[b] = statistic(sample)",
+        "    return estimates",
     ],
     "hw05": [
         "# HW5: paired arithmetic and paired-row bootstrap",
@@ -217,6 +239,16 @@ RESPONSE = "\n".join([
     "TODO",
     "",
     "**Typed statistical conclusion (required even with handwriting):**  ",
+    "TODO",
+])
+
+HW3_RESPONSE = "\n".join([
+    "### Your response - {label}",
+    "",
+    "Write your answer below in the format requested above. You may instead",
+    "insert a clear image of handwritten work; if you do, add a one-sentence",
+    "typed summary for accessibility.",
+    "",
     "TODO",
 ])
 
@@ -395,17 +427,490 @@ HW2_P3C_CODE = "\n".join([
     "forecaster_summary",
 ])
 
+HW3_P1B_RESPONSE = "\n".join([
+    "### Your response - Problem 1(b)",
+    "",
+    "| Question | Your answer |",
+    "|---|---|",
+    "| What module-label classification does the model make, and how would a maintainer use it? | TODO |",
+    "| Which scikit-learn GitHub issues should the conclusion cover? | TODO |",
+    "| Main performance measure: accuracy or average recall across modules? Why? | TODO |",
+    "| Checkpoint 1: What result for the simple title model versus the baseline would count as evidence that titles help? | TODO |",
+    "| Checkpoint 2: How much must the transformer improve over logistic regression before you would recommend a pilot? Why? | TODO |",
+    "| Quantity 1 in words: simple title model minus no-information rule | TODO |",
+    "| Quantity 2 in words: transformer minus simple title model | TODO |",
+])
+
+HW3_P1D_RESPONSE = "\n".join([
+    "### Your response - Problem 1(d)",
+    "",
+    "| Part of the plan | Your choice |",
+    "|---|---|",
+    "| Research question / hypothesis | TODO |",
+    "| GitHub issues represented in `github_issues/issues.csv` | TODO |",
+    "| Issues you want the conclusion to cover | TODO |",
+    "| Rule for keeping `reporter_group` together or allowing it across sets | TODO |",
+    "| Two comparisons to estimate | TODO |",
+    "| Job of the training data | TODO |",
+    "| Job of the validation data | TODO |",
+    "| Job of the test data | TODO |",
+    "| Main measure and the rule for passing each checkpoint | TODO |",
+    "| Decision the study will inform | TODO |",
+    "| Intended use and intended user | TODO |",
+    "| One out-of-scope use | TODO |",
+    "",
+    "**If-then decision rule (1-2 sentences):**  ",
+    "TODO",
+    "",
+    "**A favorable result would still not establish (1 sentence):**  ",
+    "TODO",
+    "",
+    "**Model Cards connection:**  ",
+    "TODO - cite the relevant subsection of Mitchell et al. Section 4",
+])
+
+HW3_P1C_RESPONSE = "\n".join([
+    "### Your response - Problem 1(c)",
+    "",
+    "| Decision | Your answer |",
+    "|---|---|",
+    "| Complete: Our final comparison is meant to tell us how the two models perform on... | TODO |",
+    "| Must GitHub issues from the same `reporter_group` stay together? Why or why not? | TODO |",
+    "| Which rows go into training, and what happens there? | TODO |",
+    "| Which rows go into validation, and what happens there? | TODO |",
+    "| Which rows go into the test set, and what happens there? | TODO |",
+    "| Does this split mainly address changes over time, repeated reporters, or both? Explain. | TODO |",
+    "| What would a random row split tell us instead? | TODO |",
+    "| What would a reporter-held-out split tell us instead? | TODO |",
+    "| What can `github_issues/issues.csv` not tell us about other software projects? | TODO |",
+])
+
+HW3_P2A_CODE = "\n".join([
+    "# Inspect the sample before fitting a model.",
+    "product_year_counts = pd.crosstab(",
+    "    complaints['received_year'], complaints['product']",
+    ")",
+    "duplicate_group_sizes = complaints.groupby('similarity_group').size()",
+    "duplicate_group_count = int((duplicate_group_sizes > 1).sum())",
+    "word_count_percentiles = (",
+    "    complaints['n_words'].quantile([0.10, 0.50, 0.90]).rename('n_words')",
+    ")",
+    "display(product_year_counts)",
+    "print('Similarity groups with more than one row:', duplicate_group_count)",
+    "display(word_count_percentiles.to_frame())",
+    "# TODO: add one assertion that every product-year cell contains 20 rows.",
+])
+
+HW3_P2A_RESPONSE = "\n".join([
+    "### Your response - Problem 2(a)",
+    "",
+    "| Check | Result from your output |",
+    "|---|---|",
+    "| Rows in each product-year cell | TODO |",
+    "| Similarity groups with more than one row | TODO |",
+    "| 10th / 50th / 90th percentiles of `n_words` | TODO |",
+    "",
+    "**Interpretation (2-3 sentences):**  ",
+    "TODO - explain what the balanced sampling means and why public narratives do not represent all CFPB complaints",
+])
+
+HW3_P2B_CODE = "\n".join([
+    "# Define the split by calendar year before fitting any model.",
+    "SPLIT_BY_YEAR = {2022: 'train', 2023: 'train', 2024: 'validation', 2025: 'test'}",
+    "complaints_split = complaints.assign(",
+    "    split=complaints['received_year'].map(SPLIT_BY_YEAR)",
+    ")",
+    "assert complaints_split['split'].notna().all()",
+    "split_order = ['train', 'validation', 'test']",
+    "split_sizes = complaints_split['split'].value_counts().reindex(split_order)",
+    "products_by_split = pd.crosstab(",
+    "    complaints_split['split'], complaints_split['product']",
+    ").reindex(split_order)",
+    "group_split_counts = (",
+    "    complaints_split[['similarity_group', 'split']].drop_duplicates()",
+    "    .groupby('similarity_group')['split'].nunique()",
+    ")",
+    "cross_split_groups = group_split_counts[group_split_counts > 1]",
+    "display(split_sizes.rename('rows').to_frame())",
+    "display(products_by_split)",
+    "print('Similarity groups appearing in more than one split:', len(cross_split_groups))",
+    "# TODO: add an assertion that the split sizes are 200, 100, and 100.",
+    "# TODO: add an assertion that all five products appear in every split.",
+    "train = complaints_split.query(\"split == 'train'\").copy()",
+    "validation = complaints_split.query(\"split == 'validation'\").copy()",
+    "test = complaints_split.query(\"split == 'test'\").copy()",
+])
+
+HW3_P2B_RESPONSE = "\n".join([
+    "### Your response - Problem 2(b)",
+    "",
+    "| Check | Result from your output |",
+    "|---|---|",
+    "| Training / validation / test rows | TODO |",
+    "| Products represented in every split | TODO |",
+    "| Similarity groups crossing splits | TODO |",
+    "",
+    "**Why the time split matches the 2025 question (1 sentence):**  ",
+    "TODO",
+])
+
+HW3_P2C_CODE = "\n".join([
+    "from sklearn.feature_extraction.text import TfidfVectorizer",
+    "from sklearn.linear_model import LogisticRegression",
+    "from sklearn.metrics import accuracy_score",
+    "from sklearn.pipeline import make_pipeline",
+    "",
+    "CANDIDATE_MIN_DF = [1, 2, 5]",
+    "",
+    "def make_text_model(min_df):",
+    "    return make_pipeline(",
+    "        TfidfVectorizer(min_df=min_df, ngram_range=(1, 2)),",
+    "        LogisticRegression(max_iter=2000, random_state=SEED),",
+    "    )",
+    "",
+    "validation_rows = []",
+    "for min_df in CANDIDATE_MIN_DF:",
+    "    candidate = make_text_model(min_df)",
+    "    candidate.fit(train['narrative'], train['product'])",
+    "    validation_prediction = candidate.predict(validation['narrative'])",
+    "    validation_rows.append({",
+    "        'min_df': min_df,",
+    "        'validation_accuracy': accuracy_score(",
+    "            validation['product'], validation_prediction",
+    "        ),",
+    "    })",
+    "validation_results = pd.DataFrame(validation_rows)",
+    "best_min_df = int(",
+    "    validation_results.sort_values(",
+    "        ['validation_accuracy', 'min_df'], ascending=[False, True]",
+    "    ).iloc[0]['min_df']",
+    ")",
+    "display(validation_results)",
+    "print('Selected min_df:', best_min_df)",
+    "# TODO: add an assertion that best_min_df is in CANDIDATE_MIN_DF.",
+])
+
+HW3_P2C_RESPONSE = "\n".join([
+    "### Your response - Problem 2(c)",
+    "",
+    "| `min_df` | Validation accuracy |",
+    "|---:|---:|",
+    "| 1 | TODO |",
+    "| 2 | TODO |",
+    "| 5 | TODO |",
+    "",
+    "**Selected value:** TODO  ",
+    "",
+    "**Why later narratives cannot influence the vocabulary (1-2 sentences):**  ",
+    "TODO",
+])
+
+HW3_P2D_CODE = "\n".join([
+    "from sklearn.dummy import DummyClassifier",
+    "",
+    "OPEN_TEST = False  # Change to True only after parts (a)-(c) are complete.",
+    "",
+    "def paired_bootstrap_accuracy_difference(",
+    "    y_true, model_prediction, floor_prediction, B=5000, seed=SEED",
+    "):",
+    "    y_true = np.asarray(y_true)",
+    "    model_prediction = np.asarray(model_prediction)",
+    "    floor_prediction = np.asarray(floor_prediction)",
+    "    paired_gain = (model_prediction == y_true).astype(float) - (",
+    "        floor_prediction == y_true",
+    "    ).astype(float)",
+    "    rng = np.random.default_rng(seed)",
+    "    bootstrap_means = np.array([",
+    "        rng.choice(paired_gain, size=len(paired_gain), replace=True).mean()",
+    "        for _ in range(B)",
+    "    ])",
+    "    interval = np.quantile(bootstrap_means, [0.025, 0.975])",
+    "    return paired_gain.mean(), interval",
+    "",
+    "if not OPEN_TEST:",
+    "    print('Test set remains unopened. Finish parts (a)-(c), then set OPEN_TEST = True.')",
+    "else:",
+    "    fit_rows = pd.concat([train, validation], ignore_index=True)",
+    "    final_model = make_text_model(best_min_df)",
+    "    final_model.fit(fit_rows['narrative'], fit_rows['product'])",
+    "    no_information = DummyClassifier(strategy='most_frequent')",
+    "    no_information.fit(fit_rows[['n_words']], fit_rows['product'])",
+    "    model_prediction = final_model.predict(test['narrative'])",
+    "    floor_prediction = no_information.predict(test[['n_words']])",
+    "    model_accuracy = accuracy_score(test['product'], model_prediction)",
+    "    floor_accuracy = accuracy_score(test['product'], floor_prediction)",
+    "    improvement, improvement_interval = paired_bootstrap_accuracy_difference(",
+    "        test['product'], model_prediction, floor_prediction",
+    "    )",
+    "    test_results = pd.DataFrame({",
+    "        'method': ['No-information classifier', 'TF-IDF logistic regression'],",
+    "        'test_accuracy': [floor_accuracy, model_accuracy],",
+    "    })",
+    "    display(test_results)",
+    "    print(f'Paired accuracy improvement: {improvement:.3f}')",
+    "    print('Paired bootstrap 95% interval: '",
+    "          f'[{improvement_interval[0]:.3f}, {improvement_interval[1]:.3f}]')",
+])
+
+HW3_P2D_RESPONSE = "\n".join([
+    "### Your response - Problem 2(d)",
+    "",
+    "| Result | Value |",
+    "|---|---:|",
+    "| No-information test accuracy | TODO |",
+    "| TF-IDF logistic-regression test accuracy | TODO |",
+    "| Paired accuracy improvement | TODO |",
+    "| Paired bootstrap 95% interval | TODO |",
+    "",
+    "**Checkpoint 1 conclusion (1-2 sentences):**  ",
+    "TODO - say whether the interval clears zero and what that means",
+])
+
+HW3_P2E_RESPONSE = "\n".join([
+    "### Your response - Problem 2(e)",
+    "",
+    "| Design decision | Problem in the initial workflow | Supporting code or output |",
+    "|---|---|---|",
+    "| Time split | TODO | TODO |",
+    "| Similarity-group check | TODO | TODO |",
+    "| TF-IDF inside the model pipeline | TODO | TODO |",
+    "| One-time test evaluation | TODO | TODO |",
+    "",
+    "**Limitation reduced by the code (1 sentence):**  ",
+    "TODO",
+    "",
+    "**Limitation the code cannot solve (1 sentence):**  ",
+    "TODO - discuss selection into the public-narrative dataset",
+])
+
+HW3_P2F_CODE = "\n".join([
+    "# Stretch workspace: paste or adapt the AI-assisted simulation below.",
+    "# Keep a fixed seed and show the group overlap and accuracy for both splits.",
+    "STRETCH_SEED = SEED",
+    "# TODO: add and run your final simulation code in this cell or new cells below.",
+])
+
+HW3_P2F_RESPONSE = "\n".join([
+    "### Your response - Problem 2(f)",
+    "",
+    "**Prediction recorded before using AI:**  ",
+    "TODO",
+    "",
+    "| Split | Groups shared by training and test | Accuracy |",
+    "|---|---:|---:|",
+    "| Random row split | TODO | TODO |",
+    "| Group-held-out split | TODO | TODO |",
+    "",
+    "**What happened and why (2-3 sentences):**  ",
+    "TODO",
+    "",
+    "**Connection to complaint `similarity_group` (1-2 sentences):**  ",
+    "TODO",
+    "",
+    "**One way the simulation is less realistic (1 sentence):**  ",
+    "TODO",
+])
+
+HW3_P3A_RESPONSE = "\n".join([
+    "### Your response - Problem 3(a)",
+    "",
+    "| What to compare | Original-request answer: evidence or omission | Detailed-request answer: evidence or omission | What you conclude |",
+    "|---|---|---|---|",
+    "| Target population and outcome | TODO | TODO | TODO |",
+    "| Unit and split | TODO | TODO | TODO |",
+    "| No-information rule, simple model, and transformer comparison | TODO | TODO | TODO |",
+    "| Uncertainty and practical importance | TODO | TODO | TODO |",
+    "| Supported claim and decision | TODO | TODO | TODO |",
+])
+
+HW3_AI_TABLE = "\n".join([
+    "",
+    "",
+    "| Assignment part | Tool | Purpose | Initial prompt only | What I checked | What changed after checking | Decision I remained responsible for |",
+    "|---|---|---|---|---|---|---|",
+    "| Problem 2(f) | TODO | Build the exploratory grouped-split simulation | TODO | TODO | TODO | TODO |",
+    "| Problem 3 original request | TODO | Obtain an analysis plan from the original request | TODO | TODO | TODO | TODO |",
+    "| Problem 3 detailed request | TODO | Obtain a plan based on the completed design brief | TODO | TODO | TODO | TODO |",
+])
+
+HW3_AI_APPENDIX = "\n".join([
+    "## Appendix A: Raw AI evidence",
+    "",
+    "Paste the two complete **first** plan outputs below. Preserve the wording",
+    "exactly as returned. Do not include follow-up conversation turns.",
+    "",
+    "### A1. Weak-request plan output",
+    "",
+    "TODO - paste the complete first response here",
+    "",
+    "### A2. Specified-request plan output",
+    "",
+    "TODO - paste the complete first response here",
+    "",
+    "**Appendix check:** Both entries contain the complete first response and no",
+    "follow-up turns. The same tool/model and data context were used for both.",
+])
+
+HW4_P1_HEADER = "\n".join([
+    "### Your response - Problem 1({letter})",
+    "",
+    "Show your work. Type it in Markdown/LaTeX, or insert a clear image of handwritten work",
+    "followed by one typed sentence stating your conclusion.",
+    "",
+])
+
+def _hw4_p1_response(letter, parts):
+    lines = [HW4_P1_HEADER.format(letter=letter)]
+    for part in parts:
+        lines += [f"**{part}**  ", "TODO", ""]
+    return "\n".join(lines).rstrip() + "\n"
+
+HW4_P1A_RESPONSE = _hw4_p1_response("a", ["(i)", "(ii)", "(iii)", "(iv) 1.", "(iv) 2.", "(iv) 3."])
+HW4_P1B_RESPONSE = _hw4_p1_response("b", ["(i)", "(ii)", "(iii)", "(iv)", "(v)"])
+HW4_P1C_RESPONSE = _hw4_p1_response("c", [
+    "(i) 1.", "(i) 2.", "(i) 3.", "(ii) 1.", "(ii) 2.",
+    "(iii) 1.", "(iii) 2.", "(iii) 3.", "(iv)", "(v)",
+])
+
+HW4_P2A_CODE = "\n".join([
+    "# Problem 2(a): code the Wilson center and plus-minus term from Problem 1(a)(ii)",
+    "z = norm.ppf(0.975)",
+    "k = int(hw['correct'].sum())",
+    "n = len(hw)",
+    "p_hat = k / n",
+    "",
+    "def wilson_interval(k, n, z):",
+    "    p_hat = k / n",
+    "    p_tilde = np.nan  # TODO: your formula for the center",
+    "    h = np.nan        # TODO: your formula for the plus-minus term",
+    "    return p_tilde - h, p_tilde + h",
+    "",
+    "wald_pm = np.nan  # TODO: the Wald plus-minus term",
+    "comparison = pd.DataFrame({",
+    "    'interval': ['Wald', 'Wilson (my formula)', 'Wilson (statsmodels)'],",
+    "    'lower': [p_hat - wald_pm, wilson_interval(k, n, z)[0], proportion_confint(k, n, method='wilson')[0]],",
+    "    'upper': [p_hat + wald_pm, wilson_interval(k, n, z)[1], proportion_confint(k, n, method='wilson')[1]],",
+    "})",
+    "print(f'{k} correct out of {n} frames, accuracy {p_hat:.3f}')",
+    "comparison.round(3)",
+])
+
+HW4_P2B_CODE = "\n".join([
+    "# Problem 2(b): sequence bootstrap with the Lab 4 function (about 10 seconds)",
+    "estimates = sequence_bootstrap(hw, lambda d: d['correct'].mean(), B=2000, seed=2027)",
+    "print('sequences resampled in each draw:', hw['sequence_id'].nunique())",
+    "boot_interval = np.quantile(estimates, [0.025, 0.975])",
+    "boot_var = estimates.var(ddof=1)",
+    "print('95% percentile interval:', boot_interval.round(3))",
+    "print('bootstrap variance:', round(boot_var, 5))",
+    "",
+    "design_effect = np.nan   # TODO: step 1",
+    "effective_n = np.nan     # TODO: step 1",
+    "rho_hat = np.nan         # TODO: step 2, solve your Problem 1(c) formula for rho",
+    "print('design effect:', design_effect, ' effective n:', effective_n, ' rho:', rho_hat)",
+])
+
+HW4_P3A_CODE = "\n".join([
+    "# Problem 3(a): the AI's attempted 'sequence bootstrap' and the supplied checks",
+    "def ai_bootstrap_attempt(dat, seed=401):",
+    "    \"\"\"Return identifiers selected for one alleged 'sequence bootstrap'.\"\"\"",
+    "    sampled_frames = dat.sample(n=len(dat), replace=True, random_state=seed)",
+    "    return sampled_frames['sequence_id'].tolist()",
+    "",
+    "def expand_sequence_draws(dat, sequence_draws):",
+    "    \"\"\"Expand sampled sequence IDs into complete blocks of their frames.\"\"\"",
+    "    blocks = []",
+    "    for draw_id, sequence_id in enumerate(sequence_draws):",
+    "        block = dat.loc[dat['sequence_id'].eq(sequence_id)].copy()",
+    "        block['bootstrap_draw_id'] = draw_id",
+    "        blocks.append(block)",
+    "    return pd.concat(blocks, ignore_index=True)",
+    "",
+    "def supplied_checks(candidate, dat):",
+    "    \"\"\"A correct candidate returns one sequence ID per original sequence.\"\"\"",
+    "    draws = candidate(dat, seed=401)",
+    "    n_sequences = dat['sequence_id'].nunique()",
+    "    assert len(draws) == n_sequences, 'Draw complete sequences, not frames.'",
+    "    assert set(draws).issubset(set(dat['sequence_id'])), 'Return sequence IDs.'",
+    "    duplicated = pd.concat([dat, dat.iloc[[0]]], ignore_index=True)",
+    "    assert len(candidate(duplicated, seed=401)) == n_sequences, (",
+    "        'Duplicating a frame must not increase the number of sequence draws.')",
+    "    expanded = expand_sequence_draws(dat, draws)",
+    "    for _, block in expanded.groupby('bootstrap_draw_id'):",
+    "        assert block['sequence_id'].nunique() == 1",
+    "        source_n = dat['sequence_id'].eq(block['sequence_id'].iloc[0]).sum()",
+    "        assert len(block) == source_n, 'Every draw must contain a complete sequence.'",
+    "",
+    "try:",
+    "    supplied_checks(ai_bootstrap_attempt, hw)",
+    "    print('original: passed')",
+    "except AssertionError as error:",
+    "    print('original: failed -', error)",
+    "",
+    "# TODO: paste the corrected function here, name it corrected_bootstrap, and run:",
+    "# supplied_checks(corrected_bootstrap, hw); print('corrected: passed')",
+])
+
+HW4_P3A_RESPONSE = "\n".join([
+    "### Your response - Problem 3(a)",
+    "",
+    "**My prompt (no mention of the bug):**  ",
+    "TODO",
+    "",
+    "**The assistant's complete first response:**  ",
+    "TODO",
+    "",
+    "**Did it notice the wrong resampling unit? Quote the relevant part or say it missed it:**  ",
+    "TODO",
+    "",
+    "**What I changed if the AI's fix failed the checks:**  ",
+    "TODO or not applicable",
+])
+
+HW4_AI_RECORD = "\n".join([
+    "## Required AI-use record (2 points)",
+    "",
+    "Record only the **initial prompt** for each use. Do not paste follow-up prompts or the full conversation into this table.",
+    "",
+    "| Assignment part | Tool | Purpose | Initial prompt only | What I checked | What changed after checking | Decision I made myself |",
+    "|---|---|---|---|---|---|---|",
+    "| Problem 2 (if AI was used) | TODO | TODO | TODO | TODO | TODO | TODO |",
+    "| Problem 3 | TODO | TODO | TODO | TODO | TODO | TODO |",
+])
+
 SPECIAL_RESPONSES = {
     ("hw01", "3", "a"): HW1_P3A_RESPONSE,
     ("hw01", "3", "b"): HW1_P3B_RESPONSE,
     ("hw01", "3", "c"): HW1_P3C_RESPONSE,
     ("hw02", "2", "d"): HW2_P2D_RESPONSE,
+    ("hw03", "1", "b"): HW3_P1B_RESPONSE,
+    ("hw03", "1", "c"): HW3_P1C_RESPONSE,
+    ("hw03", "1", "d"): HW3_P1D_RESPONSE,
+    ("hw03", "2", "a"): HW3_P2A_RESPONSE,
+    ("hw03", "2", "b"): HW3_P2B_RESPONSE,
+    ("hw03", "2", "c"): HW3_P2C_RESPONSE,
+    ("hw03", "2", "d"): HW3_P2D_RESPONSE,
+    ("hw03", "2", "e"): HW3_P2E_RESPONSE,
+    ("hw03", "2", "f"): HW3_P2F_RESPONSE,
+    ("hw03", "3", "a"): HW3_P3A_RESPONSE,
+    ("hw04", "1", "a"): HW4_P1A_RESPONSE,
+    ("hw04", "1", "b"): HW4_P1B_RESPONSE,
+    ("hw04", "1", "c"): HW4_P1C_RESPONSE,
+    ("hw04", "3", "a"): HW4_P3A_RESPONSE,
 }
 
 SPECIAL_CODE_BEFORE_RESPONSE = {
     ("hw02", "3", "a"): HW2_P3A_CODE,
     ("hw02", "3", "b"): HW2_P3B_CODE,
     ("hw02", "3", "c"): HW2_P3C_CODE,
+    ("hw03", "2", "a"): HW3_P2A_CODE,
+    ("hw03", "2", "b"): HW3_P2B_CODE,
+    ("hw03", "2", "c"): HW3_P2C_CODE,
+    ("hw03", "2", "d"): HW3_P2D_CODE,
+    ("hw03", "2", "f"): HW3_P2F_CODE,
+    ("hw04", "2", "a"): HW4_P2A_CODE,
+    ("hw04", "2", "b"): HW4_P2B_CODE,
+    ("hw04", "3", "a"): HW4_P3A_CODE,
 }
 
 FINAL = "\n".join([
@@ -453,7 +958,8 @@ def problem_cells(problem: str, hw_id: str) -> list[dict]:
     if not heading_match:
         return [markdown_cell(problem), markdown_cell(RESPONSE.format(label="problem"))]
     heading, body = heading_match.groups()
-    pieces = re.split(r"(?=^[a-e]\.\s)", body, flags=re.M)
+    subpart_pattern = r"(?=^[a-f]\.\s)" if hw_id == "hw03" else r"(?=^[a-e]\.\s)"
+    pieces = re.split(subpart_pattern, body, flags=re.M)
     introduction = pieces[0].strip()
     cells = [markdown_cell(heading + ("\n\n" + introduction if introduction else ""))]
     if len(pieces) == 1:
@@ -462,16 +968,17 @@ def problem_cells(problem: str, hw_id: str) -> list[dict]:
     problem_number = re.search(r"Problem (\d+)", heading).group(1)
     for piece in pieces[1:]:
         piece = piece.strip()
-        letter = re.match(r"([a-e])\.", piece).group(1)
+        letter = re.match(r"([a-f])\.", piece).group(1)
         cells.append(markdown_cell(piece))
         special_code = SPECIAL_CODE_BEFORE_RESPONSE.get(
             (hw_id, problem_number, letter)
         )
         if special_code:
             cells.append(code_cell(special_code))
+        default_response = HW3_RESPONSE if hw_id == "hw03" else RESPONSE
         response = SPECIAL_RESPONSES.get(
             (hw_id, problem_number, letter),
-            RESPONSE.format(label=f"Problem {problem_number}({letter})"),
+            default_response.format(label=f"Problem {problem_number}({letter})"),
         )
         cells.append(markdown_cell(response))
     return cells
@@ -495,6 +1002,19 @@ def build_notebook(qmd_path: Path, hw_id: str, label: str) -> dict:
             if cell["cell_type"] == "markdown" and "## Required AI-use record" in "".join(cell["source"]):
                 cell["source"] = ("".join(cell["source"]) + HW2_AI_TABLE).splitlines(True)
                 break
+    if hw_id == "hw03":
+        for cell in cells:
+            if cell["cell_type"] == "markdown" and "## Required AI-use record" in "".join(cell["source"]):
+                cell["source"] = ("".join(cell["source"]) + HW3_AI_TABLE).splitlines(True)
+                break
+        cells.append(markdown_cell(HW3_AI_APPENDIX))
+    if hw_id == "hw04":
+        for cell in cells:
+            text = "".join(cell["source"])
+            if cell["cell_type"] == "markdown" and "## Required AI-use record" in text:
+                cell["source"] = text.split("## Required AI-use record")[0].rstrip().splitlines(True)
+                break
+        cells.append(markdown_cell(HW4_AI_RECORD))
     cells.append(markdown_cell(FINAL))
     for index, cell in enumerate(cells):
         cell["id"] = f"{hw_id}-{index:03d}"

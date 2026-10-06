@@ -1,0 +1,642 @@
+---
+title: "Week 3A: Design the Evaluation"
+subtitle: "Statistical design to plan a useful experiment"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+execute:
+  warning: false
+  message: false
+---
+
+## The semester goal—and today's practice {.smaller}
+
+By the end of the semester, you should be able to turn
+
+> “Is the new AI model better?”
+
+into a plan that another analyst could carry out without guessing what you
+meant.
+
+Today is our first focused practice with that larger goal. We will decide how
+to:
+
+1. interpret a single prediction in context;
+2. which cases the result should describe;
+3. what the new model must beat;
+4. which data may be used for each choice;
+5. what result would change our decision.
+
+## Our running example {.smaller}
+
+A university help desk receives short email requests. Staff members assign one
+of four queues:
+
+- accounts;
+- classroom technology;
+- network access;
+- software.
+
+A simple model uses word counts as features to predict one of the four queues.
+A proposed language model predicts the same outcome. In either case, a staff
+member reviews the recommended queue before making the final choice.
+
+**Opening question:** What would you need to know before “82% accurate” told
+you anything useful?
+
+## A score does not carry its own meaning {.smaller}
+
+“82% accurate” leaves several questions unanswered:
+
+- Accurate at predicting **what recorded category**?
+- On **which requests**?
+- Compared with **what easier method**?
+- Were the test requests used while making choices?
+- How much could the result change with a different sample?
+- Is 82% enough for the way people will use the tool?
+
+The evaluation plan supplies the meaning that the number lacks.
+
+## First ask what the recorded label means {.smaller}
+
+Consider this request:
+
+> “My classroom computer connects to Wi-Fi, but the statistics software will
+> not open.”
+
+A staff member records **software**. Another reasonable staff member might
+start with **classroom technology** or **network access**.
+
+The stored label tells us **how this request was routed in the data**. It is
+not proof that there is a real ground-truth queue for the request.
+
+The model can learn to reproduce recorded decisions without proving those
+decisions were consistent, fair, or useful.
+
+## The recorded queue and the real goal can differ {.smaller}
+
+| Question | Help-desk example |
+|---|---|
+| What is one row in the dataset? | one help-desk ticket |
+| What outcome is recorded for that ticket? | queue assigned by a staff member |
+| What does the model predict? | that recorded queue |
+| How might the model be used? | recommend a queue for staff review |
+| What larger outcome might we care about? | faster, correct resolution |
+
+Accuracy at predicting the recorded queue does **not** by itself show that
+requests are resolved faster.
+
+This is a claim boundary: a clear line between what the study measures and a
+larger claim it cannot establish.
+
+## How tickets enter the teaching dataset {.smaller}
+
+```{mermaid}
+flowchart LR
+  A[All help requests] --> B[Submitted by email]
+  B --> C[Exactly one queue<br/>recorded per ticket]
+  C --> D[Queue is one of<br/>four selected]
+  D --> E[Teaching file]
+```
+
+Each arrow applies another filter. “Exactly one queue” means one queue label
+per ticket. The next step keeps tickets whose label is accounts, classroom
+technology, network access, or software.
+
+The resulting dataset may not describe phone calls, walk-in requests, tickets
+with several queue labels, or tickets from other queues.
+
+::: notes
+[Further reading] Medical-study parallel: NEJM papers use the same filtering
+logic to define who enters an analysis. See Figure 1 in
+https://www.nejm.org/doi/full/10.1056/NEJMsa2001090 (AI clinical deterioration)
+and https://www.nejm.org/doi/full/10.1056/NEJMoa1716771 (recruitment and follow-up).
+:::
+
+## Balanced samples change the mix {.smaller}
+
+Suppose the teaching file contains 100 requests from each queue. In actual use,
+accounts requests may be much more common.
+
+```{python}
+#| echo: false
+#| fig-width: 8
+#| fig-height: 2.3
+import matplotlib.pyplot as plt
+import numpy as np
+
+queues = ["accounts", "classroom", "network", "software"]
+teaching = np.array([25, 25, 25, 25])
+future = np.array([55, 10, 20, 15])
+x = np.arange(len(queues))
+
+fig, ax = plt.subplots(figsize=(8, 2.3))
+ax.bar(x - 0.18, teaching, 0.36, label="teaching file")
+ax.bar(x + 0.18, future, 0.36, label="possible future mix")
+ax.set_xticks(x, queues, rotation=12, ha="right")
+ax.set_ylabel("percent of requests")
+ax.set_ylim(0, 65)
+ax.legend(frameon=False, ncol=2)
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+Deliberately selected cases, whether balanced or chosen because they are hard,
+do not show deployment frequencies.
+
+::: notes
+[Further reading] Active learning also selects cases deliberately, often hard or
+uncertain ones. That can help training, but those cases should not double as the
+deployment evaluation set.
+
+- Cohn, Ghahramani, and Jordan, "Active Learning with Statistical Models":
+  https://papers.nips.cc/paper_files/paper/1994/hash/7f975a56c761db6506eca0b37ce6ec87-Abstract.html
+- Farquhar, Gal, and Rainforth, "On Statistical Bias in Active Learning":
+  https://arxiv.org/abs/2101.11665
+:::
+
+## Turn the broad question into one quantity {.smaller}
+
+**Broad question**
+
+> Is the language model better?
+
+**Answerable question**
+
+> For new email requests in these four queues, how much more often does the
+> language model predict the actual queue than the word-count model?
+
+**Quantity we want to learn**
+
+$$
+\text{accuracy of language model on new requests}
+-\text{accuracy of word-count model on new requests}.
+$$
+
+The statistical name for the quantity a study is designed to learn is the
+**estimand**. The plain-language description comes first.
+
+**Statistics-book reference:** Burns,
+[*Foundations for a Statistical Mindset*, §1.3.1](https://statistical-mindset.com/chapter-1.html#specify-your-estimand),
+distinguishes the estimand from the estimator and the resulting estimate.
+
+## Question, expectation, quantity {.smaller}
+
+| Part | What it does | Help-desk example |
+|---|---|---|
+| Research question | says what we want to learn | How much better is the language model for new requests? |
+| Hypothesis | states what we expect | We expect a positive and useful improvement. |
+| Quantity | says exactly what will be compared | Accuracy difference on the same new requests |
+
+“The language model is better” is not yet a complete hypothesis unless
+**better**, **for whom**, and **by how much** can be checked.
+
+For an evaluation, ask who will use the result and what decision it could
+change.
+
+::: notes
+[Further reading] This echoes DARPA's Heilmeier Catechism: "Who cares? If you
+are successful, what difference will it make?"
+https://www.darpa.mil/about/heilmeier-catechism
+:::
+
+## Use two comparisons, not one {.smaller}
+
+```{mermaid}
+flowchart LR
+  A["Baseline<br/>ignores the email text"] -->|"Signal check<br/>Do the words help?"| B["Simple text model<br/>word counts"]
+  B -->|"Upgrade check<br/>Does complexity help enough?"| C["Language model"]
+
+  classDef baseline fill:#f3f4f6,stroke:#667085,color:#252525,stroke-width:2px;
+  classDef simple fill:#e8f4ff,stroke:#155a8a,color:#252525,stroke-width:2px;
+  classDef complex fill:#fae9ed,stroke:#c41230,color:#252525,stroke-width:2px;
+  class A baseline;
+  class B simple;
+  class C complex;
+```
+
+1. **Signal check:** The baseline is the reference point. Does using the words
+   improve predictions at all?
+2. **Upgrade check:** Does the complex model improve enough over the simple
+   model to justify its extra cost?
+
+These are different questions with different comparison points.
+
+## The signal check needs a baseline {.smaller}
+
+A **baseline** is the reference method that a fitted model must beat. Ours
+ignores the email text and always predicts the most common queue. Homework 3
+calls this particular baseline the **no-information rule**.
+
+```{python}
+#| echo: false
+#| fig-width: 8
+#| fig-height: 3.2
+fig, axes = plt.subplots(1, 2, figsize=(8, 3.2), sharey=True)
+for ax, values, title in zip(
+    axes,
+    ([25, 25, 25, 25], [55, 10, 20, 15]),
+    ("Balanced teaching file", "Possible future mix"),
+):
+    ax.bar(queues, values, color=["#c41230", "#9aa4b2", "#9aa4b2", "#9aa4b2"])
+    ax.set_title(title)
+    ax.set_ylim(0, 65)
+    ax.tick_params(axis="x", rotation=25)
+    ax.spines[["top", "right"]].set_visible(False)
+axes[0].set_ylabel("percent")
+axes[0].text(0, 29, "baseline = 25%", ha="center")
+axes[1].text(0, 59, "baseline = 55%", ha="center")
+plt.tight_layout()
+plt.show()
+```
+
+The baseline accuracy depends on the category mix among the cases being
+evaluated.
+
+## Accuracy answers one simple question
+
+$$
+\text{accuracy}
+=\frac{\text{number assigned the recorded category}}
+{\text{number of evaluated cases}}.
+$$
+
+If 72 of 100 requests receive the recorded queue, accuracy is 72%.
+
+Accuracy weights **requests** equally. Therefore, common queues have more
+influence when the evaluation data are not balanced.
+
+## Recall and average recall {.smaller}
+
+For queue $k$, **recall** is the multiclass version of sensitivity:
+
+$$
+\operatorname{Recall}_k
+=
+\frac{\#\{\text{requests actually in queue }k\text{ and predicted as }k\}}
+{\#\{\text{requests actually in queue }k\}}.
+$$
+
+With $K$ queues, **average recall** gives each queue equal weight:
+
+$$
+\text{average recall}=\frac{1}{K}\sum_{k=1}^{K}\operatorname{Recall}_k.
+$$
+
+For queue recalls $0.92$, $0.48$, $0.74$, and $0.66$:
+
+$$
+\text{average recall}=\frac{0.92+0.48+0.74+0.66}{4}=0.70.
+$$
+
+Average recall is also called **macro recall** or **balanced accuracy**. Unlike
+ordinary accuracy, each queue contributes one fourth of this result.
+
+## Which metric fits the intended use? {.smaller}
+
+**Accuracy may fit when:**
+
+- every request should count equally;
+- the evaluation mix matches the mix we care about;
+- category-specific failures are also checked separately.
+
+**Average recall may fit when:**
+
+- performance in a rare queue matters as much as performance in a common one;
+- the evaluation sample was deliberately balanced;
+- we can explain why equal weight for each queue matches the use.
+
+Choose the main metric before seeing which one makes a model look best.
+
+## “Better than zero” may not be worth using {.smaller}
+
+Suppose the language model costs more to run and is harder to explain.
+
+| Improvement over simple model | Possible decision |
+|---:|---|
+| 0.2 percentage points | probably not worth changing |
+| 2 percentage points | might justify a small pilot |
+| 8 percentage points | strong reason to investigate further |
+
+A **practical threshold** is the minimum improvement that would change the
+decision. Choose it before opening the test results.
+
+There is no universal correct threshold. The reason should connect to costs,
+risks, workload, or benefits in the intended use.
+
+## Put both checks in one decision rule {.smaller}
+
+Suppose we chose 2 percentage points as the minimum useful improvement. Our
+rule could be:
+
+```{mermaid}
+flowchart LR
+  A{Do the words help?} -->|no| B[Stop]
+  A -->|yes| C{Does complexity help enough?}
+  C -->|no| D[Keep simple model]
+  C -->|yes| E[Consider a reviewed pilot]
+```
+
+The exact threshold is a decision choice. The two-step structure is the key.
+
+## Start from the familiar two-sample comparison {.smaller}
+
+For independent groups $A$ and $B$, a two-sample $t$-test starts with
+
+$$
+\widehat{\Delta}=\bar Y_B-\bar Y_A,
+\qquad
+\widehat{\operatorname{Var}}(\widehat{\Delta})
+=\frac{s_B^2}{n_B}+\frac{s_A^2}{n_A}.
+$$
+
+That variance formula works because outcomes in group $A$ are independent of
+outcomes in group $B$.
+
+In our evaluation, each request is scored by **both** models. If $C_i$ is the
+complex model's correctness indicator and $S_i$ is the simple model's, then
+
+$$
+\operatorname{Var}(\bar C-\bar S)
+=\operatorname{Var}(\bar C)+\operatorname{Var}(\bar S)
+-2\operatorname{Cov}(\bar C,\bar S).
+$$
+
+The covariance is not zero: easy requests tend to be easy for both models.
+Treating the accuracies as independent throws away information and gives the
+wrong standard error.
+
+## Pairing creates one difference per request {.smaller .compact-table}
+
+Define $D_i=C_i-S_i$. Each request now contributes one paired outcome:
+
+| Simple $S_i$ | Complex $C_i$ | Difference $D_i$ | Meaning |
+|:---:|:---:|:---:|---|
+| 1 | 1 | 0 | both correct |
+| 0 | 1 | +1 | only complex is correct |
+| 1 | 0 | −1 | only simple is correct |
+| 0 | 0 | 0 | both wrong |
+
+$$
+\widehat{\Delta}=\bar D
+=\frac{n_{01}-n_{10}}{n},
+\qquad
+\widehat{\operatorname{SE}}(\bar D)=\frac{s_D}{\sqrt n}.
+$$
+
+- The paired-$t$ analysis of the $D_i$ gives a familiar large-sample interval
+  for the difference in accuracy.
+- For binary correctness, testing equal accuracy is **McNemar's paired-proportion
+  problem**: only the two discordant cells, $n_{01}$ and $n_{10}$, determine the
+  direction of the difference.
+- A paired bootstrap resamples requests with both predictions attached. The
+  same idea extends to differences in average recall.
+
+## Three data sets have three jobs {.smaller}
+
+```{mermaid}
+flowchart LR
+  A[Training data<br/>fit words and model] --> B[Validation data<br/>choose settings]
+  B --> C[Lock every choice]
+  C --> D[Test data<br/>evaluate once]
+```
+
+| Data | What it may do |
+|---|---|
+| Training | learn text features and fit the model |
+| Validation | choose among allowed settings and rules |
+| Test | compare the finished methods once |
+
+The test set is not another source of feedback for improving the model.
+
+## Why repeated test checks are dangerous {.smaller}
+
+Imagine that none of 40 analysis choices truly improves performance. Random
+noise still makes the best-looking choice appear positive.
+
+```{python}
+#| echo: false
+#| fig-width: 8
+#| fig-height: 3.4
+rng = np.random.default_rng(2027)
+numbers_tried = np.array([1, 2, 5, 10, 20, 40])
+best_noise = []
+for n_try in numbers_tried:
+    simulated = rng.normal(0, 0.025, size=(5000, n_try))
+    best_noise.append(simulated.max(axis=1).mean() * 100)
+
+fig, ax = plt.subplots(figsize=(8, 3.4))
+ax.plot(numbers_tried, best_noise, marker="o", color="#c41230", linewidth=2)
+ax.axhline(0, color="black", linewidth=1)
+ax.set_xlabel("number of choices checked on the test set")
+ax.set_ylabel("average best-looking gain\n(percentage points)")
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+The test set becomes part of model development as soon as its result changes a
+choice.
+
+## The data split decides what “new” means {.smaller .compact-table}
+
+| Split | The question it asks |
+|---|---|
+| Random rows | How does the model perform on another request from roughly the same mix? |
+| By time | How does it perform later, when wording or queue frequencies may have changed? |
+| By group | How does it perform for a person, site, or template not seen during fitting? |
+
+None is always best. The intended use tells us which test is relevant.
+
+## Here, train and test should have different distributions {.smaller}
+
+A **distribution** describes the mix of requests we see: their wording $X$,
+their actual queues $Y$, and the relationship between the two.
+
+| Data | Distribution we want | Why |
+|---|---|---|
+| Training | older requests, deliberately balanced across queues | give the model enough examples from every queue |
+| Test | later requests in their naturally occurring mix | estimate performance for the requests the system would actually receive |
+
+Therefore, we expect
+
+$$
+P_{\text{train}}(X,Y) \ne P_{\text{test}}(X,Y).
+$$
+
+This is a **distribution change** (often called distribution shift), and here
+it is intentional. A random-row split tries to make training and test look
+similar. We instead want the test distribution to resemble **future use**, not
+the training sample.
+
+## The split encodes how we expect the distribution to change {.smaller}
+
+| Expected future setting | Appropriate test split |
+|---|---|
+| Roughly the same distribution; no important new-group problem | random rows |
+| Distribution may change over time | later time period |
+| New people, sites, or templates matter | hold out whole groups |
+| Both time and groups may change | combine time and group rules |
+
+The first row is the **neither** case. A random-row split assumes future
+requests behave like another random sample from roughly the same distribution
+as the available requests. That is a substantive assumption—not a neutral
+default.
+
+A time split does not automatically keep groups separate. A group split does
+not automatically test change over time. State what change the split is meant
+to represent and what it leaves unchanged.
+
+## Trace the path from test information to a model choice {.smaller .compact-table}
+
+**Data leakage** occurs when information reserved for final evaluation moves
+backward into model development. Name what moved and what it changed:
+
+| Test information | Path into the analysis | What it changes |
+|---|---|---|
+| words in test requests | build the vocabulary using all text | the model's input features |
+| test scores | keep trying settings until the score rises | the selected model |
+| test labels | combine queues after comparing results | the outcome being predicted |
+| subgroup results | report the subgroup with the largest gap | the claim being emphasized |
+
+“There is leakage” is incomplete. A useful diagnosis identifies the
+information, the path it followed, and the choice it influenced.
+
+## Training-only vocabulary creates unseen words {.smaller}
+
+TF-IDF learns its vocabulary and word weights from the training text. Those
+learned choices belong inside the fitted model.
+
+```python
+from sklearn.pipeline import make_pipeline
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+
+model = make_pipeline(
+    TfidfVectorizer(min_df=2),
+    LogisticRegression(max_iter=2000),
+)
+
+model.fit(training_text, training_label)
+validation_prediction = model.predict(validation_text)
+```
+
+`fit` learns both the vocabulary and classifier from training text. `predict`
+applies those frozen choices to validation text.
+
+Words that appear only in validation or test have no TF-IDF column and are
+ignored. Under distribution change, new product names or new terminology may
+therefore disappear from the model's input. During EDA, examine vocabulary
+coverage using training and validation data, decide how to handle it, and then
+leave the final test alone.
+
+## Cleaning is often an analysis choice {.smaller .compact-table}
+
+| Cleaning decision | Statistical consequence |
+|---|---|
+| Drop blank or very short requests | changes which future requests the claim covers |
+| Remove repeated templates | changes how common request types are weighted |
+| Combine queues | changes the outcome, errors, and baseline |
+| Remove signatures or boilerplate | changes the information available to the model |
+
+Cleaning is not neutral housekeeping when it changes the cases, features, or
+outcome. Use EDA to justify the rule, state what it changes, and fix it before
+the final test.
+
+## EDA should reveal the statistical design problems {.smaller .compact-table}
+
+This is familiar EDA: inspect counts, missingness, repeated text, changes over
+time, and questionable labels before fitting a model.
+
+| EDA finding | Statistical design response |
+|---|---|
+| queues have very different frequencies | choose a baseline and metrics that match the intended use |
+| templates or people repeat | decide whether groups must remain together |
+| vocabulary changes over time | use a time split and report vocabulary coverage |
+| phone and walk-in requests are absent | narrow the target or collect those cases |
+| the recorded queue is debatable | define the label and describe its limits |
+
+EDA can expose these problems. Statistical design determines the target,
+sampling, split, processing, comparisons, and claims that follow.
+
+## The model card turns choices into documentation {.smaller}
+
+For this week, focus on four parts of Mitchell et al.'s model-card framework:
+
+| Part | Question to answer |
+|---|---|
+| Intended use | Who uses the output, for what task, and with what review? |
+| Metrics | What is measured, why, and with what uncertainty? |
+| Evaluation data | Which cases were used, and how were they processed? |
+| Caveats | What use or conclusion is not supported? |
+
+This is not paperwork added after modeling. It is a compact record of the
+evaluation design.
+
+[Mitchell et al. (2019), *Model Cards for Model Reporting*](https://arxiv.org/abs/1810.03993)
+
+::: notes
+[Source]
+- Mitchell et al. (2019), Model Cards for Model Reporting, Section 4:
+  https://arxiv.org/abs/1810.03993
+:::
+
+## A complete design brief {.smaller .compact-table}
+
+| Decision | Help-desk plan |
+|---|---|
+| Prediction | recorded queue for one email request |
+| Intended use | recommendation reviewed by help-desk staff |
+| Cases described | later email requests in the same four queues |
+| Main metric | accuracy; also inspect recall by queue |
+| First comparison | simple word model minus baseline |
+| Second comparison | language model minus simple word model |
+| Data roles | older training, later validation, newest locked test |
+| Decision rule | require clear signal, then a useful gain chosen in advance |
+| Out of scope | automatic routing or claims about faster resolution |
+
+::: notes
+[Further reading] Clinical trials make the same prespecification explicit:
+Phase I dose-escalation designs (https://pmc.ncbi.nlm.nih.gov/articles/PMC2684552/)
+and Simon's two-stage Phase II design (https://doi.org/10.1016/0197-2456(89)90015-9)
+define the cases, outcome, comparison, and decision rule before seeing the result.
+:::
+
+## Check your plan with five questions {.smaller}
+
+1. What exactly is predicted, and how was that label produced?
+2. Which cases should the conclusion describe?
+3. What does the simple model beat, and what does the complex model beat?
+4. Which data are used to fit, choose, and test?
+5. What result would change the decision—and what would it still not prove?
+
+If one answer is missing, an AI assistant or analyst will fill it in. The
+unstated choice may be reasonable, but it will not necessarily be yours.
+
+## Check before you leave
+
+For the **help-desk routing project**, choose the test split that best matches
+each intended use:
+
+1. The same help desk will use the model on requests received next semester.
+2. New people or sites, not represented in training, will use the model.
+3. The help desk expects the same mixture of dates, request types, and users as
+   in the available data.
+
+Then explain in one sentence why a narrow uncertainty interval cannot
+compensate for an evaluation sample drawn from the wrong group of cases.
+
+## Next class
+
+We will start with a plausible but underspecified AI-generated plan.
+
+Then we will:
+
+- find the hidden choices in the order they occur;
+- use EDA to make those choices and their consequences visible;
+- distinguish statistical-design decisions from limits of the available data;
+- carry the same reasoning into the CFPB lab and Homework 3.

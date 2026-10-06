@@ -1,0 +1,27 @@
+{
+  "source_repository": "scikit-learn/scikit-learn",
+  "snapshot_date": "2026-08-12",
+  "created_range": "2018-01-01..2025-12-31",
+  "selection": "15 issues with exactly one module label",
+  "modules": [
+    "module:cluster",
+    "module:ensemble",
+    "module:linear_model",
+    "module:metrics",
+    "module:model_selection",
+    "module:preprocessing",
+    "module:tree",
+    "module:utils"
+  ],
+  "rows": 120,
+  "eligible_records_by_module_before_sampling": {
+    "module:cluster": 57,
+    "module:ensemble": 75,
+    "module:linear_model": 89,
+    "module:metrics": 76,
+    "module:model_selection": 53,
+    "module:preprocessing": 65,
+    "module:tree": 46,
+    "module:utils": 32
+  }
+}

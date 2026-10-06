@@ -209,11 +209,23 @@ def dynasent() -> dict:
     pd.DataFrame(lab_rows).to_csv(root / "items.csv", index=False)
     pd.DataFrame(homework_rows).to_csv(root / "homework_items.csv", index=False)
     pd.DataFrame(homework_rows[:6]).to_csv(root / "prompt_items.csv", index=False)
+    forecaster_columns = [
+        "item_id",
+        "sentence",
+        "collection_round",
+        "negative_votes",
+        "neutral_votes",
+        "positive_votes",
+    ]
+    pd.DataFrame(homework_rows[:10])[forecaster_columns].to_csv(
+        root / "forecaster_items.csv", index=False
+    )
     return {
         "rows": len(rows),
         "lab_rows": len(lab_rows),
         "homework_rows": len(homework_rows),
         "prompt_rows": 6,
+        "forecaster_rows": 10,
         "raters_per_item": 5,
     }
 

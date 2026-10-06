@@ -1,23 +1,26 @@
 # Student release data
 
 This directory contains frozen, licensed, privacy-reviewed teaching subsets.
-The current student release includes:
 
 - `camera_traps/`: 216 resized Caltech Camera Traps images in 72 complete
-  trigger sequences from 12 camera locations;
-- `dynasent/`: disjoint DynaSent v1.1 lab, homework, and forecaster subsets.
+  trigger sequences from 12 camera locations.
+- `dynasent/`: the frozen Week 2 repeated-rater teaching subset.
+- `cfpb/`: the current Week 3 structural prototype, pending replacement by a
+  time-spanning complaint extract.
+- `github_issues/`: 120 real scikit-learn issue titles and metadata for the
+  Week 3 issue-triage design problem.
 
-See each dataset directory's README for its source, license, construction, and
-interpretation limits.
+See each group README for source, license, selection, privacy, and statistical
+limitations.
 
 Do **not** copy `data/smoke/` here: those files are synthetic tests and are not
-student data. Later release gates will add `cfpb`, `nhanes`, and
-`designed_eval`.
+student data. Later releases will add `nhanes` and `designed_eval` after their
+separate release gates pass.
 
 After changing an approved release, rebuild the download manifest with:
 
 ```bash
-python scripts/build_course_data_manifest.py --release-id spring27-week02-v1
+python scripts/build_course_data_manifest.py --release-id spring27-v1
 ```
 
 The generated `manifest.json` records every distributed relative path, byte

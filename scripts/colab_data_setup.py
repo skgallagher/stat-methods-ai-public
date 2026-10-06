@@ -29,18 +29,27 @@ np.random.seed(SEED)
 COURSE_REPO_RAW_URL = {PUBLIC_REPO_RAW_URL!r}
 COURSE_DATA_BASE_URL = COURSE_REPO_RAW_URL + '/data/course'
 COURSE_DATA_GROUPS = {group_literal}
-DATA_ROOT = Path('/content/stat_ai_data')
+RUNTIME_ROOT = Path('/content') if Path('/content').exists() else Path.cwd()
+DATA_ROOT = RUNTIME_ROOT / 'stat_ai_data'
 
-# Local repository runs use the frozen release when present and otherwise the
-# synthetic smoke fixture. A fresh Colab downloads verified individual files
-# from GitHub - no ZIP upload or Drive mount is required.
-LOCAL_RELEASE = Path.cwd() / 'data' / 'course'
-LOCAL_SMOKE = Path.cwd() / 'data' / 'smoke'
+# A local notebook may start in the repository root or a nested week folder.
+# Search upward for frozen course data before falling back to a download.
+search_roots = [Path.cwd(), *Path.cwd().parents]
+LOCAL_RELEASE = next((
+    root / 'data' / 'course'
+    for root in search_roots
+    if (root / 'data' / 'course' / 'manifest.json').exists()
+), None)
+LOCAL_SMOKE = next((
+    root / 'data' / 'smoke'
+    for root in search_roots
+    if (root / 'data' / 'smoke').exists()
+), None)
 online_release = False
-if (LOCAL_RELEASE / 'manifest.json').exists():
+if LOCAL_RELEASE is not None:
     DATA_ROOT = LOCAL_RELEASE
     data_source = 'local frozen release'
-elif LOCAL_SMOKE.exists():
+elif LOCAL_SMOKE is not None:
     DATA_ROOT = LOCAL_SMOKE
     data_source = 'local synthetic smoke fixture (development only)'
 elif (DATA_ROOT / 'manifest.json').exists():
@@ -76,13 +85,17 @@ else:
     online_release = True
 
 if online_release:
-    helper_target = Path('/content/course_helpers/__init__.py')
+    # Build the package directory as path components so notebook/Markdown
+    # converters cannot turn the underscore into a literal escaped path.
+    helper_package = 'course' + '_helpers'
+    helper_target = RUNTIME_ROOT / helper_package / '__init__.py'
     helper_target.parent.mkdir(parents=True, exist_ok=True)
     urllib.request.urlretrieve(
         COURSE_REPO_RAW_URL + '/course_helpers/__init__.py', helper_target
     )
-    if '/content' not in sys.path:
-        sys.path.insert(0, '/content')
+    runtime_import_root = str(RUNTIME_ROOT)
+    if runtime_import_root not in sys.path:
+        sys.path.insert(0, runtime_import_root)
     from course_helpers import ensure_course_data
     DATA_ROOT = ensure_course_data(
         COURSE_DATA_BASE_URL,

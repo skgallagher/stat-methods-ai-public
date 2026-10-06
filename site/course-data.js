@@ -92,10 +92,38 @@ const weeklyMaterials = [
     week: 3,
     label: "Week 3",
     publishDate: "2027-01-31",
-    title: "Using AI in a Statistical Workflow",
-    description: "Prompting, verification, reproducibility, and meta-evaluating AI tools used in analysis.",
+    title: "Evaluation Design: Estimands, Splits, and AI-Assisted Workflow",
+    description: "Turn a vague question about an AI system into an estimand, comparisons, and a data split, then audit an AI-generated analysis plan using CFPB complaints.",
     links: [
-      { label: "Materials", href: `${courseLinks.publicBlob}/weeks/week03/` }
+      { label: "Lecture A", href: `${courseLinks.publicBlob}/weeks/week03/lecture_a.html` },
+      { label: "Lecture B", href: `${courseLinks.publicBlob}/weeks/week03/lecture_b.html` },
+      { label: "CFPB data release", href: `${courseLinks.publicBlob}/data/course/cfpb/README.md` },
+      { label: "GitHub issues data release", href: `${courseLinks.publicBlob}/data/course/github_issues/README.md` },
+      {
+        label: "Lab notebook",
+        href: `${courseLinks.publicBlob}/weeks/week03/lab_starter.ipynb`,
+        openDate: "2027-02-04"
+      },
+      {
+        label: "Open lab in Colab",
+        href: `${courseLinks.colabBase}/weeks/week03/lab_starter.ipynb`,
+        openDate: "2027-02-04"
+      },
+      {
+        label: "HW3 PDF",
+        href: `${courseLinks.publicBlob}/weeks/week03/hw03.pdf`,
+        openDate: "2027-02-04"
+      },
+      {
+        label: "HW3 notebook",
+        href: `${courseLinks.publicBlob}/weeks/week03/hw03_starter.ipynb`,
+        openDate: "2027-02-04"
+      },
+      {
+        label: "Open HW3 in Colab",
+        href: `${courseLinks.colabBase}/weeks/week03/hw03_starter.ipynb`,
+        openDate: "2027-02-04"
+      }
     ]
   },
   {
