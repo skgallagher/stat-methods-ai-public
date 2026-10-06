@@ -4,18 +4,19 @@ subtitle: "Week 3 · Guided in class · CFPB complaint routing"
 format: html
 ---
 
-**Today:** We will read through one complete evaluation plan, find two problems
-in a weak plan, and run a small practice analysis. We will use the CFPB
-complaint data again in Homework 3.
+## The situation
 
-In this lab, we use 2022 for training and 2023 to practice choosing a model.
-We leave 2024 and 2025 untouched because you will use them in Homework 3.
+The Consumer Financial Protection Bureau (CFPB) is a US government agency that takes complaints from people about financial products such as credit cards, mortgages, and debt collection. When someone files a complaint, they pick which product it is about, and that choice decides where the complaint goes. People do not always pick the right one, and a complaint filed in the wrong place takes longer to resolve.
 
-## Read through a complete plan — 10 minutes
+Imagine the agency wants a tool that reads a complaint and suggests a product category, which a staff member then confirms or changes. There are two candidates: a simple model built from word counts (TF-IDF with logistic regression) and a more complex language model (a transformer). The transformer costs more to run and is harder to explain, so the agency only wants it if it clearly helps.
 
-Imagine a tool that reads a public complaint narrative and recommends one of
-five CFPB product categories. An analyst reviews the recommendation before
-making the final choice.
+Today is about the step that comes **before** anyone computes an accuracy: designing the comparison so its result actually answers the agency's question. We read one careful plan, find the problems in a careless one, check two ways of splitting the data, and practice choosing a model setting without peeking at the test data.
+
+We use complaints from 2022 to fit models and 2023 to practice choosing settings. We leave 2024 and 2025 untouched; you will use them in Homework 3.
+
+## Read a careful plan
+
+**Why this step:** a plan written before anyone sees results is what makes the final number trustworthy. Here is one for the agency's question.
 
 Here are the decisions behind the plan:
 
@@ -51,7 +52,9 @@ reason for each.
 | What minimum transformer improvement would justify a pilot? | TODO |
 | Can versions of the same complaint appear in both sets? | TODO |
 
-## Find two problems in a weak plan — 6 minutes
+## Find the problems in a careless plan
+
+**Why this step:** this is the kind of plan an AI assistant writes when it gets a vague request. Each shortcut can make the transformer look better than it would be on real complaints.
 
 An AI assistant received only “determine whether the transformer is better” and
 proposed:
@@ -60,7 +63,7 @@ proposed:
 > complete dataset, try several category groupings, and report whichever
 > result is best. Deploy the transformer if it wins.
 
-With a partner, pick the two parts of this plan that worry you most. For each
+On your own or with a classmate, pick the two parts of this plan that worry you most. For each
 one, say what could go wrong and how you would change it.
 
 | Part of the plan | What could go wrong? | How would you change it? |
@@ -70,7 +73,9 @@ one, say what could go wrong and how you would change it.
 
 What important problem would remain even after those changes? TODO
 
-## Check two ways to split the data — 10 minutes
+## Check two ways to split the data
+
+**Why this step:** the agency will use the tool on complaints that arrive in the future. Splitting by year mimics that. A random split mixes years and can put near-copies of the same complaint on both sides, which makes the test too easy.
 
 The code below uses only the 2022 and 2023 rows. Complaints in the same
 `similarity_group` have the same or very similar text. Before running the code,
@@ -140,7 +145,9 @@ Fill in only the results you need:
 If the intended use is complaints received **after 2023**, which split is the
 better practice test? What did the duplicate check show? TODO
 
-## Fit one practice model — 10 minutes
+## Fit one practice model
+
+**Why this step:** a fair comparison chooses every setting without looking at the test complaints. Here we practice choosing one setting using 2023 only.
 
 We will use 2022 to fit three versions of logistic regression and 2023 to
 choose among them. Homework 3 makes a new choice using 2024, so the numbers
@@ -198,7 +205,7 @@ Complete two sentences:
 - On the 2023 practice rows, the selected model ________.  
 - TF-IDF belongs inside the pipeline because ________.
 
-## Before you leave — 7 minutes
+## Handoff
 
 ### Independent handoff response
 
@@ -211,7 +218,7 @@ Complete this individually.
 4. When the case changes to GitHub issues in Homework 3, which two choices must
    you make again? TODO
 
-## Exit ticket — 2 minutes
+## Exit ticket
 
 What result or decision did we intentionally leave for Homework 3?
 

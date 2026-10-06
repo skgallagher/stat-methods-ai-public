@@ -96,16 +96,19 @@ window.Quarto = {
 </header>
 
 
-<section id="the-question" class="level2">
-<h2 class="anchored" data-anchor-id="the-question">The question</h2>
-<p>Sentiment labels can look like facts attached to sentences. DynaSent instead records several people’s judgments. In this lab we ask:</p>
+<section id="the-situation" class="level2">
+<h2 class="anchored" data-anchor-id="the-situation">The situation</h2>
+<p>Companies and researchers use sentiment models to sort large amounts of text: flagging angry reviews for a reply, tracking how customers feel about a product, or measuring public opinion. To choose a model, a team usually compares accuracy on a <strong>benchmark</strong>, a fixed set of sentences with labels.</p>
+<p>DynaSent is one such benchmark, built from Yelp reviews. Each sentence was labeled by five crowdworkers as <code>negative</code>, <code>neutral</code>, or <code>positive</code>. A model’s benchmark score is only as meaningful as those labels. If the five people disagree about a sentence, what is the right answer the model is scored against? If we hide that disagreement, a team can trust a score too much or pick the wrong model.</p>
+<p>Today we ask:</p>
 <blockquote class="blockquote">
-<p>What changes when we treat a label as a measurement rather than truth?</p>
+<p><strong>What changes when we treat a label as a measurement rather than truth?</strong></p>
 </blockquote>
-<p>DynaSent is a sentiment-analysis benchmark with two construction rounds. Each sentence in our frozen teaching subset has five judgments: <code>negative</code>, <code>neutral</code>, or <code>positive</code>. The notebook loads this subset directly from the course GitHub repository; no local files or uploads are needed.</p>
+<p>The benchmark was built in two construction rounds. Each sentence in our frozen teaching subset has five judgments. The notebook loads this subset directly from the course GitHub repository; no local files or uploads are needed.</p>
 </section>
 <section id="label-six-sentences-yourself" class="level2">
 <h2 class="anchored" data-anchor-id="label-six-sentences-yourself">1. Label six sentences yourself</h2>
+<p><strong>Why this step:</strong> you are about to be a labeler yourself. Noticing where you hesitate shows why labels can disagree.</p>
 <p>Read six sentences before revealing the DynaSent judgments. For each sentence, record your label and a confidence from 0.50 to 1.00. These are your judgments, not attempts to guess the majority.</p>
 <p>Afterward, reveal the five-vote counts. Identify one sentence for which the judgments capture something your single label does not.</p>
 <div class="callout callout-style-default callout-warning callout-titled" title="✍️ Your turn">
@@ -124,6 +127,7 @@ window.Quarto = {
 </section>
 <section id="build-the-item-level-table" class="level2">
 <h2 class="anchored" data-anchor-id="build-the-item-level-table">2. Build the item-level table</h2>
+<p><strong>Why this step:</strong> a benchmark usually stores one label per sentence. Keeping all five votes shows what that single label hides.</p>
 <p>For every sentence, construct:</p>
 <ul>
 <li>the proportion of the five votes in each class;</li>
@@ -147,6 +151,7 @@ window.Quarto = {
 </section>
 <section id="random-and-high-disagreement-examples" class="level2">
 <h2 class="anchored" data-anchor-id="random-and-high-disagreement-examples">3. Random and high-disagreement examples</h2>
+<p><strong>Why this step:</strong> the vote counts tell us <em>that</em> people disagreed; reading the sentences suggests <em>why</em>. That tells us whether disagreement is careless labeling or real ambiguity a model should reflect.</p>
 <p>Compare two explicitly selected sets:</p>
 <ul>
 <li><strong>random:</strong> three items sampled with <code>random_state=2027</code>;</li>
@@ -170,6 +175,7 @@ window.Quarto = {
 </section>
 <section id="how-did-the-construction-process-change" class="level2">
 <h2 class="anchored" data-anchor-id="how-did-the-construction-process-change">4. How did the construction process change?</h2>
+<p><strong>Why this step:</strong> benchmark builders choose which sentences go in. If the selection changes, scores change, even for the same model.</p>
 <p>The word <em>round</em> refers to a round of dataset construction, not a second rating of the same sentences. Both rounds used the same five-person validation task, but their sentences came from different processes.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="🔎 Context">
 <div class="callout-header d-flex align-content-center">
@@ -201,6 +207,7 @@ window.Quarto = {
 </section>
 <section id="one-forecast-two-targets" class="level2">
 <h2 class="anchored" data-anchor-id="one-forecast-two-targets">5. One forecast, two targets</h2>
+<p><strong>Why this step:</strong> to score a model, someone has to choose what counts as the right answer. The same model can look much better or worse depending on that choice, and that can change which model a team picks.</p>
 <p>Each row includes a frozen model probability vector</p>
 <p><span class="math display">\[p=(p_{\text{neg}},p_{\text{neutral}},p_{\text{positive}}).\]</span></p>
 <p>We score the same forecast against two different targets:</p>
@@ -221,6 +228,7 @@ window.Quarto = {
 </section>
 <section id="what-assumptions-would-justify-averaging-raters" class="level2">
 <h2 class="anchored" data-anchor-id="what-assumptions-would-justify-averaging-raters">6. What assumptions would justify averaging raters?</h2>
+<p><strong>Why this step:</strong> averaging the five votes is only a good summary if the raters worked in certain ways. If those assumptions fail, the averaged label is less precise than it looks.</p>
 <p>Before asking whether measurements are independent, name the random experiment:</p>
 <ul>
 <li>For one fixed sentence, condition on <span class="math inline">\(X=x\)</span> and ask how raters were assigned.</li>

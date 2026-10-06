@@ -102,11 +102,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p><strong>Today:</strong> We will read through one complete evaluation plan, find two problems in a weak plan, and run a small practice analysis. We will use the CFPB complaint data again in Homework 3.</p>
-<p>In this lab, we use 2022 for training and 2023 to practice choosing a model. We leave 2024 and 2025 untouched because you will use them in Homework 3.</p>
-<section id="read-through-a-complete-plan-10-minutes" class="level2">
-<h2 class="anchored" data-anchor-id="read-through-a-complete-plan-10-minutes">Read through a complete plan — 10 minutes</h2>
-<p>Imagine a tool that reads a public complaint narrative and recommends one of five CFPB product categories. An analyst reviews the recommendation before making the final choice.</p>
+<section id="the-situation" class="level2">
+<h2 class="anchored" data-anchor-id="the-situation">The situation</h2>
+<p>The Consumer Financial Protection Bureau (CFPB) is a US government agency that takes complaints from people about financial products such as credit cards, mortgages, and debt collection. When someone files a complaint, they pick which product it is about, and that choice decides where the complaint goes. People do not always pick the right one, and a complaint filed in the wrong place takes longer to resolve.</p>
+<p>Imagine the agency wants a tool that reads a complaint and suggests a product category, which a staff member then confirms or changes. There are two candidates: a simple model built from word counts (TF-IDF with logistic regression) and a more complex language model (a transformer). The transformer costs more to run and is harder to explain, so the agency only wants it if it clearly helps.</p>
+<p>Today is about the step that comes <strong>before</strong> anyone computes an accuracy: designing the comparison so its result actually answers the agency’s question. We read one careful plan, find the problems in a careless one, check two ways of splitting the data, and practice choosing a model setting without peeking at the test data.</p>
+<p>We use complaints from 2022 to fit models and 2023 to practice choosing settings. We leave 2024 and 2025 untouched; you will use them in Homework 3.</p>
+</section>
+<section id="read-a-careful-plan" class="level2">
+<h2 class="anchored" data-anchor-id="read-a-careful-plan">Read a careful plan</h2>
+<p><strong>Why this step:</strong> a plan written before anyone sees results is what makes the final number trustworthy. Here is one for the agency’s question.</p>
 <p>Here are the decisions behind the plan:</p>
 <ol type="1">
 <li><strong>What is the model trying to predict?</strong> For each complaint, the model predicts the product category recorded by the CFPB. That category is the decision stored in the data. It does not prove that every complaint has one objectively correct category.</li>
@@ -140,13 +145,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="find-two-problems-in-a-weak-plan-6-minutes" class="level2">
-<h2 class="anchored" data-anchor-id="find-two-problems-in-a-weak-plan-6-minutes">Find two problems in a weak plan — 6 minutes</h2>
+<section id="find-the-problems-in-a-careless-plan" class="level2">
+<h2 class="anchored" data-anchor-id="find-the-problems-in-a-careless-plan">Find the problems in a careless plan</h2>
+<p><strong>Why this step:</strong> this is the kind of plan an AI assistant writes when it gets a vague request. Each shortcut can make the transformer look better than it would be on real complaints.</p>
 <p>An AI assistant received only “determine whether the transformer is better” and proposed:</p>
 <blockquote class="blockquote">
 <p>Randomly split all years, remove short narratives and rare words using the complete dataset, try several category groupings, and report whichever result is best. Deploy the transformer if it wins.</p>
 </blockquote>
-<p>With a partner, pick the two parts of this plan that worry you most. For each one, say what could go wrong and how you would change it.</p>
+<p>On your own or with a classmate, pick the two parts of this plan that worry you most. For each one, say what could go wrong and how you would change it.</p>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -170,10 +176,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <p>What important problem would remain even after those changes? TODO</p>
 </section>
-<section id="check-two-ways-to-split-the-data-10-minutes" class="level2">
-<h2 class="anchored" data-anchor-id="check-two-ways-to-split-the-data-10-minutes">Check two ways to split the data — 10 minutes</h2>
+<section id="check-two-ways-to-split-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="check-two-ways-to-split-the-data">Check two ways to split the data</h2>
+<p><strong>Why this step:</strong> the agency will use the tool on complaints that arrive in the future. Splitting by year mimics that. A random split mixes years and can put near-copies of the same complaint on both sides, which makes the test too easy.</p>
 <p>The code below uses only the 2022 and 2023 rows. Complaints in the same <code>similarity_group</code> have the same or very similar text. Before running the code, predict which split will put a similarity group in both sets.</p>
-<div id="ada04bd7" class="cell" data-execution_count="1">
+<div id="122d557b" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>cfpb_root <span class="op">=</span> data_dir <span class="op">/</span> <span class="st">"cfpb"</span></span>
@@ -249,10 +256,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <p>If the intended use is complaints received <strong>after 2023</strong>, which split is the better practice test? What did the duplicate check show? TODO</p>
 </section>
-<section id="fit-one-practice-model-10-minutes" class="level2">
-<h2 class="anchored" data-anchor-id="fit-one-practice-model-10-minutes">Fit one practice model — 10 minutes</h2>
+<section id="fit-one-practice-model" class="level2">
+<h2 class="anchored" data-anchor-id="fit-one-practice-model">Fit one practice model</h2>
+<p><strong>Why this step:</strong> a fair comparison chooses every setting without looking at the test complaints. Here we practice choosing one setting using 2023 only.</p>
 <p>We will use 2022 to fit three versions of logistic regression and 2023 to choose among them. Homework 3 makes a new choice using 2024, so the numbers below are not homework answers.</p>
-<div id="5884c5a7" class="cell" data-execution_count="2">
+<div id="a8e68399" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.feature_extraction.text <span class="im">import</span> TfidfVectorizer</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score</span>
@@ -321,8 +329,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>TF-IDF belongs inside the pipeline because ________.</li>
 </ul>
 </section>
-<section id="before-you-leave-7-minutes" class="level2">
-<h2 class="anchored" data-anchor-id="before-you-leave-7-minutes">Before you leave — 7 minutes</h2>
+<section id="handoff" class="level2">
+<h2 class="anchored" data-anchor-id="handoff">Handoff</h2>
 <section id="independent-handoff-response" class="level3">
 <h3 class="anchored" data-anchor-id="independent-handoff-response">Independent handoff response</h3>
 <p>Complete this individually.</p>
@@ -334,8 +342,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol>
 </section>
 </section>
-<section id="exit-ticket-2-minutes" class="level2">
-<h2 class="anchored" data-anchor-id="exit-ticket-2-minutes">Exit ticket — 2 minutes</h2>
+<section id="exit-ticket" class="level2">
+<h2 class="anchored" data-anchor-id="exit-ticket">Exit ticket</h2>
 <p>What result or decision did we intentionally leave for Homework 3?</p>
 <p><strong>For Homework 3:</strong> In Problem 1, you make similar choices for GitHub issues. In Problem 2, you train with 2022–2023, choose a model with 2024, and test it once with 2025. Nothing in this lab reveals those 2024 or 2025 results.</p>
 </section>

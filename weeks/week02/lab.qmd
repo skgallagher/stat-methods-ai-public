@@ -4,19 +4,22 @@ subtitle: "Week 2 · DynaSent"
 format: html
 ---
 
-## The question
+## The situation
 
-Sentiment labels can look like facts attached to sentences. DynaSent instead
-records several people's judgments. In this lab we ask:
+Companies and researchers use sentiment models to sort large amounts of text: flagging angry reviews for a reply, tracking how customers feel about a product, or measuring public opinion. To choose a model, a team usually compares accuracy on a **benchmark**, a fixed set of sentences with labels.
 
-> What changes when we treat a label as a measurement rather than truth?
+DynaSent is one such benchmark, built from Yelp reviews. Each sentence was labeled by five crowdworkers as `negative`, `neutral`, or `positive`. A model's benchmark score is only as meaningful as those labels. If the five people disagree about a sentence, what is the right answer the model is scored against? If we hide that disagreement, a team can trust a score too much or pick the wrong model.
 
-DynaSent is a sentiment-analysis benchmark with two construction rounds. Each
-sentence in our frozen teaching subset has five judgments: `negative`,
-`neutral`, or `positive`. The notebook loads this subset directly from the
+Today we ask:
+
+> **What changes when we treat a label as a measurement rather than truth?**
+
+The benchmark was built in two construction rounds. Each sentence in our frozen teaching subset has five judgments. The notebook loads this subset directly from the
 course GitHub repository; no local files or uploads are needed.
 
 ## 1. Label six sentences yourself
+
+**Why this step:** you are about to be a labeler yourself. Noticing where you hesitate shows why labels can disagree.
 
 Read six sentences before revealing the DynaSent judgments. For each sentence,
 record your label and a confidence from 0.50 to 1.00. These are your judgments,
@@ -31,6 +34,8 @@ judgments.
 :::
 
 ## 2. Build the item-level table
+
+**Why this step:** a benchmark usually stores one label per sentence. Keeping all five votes shows what that single label hides.
 
 For every sentence, construct:
 
@@ -51,6 +56,8 @@ preview or restart the whole notebook without first filling blanks.
 :::
 
 ## 3. Random and high-disagreement examples
+
+**Why this step:** the vote counts tell us *that* people disagreed; reading the sentences suggests *why*. That tells us whether disagreement is careless labeling or real ambiguity a model should reflect.
 
 Compare two explicitly selected sets:
 
@@ -76,6 +83,8 @@ compare the two sets, and answer the highlighted interpretation question.
 
 ## 4. How did the construction process change?
 
+**Why this step:** benchmark builders choose which sentences go in. If the selection changes, scores change, even for the same model.
+
 The word *round* refers to a round of dataset construction, not a second rating
 of the same sentences. Both rounds used the same five-person validation task,
 but their sentences came from different processes.
@@ -99,6 +108,8 @@ alternative explanation.
 :::
 
 ## 5. One forecast, two targets
+
+**Why this step:** to score a model, someone has to choose what counts as the right answer. The same model can look much better or worse depending on that choice, and that can change which model a team picks.
 
 Each row includes a frozen model probability vector
 
@@ -137,6 +148,8 @@ majority target discards and why a lower soft-target score does not prove that
 the soft target is universally correct.
 
 ## 6. What assumptions would justify averaging raters?
+
+**Why this step:** averaging the five votes is only a good summary if the raters worked in certain ways. If those assumptions fail, the averaged label is less precise than it looks.
 
 Before asking whether measurements are independent, name the random experiment:
 

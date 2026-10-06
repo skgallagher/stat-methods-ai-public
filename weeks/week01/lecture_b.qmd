@@ -1,6 +1,6 @@
 ---
 title: "Week 1B: What Exactly Are We Comparing?"
-subtitle: "25-minute lecture bridge + guided lab"
+subtitle: "Lecture bridge and guided lab"
 author: "Shannon Gallagher"
 format:
   revealjs:
@@ -125,17 +125,15 @@ $0.84$ on the same holdout.
 
 Improvement is not part of the rubric.
 
-## Lab checkpoints
+## Today's lab
 
-By minute 5: the bias–variance scaffold attempted before its reveal.
-
-By minute 15: six random frames, one full sequence, and class balance inspected.
-
-By minute 28: baseline/AI performance and the four-cell paired table completed on held-out cameras.
-
-By minute 42: four reproducibly selected errors displayed and interpreted.
-
-Before leaving: AI-claim audit and four-sentence handoff saved.
+1. Name the four pieces for the wildlife team.
+2. Look at random photos and one full sequence.
+3. Fit the simple model and compare it with the AI on new cameras.
+4. See what changes if photos are split at random.
+5. Choose mistakes by a rule, then look at them.
+6. Check an AI's explanation against the evidence.
+7. Write the handoff to the team.
 
 ## HW1 handoff {.smaller}
 
