@@ -5,204 +5,816 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Syllabus for Statistical Evaluation of AI, Carnegie Mellon University, Spring 2027.">
     <title>Syllabus · Statistical Evaluation of AI</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+    <link rel="stylesheet" href="styles.css?v=4">
   </head>
   <body>
     <header class="site-header">
-      <nav class="nav" aria-label="Main navigation">
-        <a class="brand" href="index.html">
-          <span>Statistical Thinking</span>
-          <small>for the AI Era</small>
-        </a>
-        <div class="nav-links">
+      <div class="wrap">
+        <a class="course-name" href="index.html">Statistical Evaluation of AI</a>
+        <nav aria-label="Main navigation">
           <a href="index.html">Home</a>
-          <a href="modules.html">Weekly materials</a>
-          <a href="project.html">Final project</a>
+          <a href="modules.html">Schedule</a>
+          <a href="project.html">Project</a>
           <a href="syllabus.html" aria-current="page">Syllabus</a>
           <a href="#" data-public-repo>GitHub</a>
-        </div>
-      </nav>
+        </nav>
+      </div>
     </header>
 
-    <main>
-      <section class="page-intro ochre-intro">
-        <div class="wrap intro-grid">
-          <div>
-            <p class="eyebrow">Carnegie Mellon University · Spring 2027</p>
-            <h1>Syllabus</h1>
-            <p class="lede">Statistical Evaluation of AI · Department of Statistics &amp; Data Science</p>
-          </div>
-          <aside class="syllabus-status">
-            <strong>Planning draft</strong>
-            <p>Course number, units, meeting time, location, and staff details remain to be finalized. Canvas will contain authoritative dated announcements.</p>
-          </aside>
-        </div>
-      </section>
+    <main class="wrap">
+      <h1>Syllabus</h1>
+      <p class="subtitle">Carnegie Mellon University · Statistics &amp; Data Science · Spring 2027 · <a href="syllabus.pdf">PDF version</a></p>
+      <ul class="toc">
+        <li><a href="#course-information">Course information</a></li>
+        <li><a href="#course-staff">Course staff</a></li>
+        <li><a href="#course-description">Course description</a></li>
+        <li><a href="#course-goals">Course goals</a></li>
+        <li><a href="#learning-objectives">Learning objectives</a></li>
+        <li><a href="#audience-and-prerequisites">Audience and prerequisites</a></li>
+        <li><a href="#course-format">Course format</a></li>
+        <li><a href="#final-project">Final project</a></li>
+        <li><a href="#major-topics">Major topics</a></li>
+        <li><a href="#data-and-computing">Data and computing</a></li>
+        <li><a href="#ai-access">AI access</a></li>
+        <li><a href="#assessment-and-grades">Assessment and grades</a></li>
+        <li><a href="#course-calendar">Course calendar</a></li>
+        <li><a href="#course-policies">Course policies</a></li>
+        <li><a href="#syllabus-changes">Syllabus changes</a></li>
+      </ul>
+      <div class="prose">
+<h2 id="course-information">Course information</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr>
+<td><strong>Course number</strong></td>
+<td>TBD; cross-listed for undergraduate and master’s students</td>
+</tr>
+<tr>
+<td><strong>Units</strong></td>
+<td>9 (anticipated)</td>
+</tr>
+<tr>
+<td><strong>Meeting days and time</strong></td>
+<td>Tuesdays and Thursdays, 80 minutes; time TBD</td>
+</tr>
+<tr>
+<td><strong>Location</strong></td>
+<td>TBD</td>
+</tr>
+<tr>
+<td><strong>Course website</strong></td>
+<td>Canvas, link TBD</td>
+</tr>
+<tr>
+<td><strong>Final examination</strong></td>
+<td>No traditional final exam; the final project, presentation, and oral
+defense form the culminating assessment</td>
+</tr>
+</tbody>
+</table>
+<h2 id="course-staff">Course staff</h2>
+<h3 id="instructor">Instructor</h3>
+<p><strong>Shannon Gallagher</strong><br />
+Email: TBD<br />
+Office: TBD<br />
+Office hours: TBD and by appointment</p>
+<h3 id="teaching-assistants">Teaching assistants</h3>
+<p>Names, contact information, office hours, and responsibilities:
+TBD.</p>
+<p>Questions whose answers may help the entire class should be posted to
+the designated Canvas discussion board. Personal matters and questions
+involving grades should be sent privately. Course staff will ordinarily
+respond within two business days; students should not expect immediate
+responses at night or on weekends.</p>
+<h2 id="course-description">Course description</h2>
+<p>Modern AI systems arrive with benchmark scores, probability claims,
+and confident recommendations. This course asks what those numbers
+actually mean.</p>
+<p>Students will study AI systems through a statistician’s perspective.
+They will define populations and estimands, investigate how data and
+labels were produced, assess the quality and assumptions of benchmarks,
+quantify uncertainty, compare systems fairly, test consequential
+assumptions, and interpret results in context.</p>
+<p>This class <strong>is not</strong> a survey of machine-learning
+algorithms but rather a study of how a statistician or data scientist
+should use these systems. In this course, students will both use
+statistical thinking to evaluate AI systems and use AI to enhance their
+statistical output, thus creating a feedback loop where one strategy can
+propel the other forward.</p>
+<h2 id="course-goals">Course goals</h2>
+<p>The course has two linked goals:</p>
+<ol type="1">
+<li>Develop statisticians who can evaluate empirical claims about AI
+systems.</li>
+<li>Develop statisticians who can use AI tools productively without
+outsourcing statistical judgment.</li>
+</ol>
+<p>Every substantial analysis follows the same five-stage workflow:</p>
+<ol type="1">
+<li>Define the research question, hypotheses, and estimands.</li>
+<li>Explore the data and assess its quality.</li>
+<li>Model the data, make inferences, and evaluate performance.</li>
+<li>Test how sensitive the conclusions are to key assumptions.</li>
+<li>Make a decision and state its limitations and next steps.</li>
+</ol>
+<h2 id="learning-objectives">Learning objectives</h2>
+<p>By the end of the course, students will be able to:</p>
+<ol type="1">
+<li>Translate a claim about an AI system into a statistical question
+with a target population, unit, and estimand.</li>
+<li>Evaluate how data and labels were produced and how that shapes what
+a benchmark measures.</li>
+<li>Quantify uncertainty in AI performance and compare systems fairly
+against a statistical baseline.</li>
+<li>Judge whether a system’s probability claims are calibrated and
+whether its performance carries over to new populations.</li>
+<li>Use AI tools in statistical work while checking and documenting what
+they contribute.</li>
+<li>Make and defend a recommendation whose strength matches the
+evidence.</li>
+</ol>
+<h2 id="audience-and-prerequisites">Audience and prerequisites</h2>
+<p>The course is for advanced undergraduates and master’s students. The
+prerequisite is 36-401 (Modern Regression) or an equivalent course.
+Students should be comfortable with:</p>
+<ul>
+<li>interpreting regression coefficients and fitted probabilities;</li>
+<li>confidence intervals and hypothesis tests;</li>
+<li>basic data manipulation, visualization, and programming;</li>
+<li>explaining a statistical result in writing.</li>
+</ul>
+<p>Further coursework in statistics or machine learning helps but is not
+required. Machine learning is not the point of this course. We study AI
+systems only as far as we need to evaluate them, and Week 1 builds up to
+neural networks starting from regression.</p>
+<h2 id="course-format">Course format</h2>
+<h3 id="weeks-17">Weeks 1–7</h3>
+<p>Tuesdays usually introduce a statistical problem and work through
+examples. Thursdays usually pair a shorter lecture with a hands-on lab.
+A short online checkpoint quiz closes out each week.</p>
+<h3 id="weeks-915">Weeks 9–15</h3>
+<p>After spring break, the course shifts to the team project. One class
+each week introduces a new statistical topic. The other is mostly a
+project work session, where teams work together in class.</p>
+<h2 id="final-project">Final project</h2>
+<p>The final project is the center of the course. In teams of four,
+students act as statistical consultants. A client has an AI system, some
+data, and a decision to make, and the team designs and carries out a
+statistical study to inform that decision. Every team fits a statistical
+baseline it can explain, compares it fairly with the AI system,
+quantifies uncertainty, tests whether its conclusion survives a
+reasonable alternative analysis, and makes a recommendation that matches
+the evidence.</p>
+<p>Teams choose one of four tracks:</p>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 42%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr>
+<th>Track</th>
+<th>Client question</th>
+<th>Data and AI system</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Food tagging</td>
+<td>Should an online marketplace tag food photos automatically?</td>
+<td>Food-101 images; CLIP image classifier</td>
+</tr>
+<tr>
+<td>Pet tagging</td>
+<td>Can the system tag pet breeds, or only cats versus dogs?</td>
+<td>Oxford-IIIT Pet images; CLIP image classifier</td>
+</tr>
+<tr>
+<td>Human preferences</td>
+<td>Does an LLM judge measure what people actually prefer?</td>
+<td>Stanford Human Preferences pairs from Reddit; LLM judge</td>
+</tr>
+<tr>
+<td>Instruction following</td>
+<td>Is an LLM judge a trustworthy way to check whether responses follow
+instructions?</td>
+<td>IFEval-style prompts and responses; rule checker and LLM judge</td>
+</tr>
+</tbody>
+</table>
+<p>Data, cached AI outputs, and starter code are provided for every
+track. Teams and track choices are set by the midterm. The project then
+runs through the end of the semester, with two milestones, a short
+ending artifact, a recorded video, an oral defense, and a written
+report.</p>
+<h2 id="major-topics">Major topics</h2>
+<ul>
+<li>From regression to neural networks</li>
+<li>Data and labels as measurements</li>
+<li>Evaluation design, including estimands, splits, and leakage</li>
+<li>Uncertainty in benchmark performance</li>
+<li>Comparing systems on the same cases</li>
+<li>Calibration and decision rules</li>
+<li>Distribution shift and sensitivity analysis</li>
+<li>Designed evaluations and LLM judges</li>
+</ul>
+<h2 id="data-and-computing">Data and computing</h2>
+<p>Labs and homework use a few datasets that recur through the semester,
+plus others when a topic calls for it. The final project uses the track
+datasets described above.</p>
+<p>We use Python in Google Colab on free, CPU-only resources. Data
+subsets, starter code, and cached AI-system outputs are provided, so no
+assignment requires a paid service, a GPU, or a large download. Rules
+for shared lab notebooks, service outages, and typed versus handwritten
+work are on the course technology page in Canvas.</p>
+<p>Do not upload course data or project materials to an outside service,
+including an AI tool, unless the assignment says you may.</p>
+<h2 id="ai-access">AI access</h2>
+<p>We assume you have access to at least one general-purpose AI
+assistant. You do not need to pay for one. Free options include:</p>
+<ul>
+<li><a
+href="https://www.cmu.edu/computing/services/ai/tools/copilot/index.html">Microsoft
+Copilot Chat</a> and <a
+href="https://www.cmu.edu/computing/services/ai/tools/google-ai-tools/index.html">Google
+Gemini and NotebookLM</a>, available at no cost with your CMU account.
+Sign in with your Andrew ID to get CMU’s data protections.</li>
+<li>The Gemini assistant built into Google Colab.</li>
+<li>The free tiers of ChatGPT and Claude.</li>
+</ul>
+<p>No assignment requires a paid plan. Free tiers have usage limits, so
+don’t leave AI-assisted work until the last hour.</p>
+<h2 id="readings-and-learning-resources">Readings and learning
+resources</h2>
+<p><strong>Textbook.</strong> Christopher M. Bishop and Hugh Bishop,
+<em>Deep Learning: Foundations and Concepts</em> (2024). A free online
+version is available at <a
+href="https://www.bishopbook.com/">bishopbook.com</a>. We use it as a
+technical reference for the AI systems we study.</p>
+<p>I will link short readings and sources as we go.</p>
+<h2 id="assessment-and-grades">Assessment and grades</h2>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 8%" />
+<col style="width: 58%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th style="text-align: right;">Weight</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Homework (seven, lowest dropped)</td>
+<td style="text-align: right;">15%</td>
+<td>Practice with feedback; AI allowed where each assignment says</td>
+</tr>
+<tr>
+<td>Weekly checkpoints (ten, lowest two dropped)</td>
+<td style="text-align: right;">20%</td>
+<td>Short online quizzes on each week’s lectures, without AI</td>
+</tr>
+<tr>
+<td>In-class midterm</td>
+<td style="text-align: right;">25%</td>
+<td>A challenging exam on the first half of the course, without AI</td>
+</tr>
+<tr>
+<td>Final project, including peer assessment</td>
+<td style="text-align: right;">40%</td>
+<td>Team statistical evaluation study, video, oral defense, and
+report</td>
+</tr>
+</tbody>
+</table>
+<p>Homework is where you practice, with AI assistance where permitted.
+Checkpoints, the midterm, and the oral defense are where you show,
+without assistance, that the reasoning is your own.</p>
+<h3 id="letter-grades">Letter grades</h3>
+<p>Letter grades use these thresholds. Master’s students receive
+graduate letter grades, which include plus and minus grades.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Course percentage</th>
+<th style="text-align: center;">Undergraduate</th>
+<th style="text-align: center;">Master’s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">93–100</td>
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">A</td>
+</tr>
+<tr>
+<td style="text-align: right;">90–&lt;93</td>
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">A−</td>
+</tr>
+<tr>
+<td style="text-align: right;">87–&lt;90</td>
+<td style="text-align: center;">B</td>
+<td style="text-align: center;">B+</td>
+</tr>
+<tr>
+<td style="text-align: right;">83–&lt;87</td>
+<td style="text-align: center;">B</td>
+<td style="text-align: center;">B</td>
+</tr>
+<tr>
+<td style="text-align: right;">80–&lt;83</td>
+<td style="text-align: center;">B</td>
+<td style="text-align: center;">B−</td>
+</tr>
+<tr>
+<td style="text-align: right;">77–&lt;80</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">C+</td>
+</tr>
+<tr>
+<td style="text-align: right;">73–&lt;77</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">C</td>
+</tr>
+<tr>
+<td style="text-align: right;">70–&lt;73</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">C−</td>
+</tr>
+<tr>
+<td style="text-align: right;">67–&lt;70</td>
+<td style="text-align: center;">D</td>
+<td style="text-align: center;">D+</td>
+</tr>
+<tr>
+<td style="text-align: right;">60–&lt;67</td>
+<td style="text-align: center;">D</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td style="text-align: right;">&lt;60</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">R</td>
+</tr>
+</tbody>
+</table>
+<p>Your master’s program sets its own minimum passing grade.</p>
+<p>Both scales follow CMU’s <a
+href="https://www.cmu.edu/policies/student-and-student-life/grading.html">grading
+standards</a>. Individual assignments may use points or rubric
+categories. Final course percentages are computed from the weights
+above; the course is not graded by ranking students against one
+another.</p>
+<h3 id="homework">Homework</h3>
+<p>There are seven graded homeworks, and the lowest score is dropped.
+Homework is usually due Tuesday at 11:59 pm. Project milestones are
+separate from homework.</p>
+<p>Each homework has three problems. Problem 1 is a derivation or hand
+calculation done without AI, and it is good practice for the midterm.
+Problem 2 is a data analysis that picks up where the lab left off.
+Problem 3 asks you to use an AI tool and then check and correct what it
+produced.</p>
+<p>You may reuse code from lab. The analysis and the writing you turn in
+must be your own.</p>
+<p>You do all homework in a Colab notebook that we provide. Submit two
+files to Gradescope, a PDF of the finished notebook and the notebook
+itself. Handwritten work is welcome but never required. You can type
+math in the notebook, or insert a photo of handwritten work followed by
+a typed sentence stating your conclusion.</p>
+<p>Before HW1, you will complete HW0. It is an ungraded practice run of
+the whole process, so submission problems get fixed before anything
+counts.</p>
+<h3 id="labs-and-project-work-sessions">Labs and project work
+sessions</h3>
+<p>A lab is a guided coding session in class. The instructor works
+through an example in a Colab notebook. Then students change the code,
+run it, and talk through the results with classmates. Labs vary from
+week to week, but most are set up so that the homework starts where the
+lab leaves off and reuses its code.</p>
+<p>Labs are not graded. Skipping one will usually make that week’s
+homework harder.</p>
+<p>After spring break, Thursdays are mostly project work sessions. Teams
+work on their projects in class, often after a short guided exercise
+that builds part of the next milestone. This work is not graded
+separately.</p>
+<h3 id="weekly-checkpoints">Weekly checkpoints</h3>
+<p>Each week ends with a short online checkpoint quiz in Canvas. It
+opens after Thursday’s class, covers that week’s lectures and lab, and
+is due the following Tuesday at 11:59 pm. Once you open it, you have 20
+minutes to finish, and you get one attempt.</p>
+<p>Checkpoints are individual. You may use your own notes, but not AI
+tools, classmates, or any other outside help. Questions come directly
+from that week’s lectures, so if you followed lecture and reviewed your
+notes, a checkpoint should not take long. They are also good practice
+for the midterm.</p>
+<p>There are ten checkpoints, one for each of Weeks 1–6 and 9–12. Your
+lowest two scores are dropped. That covers ordinary illness, travel, and
+busy weeks, so there are no makeups or extensions. If something serious
+affects more than two checkpoints, contact the instructor.</p>
+<p>If attendance starts to drop, I will move checkpoints into class
+time.</p>
+<h3 id="midterm">Midterm</h3>
+<p>The midterm is in class on Thursday, March 4, and is designed to be
+challenging. It is completed individually without AI tools, networked
+devices, or books. You may bring <strong>one sheet of notes you prepared
+yourself, front and back</strong> (US letter or A4, handwritten or
+typed). There is no final exam.</p>
+<h3 id="final-project-1">Final project</h3>
+<p>Each team carries out a full statistical evaluation of one AI system
+for a client, following the five steps above. Every project includes a
+simple reference point (such as always predicting the most common class)
+and a statistical baseline the team fits and can explain, usually
+logistic regression. It also includes uncertainty for each key estimate,
+a fair comparison between the baseline and the AI system, one
+sensitivity analysis that could change the conclusion, and a
+recommendation that matches the evidence.</p>
+<p>The project is 40% of the course grade, divided as follows:</p>
+<table>
+<thead>
+<tr>
+<th>Deliverable</th>
+<th style="text-align: right;">Share of project grade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Milestone 1: questions, estimands, EDA, and design</td>
+<td style="text-align: right;">15%</td>
+</tr>
+<tr>
+<td>Milestone 2: modeling, inference, and evaluation</td>
+<td style="text-align: right;">20%</td>
+</tr>
+<tr>
+<td>Ending artifact: sensitivity analysis and decision</td>
+<td style="text-align: right;">5% (completion)</td>
+</tr>
+<tr>
+<td>Five-minute recorded video</td>
+<td style="text-align: right;">20%</td>
+</tr>
+<tr>
+<td>Oral discussion and defense</td>
+<td style="text-align: right;">20%</td>
+</tr>
+<tr>
+<td>Written report</td>
+<td style="text-align: right;">10%</td>
+</tr>
+<tr>
+<td>Within-team peer assessment</td>
+<td style="text-align: right;">10%</td>
+</tr>
+</tbody>
+</table>
+<p>The video is the polished, client-facing argument. The oral defense
+checks that every team member understands it. The ending artifact is a
+small completion grade meant to keep teams from starting the final
+argument in the last week.</p>
+<p>For the peer assessment, each student privately evaluates their own
+teammates, with specific examples. Ratings are not averaged
+mechanically, and documented, substantial non-contribution can lower an
+individual’s project grade.</p>
+<h2 id="course-calendar">Course calendar</h2>
+<p>Dates follow CMU’s official Spring 2027 academic calendar. Homework
+is due Tuesdays at 11:59 pm unless noted. Each week’s checkpoint opens
+after Thursday’s class and is due the following Tuesday at 11:59 pm.
+Canvas contains the authoritative dated calendar.</p>
+<table>
+<colgroup>
+<col style="width: 5%" />
+<col style="width: 13%" />
+<col style="width: 30%" />
+<col style="width: 11%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: right;">Week</th>
+<th>Tue / Thu</th>
+<th>Topic</th>
+<th>Checkpoint</th>
+<th>In class and due</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td>Jan 19 / 21</td>
+<td>From regression to neural networks</td>
+<td>CP1</td>
+<td>Baseline lab · HW0 due Thu Jan 21</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>Jan 26 / 28</td>
+<td>Data as measurement: labels and repeated judgments</td>
+<td>CP2</td>
+<td>Label-measurement lab · HW1 due Jan 26</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>Feb 2 / 4</td>
+<td>Evaluation design: estimands, splits, and AI-assisted workflow</td>
+<td>CP3</td>
+<td>Evaluation-design lab · HW2 due Feb 2</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>Feb 9 / 11</td>
+<td>Benchmark performance as estimation</td>
+<td>CP4</td>
+<td>Interval lab · HW3 due Feb 9</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>Feb 16 / 18</td>
+<td>Paired system comparison</td>
+<td>CP5</td>
+<td>Paired-comparison lab · HW4 due Feb 16</td>
+</tr>
+<tr>
+<td style="text-align: right;">6</td>
+<td>Feb 23 / 25</td>
+<td>Calibration and decision-rule sensitivity</td>
+<td>CP6</td>
+<td>Calibration lab · HW5 due Feb 23</td>
+</tr>
+<tr>
+<td style="text-align: right;">7</td>
+<td>Mar 2 / 4</td>
+<td>First-half synthesis</td>
+<td>—</td>
+<td>Review Tue · <strong>in-class midterm Thu Mar 4</strong> · project
+teams finalized</td>
+</tr>
+<tr>
+<td style="text-align: right;">8</td>
+<td>Mar 9 / 11</td>
+<td><strong>Spring break</strong></td>
+<td>—</td>
+<td>No class or assignment</td>
+</tr>
+<tr>
+<td style="text-align: right;">9</td>
+<td>Mar 16 / 18</td>
+<td>Distribution shift and project launch</td>
+<td>CP7</td>
+<td>Shift exercise · project question and initial EDA due Thu Mar
+18</td>
+</tr>
+<tr>
+<td style="text-align: right;">10</td>
+<td>Mar 23 / 25</td>
+<td>Sensitivity analysis</td>
+<td>CP8</td>
+<td>Project Milestone 1 due Mar 23 · HW6 due Mar 30</td>
+</tr>
+<tr>
+<td style="text-align: right;">11</td>
+<td>Mar 30 / Apr 1</td>
+<td>Designed AI evaluations</td>
+<td>CP9</td>
+<td>Substudy design due Thu Apr 1</td>
+</tr>
+<tr>
+<td style="text-align: right;">12</td>
+<td>Apr 6 / 8</td>
+<td>LLM judges as measurement instruments</td>
+<td>CP10</td>
+<td>Project Milestone 2 due Apr 6 · HW7 due Apr 13</td>
+</tr>
+<tr>
+<td style="text-align: right;">13</td>
+<td>Apr 13 / —</td>
+<td>Human-centered and responsible AI</td>
+<td>—</td>
+<td>Guest lecture: Carol J. Smith (Tue) · no class Thu (Spring
+Carnival)</td>
+</tr>
+<tr>
+<td style="text-align: right;">14</td>
+<td>Apr 20 / 22</td>
+<td>Statistical argument and recommendation</td>
+<td>—</td>
+<td>Ending artifact due Apr 20 · video dry run Thu</td>
+</tr>
+<tr>
+<td style="text-align: right;">15</td>
+<td>Apr 27 / 29</td>
+<td>Oral defenses and course synthesis</td>
+<td>—</td>
+<td>Video due Sun Apr 25 · oral defenses Tue and Thu · report due Fri
+Apr 30</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Registrar dates.</strong> The semester drop deadline is Mon
+Mar 1, and by then you will have feedback on several homeworks and
+checkpoints. The pass/no pass and withdrawal deadline is Mon Apr 5. The
+last day of classes is Fri Apr 30, and there is no final exam during the
+May 3–11 exam period.</p>
+<p>The instructor may adjust the pace or readings in response to student
+learning and developments in AI evaluation. Changes to graded work or
+deadlines will be announced on Canvas with reasonable notice.</p>
+<h2 id="course-policies">Course policies</h2>
+<h3 id="attendance-and-participation">Attendance and participation</h3>
+<p>Regular attendance is strongly encouraged. Labs and project work
+sessions are hard to make up from slides alone, and they are where
+homework and project work usually start. Attendance is not graded. If
+attendance drops, the weekly checkpoint quizzes will move into class
+time.</p>
+<p>If illness, a religious observance, university travel,
+disability-related needs, or an emergency prevents attendance, notify
+course staff as soon as reasonably possible. Students are not expected
+to disclose private medical details. We will identify an appropriate way
+to recover the essential learning or artifact.</p>
+<h3 id="late-work">Late work</h3>
+<p>There are no flex days. If you need more time on an assignment, ask
+the instructor before the deadline. Extensions of up to 24 hours are
+considered case by case.</p>
+<p>Weekly checkpoints do not get extensions, because the lowest two
+scores are already dropped. University-approved accommodations and
+serious emergencies are handled individually.</p>
+<p>Work submitted late without an approved extension may receive reduced
+or no credit.</p>
+<h3 id="collaboration">Collaboration</h3>
+<p>Statistical work benefits from discussion, but collaboration must
+remain visible and must not replace individual understanding.</p>
+<ul>
+<li><strong>Labs.</strong> Work with whomever you like. Talking through
+the lab with classmates is encouraged.</li>
+<li><strong>Homework.</strong> You may discuss concepts, debugging, and
+the lab code with classmates. You must run the analysis, make the
+decisions, and write the code and prose yourself. Do not share finished
+answers, solution files, or text or code that others could copy.</li>
+<li><strong>Weekly checkpoints.</strong> These are individual. Your own
+notes are allowed, but not AI tools, classmates, or other outside
+help.</li>
+<li><strong>Midterm.</strong> No collaboration or outside help.</li>
+<li><strong>Project.</strong> Collaborate within your team. Sharing
+project work outside your team requires instructor permission.</li>
+</ul>
+<p>Every individual submission must list collaborators and other
+assistance, or state that none was received. Every external source,
+including borrowed code and AI assistance, must be acknowledged where
+required.</p>
+<h3 id="ai-tools">AI tools</h3>
+<p>AI is part of how this course is taught, and two rules apply whenever
+you use it. You are responsible for every statement, number, citation,
+and line of code you turn in. You must also record what the AI
+contributed and how you checked it, so another analyst could follow what
+happened.</p>
+<p>AI is allowed, and sometimes required, on homework and the project.
+Each assignment says how. Sometimes you will use AI to explain an idea
+or draft code, and sometimes the AI system is the thing you are
+evaluating. Making up citations, turning in output you didn’t check, or
+passing off AI work as your own is not acceptable.</p>
+<p>AI is not allowed on weekly checkpoints or the midterm. “The AI said
+so” is never statistical evidence.</p>
+<p>AI built into other tools counts too. That includes the Colab
+assistant, chat panels in editors, and autocomplete that writes code or
+prose for you. Turn these off when an assignment or problem says no AI.
+Don’t give them course data unless the assignment says you may.</p>
+<h3 id="academic-integrity">Academic integrity</h3>
+<p>Honesty, attribution, and transparency are part of the statistical
+practice this course teaches. Students must comply with Carnegie
+Mellon’s <a
+href="https://www.cmu.edu/policies/student-and-student-life/academic-integrity.html">Policy
+on Academic Integrity</a>. The policy requires original work and
+acknowledgement of permitted collaboration and assistance. In this
+course, that acknowledgement includes people, sources, software, and AI
+tools as described above.</p>
+<p>Copying another student’s work, providing copyable individual
+solutions, using unauthorized assistance, fabricating data or citations,
+misrepresenting an AI-generated contribution, or using prohibited tools
+on an assessment may constitute an academic-integrity violation. Ask
+before submitting if the boundary is unclear.</p>
+<h3 id="regrade-requests">Regrade requests</h3>
+<p>Requests to correct a grading or scoring error must be submitted in
+writing within seven calendar days of the graded work being returned.
+The request should identify the relevant rubric criterion and explain
+the suspected error. A regrade reviews the relevant work for accuracy
+and consistency; it is not a negotiation for additional points. Clerical
+errors should be reported at any time.</p>
+<h3 id="devices-and-recording">Devices and recording</h3>
+<p>You will need a laptop for labs and some class activities. During
+discussion, I may ask you to close it.</p>
+<p>Do not record class (audio, video, photos, or screenshots) without my
+written permission or an approved disability accommodation. Any approved
+recording is for your own use and may not be shared. This protects class
+discussion, student work, and guest speakers.</p>
+<h3 id="if-course-technology-goes-down">If course technology goes
+down</h3>
+<p>If Colab, Canvas, or another course service goes down, save what you
+can, note when it happened, and keep working on anything that doesn’t
+need it. Don’t pay for a substitute or move course data somewhere else.
+If a service is down for more than 15 minutes during class, we will
+finish the lab another time. If a confirmed outage hits in the last six
+hours before a homework or project deadline, everyone gets an extension,
+announced on Canvas. If your own computer or internet fails, tell us
+right away and we will help you find another way to work or submit.</p>
+<h3 id="respect-inclusion-and-religious-observances">Respect, inclusion,
+and religious observances</h3>
+<p>Different experiences and perspectives are an asset in a course about
+measurement, populations, human judgments, and consequential decisions.
+We will critique claims and methods rigorously while treating classmates
+and the people represented in data with care. Students should use one
+another’s stated names and pronouns and make room for equitable
+participation in group work and discussion.</p>
+<p>Students who experience a conflict with a religious or cultural
+observance should contact the instructor as early as practical. The
+course calendar will be checked against CMU’s inclusive holiday and
+interfaith calendar when dates are finalized.</p>
+<h3 id="accommodations-for-students-with-disabilities">Accommodations
+for students with disabilities</h3>
+<p>If you require accommodations that are not yet approved, apply
+through the <a
+href="https://rainier.accessiblelearning.com/cmu/start">Disability
+Resources Online Portal</a>. If accommodations are already approved, use
+the portal’s <a
+href="https://rainier.accessiblelearning.com/cmu">Accommodations
+Management</a> section to notify the instructor and discuss your needs
+as early as possible. The instructor will work with you and the Office
+of Disability Resources to provide appropriate accommodations.</p>
+<h3 id="mandatory-reporting">Mandatory reporting</h3>
+<p>CMU employees, including instructors and teaching assistants acting
+in their course roles, are required to report information about possible
+discrimination or sexual misconduct to the <a
+href="https://www.cmu.edu/title-ix">Office for Institutional Equity and
+Title IX</a>. That office will offer information and support; the
+student decides whether and how to respond. Students who prefer to speak
+with someone who is not required to report can use CMU’s <a
+href="https://www.cmu.edu/title-ix/how-to-report-+-options-for-resolution/confidential-reporting.html">confidential
+reporting resources</a>.</p>
+<h3 id="student-well-being-and-campus-resources">Student well-being and
+campus resources</h3>
+<p>Academic stress and difficult life events can interfere with
+learning. Asking for support early is a sound decision, not a failure.
+Students are welcome to contact the instructor when course circumstances
+are contributing to a problem; private details are not required to ask
+for help.</p>
+<ul>
+<li><a href="https://www.cmu.edu/counseling/">Counseling and
+Psychological Services (CaPS)</a> provides confidential support. Call
+<strong>412-268-2922</strong> for assistance; phone support is available
+24/7.</li>
+<li>For an imminent, life-threatening emergency, call <strong>CMU Police
+at 412-268-2323</strong> or <strong>911</strong>.</li>
+<li><a href="https://www.cmu.edu/student-success/">Student Academic
+Success Center</a> services may be used consistent with the
+acknowledgement rules above.</li>
+<li><a href="https://www.cmu.edu/wellbeing/resources/">CMU Pantry and
+other well-being resources</a> are available to undergraduate and
+graduate students.</li>
+</ul>
+<h2 id="how-to-succeed-in-this-course">How to succeed in this
+course</h2>
+<ul>
+<li>Treat every headline number as an estimate. Name its target
+population and uncertainty.</li>
+<li>Keep a running analysis notebook and AI-use log rather than
+reconstructing decisions at the deadline.</li>
+<li>Finish each lab. It usually sets up the homework.</li>
+<li>Review your lecture notes before each checkpoint, and do homework
+Problem 1 without AI. Both prepare you for the midterm.</li>
+<li>Read for a purpose. Identify the figure, assumption, or
+documentation detail the week’s analysis uses.</li>
+<li>Start project questions with the client decision, not with an
+available metric.</li>
+<li>Use office hours before a small design ambiguity becomes a large
+coding problem.</li>
+<li>Be prepared to explain any submitted result without relying on the
+AI tool, teammate, or code that produced it.</li>
+</ul>
+<h2 id="syllabus-changes">Syllabus changes</h2>
+<p>This syllabus describes the intended course. The instructor may make
+reasonable changes to topics, readings, examples, or dates in response
+to the official university calendar, guest-speaker availability, or
+student learning. Material changes will be announced through Canvas, and
+the dated Canvas schedule will control when it differs from this
+planning document.</p>
 
-      <nav class="jump-nav wrap" aria-label="Syllabus sections">
-        <a href="#overview">Overview</a>
-        <a href="#goals">Goals</a>
-        <a href="#format">Format</a>
-        <a href="#grading">Grading</a>
-        <a href="#policies">Policies</a>
-        <a href="#support">Support</a>
-      </nav>
-
-      <section class="section" id="overview" aria-labelledby="overview-title">
-        <div class="section-heading compact-heading">
-          <p class="eyebrow">Overview</p>
-          <h2 id="overview-title">What this course is about</h2>
-        </div>
-        <div class="syllabus-facts">
-          <dl>
-            <div><dt>Instructor</dt><dd>Shannon Gallagher</dd></div>
-            <div><dt>Course number</dt><dd>TBD</dd></div>
-            <div><dt>Units</dt><dd>TBD; 9 anticipated</dd></div>
-            <div><dt>Meetings</dt><dd>Two 80-minute meetings per week</dd></div>
-            <div><dt>Computing</dt><dd>Python + Google Colab</dd></div>
-            <div><dt>Final exam</dt><dd>No traditional final; the project is the culminating assessment</dd></div>
-          </dl>
-          <div class="syllabus-copy">
-            <p>Modern AI systems arrive with benchmark scores, probability claims, and confident recommendations. This course asks what those numbers are actually evidence of.</p>
-            <p>Students work as statisticians studying AI systems: defining populations and estimands, investigating how data and labels were produced, owning a familiar baseline, quantifying uncertainty, comparing systems fairly, testing consequential assumptions, and making bounded recommendations.</p>
-            <p>This is not a survey of machine-learning algorithms. The central object of study is the <strong>evaluation</strong>: its population, measurements, design, uncertainty, assumptions, and consequences.</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section tinted-section" id="goals" aria-labelledby="goals-title">
-        <div class="section-heading compact-heading">
-          <p class="eyebrow">Course goals</p>
-          <h2 id="goals-title">Statistical judgment stays with the analyst</h2>
-          <p class="muted">Students learn both to evaluate empirical claims about AI systems and to use AI tools without outsourcing judgment.</p>
-        </div>
-        <div class="objective-grid">
-          <article><span>1</span><p>Translate an AI claim into a population, unit, estimand, comparison, and decision.</p></article>
-          <article><span>2</span><p>Evaluate representations and labels as measurements produced by a process.</p></article>
-          <article><span>3</span><p>Conduct purposeful EDA that changes or qualifies the analysis.</p></article>
-          <article><span>4</span><p>Fit, explain, and defend a familiar statistical baseline.</p></article>
-          <article><span>5</span><p>Quantify uncertainty and evaluate calibration or paired differences.</p></article>
-          <article><span>6</span><p>Design and conduct a pre-specified sensitivity analysis.</p></article>
-          <article><span>7</span><p>Use AI tools with an auditable record of assistance and verification.</p></article>
-          <article><span>8</span><p>Make and orally defend a recommendation whose scope matches the evidence.</p></article>
-        </div>
-      </section>
-
-      <section class="section" id="format" aria-labelledby="format-title">
-        <div class="section-heading compact-heading">
-          <p class="eyebrow">Audience and format</p>
-          <h2 id="format-title">How the course works</h2>
-        </div>
-        <div class="info-grid">
-          <article>
-            <h3>Prerequisites</h3>
-            <p>Advanced undergraduates should be comfortable with statistical inference, regression, fitted probabilities, confidence intervals, data manipulation, visualization, and statistical writing. Prior machine learning is helpful but not required.</p>
-          </article>
-          <article>
-            <h3>Weekly rhythm</h3>
-            <p>The first meeting develops a statistical problem and worked example. The second connects it to a guided lab. Labs move from instructor example to paired modification to an individual homework handoff.</p>
-          </article>
-          <article>
-            <h3>Computing and access</h3>
-            <p>Course subsets, starter code, baselines, and cached AI outputs are provided. No assignment requires a paid API, GPU, or large personal download.</p>
-          </article>
-        </div>
-        <div class="syllabus-note">
-          <strong>Distribution of materials</strong>
-          <p>Lectures, student labs, homework prompts/starters, and public data are linked from this site. Homework solutions and lab solutions are distributed through Canvas only.</p>
-        </div>
-      </section>
-
-      <section class="section" id="grading" aria-labelledby="grading-title">
-        <div class="section-heading compact-heading">
-          <p class="eyebrow">Assessment</p>
-          <h2 id="grading-title">Course grade</h2>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Component</th><th>Weight</th><th>Purpose</th></tr></thead>
-            <tbody>
-              <tr><td>Seven individual homeworks</td><td>25%</td><td>Repeated reasoning and analysis; lowest score dropped</td></tr>
-              <tr><td>Guided labs and studio artifacts</td><td>10%</td><td>Hands-on practice and checked handoffs</td></tr>
-              <tr><td>Lecture checks</td><td>5%</td><td>Frequent, low-stakes interpretation and transfer</td></tr>
-              <tr><td>In-class midterm</td><td>20%</td><td>Individual command of first-half foundations</td></tr>
-              <tr><td>Team final project</td><td>35%</td><td>Complete evaluation study and defense</td></tr>
-              <tr><td>Within-team peer assessment</td><td>5%</td><td>Private evidence of preparation and contribution</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="grade-notes">
-          <article><h3>Homeworks</h3><p>Each combines statistical reasoning, lab-connected analysis, and an AI-assisted task that must be checked. The lowest of seven scores is dropped.</p></article>
-          <article><h3>Midterm</h3><p>In class during Week 7; no AI, networked devices, or books. One student-prepared sheet, front and back, is permitted.</p></article>
-          <article><h3>Final project</h3><p>Teams build one evaluation study through checkpoints, a five-minute video, an oral discussion, and a concise written report.</p></article>
-          <article><h3>Letter grades</h3><p>A: 90–100 · B: 80–&lt;90 · C: 70–&lt;80 · D: 60–&lt;70 · R: below 60. Grades are not assigned by ranking students.</p></article>
-        </div>
-      </section>
-
-      <section class="section tinted-section" id="policies" aria-labelledby="policies-title">
-        <div class="section-heading compact-heading">
-          <p class="eyebrow">Course policies</p>
-          <h2 id="policies-title">Working together responsibly</h2>
-          <p class="muted">Open a policy for details. Ask before submitting whenever a boundary is unclear.</p>
-        </div>
-        <div class="policy-list">
-          <details open>
-            <summary>AI tools</summary>
-            <p>AI use is permitted—and sometimes required—when an assignment allows it. Students remain responsible for every submitted claim, citation, computation, and line of code. Required records document what the tool contributed and how it was checked. AI is not permitted on the midterm or on lecture checks unless explicitly authorized. “The AI said so” is never statistical evidence.</p>
-          </details>
-          <details>
-            <summary>Collaboration</summary>
-            <p>Lab collaboration is expected. Homework concepts and debugging strategies may be discussed, but each student runs the analysis and writes independently. Do not exchange finished answers, solution files, or copyable text or code. Project collaboration stays within the assigned team.</p>
-          </details>
-          <details>
-            <summary>Attendance and participation</summary>
-            <p>Regular attendance is strongly encouraged because guided labs and studios depend on collaboration and feedback. Contact course staff promptly when illness, an observance, university travel, an accommodation, or an emergency requires an alternative.</p>
-          </details>
-          <details>
-            <summary>Flex days and late work</summary>
-            <p>Each student receives three flex days across HW1–HW5, with at most two applied to one homework. Later homework, checks, project work, and final deliverables do not use individual flex days. Serious circumstances are handled individually.</p>
-          </details>
-          <details>
-            <summary>Academic integrity</summary>
-            <p>Copying work, providing copyable individual solutions, fabricating data or citations, misrepresenting AI contributions, or using prohibited tools may constitute a violation. Students must follow CMU's <a href="https://www.cmu.edu/policies/student-and-student-life/academic-integrity.html">Academic Integrity Policy</a>.</p>
-          </details>
-          <details>
-            <summary>Regrade requests</summary>
-            <p>Submit requests in writing within seven calendar days, identify the relevant rubric criterion, and explain the suspected error. Clerical errors may be reported at any time.</p>
-          </details>
-          <details>
-            <summary>Devices, recording, and service outages</summary>
-            <p>Laptops are needed for labs. Do not record class members or activities without written permission or an approved accommodation. During a required-service outage, preserve the latest work, note the unavailable service, continue non-computing work, and check Canvas for an extension or alternate plan.</p>
-          </details>
-          <details>
-            <summary>Respect, inclusion, and religious observances</summary>
-            <p>We critique claims rigorously while treating classmates and people represented in data with care. Contact the instructor early about religious or cultural observance conflicts.</p>
-          </details>
-        </div>
-      </section>
-
-      <section class="section" id="support" aria-labelledby="support-title">
-        <div class="section-heading compact-heading">
-          <p class="eyebrow">Access and support</p>
-          <h2 id="support-title">CMU resources</h2>
-        </div>
-        <div class="support-grid">
-          <a href="https://rainier.accessiblelearning.com/cmu/start"><strong>Disability Resources</strong><span>Apply for or manage accommodations</span></a>
-          <a href="https://www.cmu.edu/counseling/"><strong>Counseling and Psychological Services</strong><span>Confidential support · 412-268-2922</span></a>
-          <a href="https://www.cmu.edu/student-success/"><strong>Student Academic Success Center</strong><span>Learning and academic coaching</span></a>
-          <a href="https://www.cmu.edu/title-ix"><strong>Institutional Equity and Title IX</strong><span>Information, support, and reporting resources</span></a>
-        </div>
-        <p class="emergency-note"><strong>Emergency:</strong> For an imminent, life-threatening emergency, call CMU Police at 412-268-2323 or 911.</p>
-      </section>
+      </div>
     </main>
 
-    <footer class="site-footer">
-      <div class="footer-grid">
-        <p><strong>Statistical Evaluation of AI</strong><br>Carnegie Mellon University · Spring 2027</p>
-        <p class="footer-note">Reasonable changes will be announced through Canvas. Canvas controls if it differs from this planning syllabus.</p>
-      </div>
+    <footer>
+      <div class="wrap">Statistical Evaluation of AI · Carnegie Mellon University · Spring 2027. Canvas has the official deadlines.</div>
     </footer>
-    <script src="course-data.js"></script>
-    <script src="site.js"></script>
+
+    <script src="course-data.js?v=4"></script>
+    <script src="site.js?v=4"></script>
   </body>
 </html>

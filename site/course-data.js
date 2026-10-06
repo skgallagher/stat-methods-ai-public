@@ -10,289 +10,83 @@ const courseLinks = {
 };
 
 const siteSettings = {
-  // Use "scheduled" when the course is live. Preview shows one chosen week.
-  // Beta shows Weeks 1 through betaThroughWeek with every link open, for testers.
+  // "scheduled": a week appears after its Sunday publishDate (use when the course is live).
+  // "preview": show only previewWeek, with lab and homework links locked until their openDate.
+  // "beta": show Weeks 1 through betaThroughWeek with every link open, for testers.
   moduleReleaseMode: "beta",
   previewWeek: 2,
   betaThroughWeek: 4
 };
 
+// Helpers so each week below stays short.
+const slides = (week) => [
+  { label: "Tue", href: `${courseLinks.pagesBase}/weeks/${week}/lecture_a.html` },
+  { label: "Thu", href: `${courseLinks.pagesBase}/weeks/${week}/lecture_b.html` }
+];
+const notebook = (path, openDate) => [
+  { label: "Colab", href: `${courseLinks.colabBase}/${path}`, openDate },
+  { label: "notebook", href: `${courseLinks.publicBlob}/${path}`, openDate }
+];
+const dataRelease = (label, folder) => ({ label, href: `${courseLinks.publicBlob}/data/course/${folder}/README.md` });
+
+// One entry per week. Topics and dates follow the syllabus calendar.
 const weeklyMaterials = [
   {
-    week: 1,
-    label: "Week 1",
-    publishDate: "2027-01-17",
-    title: "Logistic Regression to Neural Networks",
-    description: "Build a one-hidden-layer network from familiar statistical pieces, then compare a baseline and a vision system on genuinely new cameras.",
-    links: [
-      { label: "Lecture A", href: `${courseLinks.pagesBase}/weeks/week01/lecture_a.html` },
-      { label: "Lecture B", href: `${courseLinks.pagesBase}/weeks/week01/lecture_b.html` },
-      { label: "Data release", href: `${courseLinks.publicBlob}/data/course/camera_traps/README.md` },
-      {
-        label: "Lab notebook",
-        href: `${courseLinks.publicBlob}/weeks/week01/lab_starter.ipynb`,
-        openDate: "2027-01-21"
-      },
-      {
-        label: "Open lab in Colab",
-        href: `${courseLinks.colabBase}/weeks/week01/lab_starter.ipynb`,
-        openDate: "2027-01-21"
-      },
-      {
-        label: "HW1 PDF",
-        href: `${courseLinks.publicBlob}/weeks/week01/hw01.pdf`,
-        openDate: "2027-01-21"
-      },
-      {
-        label: "HW1 notebook",
-        href: `${courseLinks.publicBlob}/weeks/week01/hw01_starter.ipynb`,
-        openDate: "2027-01-21"
-      },
-      {
-        label: "Open HW1 in Colab",
-        href: `${courseLinks.colabBase}/weeks/week01/hw01_starter.ipynb`,
-        openDate: "2027-01-21"
-      }
-    ]
+    week: 1, dates: "Jan 19 / 21", publishDate: "2027-01-17",
+    topic: "From regression to neural networks",
+    slides: slides("week01"),
+    lab: notebook("weeks/week01/lab_starter.ipynb", "2027-01-21"),
+    homework: { label: "HW1", due: "Jan 26", pdf: `${courseLinks.publicBlob}/weeks/week01/hw01.pdf`, links: notebook("weeks/week01/hw01_starter.ipynb", "2027-01-21"), openDate: "2027-01-21" },
+    data: [dataRelease("Camera Traps data", "camera_traps")]
   },
   {
-    week: 2,
-    label: "Week 2",
-    publishDate: "2027-01-24",
-    title: "Data as Measurement: Labels and Disagreement",
-    description: "Use repeated DynaSent judgments to study label distributions, conditional and marginal dependence, hard and soft targets, and Brier score.",
-    links: [
-      { label: "Lecture A", href: `${courseLinks.pagesBase}/weeks/week02/lecture_a.html` },
-      { label: "Lecture B", href: `${courseLinks.pagesBase}/weeks/week02/lecture_b.html` },
-      { label: "Data release", href: `${courseLinks.publicBlob}/data/course/dynasent/README.md` },
-      {
-        label: "Lab notebook",
-        href: `${courseLinks.publicBlob}/weeks/week02/lab.ipynb`,
-        openDate: "2027-01-28"
-      },
-      {
-        label: "Open lab in Colab",
-        href: `${courseLinks.colabBase}/weeks/week02/lab.ipynb`,
-        openDate: "2027-01-28"
-      },
-      {
-        label: "HW2 PDF",
-        href: `${courseLinks.publicBlob}/weeks/week02/hw02.pdf`,
-        openDate: "2027-01-28"
-      },
-      {
-        label: "HW2 notebook",
-        href: `${courseLinks.publicBlob}/weeks/week02/hw02_starter.ipynb`,
-        openDate: "2027-01-28"
-      },
-      {
-        label: "Open HW2 in Colab",
-        href: `${courseLinks.colabBase}/weeks/week02/hw02_starter.ipynb`,
-        openDate: "2027-01-28"
-      }
-    ]
+    week: 2, dates: "Jan 26 / 28", publishDate: "2027-01-24",
+    topic: "Data as measurement: labels and repeated judgments",
+    slides: slides("week02"),
+    lab: notebook("weeks/week02/lab.ipynb", "2027-01-28"),
+    homework: { label: "HW2", due: "Feb 2", pdf: `${courseLinks.publicBlob}/weeks/week02/hw02.pdf`, links: notebook("weeks/week02/hw02_starter.ipynb", "2027-01-28"), openDate: "2027-01-28" },
+    data: [dataRelease("DynaSent data", "dynasent")]
   },
   {
-    week: 3,
-    label: "Week 3",
-    publishDate: "2027-01-31",
-    title: "Evaluation Design: Estimands, Splits, and AI-Assisted Workflow",
-    description: "Turn a vague question about an AI system into an estimand, comparisons, and a data split, then audit an AI-generated analysis plan using CFPB complaints.",
-    links: [
-      { label: "Lecture A", href: `${courseLinks.pagesBase}/weeks/week03/lecture_a.html` },
-      { label: "Lecture B", href: `${courseLinks.pagesBase}/weeks/week03/lecture_b.html` },
-      { label: "CFPB data release", href: `${courseLinks.publicBlob}/data/course/cfpb/README.md` },
-      { label: "GitHub issues data release", href: `${courseLinks.publicBlob}/data/course/github_issues/README.md` },
-      {
-        label: "Lab notebook",
-        href: `${courseLinks.publicBlob}/weeks/week03/lab_starter.ipynb`,
-        openDate: "2027-02-04"
-      },
-      {
-        label: "Open lab in Colab",
-        href: `${courseLinks.colabBase}/weeks/week03/lab_starter.ipynb`,
-        openDate: "2027-02-04"
-      },
-      {
-        label: "HW3 PDF",
-        href: `${courseLinks.publicBlob}/weeks/week03/hw03.pdf`,
-        openDate: "2027-02-04"
-      },
-      {
-        label: "HW3 notebook",
-        href: `${courseLinks.publicBlob}/weeks/week03/hw03_starter.ipynb`,
-        openDate: "2027-02-04"
-      },
-      {
-        label: "Open HW3 in Colab",
-        href: `${courseLinks.colabBase}/weeks/week03/hw03_starter.ipynb`,
-        openDate: "2027-02-04"
-      }
-    ]
+    week: 3, dates: "Feb 2 / 4", publishDate: "2027-01-31",
+    topic: "Evaluation design: estimands, splits, and AI-assisted workflow",
+    slides: slides("week03"),
+    lab: notebook("weeks/week03/lab_starter.ipynb", "2027-02-04"),
+    homework: { label: "HW3", due: "Feb 9", pdf: `${courseLinks.publicBlob}/weeks/week03/hw03.pdf`, links: notebook("weeks/week03/hw03_starter.ipynb", "2027-02-04"), openDate: "2027-02-04" },
+    data: [dataRelease("CFPB data", "cfpb"), dataRelease("GitHub issues data", "github_issues")]
   },
   {
-    week: 4,
-    label: "Week 4",
-    publishDate: "2027-02-07",
-    title: "How Precise Is a Benchmark Score?",
-    description: "Treat a benchmark score as an estimate with a standard error, choose an interval that behaves near 100% accuracy, and account for photos that come in bursts.",
-    links: [
-      { label: "Lecture A", href: `${courseLinks.pagesBase}/weeks/week04/lecture_a.html` },
-      { label: "Lecture B", href: `${courseLinks.pagesBase}/weeks/week04/lecture_b.html` },
-      { label: "Data release", href: `${courseLinks.publicBlob}/data/course/camera_traps/README.md` },
-      {
-        label: "Lab notebook",
-        href: `${courseLinks.publicBlob}/weeks/week04/lab_starter.ipynb`,
-        openDate: "2027-02-11"
-      },
-      {
-        label: "Open lab in Colab",
-        href: `${courseLinks.colabBase}/weeks/week04/lab_starter.ipynb`,
-        openDate: "2027-02-11"
-      },
-      {
-        label: "HW4 PDF",
-        href: `${courseLinks.publicBlob}/weeks/week04/hw04.pdf`,
-        openDate: "2027-02-11"
-      },
-      {
-        label: "HW4 notebook",
-        href: `${courseLinks.publicBlob}/weeks/week04/hw04_starter.ipynb`,
-        openDate: "2027-02-11"
-      },
-      {
-        label: "Open HW4 in Colab",
-        href: `${courseLinks.colabBase}/weeks/week04/hw04_starter.ipynb`,
-        openDate: "2027-02-11"
-      }
-    ]
+    week: 4, dates: "Feb 9 / 11", publishDate: "2027-02-07",
+    topic: "Benchmark performance as estimation",
+    slides: slides("week04"),
+    lab: notebook("weeks/week04/lab_starter.ipynb", "2027-02-11"),
+    homework: { label: "HW4", due: "Feb 16", pdf: `${courseLinks.publicBlob}/weeks/week04/hw04.pdf`, links: notebook("weeks/week04/hw04_starter.ipynb", "2027-02-11"), openDate: "2027-02-11" },
+    data: [dataRelease("Camera Traps data", "camera_traps")]
   },
-  {
-    week: 5,
-    label: "Week 5",
-    publishDate: "2027-02-14",
-    title: "Accuracy Is an Estimate",
-    description: "Performance metrics, confidence intervals, baseline comparisons, and decision costs.",
-    links: [
-      { label: "Materials", href: `${courseLinks.publicBlob}/weeks/week05/` }
-    ]
-  },
-  {
-    week: 6,
-    label: "Week 6",
-    publishDate: "2027-02-21",
-    title: "Calibration and Confidence",
-    description: "Reliability diagrams, confidence scores, calibration checks, and midterm review. No homework this week.",
-    links: [
-      { label: "Materials", href: `${courseLinks.publicBlob}/weeks/week06/` }
-    ]
-  },
-  {
-    week: 7,
-    label: "Week 7",
-    publishDate: "2027-02-28",
-    title: "Midterm and Synthesis",
-    description: "Synthesis of representation, benchmarks, estimation, and calibration. Closed-book, no-AI midterm.",
-    links: [
-      { label: "Review Materials", href: `${courseLinks.publicBlob}/weeks/week07/` }
-    ]
-  },
-  {
-    week: 8,
-    label: "Week 8",
-    publishDate: "2027-03-14",
-    title: "Distribution Shift",
-    description: "Representativeness, shifted populations, project launch, and first evaluation questions.",
-    links: [
-      { label: "Materials", href: `${courseLinks.publicBlob}/weeks/week08/` }
-    ]
-  },
-  {
-    week: 9,
-    label: "Week 9",
-    publishDate: "2027-03-21",
-    title: "Robustness and Ablation",
-    description: "Sensitivity analysis, perturbations, ablations, and Project Checkpoint 1.",
-    links: [
-      { label: "Materials", href: `${courseLinks.publicBlob}/weeks/week09/` },
-      { label: "Checkpoint 1", href: `${courseLinks.publicBlob}/projects/checkpoints/checkpoint01.md` }
-    ]
-  },
-  {
-    week: 10,
-    label: "Week 10",
-    publishDate: "2027-03-28",
-    title: "Model Comparison Under Realistic Decision Costs",
-    description: "Class-specific errors, asymmetric loss, human review thresholds, and client-facing interpretation.",
-    links: [
-      { label: "Materials", href: `${courseLinks.publicBlob}/weeks/week10/` }
-    ]
-  },
-  {
-    week: 11,
-    label: "Week 11",
-    publishDate: "2027-04-04",
-    title: "Calibration in the Wild",
-    description: "Stratified calibration, high-confidence errors, judge agreement, and Project Checkpoint 2.",
-    links: [
-      { label: "Materials", href: `${courseLinks.publicBlob}/weeks/week11/` },
-      { label: "Checkpoint 2", href: `${courseLinks.publicBlob}/projects/checkpoints/checkpoint02.md` }
-    ]
-  },
-  {
-    week: 12,
-    label: "Week 12",
-    publishDate: "2027-04-11",
-    title: "Human Evaluation as Experimental Design",
-    description: "Human feedback as data, rubrics, rater agreement, measurement bias, and labeling protocols.",
-    links: [
-      { label: "Materials", href: `${courseLinks.publicBlob}/weeks/week12/` }
-    ]
-  },
-  {
-    week: 13,
-    label: "Week 13",
-    publishDate: "2027-04-18",
-    title: "Statistical Argument and Client Recommendation",
-    description: "Final claims, limitations, robustness, ending artifact, and video planning.",
-    links: [
-      { label: "Materials", href: `${courseLinks.publicBlob}/weeks/week13/` },
-      { label: "Ending Artifact", href: `${courseLinks.publicBlob}/projects/checkpoints/ending_artifact.md` }
-    ]
-  },
-  {
-    week: 14,
-    label: "Week 14",
-    publishDate: "2027-04-25",
-    title: "Project Presentations and Course Synthesis",
-    description: "Recorded videos, oral discussions, final reports, and course synthesis.",
-    links: [
-      { label: "Final Project", href: `${courseLinks.publicBlob}/projects/final_project.md` }
-    ]
-  }
+  { week: 5, dates: "Feb 16 / 18", publishDate: "2027-02-14", topic: "Paired system comparison" },
+  { week: 6, dates: "Feb 23 / 25", publishDate: "2027-02-21", topic: "Calibration and decision-rule sensitivity" },
+  { week: 7, dates: "Mar 2 / 4", publishDate: "2027-02-28", topic: "First-half synthesis", note: "In-class midterm Thu Mar 4" },
+  { week: 8, dates: "Mar 9 / 11", publishDate: null, topic: "Spring break", isBreak: true },
+  { week: 9, dates: "Mar 16 / 18", publishDate: "2027-03-14", topic: "Distribution shift and project launch" },
+  { week: 10, dates: "Mar 23 / 25", publishDate: "2027-03-21", topic: "Sensitivity analysis", note: "Project Milestone 1 due Mar 23" },
+  { week: 11, dates: "Mar 30 / Apr 1", publishDate: "2027-03-28", topic: "Designed AI evaluations" },
+  { week: 12, dates: "Apr 6 / 8", publishDate: "2027-04-04", topic: "LLM judges as measurement instruments", note: "Project Milestone 2 due Apr 6" },
+  { week: 13, dates: "Apr 13", publishDate: "2027-04-11", topic: "Human-centered and responsible AI", note: "Guest lecture Tue · no class Thu (Spring Carnival)" },
+  { week: 14, dates: "Apr 20 / 22", publishDate: "2027-04-18", topic: "Statistical argument and recommendation", note: "Ending artifact due Apr 20" },
+  { week: 15, dates: "Apr 27 / 29", publishDate: "2027-04-25", topic: "Oral defenses and course synthesis", note: "Video due Apr 25 · report due Apr 30" }
 ];
 
 const projectDocs = [
   {
-    label: "Project data downloads",
+    label: "Project data",
     href: courseLinks.projectDataBox,
-    actionLabel: "Open Box folder",
+    actionLabel: "Box folder",
     openDate: "2027-03-14",
-    status: "Four frozen course bundles with starter notebooks, cached AI outputs, provenance, and sealed holdouts · opens with the Week 8 project launch"
+    status: "Data, cached AI outputs, and starter notebooks for all four tracks. Opens with the project launch in Week 9."
   },
   {
-    label: "Project statement",
+    label: "Project handbook",
     href: null,
-    status: "Student-facing overview and deliverables · coming later"
-  },
-  {
-    label: "Project rubric",
-    href: null,
-    status: "Weights and evaluation criteria · coming later"
-  },
-  {
-    label: "Datasets and baselines",
-    href: null,
-    status: "Supported choices and baseline cookbook · coming later"
+    status: "Deliverables, rubrics, and examples. Coming later."
   }
 ];

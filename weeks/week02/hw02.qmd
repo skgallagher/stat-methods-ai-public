@@ -1,6 +1,6 @@
 ---
 title: "Homework 2: What Is the Target?"
-subtitle: "Statistical Thinking for the AI Era · Spring 2027"
+subtitle: "Statistical Evaluation of AI · Spring 2027"
 format: pdf
 ---
 

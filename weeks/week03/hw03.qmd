@@ -1,6 +1,6 @@
 ---
 title: "Homework 3: Design the Evaluation Before Running It"
-subtitle: "Statistical Thinking for the AI Era · Spring 2027"
+subtitle: "Statistical Evaluation of AI · Spring 2027"
 format:
   pdf:
     geometry:

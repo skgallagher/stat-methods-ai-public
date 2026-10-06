@@ -2,25 +2,18 @@ function setRepoLinks() {
   document.querySelectorAll("[data-public-repo]").forEach((element) => {
     element.href = courseLinks.publicRepo;
   });
-
-  document.querySelectorAll("[data-instructor-repo]").forEach((element) => {
-    element.href = courseLinks.instructorRepo;
-  });
 }
 
 function isReleased(item, today = new Date()) {
-  if (siteSettings.moduleReleaseMode === "all") return true;
-  if (siteSettings.moduleReleaseMode === "beta") {
-    return item.week <= siteSettings.betaThroughWeek;
-  }
-  if (siteSettings.moduleReleaseMode === "preview") {
-    return item.week === siteSettings.previewWeek;
-  }
-  const publishDate = new Date(`${item.publishDate}T00:00:00`);
-  return publishDate <= today;
+  if (!item.slides) return false;
+  const mode = siteSettings.moduleReleaseMode;
+  if (mode === "all") return true;
+  if (mode === "beta") return item.week <= siteSettings.betaThroughWeek;
+  if (mode === "preview") return item.week === siteSettings.previewWeek;
+  return new Date(`${item.publishDate}T00:00:00`) <= today;
 }
 
-function formatOpenDate(dateString) {
+function formatDate(dateString) {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
@@ -28,99 +21,95 @@ function formatOpenDate(dateString) {
   }).format(new Date(`${dateString}T12:00:00-05:00`));
 }
 
-function materialLink(link, today = new Date()) {
-  if (!link.openDate || siteSettings.moduleReleaseMode === "beta") {
-    return `<a class="pill" href="${link.href}">${link.label}</a>`;
+function isOpen(openDate, today = new Date()) {
+  if (!openDate || siteSettings.moduleReleaseMode === "beta") return true;
+  return new Date(`${openDate}T00:00:00-05:00`) <= today;
+}
+
+function link(item) {
+  if (!item.href) return `<span class="locked">${item.label}</span>`;
+  if (!isOpen(item.openDate)) {
+    return `<span class="locked" title="Opens ${formatDate(item.openDate)}">${item.label}</span>`;
   }
+  return `<a href="${item.href}">${item.label}</a>`;
+}
 
-  const openDate = new Date(`${link.openDate}T00:00:00-05:00`);
-  if (openDate <= today) {
-    return `<a class="pill" href="${link.href}">${link.label}</a>`;
+function linkList(items) {
+  return items.map(link).join(" · ");
+}
+
+function homeworkCell(hw) {
+  if (!hw) return "";
+  if (!isOpen(hw.openDate)) {
+    return `<span class="locked">${hw.label}</span><span class="small">opens ${formatDate(hw.openDate)}</span>`;
   }
-
-  const label = `${link.label} · opens ${formatOpenDate(link.openDate)}`;
-  return `<span class="pill pill-locked" aria-disabled="true" title="${label}">${label}</span>`;
+  return `${hw.label} · <a href="${hw.pdf}">PDF</a><br>${linkList(hw.links)}<span class="small">due ${hw.due}</span>`;
 }
 
-function sortedModules() {
-  return weeklyMaterials
-    .filter((item) => isReleased(item))
-    .sort((a, b) => b.week - a.week);
+function currentWeek() {
+  const released = weeklyMaterials.filter((item) => isReleased(item));
+  return released.length ? released[released.length - 1] : null;
 }
 
-function moduleCard(item) {
-  const releaseText = item.publishDate
-    ? `<p class="module-date">Publishes ${formatOpenDate(item.publishDate)}</p>`
-    : "";
+function renderSchedule() {
+  const body = document.querySelector("[data-schedule]");
+  if (!body) return;
+  const current = currentWeek();
 
-  return `
-    <article class="card module-card">
-      <div class="module-kicker">${item.label}</div>
-      <h3>${item.title}</h3>
-      <p>${item.description}</p>
-      ${releaseText}
-      <div class="pill-row">
-        ${item.links.map((link) => materialLink(link)).join("")}
-      </div>
-    </article>
-  `;
-}
+  body.innerHTML = weeklyMaterials.map((item) => {
+    const released = isReleased(item);
+    const classes = [item.isBreak ? "break" : "", current && item.week === current.week ? "current" : ""].join(" ").trim();
+    const data = released && item.data
+      ? `<span class="small">${item.data.map(link).join(" · ")}</span>`
+      : "";
+    const note = item.note ? `<span class="small">${item.note}</span>` : "";
+    return `
+      <tr class="${classes}">
+        <td class="week">${item.week}</td>
+        <td class="dates">${item.dates}</td>
+        <td class="topic">${item.topic}${note}${data}</td>
+        <td class="links" data-label="Slides">${released ? linkList(item.slides) : ""}</td>
+        <td class="links" data-label="Lab">${released ? linkList(item.lab) : ""}</td>
+        <td class="links" data-label="Homework">${released ? homeworkCell(item.homework) : ""}</td>
+      </tr>`;
+  }).join("");
 
-function renderMaterials() {
-  const container = document.querySelector("[data-weekly-materials]");
-  if (!container) return;
-
-  const latest = sortedModules().slice(0, 1);
-  container.innerHTML = latest.length
-    ? latest.map(moduleCard).join("")
-    : `<article class="card"><h3>Modules coming soon</h3><p>Weekly materials will appear here on Sundays during the semester.</p></article>`;
-}
-
-function renderModulesPage() {
-  const container = document.querySelector("[data-modules-list]");
-  if (!container) return;
-
-  const modules = sortedModules();
-  container.innerHTML = modules.length
-    ? modules.map(moduleCard).join("")
-    : `<article class="card"><h3>No released modules yet</h3><p>Weekly materials will appear here on Sundays during the semester.</p></article>`;
-
-  const modeLabel = document.querySelector("[data-release-mode]");
-  if (modeLabel) {
-    if (siteSettings.moduleReleaseMode === "preview") {
-      modeLabel.textContent = `Preview mode: showing Week ${siteSettings.previewWeek}. Lab and homework links remain gated by their opening dates.`;
-    } else if (siteSettings.moduleReleaseMode === "beta") {
-      modeLabel.textContent = `Beta preview: showing Weeks 1–${siteSettings.betaThroughWeek} with every link open.`;
-    } else if (siteSettings.moduleReleaseMode === "all") {
-      modeLabel.textContent = "Preview mode: showing all scheduled modules.";
-    } else {
-      modeLabel.textContent = "Live mode: modules appear after their Sunday publish date.";
-    }
+  const mode = document.querySelector("[data-release-mode]");
+  if (mode && siteSettings.moduleReleaseMode === "beta") {
+    mode.textContent = `Beta preview: Weeks 1–${siteSettings.betaThroughWeek} are open for testing.`;
   }
+}
+
+function renderThisWeek() {
+  const box = document.querySelector("[data-this-week]");
+  if (!box) return;
+  const item = currentWeek();
+  if (!item) {
+    box.innerHTML = `<p>Materials for each week appear here the Sunday before class.</p>`;
+    return;
+  }
+  box.innerHTML = `
+    <p class="this-week-title">Week ${item.week} · ${item.dates}</p>
+    <p class="this-week-topic">${item.topic}</p>
+    <dl>
+      <dt>Slides</dt><dd>${linkList(item.slides)}</dd>
+      <dt>Lab</dt><dd>${linkList(item.lab)}</dd>
+      <dt>Homework</dt><dd>${homeworkCell(item.homework)}</dd>
+    </dl>`;
 }
 
 function renderProjectDocs() {
-  const container = document.querySelector("[data-project-docs]");
-  if (!container) return;
-
-  container.innerHTML = projectDocs.map((doc) => `
-    <article class="card">
-      <h3>${doc.label}</h3>
-      <p>${doc.status}</p>
-      <div class="pill-row">
-        ${doc.href
-          ? materialLink({
-              label: doc.actionLabel || "Open in GitHub",
-              href: doc.href,
-              openDate: doc.openDate
-            })
-          : `<span class="pill pill-locked" aria-disabled="true">Coming soon</span>`}
-      </div>
-    </article>
-  `).join("");
+  const list = document.querySelector("[data-project-docs]");
+  if (!list) return;
+  list.innerHTML = projectDocs.map((doc) => {
+    const action = doc.href
+      ? link({ label: doc.actionLabel || "Open", href: doc.href, openDate: doc.openDate })
+      : `<span class="locked">Coming later</span>`;
+    return `<li><strong>${doc.label}.</strong> ${doc.status} ${action}</li>`;
+  }).join("");
 }
 
 setRepoLinks();
-renderMaterials();
-renderModulesPage();
+renderSchedule();
+renderThisWeek();
 renderProjectDocs();

@@ -3,83 +3,50 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Weekly lectures, labs, homework, and data for Statistical Evaluation of AI.">
-    <title>Weekly Materials · Statistical Evaluation of AI</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="Weekly schedule, slides, labs, and homework for Statistical Evaluation of AI.">
+    <title>Schedule · Statistical Evaluation of AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+    <link rel="stylesheet" href="styles.css?v=4">
   </head>
   <body>
     <header class="site-header">
-      <nav class="nav" aria-label="Main navigation">
-        <a class="brand" href="index.html">
-          <span>Statistical Thinking</span>
-          <small>for the AI Era</small>
-        </a>
-        <div class="nav-links">
+      <div class="wrap">
+        <a class="course-name" href="index.html">Statistical Evaluation of AI</a>
+        <nav aria-label="Main navigation">
           <a href="index.html">Home</a>
-          <a href="modules.html" aria-current="page">Weekly materials</a>
-          <a href="project.html">Final project</a>
+          <a href="modules.html" aria-current="page">Schedule</a>
+          <a href="project.html">Project</a>
           <a href="syllabus.html">Syllabus</a>
           <a href="#" data-public-repo>GitHub</a>
-        </div>
-      </nav>
+        </nav>
+      </div>
     </header>
 
-    <main>
-      <section class="page-intro teal-intro">
-        <div class="wrap intro-grid">
-          <div>
-            <p class="eyebrow">Lectures · Labs · Homework · Data</p>
-            <h1>Weekly materials</h1>
-            <p class="lede">Everything for a week lives in one card. Released weeks appear newest first.</p>
-          </div>
-          <aside class="release-note">
-            <strong>Release status</strong>
-            <p data-release-mode>Modules appear after their Sunday publish date.</p>
-          </aside>
-        </div>
-      </section>
+    <main class="wrap">
+      <h1>Schedule and materials</h1>
+      <p class="subtitle">Slides go up the Sunday before each week. Labs and homework open on Thursday, and homework is due the following Tuesday at 11:59 pm. Canvas has the official deadlines.</p>
+      <p class="release-mode" data-release-mode></p>
 
-      <section class="section" aria-labelledby="released-title">
-        <div class="section-heading compact-heading">
-          <p class="eyebrow">Available now</p>
-          <h2 id="released-title">Released modules</h2>
-        </div>
-        <div class="modules-list" data-modules-list></div>
-      </section>
+      <div class="table-scroll">
+        <table class="schedule">
+          <thead>
+            <tr><th>Week</th><th>Dates</th><th>Topic</th><th>Slides</th><th>Lab</th><th>Homework</th></tr>
+          </thead>
+          <tbody data-schedule></tbody>
+        </table>
+      </div>
 
-      <section class="section calendar-section" id="calendar" aria-labelledby="calendar-title">
-        <div class="section-heading compact-heading">
-          <p class="eyebrow">Spring 2027</p>
-          <h2 id="calendar-title">Course calendar</h2>
-          <p class="muted">Canvas will contain authoritative deadlines; this is the instructional sequence.</p>
-        </div>
-        <div class="calendar-list">
-          <div><strong>Week 1 · Jan 19</strong><span>From regression to neural networks</span></div>
-          <div><strong>Week 2 · Jan 26</strong><span>Data as measurement: labels and repeated judgments</span></div>
-          <div><strong>Week 3 · Feb 2</strong><span>Evaluation design: estimands, splits, and AI-assisted workflow</span></div>
-          <div><strong>Week 4 · Feb 9</strong><span>Benchmark performance as estimation</span></div>
-          <div><strong>Week 5 · Feb 16</strong><span>Paired system comparison</span></div>
-          <div><strong>Week 6 · Feb 23</strong><span>Calibration and decision-rule sensitivity</span></div>
-          <div><strong>Week 7 · Mar 2</strong><span>First-half synthesis; in-class midterm Thu Mar 4</span></div>
-          <div class="break-row"><strong>Week 8 · Mar 9</strong><span>Spring break, no class</span></div>
-          <div><strong>Week 9 · Mar 16</strong><span>Distribution shift and project launch</span></div>
-          <div><strong>Week 10 · Mar 23</strong><span>Sensitivity analysis; project Milestone 1</span></div>
-          <div><strong>Week 11 · Mar 30</strong><span>Designed AI evaluations</span></div>
-          <div><strong>Week 12 · Apr 6</strong><span>LLM judges as measurement instruments; project Milestone 2</span></div>
-          <div><strong>Week 13 · Apr 13</strong><span>Human-centered and responsible AI; guest lecture</span></div>
-          <div><strong>Week 14 · Apr 20</strong><span>Statistical argument and recommendation</span></div>
-          <div><strong>Week 15 · Apr 27</strong><span>Oral defenses and course synthesis</span></div>
-        </div>
-      </section>
+      <h2>Working in Colab</h2>
+      <p>Labs and homework are Colab notebooks. Click <strong>Colab</strong> to open one, then choose <strong>File → Save a copy in Drive</strong> so your work is saved. The first cell downloads the course data, so run it before anything else. The <strong>notebook</strong> link shows the same file on GitHub.</p>
     </main>
 
-    <footer class="site-footer">
-      <div class="footer-grid">
-        <p><strong>Statistical Evaluation of AI</strong><br>Weekly materials · Spring 2027</p>
-        <p class="footer-note">Labs and homework unlock on their posted opening dates.</p>
-      </div>
+    <footer>
+      <div class="wrap">Statistical Evaluation of AI · Carnegie Mellon University · Spring 2027. Canvas has the official deadlines.</div>
     </footer>
-    <script src="course-data.js"></script>
-    <script src="site.js"></script>
+
+    <script src="course-data.js?v=4"></script>
+    <script src="site.js?v=4"></script>
   </body>
 </html>
