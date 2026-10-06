@@ -35,9 +35,12 @@ All assignments are solvable on CPU.
 
 ## Weekly Materials
 
-### Week 01 — Images as Data
+### Week 01 — Logistic Regression to Neural Networks
 
-Slides: `weeks/week01/slides.html`
+Lecture drafts:
+
+- `lecture_drafts/week01a_logistic_to_neural_nets.qmd`
+- `lecture_drafts/week01b_accuracy_baselines_benchmarks.qmd`
 
 Lab:
 
@@ -61,6 +64,7 @@ Homework:
 
 - `weeks/` — weekly materials (slides + labs)
 - `labs/` — lab templates
+- `lecture_drafts/` — two lecture drafts per week (`weekXXa`, `weekXXb`)
 - `homeworks/` — homework notebooks plus lightweight prompt pages
 - `code/` — shared utilities
 - `data/` — small datasets
