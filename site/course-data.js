@@ -4,6 +4,8 @@ const courseLinks = {
   publicBlob: "https://github.com/skgallagher/stat-methods-ai-public/blob/main",
   publicRaw: "https://raw.githubusercontent.com/skgallagher/stat-methods-ai-public/main",
   colabBase: "https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main",
+  // The course website lives here. Copies opened on GitHub Pages forward to it.
+  siteHome: "https://www.stat.cmu.edu/~sgallagh/courses/stat-ai-spring-2027/",
   // GitHub Pages serves the public repo, so HTML slides render in the browser.
   pagesBase: "https://skgallagher.github.io/stat-methods-ai-public",
   projectDataBox: "https://cmu.box.com/s/9jzjm8u9wc9kmkmewsoi9ciekbkf5c2k"

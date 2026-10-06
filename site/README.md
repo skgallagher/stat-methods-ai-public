@@ -1,6 +1,10 @@
 # Course Website
 
-A static, no-build site. It links to the canonical files in the public repo rather than copying them. Slides open through GitHub Pages (`https://skgallagher.github.io/stat-methods-ai-public/`), and notebooks open in Colab.
+A static, no-build site, hosted at https://www.stat.cmu.edu/~sgallagh/courses/stat-ai-spring-2027/. It links to the canonical files in the public repo rather than copying them. Slides open through GitHub Pages (`https://skgallagher.github.io/stat-methods-ai-public/`), and notebooks open in Colab. The copy of this folder that GitHub Pages also serves forwards visitors to the stat.cmu.edu site.
+
+## Deploying
+
+Run `bash instructor_only/deploy_site.sh` from the instructor repo after pushing. It copies this folder to the course directory on the stat.cmu.edu server over SSH (host `leviathan` in `~/.ssh/config`). It does not delete anything on the server.
 
 ## Files
 

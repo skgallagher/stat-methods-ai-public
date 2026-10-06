@@ -1,3 +1,9 @@
+// The website lives on stat.cmu.edu. If this copy was opened on GitHub Pages, go there.
+if (window.location.hostname.endsWith("github.io")) {
+  const page = window.location.pathname.split("/site/")[1] || "";
+  window.location.replace(courseLinks.siteHome + page + window.location.hash);
+}
+
 function setRepoLinks() {
   document.querySelectorAll("[data-public-repo]").forEach((element) => {
     element.href = courseLinks.publicRepo;
