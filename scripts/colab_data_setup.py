@@ -108,3 +108,32 @@ print('Setup complete. Data root:', DATA_ROOT)
 print('Data source:', data_source)
 print('Requested groups:', COURSE_DATA_GROUPS)
 """
+
+
+def build_simple_setup(groups: list[str]) -> str:
+    """Return a short student-facing setup cell that uses course_helpers/course_setup.py."""
+    group_args = ", ".join(repr(group) for group in groups)
+    return f"""# Run this cell once. It downloads a small course helper file, then uses it
+# to download this week's data and check that every file arrived intact.
+from pathlib import Path
+import urllib.request
+
+HELPER_URL = "{PUBLIC_REPO_RAW_URL}/course_helpers/course_setup.py"
+if not Path("course_setup.py").exists():
+    urllib.request.urlretrieve(HELPER_URL, "course_setup.py")
+
+from course_setup import setup_course
+data_dir = setup_course({group_args})
+"""
+
+
+def build_common_imports() -> str:
+    """Return the visible imports cell shared by every notebook."""
+    return """# Libraries and a fixed random seed used in this notebook
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+SEED = 2027
+np.random.seed(SEED)  # makes random results repeatable
+"""

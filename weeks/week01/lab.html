@@ -171,7 +171,7 @@ Reveal after attempting the derivation
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
-<div id="05e6cc35" class="cell" data-execution_count="1">
+<div id="7eeb3894" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -196,7 +196,7 @@ Reveal after attempting the derivation
 <li>explain why adjacent frames should not cross a train/test boundary;</li>
 <li>compute the observed majority-class reference on the analysis split.</li>
 </ul>
-<div id="33321d30" class="cell" data-execution_count="2">
+<div id="afff9c68" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>analysis <span class="op">=</span> dat.query(<span class="st">"split == 'analysis'"</span>).copy()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>holdout <span class="op">=</span> dat.query(<span class="st">"split == 'holdout_camera'"</span>).copy()</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>analysis_majority_reference <span class="op">=</span> analysis[<span class="st">"animal_present"</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>).<span class="bu">max</span>()</span>
@@ -208,7 +208,7 @@ Reveal after attempting the derivation
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    fig, axes <span class="op">=</span> plt.subplots(nrows, ncols, figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">3.4</span> <span class="op">*</span> nrows))</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    axes <span class="op">=</span> np.atleast_1d(axes).ravel()</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ax, (_, row) <span class="kw">in</span> <span class="bu">zip</span>(axes, rows.iterrows()):</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        ax.imshow(plt.imread(DATA_ROOT <span class="op">/</span> row[<span class="st">"image_path"</span>]))</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        ax.imshow(plt.imread(data_dir <span class="op">/</span> row[<span class="st">"image_path"</span>]))</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        ax.set_title(</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"</span><span class="sc">{</span>row[<span class="st">'image_id'</span>]<span class="sc">}</span><span class="ss"> | truth=</span><span class="sc">{</span>row[<span class="st">'animal_present'</span>]<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span></span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"camera=</span><span class="sc">{</span>row[<span class="st">'camera_id'</span>]<span class="sc">}</span><span class="ss"> | sequence=</span><span class="sc">{</span>row[<span class="st">'sequence_id'</span>]<span class="sc">}</span><span class="ss">"</span></span>
@@ -237,7 +237,7 @@ Reveal after attempting the derivation
 <section id="baseline-fit-4-minutes" class="level2">
 <h2 class="anchored" data-anchor-id="baseline-fit-4-minutes">Baseline fit — 4 minutes</h2>
 <p>Fit logistic regression to the documented summaries. One partner drives; the other checks that only analysis rows enter the fit. The coefficient signs describe changes in the fitted log-odds holding the other listed summaries fixed; they are not causal effects.</p>
-<div id="2e66d163" class="cell" data-execution_count="3">
+<div id="66e42861" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> LogisticRegression(max_iter<span class="op">=</span><span class="dv">2000</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>baseline.fit(analysis[FEATURES], analysis[<span class="st">"animal_present"</span>])</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -250,7 +250,7 @@ Reveal after attempting the derivation
 <h2 class="anchored" data-anchor-id="pairs-analyze-results-6-minutes">Pairs analyze results — 6 minutes</h2>
 <p>Complete the supplied table with analysis and held-out-camera accuracy for the baseline and supplied vision model. The denominator is the number of frames. Include the denominator and the observed majority-class reference computed separately within each displayed split. This reference describes class balance after seeing the split’s labels; it is not a fitted, deployable rule.</p>
 <p>Interpret two coefficient signs as features of the fitted prediction surface, holding the other listed summaries fixed. Then explain which performance number is merely an in-sample fit diagnostic and which describes frames from the represented held-out camera locations.</p>
-<div id="95b12f2e" class="cell" data-execution_count="4">
+<div id="cea0eced" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> performance_rows(data, split_name):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    majority_reference <span class="op">=</span> data[<span class="st">"animal_present"</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>).<span class="bu">max</span>()</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    rows <span class="op">=</span> []</span>
@@ -321,7 +321,7 @@ Reveal after attempting the derivation
 <section id="instructor-run-random-frame-contrast-2-minutes" class="level2">
 <h2 class="anchored" data-anchor-id="instructor-run-random-frame-contrast-2-minutes">Instructor run: random-frame contrast — 2 minutes</h2>
 <p>The instructor runs the contrast below. It deliberately allows cameras and trigger sequences to cross the random train/test boundary. Before running it, predict how its accuracy might compare with the camera-held-out accuracy and name one reason; the direction is not guaranteed in every finite dataset.</p>
-<div id="2e5552da" class="cell" data-execution_count="5">
+<div id="fe775abb" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>comparison_pool <span class="op">=</span> dat.query(<span class="st">"split in ['analysis', 'holdout_camera']"</span>).copy()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>random_train, random_test <span class="op">=</span> train_test_split(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    comparison_pool,</span>
@@ -368,7 +368,7 @@ Reveal after attempting the derivation
 <section id="select-errors-3-minutes" class="level2">
 <h2 class="anchored" data-anchor-id="select-errors-3-minutes">Select errors — 3 minutes</h2>
 <p>Switch driver and navigator. The code below chooses errors <strong>before</strong> displaying them: one reproducibly random error and one highest-confidence error from each system. Read the function together and identify where the rule is locked.</p>
-<div id="b0446b2b" class="cell" data-execution_count="6">
+<div id="4f752455" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> select_system_errors(data, system, seed<span class="op">=</span>SEED):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    columns <span class="op">=</span> {</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"baseline"</span>: (<span class="st">"baseline_prob"</span>, <span class="st">"baseline_pred"</span>),</span>
@@ -413,10 +413,10 @@ Reveal after attempting the derivation
 <h2 class="anchored" data-anchor-id="pairs-inspect-errors-5-minutes">Pairs inspect errors — 5 minutes</h2>
 <p>Display exactly the cases selected above. Do not browse first and then invent a selection rule. Then change <code>seed</code> once and explain which selections can change and which cannot.</p>
 <p>Write one visible similarity or contrast and one fact these four purposively selected cases cannot establish about the target population.</p>
-<div id="93cc119d" class="cell" data-execution_count="7">
+<div id="9e3a2007" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="dv">8</span>))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, (_, row) <span class="kw">in</span> <span class="bu">zip</span>(axes.flat, selected_errors.iterrows()):</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    image_path <span class="op">=</span> DATA_ROOT <span class="op">/</span> row[<span class="st">"image_path"</span>]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    image_path <span class="op">=</span> data_dir <span class="op">/</span> row[<span class="st">"image_path"</span>]</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    ax.imshow(plt.imread(image_path))</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    ax.set_title(</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span>row[<span class="st">'system'</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>row[<span class="st">'selection_rule'</span>]<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span></span>
@@ -441,7 +441,7 @@ Reveal after attempting the derivation
 </blockquote>
 <p>Do not rate the paragraph as a whole. Break it into checkable claims and complete the audit table. A checkable claim is a short statement that the displayed sequence, split check, documentation, or analysis could support, contradict, or qualify. Then rewrite the explanation in 2-3 sentences using <strong>frame</strong>, <strong>sequence</strong>, <strong>camera</strong>, and the expected direction of bias.</p>
 <p>Preserve the original paragraph, completed table, and rewrite. Verification means checking course evidence—not asking a second AI assistant.</p>
-<div id="2e3c4c1b" class="cell" data-execution_count="8">
+<div id="4ba4d657" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>claim_audit <span class="op">=</span> pd.DataFrame(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"claim"</span>: [</span>
@@ -477,7 +477,7 @@ Reveal after attempting the derivation
 <li>how the AI system compares descriptively;</li>
 <li>the largest remaining limitation.</li>
 </ol>
-<div id="43c4e59a" class="cell" data-execution_count="9">
+<div id="8ee3224a" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>handoff <span class="op">=</span> paired_table.copy()</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> handoff[<span class="st">"n"</span>].<span class="bu">sum</span>() <span class="op">==</span> <span class="bu">len</span>(holdout)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(handoff) <span class="op">==</span> <span class="dv">4</span></span>

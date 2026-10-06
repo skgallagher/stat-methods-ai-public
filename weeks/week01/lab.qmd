@@ -87,7 +87,7 @@ def display_frames(rows, title):
     fig, axes = plt.subplots(nrows, ncols, figsize=(11, 3.4 * nrows))
     axes = np.atleast_1d(axes).ravel()
     for ax, (_, row) in zip(axes, rows.iterrows()):
-        ax.imshow(plt.imread(DATA_ROOT / row["image_path"]))
+        ax.imshow(plt.imread(data_dir / row["image_path"]))
         ax.set_title(
             f"{row['image_id']} | truth={row['animal_present']}\n"
             f"camera={row['camera_id']} | sequence={row['sequence_id']}"
@@ -307,7 +307,7 @@ Write one visible similarity or contrast and one fact these four purposively sel
 #| eval: false
 fig, axes = plt.subplots(2, 2, figsize=(11, 8))
 for ax, (_, row) in zip(axes.flat, selected_errors.iterrows()):
-    image_path = DATA_ROOT / row["image_path"]
+    image_path = data_dir / row["image_path"]
     ax.imshow(plt.imread(image_path))
     ax.set_title(
         f"{row['system']} | {row['selection_rule']}\n"

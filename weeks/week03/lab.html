@@ -173,10 +173,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="check-two-ways-to-split-the-data-10-minutes" class="level2">
 <h2 class="anchored" data-anchor-id="check-two-ways-to-split-the-data-10-minutes">Check two ways to split the data — 10 minutes</h2>
 <p>The code below uses only the 2022 and 2023 rows. Complaints in the same <code>similarity_group</code> have the same or very similar text. Before running the code, predict which split will put a similarity group in both sets.</p>
-<div id="dba4c967" class="cell" data-execution_count="1">
+<div id="ada04bd7" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>cfpb_root <span class="op">=</span> DATA_ROOT <span class="op">/</span> <span class="st">"cfpb"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>cfpb_root <span class="op">=</span> data_dir <span class="op">/</span> <span class="st">"cfpb"</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>complaints <span class="op">=</span> pd.read_csv(cfpb_root <span class="op">/</span> <span class="st">"complaints.csv"</span>)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>complaints[<span class="st">"date_received"</span>] <span class="op">=</span> pd.to_datetime(complaints[<span class="st">"date_received"</span>])</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> complaints[<span class="st">"complaint_id"</span>].is_unique</span>
@@ -252,7 +252,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="fit-one-practice-model-10-minutes" class="level2">
 <h2 class="anchored" data-anchor-id="fit-one-practice-model-10-minutes">Fit one practice model — 10 minutes</h2>
 <p>We will use 2022 to fit three versions of logistic regression and 2023 to choose among them. Homework 3 makes a new choice using 2024, so the numbers below are not homework answers.</p>
-<div id="8861c6f6" class="cell" data-execution_count="2">
+<div id="5884c5a7" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.feature_extraction.text <span class="im">import</span> TfidfVectorizer</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score</span>

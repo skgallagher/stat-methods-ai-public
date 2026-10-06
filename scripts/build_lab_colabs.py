@@ -1,7 +1,7 @@
 """Convert active lab QMD sources into student-facing Colab notebooks.
 
 The converter preserves the QMD as the source of truth, creates one notebook cell
-per instructional phase, converts relative data paths to DATA_ROOT, and inserts
+per instructional phase, converts relative data paths to data_dir, and inserts
 the response/check cells that make the lab usable in class.
 """
 
@@ -11,7 +11,7 @@ import json
 import re
 from pathlib import Path
 
-from colab_data_setup import build_setup
+from colab_data_setup import build_common_imports, build_simple_setup
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,7 +23,7 @@ DATA_GROUPS = {
     "01": ["camera_traps"],
     "02": ["dynasent"],
     "03": ["cfpb"],
-    "04": ["camera_traps", "nhanes"],
+    "04": ["camera_traps"],
     "05": ["cfpb"],
     "06": ["cfpb"],
     "09": ["cfpb"],
@@ -32,60 +32,46 @@ DATA_GROUPS = {
     "12": ["designed_eval"],
 }
 
-WORKFLOW = """## How this Colab lab works
+WORKFLOW = """## How this lab works
 
-Use one shared team copy. One person is the **driver** and runs code; the other is the **statistical navigator** and checks the unit, denominator, split, and claim. Switch roles at the marked handoff.
+Labs are not graded. Work with a classmate or on your own, whichever helps you more.
 
-1. Record the individual prediction before revealing output.
-2. Run the instructor example.
-3. Modify the supplied code with your partner.
-4. Run the supplied structural check.
-5. Inspect actual images or text when requested.
-6. Write the independent handoff in your own words.
-
-The notebook file is shared; each collaborator's temporary Colab runtime is not. Avoid two people executing different versions simultaneously. Save the notebook before switching drivers.
+1. Run the setup cells below.
+2. Follow along as the instructor works through the example.
+3. Change the code when the lab asks you to, and write short answers where you see TODO.
+4. Save a copy before you leave. Most labs set up that week's homework, and you can reuse the code.
 """
 
-PREDICTION = """### Individual response — before running output
+PREDICTION = """### Your prediction
 
-TODO: record your prediction, estimand/unit, or design choice in 1–3 sentences.
+TODO: before running the code, write what you expect in 1-2 sentences.
 """
 
-PAIR_RESPONSE = """### Pair record
+PAIR_RESPONSE = """### What you found
 
-**Driver:** TODO  
-**Statistical navigator:** TODO  
-**Result/check:** TODO  
-**What the result supports—and does not:** TODO
+TODO: the result, and what it does and does not support.
 """
 
-HANDOFF = """### Independent handoff
-
-Write this individually before discussing wording with your partner.
+HANDOFF = """### Your handoff
 
 TODO
 """
 
-DISCUSSION_RESPONSE = """### Individual discussion response
-
-Write your own answer before comparing wording with your partner.
+DISCUSSION_RESPONSE = """### Discussion notes
 
 TODO
 """
 
-EXIT_RESPONSE = """### Exit-ticket response
+EXIT_RESPONSE = """### Exit ticket
 
 TODO
 """
 
-FINAL = """## Before leaving
+FINAL = """## Before you leave
 
-- [ ] The notebook runs in order through the required handoff.
-- [ ] Denominators, units, and evaluated population are visible.
-- [ ] Required image/text cases are displayed rather than merely described.
-- [ ] The driver and navigator switched at least once.
-- [ ] Each person wrote the independent handoff.
-- [ ] The named artifact was saved for the homework or project.
+- [ ] The notebook runs from top to bottom.
+- [ ] You wrote the handoff answer.
+- [ ] You saved a copy. You will reuse its code in the homework or project.
 """
 
 
@@ -127,7 +113,7 @@ def parse_qmd(body: str) -> list[tuple[str, str]]:
         source = re.sub(r"^#\|\s*eval:\s*false\s*\n", "", match.group(1))
         source = re.sub(
             r"(['\"])\.\./\.\./data/([^'\"]+)\1",
-            lambda m: f'DATA_ROOT / "{m.group(2)}"',
+            lambda m: f'data_dir / "{m.group(2)}"',
             source,
         )
         blocks.append(("code", source.strip()))
@@ -138,7 +124,12 @@ def parse_qmd(body: str) -> list[tuple[str, str]]:
 
 def build_lab(qmd: Path, week: str) -> dict:
     title, body = front_matter(qmd.read_text())
-    cells = [md(f"# {title}\n"), md(WORKFLOW), code(build_setup(DATA_GROUPS[week]))]
+    cells = [
+        md(f"# {title}\n"),
+        md(WORKFLOW),
+        code(build_simple_setup(DATA_GROUPS[week])),
+        code(build_common_imports()),
+    ]
     current_heading = ""
     response_added: set[str] = set()
 

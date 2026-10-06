@@ -80,7 +80,7 @@ predict which split will put a similarity group in both sets.
 #| eval: false
 from sklearn.model_selection import train_test_split
 
-cfpb_root = DATA_ROOT / "cfpb"
+cfpb_root = data_dir / "cfpb"
 complaints = pd.read_csv(cfpb_root / "complaints.csv")
 complaints["date_received"] = pd.to_datetime(complaints["date_received"])
 assert complaints["complaint_id"].is_unique
