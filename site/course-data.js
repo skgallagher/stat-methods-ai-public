@@ -75,7 +75,7 @@ const weeklyMaterials = [
   { week: 12, dates: "Apr 6 / 8", publishDate: "2027-04-04", topic: "LLM judges as measurement instruments", note: "Project Milestone 2 due Apr 6" },
   { week: 13, dates: "Apr 13", publishDate: "2027-04-11", topic: "Human-centered and responsible AI", note: "Guest lecture Tue · no class Thu (Spring Carnival)" },
   { week: 14, dates: "Apr 20 / 22", publishDate: "2027-04-18", topic: "Statistical argument and recommendation", note: "Ending artifact due Apr 20" },
-  { week: 15, dates: "Apr 27 / 29", publishDate: "2027-04-25", topic: "Oral defenses and course synthesis", note: "Video due Apr 25 · report due Apr 30" }
+  { week: 15, dates: "Apr 27 / 29", publishDate: "2027-04-25", topic: "Oral defenses and course synthesis", note: "Video and slides due Apr 25" }
 ];
 
 const projectDocs = [

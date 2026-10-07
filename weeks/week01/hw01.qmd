@@ -32,15 +32,23 @@ For $0<q<1$, the logit function is $\operatorname{logit}(q)=\log\{q/(1-q)\}$. Th
 
 Each numbered item is a separate grading checkpoint. Show your setup and intended next step; correct partial work can earn substantial credit.
 
-a. **Bernoulli likelihood and intercept (13 points).** Let $Y_1,\ldots,Y_n$ be independent $\operatorname{Bernoulli}(p)$ observations and let $k=\sum_{i=1}^nY_i$.
+a. **Bernoulli likelihood, the intercept, and its standard error (13 points).** Let $Y_1,\ldots,Y_n$ be independent $\operatorname{Bernoulli}(p)$ observations and let $k=\sum_{i=1}^nY_i$, with $0<k<n$.
 
-   **(i) Likelihood setup (3 points).** For $0<k<n$, write the likelihood $L(p)$ and log-likelihood $\ell(p)$, simplifying both in terms of $k$ and $n$.
+   **(i) Likelihood setup (2 points).** Write the likelihood $L(p)$ and log-likelihood $\ell(p)$, simplifying both in terms of $k$ and $n$.
 
-   **(ii) Maximize over $p$ (5 points).** Differentiate $\ell(p)$, solve the score equation for $p$, and justify that $\widehat p=k/n$ is a maximum using the second derivative or another clear argument.
+   **(ii) Maximize over $p$ (3 points).** Set the derivative of $\ell(p)$ equal to zero and solve for $p$. Use the second derivative to show that $\widehat p=k/n$ is a maximum.
 
-   **(iii) Transform to an intercept (3 points).** If $p=\sigma(\beta_0)$, use the inverse relationship above to derive the MLE of $\beta_0$.
+   **(iii) Transform to an intercept (1 point).** In an intercept-only logistic regression, $p=\sigma(\beta_0)$, so $\beta_0=\operatorname{logit}(p)$. Write the MLE $\widehat\beta_0$.
 
-   **(iv) Check the endpoints (2 points).** Explain what happens to the finite MLE of $\beta_0$ when $k=0$ and when $k=n$.
+   **(iv) Standard error by the delta method (4 points).** You know $\operatorname{Var}(\widehat p)=p(1-p)/n$. The delta method says that for a smooth function $g$,
+   $$\operatorname{Var}\{g(\widehat p)\}\approx g'(p)^2\operatorname{Var}(\widehat p).$$
+   Show that the derivative of $\operatorname{logit}(p)$ is $1/\{p(1-p)\}$. Then show that
+   $$\operatorname{SE}(\widehat\beta_0)\approx\frac{1}{\sqrt{n\,\widehat p(1-\widehat p)}},$$
+   where you plug in $\widehat p$ for $p$ at the end.
+
+   **(v) Numbers, an interval, and the endpoints (3 points).** Suppose $k=36$ of $n=40$. Compute $\widehat\beta_0$ and its standard error. Form the 95% interval $\widehat\beta_0\pm1.96\,\operatorname{SE}$ for $\beta_0$, then apply $\sigma$ to both endpoints to get an interval for $p$. In one sentence, say what happens to $\widehat\beta_0$ and its standard error as $k$ approaches $0$ or $n$.
+
+   *Optional check.* An intercept-only logistic regression in `statsmodels` on 36 ones and 4 zeros reports the same estimate and standard error.
 
 b. **No-hidden-layer network and logistic regression (13 points).** Consider a sigmoid network with no hidden layer,
 
@@ -56,19 +64,19 @@ $$-\sum_{i=1}^n\left\{y_i\log(\widehat p_i)+(1-y_i)\log(1-\widehat p_i)\right\},
 
    **(iii) Separate architecture from fitting (4 points).** Give one architecture change that breaks equality of the model classes and one fitting change that can make the fitted coefficients differ from the unpenalized MLE. For each change, state which equivalence it breaks.
 
-c. **Perceptron boundary (10 points).** A perceptron uses the score
+c. **Decision boundary and cutoff (10 points).** A fitted logistic regression is
 
-$$s(x)=-1+2x_1-x_2$$
+$$\widehat p(x)=\sigma(-1+2x_1-x_2),$$
 
-and predicts $\widehat y=\mathbf 1\{s(x)>0\}$.
+and the rule predicts 1 when $\widehat p(x)\ge c$.
 
-   **(i) Boundary equation (2 points).** Set $s(x)=0$ and write the decision boundary as an equation for $x_2$ in terms of $x_1$.
+   **(i) Boundary equation (2 points).** At $c=0.5$, show that the rule predicts 1 exactly when $-1+2x_1-x_2\ge0$. Write the decision boundary as an equation for $x_2$ in terms of $x_1$.
 
    **(ii) Draw and label (3 points).** Draw the boundary on labeled $x_1$ and $x_2$ axes and clearly label the side classified as 1. You may draw it on the computer or insert a clear photo of a hand-drawn graph in the notebook.
 
-   **(iii) Classify and place three points (3 points).** Compute the score and classification for $(0,0)$, $(1,0)$, and $(1,1)$, and add the three labeled points to your drawing. Note any point on the boundary and apply the strict inequality carefully.
+   **(iii) Classify and place three points (3 points).** Compute $\widehat p$ and the classification at $c=0.5$ for $(0,0)$, $(1,0)$, and $(1,1)$, and add the three labeled points to your drawing. Note any point on the boundary.
 
-   **(iv) Positive rescaling (2 points).** Explain what happens to the boundary and classifications if every coefficient, including the intercept, is multiplied by a positive constant.
+   **(iv) Move the cutoff (2 points).** Raise the cutoff to $c=0.8$. Find the new boundary, add it to your drawing, and explain in one sentence what changed and what did not.
 
 d. **Bias, variance, and flexibility (14 points).** Fix a feature vector $x$. Let $p(x)=\Pr(Y=1\mid X=x)$ and let $\widehat p_D(x)$ be an estimated probability fitted using a random training dataset $D$. Assume the new response $Y$ and $D$ are conditionally independent given $x$.
 

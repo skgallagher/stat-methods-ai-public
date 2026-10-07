@@ -118,3 +118,20 @@
 .reveal .sequence-frame p {
   margin: 0.15em 0 0;
 }
+
+.reveal .compact-table table {
+  font-size: 0.70em;
+}
+
+.reveal .compact-table table td,
+.reveal .compact-table table th {
+  padding: 0.20em 0.32em;
+}
+
+.reveal th {
+  color: var(--course-accent-dark);
+}
+
+.reveal .vote-list li {
+  margin: 0.15em 0;
+}

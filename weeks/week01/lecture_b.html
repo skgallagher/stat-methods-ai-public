@@ -10,7 +10,7 @@
   <meta name="generator" content="quarto-1.9.38">
 
   <meta name="author" content="Shannon Gallagher">
-  <title>Week 1B: What Exactly Are We Comparing?</title>
+  <title>Week 1B: How Models Are Fit, and What We Compare</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -34,9 +34,27 @@
   </style>
   <link rel="stylesheet" href="lecture_b_files/libs/revealjs/dist/theme/quarto-0427d8d92a431aa6a6430e53ec02a470.css">
   <link rel="stylesheet" href="lecture.css">
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
   <link href="lecture_b_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="lecture_b_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="lecture_b_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="lecture_b_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="lecture_b_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
   <link href="lecture_b_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
     .reveal div.sourceCode {
@@ -131,8 +149,8 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Week 1B: What Exactly Are We Comparing?</h1>
-  <p class="subtitle">Lecture bridge and guided lab</p>
+  <h1 class="title">Week 1B: How Models Are Fit, and What We Compare</h1>
+  <p class="subtitle">Statistical Evaluation of AI</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -143,86 +161,46 @@ Shannon Gallagher
 </div>
 
 </section>
-<section id="today" class="slide level2">
+<section id="today" class="slide level2 smaller">
 <h2>Today</h2>
 <ol type="1">
-<li>Probability output versus action</li>
-<li>Floors and transparent baselines</li>
-<li>Frames, sequences, and cameras</li>
-<li>Guided Lab 1</li>
+<li>How statistics and ML fit the same model, and why they stop in different places.</li>
+<li>How precise an estimate is: curvature and the delta method.</li>
+<li>What exactly we compare in the lab.</li>
 </ol>
+<p>Then the lab.</p>
 </section>
-<section id="a-probability-is-not-an-action" class="slide level2">
-<h2>A probability is not an action</h2>
-<p>For one frame, a model provides <span class="math inline">\(\widehat p(\text{animal present})\)</span>.</p>
-<p>The analyst still chooses:</p>
+<section id="fitting-means-searching" class="slide level2 smaller">
+<h2>Fitting means searching</h2>
+<p>Logistic regression and a neural network both minimize the same loss: the negative log-likelihood, which ML calls binary cross-entropy. With features, there is no formula for the answer like <span class="math inline">\hat p = k/n</span>. We search for the minimum.</p>
+<div id="aec09b40" class="cell" data-fig-height="2.8" data-fig-width="9" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_b_files/figure-revealjs/cell-2-output-1.png" width="855" height="260"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>At each guess, the <strong>derivative</strong> of the loss, the slope of the tangent line, says which way is downhill and how steep it is.</p>
+</section>
+<section id="two-ways-to-search" class="slide level2 smaller">
+<h2>Two ways to search</h2>
 <ul>
-<li>threshold;</li>
-<li>relative error costs;</li>
-<li>whether uncertain cases receive human review;</li>
-<li>which population the rule is intended for.</li>
+<li><strong>Gradient descent</strong>, the ML default: take a small step downhill, sized by the slope. Repeat. <span class="math inline">\;\beta_{\text{new}} = \beta - \eta\, L'(\beta)</span></li>
+<li><strong>Newton–Raphson</strong>, the statistics default: use the slope and the curvature to jump to the bottom of the local parabola. <span class="math inline">\;\beta_{\text{new}} = \beta - L'(\beta)/L''(\beta)</span></li>
 </ul>
-<p>We will evaluate the probability model before pretending the action is settled.</p>
-</section>
-<section id="three-reference-points" class="slide level2">
-<h2>Three reference points</h2>
-<ol type="1">
-<li><strong>Observed majority-class reference:</strong> what fraction would be correct if we chose the more common label in this displayed split after seeing its labels?</li>
-<li><strong>Logistic baseline:</strong> what do documented simple summaries explain?</li>
-<li><strong>Provided AI system:</strong> what does the flexible representation add?</li>
-</ol>
-<p>The first quantity describes class balance; it is not a fitted, deployable rule. A headline AI score without simple reference points has no scale.</p>
-</section>
-<section id="one-file-several-units" class="slide level2 smaller">
-<h2>One file, several units</h2>
-<table class="caption-top">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Question</th>
-<th>Relevant unit</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>What is scored and counted in accuracy?</td>
-<td>frame</td>
-</tr>
-<tr class="even">
-<td>Which observations are dependent?</td>
-<td>trigger sequence</td>
-</tr>
-<tr class="odd">
-<td>What defines the protected split and new-location target?</td>
-<td>camera location</td>
-</tr>
-</tbody>
-</table>
-<p>Today we pool accuracy over frames, so cameras are weighted by their frame counts. The split follows the claim, not the convenience of a random-number generator.</p>
-</section>
-<section id="three-frames-are-not-three-independent-scenes" class="slide level2 smaller">
-<h2>Three frames are not three independent scenes</h2>
-<div class="columns">
-<div class="column sequence-frame" style="width:33%;">
-<p><img data-src="assets/cct_bobcat_sequence_frame1.jpg" alt="Bobcat entering a rocky creek bed in the first frame of a camera-trap sequence"></p>
-<p><strong>Frame 1 · 7:49:26</strong></p>
-</div><div class="column sequence-frame" style="width:33%;">
-<p><img data-src="assets/cct_bobcat_sequence_frame2.jpg" alt="Bobcat moving up the same rocky creek bed one second later"></p>
-<p><strong>Frame 2 · 7:49:27</strong></p>
-</div><div class="column sequence-frame" style="width:33%;">
-<p><img data-src="assets/cct_bobcat_sequence_frame3.jpg" alt="Bobcat farther up the same rocky creek bed two seconds after the first frame"></p>
-<p><strong>Frame 3 · 7:49:28</strong></p>
-</div></div>
-<p>Same camera, same trigger sequence, nearly the same background. A random frame split can put this shared scene on both sides of the evaluation.</p>
+<div id="ca585f1e" class="cell" data-fig-height="2.7" data-fig-width="9" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_b_files/figure-revealjs/cell-3-output-1.png" width="864" height="245"></p>
+</figure>
+</div>
+</div>
+</div>
 <aside class="notes">
-<p>[Sources]</p>
-<ul>
-<li>Caltech Camera Traps, LILA BC: https://lila.science/datasets/caltech-camera-traps (Community Data License Agreement—Permissive).</li>
-<li>Frozen Week 1 release images <code>cct0127</code>–<code>cct0129</code>; official source files <code>598f7899-23d2-11e8-a6a3-ec086b02610b.jpg</code>, <code>5a23108e-23d2-11e8-a6a3-ec086b02610b.jpg</code>, and <code>597e6333-23d2-11e8-a6a3-ec086b02610b.jpg</code>; sequence <code>701ebda8-5567-11e8-ae8b-dca9047ef277</code>, category <code>bobcat</code>, location <code>39</code>.</li>
-</ul>
+<p>Both start at 0, the usual default. Newton is fast but can overshoot from a bad start: from β₀ = −2 on this problem it jumps past the minimum and diverges. Software adds safeguards such as step halving. Gradient descent is slow but cheap per step, which matters when there are millions of weights.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -235,66 +213,209 @@ Shannon Gallagher
           display:block!important;
       }</style></aside>
 </section>
-<section id="paired-correctness-keeps-the-cases-aligned" class="slide level2">
-<h2>Paired correctness keeps the cases aligned</h2>
-<p>Two email-routing systems see the same 100 messages:</p>
+<section id="converged-or-close-enough" class="slide level2 smaller">
+<h2>Converged, or close enough?</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Statistics</th>
+<th>Machine learning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Typical method</td>
+<td>Newton–Raphson (what <code>glm</code> and <code>statsmodels</code> use)</td>
+<td>gradient descent on random batches of data</td>
+</tr>
+<tr class="even">
+<td>Stops when</td>
+<td>the estimate stops changing</td>
+<td>held-out error stops improving, or time runs out</td>
+</tr>
+<tr class="odd">
+<td>Ends at</td>
+<td>the MLE</td>
+<td>close to a minimum, not exactly the MLE</td>
+</tr>
+<tr class="even">
+<td>Standard errors</td>
+<td>from the curvature at the MLE</td>
+<td>not routinely computed</td>
+</tr>
+</tbody>
+</table>
+<p>Statistics goes all the way to the optimum, because the theory behind standard errors and tests lives there. ML stops when it is close enough. With millions of weights the exact minimum is out of reach, and stopping early keeps a network from fitting noise.</p>
+</section>
+<section id="curvature-gives-the-standard-error" class="slide level2 smaller">
+<h2>Curvature gives the standard error</h2>
+<p>A sharply curved log-likelihood pins the estimate down. A flat one does not.</p>
+<div id="54eba6b4" class="cell" data-fig-height="2.3" data-fig-width="9" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_b_files/figure-revealjs/cell-4-output-1.png" width="854" height="211"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><span class="math display">\operatorname{SE}(\hat\theta) \approx \frac{1}{\sqrt{-\ell''(\hat\theta)}}.</span></p>
+<p><strong>Check with <span class="math inline">p</span>.</strong> At <span class="math inline">\hat p = k/n</span>, <span class="math inline">-\ell''(\hat p) = n/\{\hat p(1-\hat p)\}</span>, so <span class="math inline">\operatorname{SE}(\hat p) = \sqrt{\hat p(1-\hat p)/n}</span>: the formula you already know. This is where the standard errors in <code>summary()</code> come from.</p>
+</section>
+<section id="how-precise-is-a-function-of-hat-p" class="slide level2 smaller">
+<h2>How precise is a function of <span class="math inline">\hat p</span>?</h2>
+<p>Curvature gave us the precision of <span class="math inline">\hat p</span>:</p>
+<p><span class="math display">\operatorname{SE}(\hat p) = \sqrt{\frac{\hat p(1-\hat p)}{n}}.</span></p>
+<p>But we often report a <strong>function</strong> of <span class="math inline">\hat p</span>, such as Tuesday’s odds <span class="math inline">\hat p/(1-\hat p)</span>, or the log-odds <span class="math inline">\operatorname{logit}(\hat p)</span>, which is the logistic regression intercept <span class="math inline">\hat\beta_0</span>.</p>
+<p>How precise are those?</p>
+</section>
+<section id="the-idea-zoom-in-until-the-curve-is-a-line" class="slide level2 smaller">
+<h2>The idea: zoom in until the curve is a line</h2>
+<div id="c4c0ea78" class="cell" data-fig-height="3" data-fig-width="9" data-execution_count="4">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_b_files/figure-revealjs/cell-5-output-1.png" width="844" height="279"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The same tangent-line idea we used to fit. Near <span class="math inline">\hat p</span>, the curve is almost its tangent line, and the tangent stretches the spread of <span class="math inline">\hat p</span> by the derivative <span class="math inline">g'(\hat p)</span>:</p>
+<p><span class="math display">\operatorname{SE}\{g(\hat p)\} \approx |g'(\hat p)|\;\operatorname{SE}(\hat p).</span></p>
+<p>This is the <strong>delta method</strong>.</p>
+<p class="compact-note">
+The formal version expands around the true p: g(p̂) ≈ g(p) + g′(p)(p̂ − p), so Var{g(p̂)} ≈ g′(p)² p(1 − p)/n.&nbsp;In practice we plug in p̂.
+</p>
+</section>
+<section id="worked-example-the-odds" class="slide level2 smaller">
+<h2>Worked example: the odds</h2>
+<p>With 70 animal photos out of 100, <span class="math inline">\hat p = 0.7</span> and <span class="math display">\operatorname{SE}(\hat p) = \sqrt{\frac{0.7 \times 0.3}{100}} = 0.046.</span></p>
+<ol type="1">
+<li><strong>Estimate.</strong> The odds are <span class="math inline">0.7/0.3 = 2.33</span>, about 7 animal photos for every 3 empty ones.</li>
+<li><strong>Derivative.</strong> For <span class="math inline">g(p) = p/(1-p)</span>, <span class="math inline">g'(p) = 1/(1-p)^2</span>. The tangent to the curve at <span class="math inline">\hat p = 0.7</span> has <span class="math inline">g'(0.7) = 1/0.3^2 = 11.1</span>.</li>
+<li><strong>Standard error.</strong> Multiply the derivative by <span class="math inline">\operatorname{SE}(\hat p)</span>: <span class="math inline">11.1 \times 0.046 = 0.51</span>.</li>
+</ol>
+<p>In HW1 you do the same for the intercept <span class="math inline">\hat\beta_0 = \operatorname{logit}(\hat p)</span>.</p>
+<p class="compact-note">
+Standard errors return in force in Week 4, when we ask how precise a benchmark score is.
+</p>
+</section>
+<section id="remember-tuesdays-bobcat" class="slide level2 smaller">
+<h2>Remember Tuesday’s bobcat?</h2>
+<div class="columns">
+<div class="column sequence-frame" style="width:33%;">
+<p><img data-src="assets/cct_bobcat_sequence_frame1.jpg" alt="Bobcat entering a rocky creek bed in the first frame of a camera-trap burst"></p>
+<p><strong>Photo 1 · 7:49:26</strong></p>
+</div><div class="column sequence-frame" style="width:33%;">
+<p><img data-src="assets/cct_bobcat_sequence_frame2.jpg" alt="Bobcat moving up the same rocky creek bed one second later"></p>
+<p><strong>Photo 2 · 7:49:27</strong></p>
+</div><div class="column sequence-frame" style="width:33%;">
+<p><img data-src="assets/cct_bobcat_sequence_frame3.jpg" alt="Bobcat farther up the same rocky creek bed two seconds after the first photo"></p>
+<p><strong>Photo 3 · 7:49:28</strong></p>
+</div></div>
+<p>The camera took three photos in three seconds. They are nearly the same picture.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Question</th>
+<th>Unit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>What does accuracy count?</td>
+<td>a photo</td>
+</tr>
+<tr class="even">
+<td>Which photos are not independent?</td>
+<td>the three in a burst</td>
+</tr>
+<tr class="odd">
+<td>What do we hold out to test on?</td>
+<td>whole cameras</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>Sources: Caltech Camera Traps, LILA BC (Community Data License Agreement, Permissive). Course images cct0127 to cct0129; sequence 701ebda8-5567-11e8-ae8b-dca9047ef277, category bobcat, location 39.</p>
+<p>If photos were split at random, two photos of this bobcat could land in training and the third in testing. The model would be tested on a scene it has already seen, which makes it look better than it will at a new camera. The lab shows this.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="three-reference-points" class="slide level2 smaller">
+<h2>Three reference points</h2>
+<p>An AI accuracy of 90% means little until you know what simpler approaches get. In the lab we compare three things on the same photos:</p>
+<ol type="1">
+<li><strong>Always guess the more common label.</strong> If half the photos are empty, always saying “empty” is right half the time.</li>
+<li><strong>A simple model.</strong> Logistic regression on brightness, color, and edges.</li>
+<li><strong>The AI.</strong> MegaDetector’s probabilities, turned into calls with a cutoff.</li>
+</ol>
+</section>
+<section id="compare-on-the-same-photos" class="slide level2 smaller">
+<h2>Compare on the same photos</h2>
+<p>Two models sort the same 100 photos:</p>
 <table class="caption-top">
 <thead>
 <tr class="header">
 <th></th>
-<th style="text-align: right;">AI correct</th>
+<th style="text-align: right;">AI right</th>
 <th style="text-align: right;">AI wrong</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Baseline correct</td>
+<td><strong>Simple model right</strong></td>
 <td style="text-align: right;">68</td>
 <td style="text-align: right;">9</td>
 </tr>
 <tr class="even">
-<td>Baseline wrong</td>
+<td><strong>Simple model wrong</strong></td>
 <td style="text-align: right;">15</td>
 <td style="text-align: right;">8</td>
 </tr>
 </tbody>
 </table>
-<p>The four cells are mutually exclusive and sum to 100. The two accuracies are descriptive summaries; the discordant cells, 9 and 15, show where the systems differ on the same messages. Formal comparison waits until Week 5.</p>
+<p>The simple model is right on 77 and the AI on 83. The interesting photos are the ones where they disagree: 9 that only the simple model got right and 15 that only the AI got right. Whether 15 versus 9 is a real difference waits until Week 5.</p>
 </section>
-<section id="a-case-gallery-is-diagnostic-not-representative" class="slide level2 smaller">
-<h2>A case gallery is diagnostic, not representative</h2>
-<p>A locked rule selects one reproducibly random error and one highest-confidence error per system before any case is displayed.</p>
+<section id="which-mistakes-should-we-look-at" class="slide level2 smaller">
+<h2>Which mistakes should we look at?</h2>
+<p>Looking at errors is how you learn what a model gets wrong. But if you browse until something looks interesting, you will find a story every time.</p>
 <ul>
-<li>This prevents browsing until a persuasive example appears.</li>
-<li>The selected cases can reveal a plausible mechanism or useful contrast.</li>
-<li>Four purposively selected errors cannot estimate how common a pattern is.</li>
+<li>Pick the errors by a rule set in advance: one random error and the most confident error for each model.</li>
+<li>What you see can suggest <em>why</em> a model fails.</li>
+<li>Four hand-picked errors cannot tell you how <em>common</em> that failure is.</li>
 </ul>
 </section>
-<section id="worked-example-an-ambitious-extension" class="slide level2 smaller">
-<h2>Worked example: an ambitious extension</h2>
-<p>An email-routing study locks logistic regression and obtains held-out accuracy <span class="math inline">\(0.78\)</span>. After seeing it, an AI assistant proposes a random forest, which scores <span class="math inline">\(0.84\)</span> on the same holdout.</p>
+<section id="an-extra-model-after-the-fact" class="slide level2 smaller">
+<h2>An extra model, after the fact</h2>
+<p>In HW1 you try one bigger change with AI help, such as a nonlinear model or a new feature. Suppose the simple model gets 0.78 on the held-out cameras. After seeing that, an AI suggests a random forest, which gets 0.84 on the same cameras.</p>
 <ul>
-<li>The random forest result is a reproducible <strong>exploratory extension</strong>.</li>
-<li>It is not clean confirmation because model choice used the holdout.</li>
-<li>It cannot replace the locked primary comparison without new untouched data.</li>
-<li>A lower score could still reveal a useful failure mode.</li>
+<li>It is worth reporting, as exploration.</li>
+<li>It is not a fair win, because you chose it after seeing the held-out data.</li>
+<li>Confirming it would take new photos that neither model has seen.</li>
 </ul>
+<p>You earn the points for a real attempt, shown honestly, whether or not it does better.</p>
 </section>
-<section id="how-the-ambitious-attempt-earns-credit" class="slide level2">
-<h2>How the ambitious attempt earns credit</h2>
-<ol type="1">
-<li>Make a substantial change, not a cosmetic rewrite.</li>
-<li>Keep the official data split and primary analysis visible.</li>
-<li>Preserve the prompt, code, output, and any failure.</li>
-<li>State exactly what the extension does—and does not—establish.</li>
-</ol>
-<p>Improvement is not part of the rubric.</p>
-</section>
-<section id="todays-lab" class="slide level2">
+<section id="todays-lab" class="slide level2 smaller">
 <h2>Today’s lab</h2>
 <ol type="1">
 <li>Name the four pieces for the wildlife team.</li>
-<li>Look at random photos and one full sequence.</li>
+<li>Look at random photos and one full burst.</li>
 <li>Fit the simple model and compare it with the AI on new cameras.</li>
 <li>See what changes if photos are split at random.</li>
 <li>Choose mistakes by a rule, then look at them.</li>
@@ -304,15 +425,8 @@ Shannon Gallagher
 </section>
 <section id="hw1-handoff" class="slide level2 smaller">
 <h2>HW1 handoff</h2>
-<p>You may reuse:</p>
-<ul>
-<li>data loader;</li>
-<li>documented feature list;</li>
-<li>baseline fit;</li>
-<li>paired-table code.</li>
-</ul>
-<p>You independently analyze new cameras, select errors reproducibly, and audit an AI explanation of split leakage.</p>
-<p>The final five points require one ambitious AI-assisted baseline extension. It remains exploratory even if its held-out score is higher.</p>
+<p>From the lab you can reuse the data loader, the photo features, the logistic regression fit, and the paired-table code.</p>
+<p>On your own, you analyze the homework cameras, pick errors by the rule, and check an AI’s explanation of why a random split can make a model look better than it is.</p>
 
 </section>
     </div>
@@ -329,13 +443,13 @@ Shannon Gallagher
   <script src="lecture_b_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
   <script src="lecture_b_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
   <script src="lecture_b_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="lecture_b_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
   <script src="lecture_b_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
   <script src="lecture_b_files/libs/revealjs/plugin/notes/notes.js"></script>
   <script src="lecture_b_files/libs/revealjs/plugin/search/search.js"></script>
   <script src="lecture_b_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="lecture_b_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
@@ -350,7 +464,8 @@ Shannon Gallagher
 'autoAnimateDuration': 1,
 'autoAnimateUnmatched': true,
 'jumpToSlide': true,
-'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
 'smaller': false,
  
         // Display controls in the bottom right corner
@@ -503,27 +618,9 @@ Shannon Gallagher
         // Factor of the display size that should remain empty around the content
         margin: 0.1,
 
-        math: {
-          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
-          config: 'TeX-AMS_HTML-full',
-          tex2jax: {
-            inlineMath: [['\\(','\\)']],
-            displayMath: [['\\[','\\]']],
-            balanceBraces: true,
-            processEscapes: false,
-            processRefs: true,
-            processEnvironments: true,
-            preview: 'TeX',
-            skipTags: ['script','noscript','style','textarea','pre','code'],
-            ignoreClass: 'tex2jax_ignore',
-            processClass: 'tex2jax_process'
-          },
-        },
-
         // reveal.js plugins
-        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
 
-          RevealMath,
           RevealNotes,
           RevealSearch,
           RevealZoom

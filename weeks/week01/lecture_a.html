@@ -10,7 +10,7 @@
   <meta name="generator" content="quarto-1.9.38">
 
   <meta name="author" content="Shannon Gallagher">
-  <title>Week 1A: From Regression to Neural Networks</title>
+  <title>Statistical Evaluation of AI</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -34,9 +34,27 @@
   </style>
   <link rel="stylesheet" href="lecture_a_files/libs/revealjs/dist/theme/quarto-0427d8d92a431aa6a6430e53ec02a470.css">
   <link rel="stylesheet" href="lecture.css">
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
   <link href="lecture_a_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="lecture_a_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="lecture_a_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="lecture_a_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="lecture_a_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
   <link href="lecture_a_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
     .reveal div.sourceCode {
@@ -131,8 +149,8 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Week 1A: From Regression to Neural Networks</h1>
-  <p class="subtitle">Statistical continuity—and what changes</p>
+  <h1 class="title">Statistical Evaluation of AI</h1>
+  <p class="subtitle">Week 1A · Use statistics for AI and AI for statistics</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -143,255 +161,205 @@ Shannon Gallagher
 </div>
 
 </section>
-<section id="the-course-in-one-sentence" class="slide level2">
-<h2>The course in one sentence</h2>
-<p>We work as <strong>statisticians studying AI systems</strong>—and use AI tools as assistants whose work also requires evaluation.</p>
-<p>By the final project, every team must answer:</p>
-<blockquote>
-<p>What does the evidence support, for which population, under which assumptions, and what should the client do?</p>
-</blockquote>
+<section id="use-statistics-for-ai-and-ai-for-statistics" class="slide level2">
+<h2>Use statistics for AI and AI for statistics</h2>
+<p>That is this course in one line. Each half is a question.</p>
+<ul>
+<li><strong>Statistics for AI.</strong> Someone says an AI system works. How would we know?</li>
+<li><strong>AI for statistics.</strong> An AI tool did part of our analysis. How do we know it is right?</li>
+</ul>
+<p><strong>What do you think?</strong></p>
+<aside class="notes">
+<p>Take three or four answers and write them on the next slide. Do not resolve it yet. The opening comes back to this after the sepsis example.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="the-five-stage-workflow" class="slide level2">
-<h2>The five-stage workflow</h2>
+<section class="slide level2">
+
+<aside class="notes">
+<p>Blank slide for writing the class’s answers. Press C to draw on this slide, or B for a blackboard. Press the same key again to return.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="how-do-you-use-ai-for-data-work" class="slide level2 smaller">
+<h2>How do you use AI for data work?</h2>
+<p>Raise your hand if you have used an AI tool to</p>
+<ul>
+<li>write or fix code in Python, R, or SQL;</li>
+<li>clean or reshape a dataset;</li>
+<li>pick a statistical method or model;</li>
+<li>explain output you did not understand;</li>
+<li>write up results;</li>
+<li>do homework you were supposed to do yourself (no hands needed).</li>
+</ul>
+<aside class="notes">
+<p>After the hands, tell a story of AI being confidently wrong. Mine: I was sure there was a bug in my code. The AI told me over and over that it had checked the code itself and it was correct. There was a bug.</p>
+<p>Then ask for theirs. Typical ones: it invented a function or argument, fit the wrong model, misread a coefficient, or made up a citation. These set up the next slide.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="good-use-or-bad-use" class="slide level2 smaller">
+<h2>Good use or bad use?</h2>
+<p>Name a way to use AI for data work. Is it a good use, a bad use, or does it depend?</p>
+<aside class="notes">
+<p>Let the class generate the examples and write them on this slide (press C to draw). For each one, take a quick vote: good, bad, or it depends. Where the room splits, ask what would make it a good use.</p>
+<p>If the room is quiet, offer some of these:</p>
 <ol type="1">
-<li>Research question, hypotheses, and estimands</li>
-<li>EDA and data-quality assessment</li>
-<li>Modeling, inference, and evaluation</li>
-<li>Sensitivity analysis</li>
-<li>Decision, limitations, and future directions</li>
+<li>Ask an AI to fix a pandas error message.</li>
+<li>Paste in a dataset and ask, “What’s significant?”</li>
+<li>Ask it to explain what a logistic regression coefficient means.</li>
+<li>Ask it to write the conclusion of your analysis.</li>
+<li>Use it to label 10,000 images for training data.</li>
+<li>Ask it to write tests that check your data-cleaning code.</li>
+<li>Ask which model to use, then use that model.</li>
+<li>Ask it to summarize a paper you have not read, then cite the paper.</li>
 </ol>
-<p>Week 1 begins in Stage 3 because regression is already familiar. The rest of the course builds the study around it.</p>
+<p>Where these usually land: 1 and 6 are good because you can check them (the code runs, the tests pass). 3 is good if you check it against a source. 2 and 7 hand over the judgment. 4 depends on whether you could defend every sentence. 5 depends on checking a sample of the labels, which is Week 2. 8 is bad.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
 </section>
-<section id="breimans-two-cultures" class="slide level2">
-<h2>Breiman’s two cultures</h2>
+<section id="what-the-good-uses-have-in-common" class="slide level2 smaller">
+<h2>What the good uses have in common</h2>
+<div class="fragment">
+<ul>
+<li>You can <strong>check</strong> the output. The code runs, the test passes, or you know what a right answer looks like.</li>
+<li>A mistake is <strong>cheap to catch</strong> before it matters.</li>
+<li><strong>You</strong> still make the calls that need judgment: which question, which data, and what the result means.</li>
+</ul>
+</div>
+<div class="fragment">
+<p>The bad uses hand over the judgment and leave no way to check.</p>
+<p>That is the <strong>AI for statistics</strong> half of this course. Use AI where you can check it, and learn how to check it.</p>
+</div>
+</section>
+<section id="a-claim-to-check-a-sepsis-alarm" class="slide level2 smaller">
+<h2>A claim to check: a sepsis alarm</h2>
+<p>Sepsis is the body’s extreme response to an infection. At least 1 in 5 adults who develop it die in the hospital or are discharged to hospice. Finding and treating it early is linked to lower mortality.</p>
+<p>Epic, a major medical-records company, sells a model that scores each hospital patient’s risk of sepsis and alerts the staff. Hundreds of US hospitals use it. Epic and a partner health system reported an <strong>AUC between 0.76 and 0.83</strong>.</p>
+<p>Your hospital is deciding whether to turn the alerts on. <strong>What would you want to know first?</strong></p>
+<p class="compact-note">
+AUC is the chance the model gives a random patient with sepsis a higher score than a random patient without it. 0.5 is a coin flip, and 1 is perfect.<br> Sources: CDC, “About Sepsis” (cdc.gov/sepsis); Wong et al.&nbsp;(2021), JAMA Internal Medicine 181(8):1065–1070; Habib, Lin, and Grant (2021), JAMA Internal Medicine 181(8):1040–1041.
+</p>
+<aside class="notes">
+<p>Collect answers on the board (press C to write) and keep them; they become the five stages two slides from now. Steer toward: whose patients it was built and tested on; how sepsis was defined in the records; when each score was made relative to sepsis; how many real cases it catches; how often it alarms; how precise the numbers are; whether it beats what doctors and nurses already catch.</p>
+<p>Source details. CDC: “Sepsis is the body’s extreme response to an infection”; “At least 1 in 5 adults and 1 in 10 children who develop sepsis die during hospitalization or are discharged to hospice.” For scale if asked: about 1.7 million US adults develop sepsis each year and at least 350,000 of them die or go to hospice, roughly 0.1% of Americans and about 1 in 9 US deaths. These are deaths among people who had sepsis, many of whom were already very sick, so they are not all deaths caused by sepsis. Wong et al.: the model “is implemented at hundreds of US hospitals”; early detection and treatment “have been associated with a significant mortality benefit.” The 0.76 to 0.83 AUC was “jointly reported by Epic and University of Colorado Health” (Habib, Lin, and Grant editorial).</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-an-independent-check-found" class="slide level2 smaller">
+<h2>What an independent check found</h2>
+<p>Michigan Medicine ran the model on 38,455 hospitalizations, and 7% had sepsis. Counting only scores made <strong>before</strong> sepsis began,</p>
+<ul>
+<li>the AUC was <strong>0.63</strong> (95% CI 0.62 to 0.64);</li>
+<li>it <strong>missed two-thirds</strong> of the patients who had sepsis;</li>
+<li>it alerted on <strong>18% of all patients</strong>, and only about 1 alert in 8 was sepsis.</li>
+</ul>
+<div class="fragment">
+<p>Counting scores from up to 3 hours <strong>after</strong> sepsis began raised the AUC to <strong>0.80</strong>. An alarm that fires once sepsis is obvious looks accurate and helps no one.</p>
+<p>The model is a penalized <strong>logistic regression</strong>, the model we start with today.</p>
+</div>
+<p class="compact-note">
+Wong et al.&nbsp;(2021), “External validation of a widely implemented proprietary sepsis prediction model in hospitalized patients,” JAMA Internal Medicine 181(8):1065–1070 (corrected version).
+</p>
+<aside class="notes">
+<p>Point out the alert numbers: staff who get an alert on 18% of patients, mostly false, learn to ignore it. That is a decision cost, not just a metric.</p>
+<p>The 95% interval is narrow because the sample is large. The problem is not sampling uncertainty. It is which patients, how sepsis was defined, and when a prediction counts. The authors write that “the large difference in reported AUCs is likely due to our consideration of sepsis timing.” Counting predictions made after the outcome is already apparent is a form of leakage, which is Week 3.</p>
+<p>Source details from the corrected article: sensitivity 33%, specificity 83%, positive predictive value 12% at a score threshold of 6; 1,709 of 2,552 sepsis patients not identified (67%); alerts for 6,971 of 38,455 hospitalizations (18%). Measured over 4- to 24-hour prediction windows, the AUC was 0.72 to 0.76. The model was developed on about 405,000 encounters from 3 health systems, 2013 to 2015.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-two-halves-are-one-skill" class="slide level2 smaller">
+<h2>The two halves are one skill</h2>
+<p>Both halves ask the same question: <strong>how do you know it is right?</strong></p>
 <table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
 <thead>
 <tr class="header">
-<th>Data-modeling culture</th>
-<th>Algorithmic-modeling culture</th>
+<th></th>
+<th>Statistics for AI</th>
+<th>AI for statistics</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Specify a stochastic model</td>
-<td>Optimize predictive performance</td>
+<td>What we check</td>
+<td>a claim about an AI system</td>
+<td>work an AI tool did for us</td>
 </tr>
 <tr class="even">
-<td>Interpret parameters and assumptions</td>
-<td>Evaluate on held-out cases</td>
+<td>Example</td>
+<td>“AUC between 0.76 and 0.83”</td>
+<td>AI-written code that cleans our data</td>
 </tr>
 <tr class="odd">
-<td>Ask what generated the data</td>
-<td>Permit a complicated fitted function</td>
+<td>What we ask</td>
+<td>Which population? Measured how? How precise?</td>
+<td>Does it run? Is it right? Can I explain it?</td>
 </tr>
 </tbody>
 </table>
-<p>Our position is not to choose a team. It is to evaluate predictive systems with statistical discipline.</p>
+<p>The course has two goals that match. You will learn to evaluate claims about AI systems, and to use AI tools well without handing over your statistical judgment.</p>
 </section>
-<section id="start-with-the-model-you-know" class="slide level2 smaller">
-<h2>Start with the model you know</h2>
-<p><span class="math display">\[Y_i\mid x_i\sim\operatorname{Bernoulli}(p_i),\qquad
-\operatorname{logit}(p_i)=\beta_0+x_i^T\beta.\]</span></p>
-<p>This gives us three distinct pieces:</p>
-<ul>
-<li>a probability model with an explicit feature set;</li>
-<li>a likelihood and inferential assumptions;</li>
-<li>a decision rule only after a threshold is chosen.</li>
-</ul>
-<p>We use</p>
-<p><span class="math display">\[\sigma(z)=\frac{1}{1+e^{-z}},\qquad
-\operatorname{logit}(q)=\log\!\left\{\frac{q}{1-q}\right\}.\]</span></p>
-</section>
-<section id="the-bernoulli-likelihood-is-still-underneath" class="slide level2">
-<h2>The Bernoulli likelihood is still underneath</h2>
-<p>For independent binary outcomes with a common probability <span class="math inline">\(p\)</span> and <span class="math inline">\(k=\sum_i y_i\)</span>,</p>
-<p><span class="math display">\[L(p)=p^k(1-p)^{n-k},\qquad
-\ell(p)=k\log p+(n-k)\log(1-p).\]</span></p>
-<p>Differentiate:</p>
-<p><span class="math display">\[\ell'(p)=\frac{k}{p}-\frac{n-k}{1-p}
-=\frac{k-np}{p(1-p)}.\]</span></p>
-<p>The stationary point solves <span class="math inline">\(k-np=0\)</span>.</p>
-</section>
-<section id="the-intercept-only-mle" class="slide level2">
-<h2>The intercept-only MLE</h2>
-<p>Therefore <span class="math inline">\(\ell'(p)=0\)</span> implies <span class="math inline">\(\widehat p=k/n\)</span>, and</p>
-<p><span class="math display">\[\ell''(p)=-\frac{k}{p^2}-\frac{n-k}{(1-p)^2}&lt;0\]</span></p>
-<p>confirms the interior solution is a maximum. If <span class="math inline">\(p=\sigma(\beta_0)\)</span>, then <span class="math inline">\(\widehat\beta_0=\operatorname{logit}(k/n)\)</span>.</p>
-<p>At the endpoints, <span class="math inline">\(k=0\)</span> sends <span class="math inline">\(\widehat\beta_0\)</span> toward <span class="math inline">\(-\infty\)</span> and <span class="math inline">\(k=n\)</span> sends it toward <span class="math inline">\(+\infty\)</span>; there is no finite intercept MLE.</p>
-<p>Neural-network training will reuse this likelihood idea.</p>
-</section>
-<section id="no-hidden-layer-exactly-logistic-regression" class="slide level2 smaller">
-<h2>No hidden layer: exactly logistic regression</h2>
-<p><span class="math display">\[\widehat p_i=\sigma(w_0+x_i^Tw)\]</span></p>
-<p>implies</p>
-<p><span class="math display">\[\operatorname{logit}(\widehat p_i)=w_0+x_i^Tw.\]</span></p>
-<p>The logit is one linear function of the original features: the same model class as logistic regression. For Bernoulli outcomes,</p>
-<p><span class="math display">\[
--\ell(w_0,w)
-=-\sum_i\left\{y_i\log(\widehat p_i)
-+(1-y_i)\log(1-\widehat p_i)\right\}
-=\text{binary cross-entropy}.
-\]</span></p>
-<p>With the same data, no penalty, and full optimization, this sigmoid network and logistic regression fit the same model.</p>
-<aside class="notes">
-<p>Layer names are inconsistent across books. In this course, always say whether a hidden layer is present. “No hidden layer” is unambiguous; “one hidden layer” means the representation in a later slide.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="two-equivalencestwo-ways-to-break-them" class="slide level2 smaller">
-<h2>Two equivalences—two ways to break them</h2>
-<ol type="1">
-<li><strong>Model-class equivalence:</strong> the logit is one linear function of the original features. A nonlinear hidden layer breaks this statement.</li>
-<li><strong>Fitting equivalence:</strong> minimizing binary cross-entropy reaches the same optimizer as maximizing the unpenalized Bernoulli likelihood. A penalty or early stopping can change the fitted coefficients without adding a hidden layer.</li>
-</ol>
-<p>When claiming two procedures are “the same,” say whether you mean the functions they can represent or the estimate produced by a particular fitting procedure.</p>
-</section>
-<section id="check-same-model-class-or-same-fit" class="slide level2">
-<h2>Check: same model class or same fit?</h2>
-<p>A no-hidden-layer sigmoid model is fitted with an <span class="math inline">\(L_2\)</span> penalty.</p>
-<ol type="1">
-<li>Is its model class still logistic regression?</li>
-<li>Must its coefficients equal the unpenalized logistic-regression MLE?</li>
-<li>Which of the two equivalences changed?</li>
-</ol>
-<p>Answer all three before discussing with a neighbor.</p>
-</section>
-<section id="model-estimate-metric-decision" class="slide level2">
-<h2>Model, estimate, metric, decision</h2>
-<p>These are different objects:</p>
-<ul>
-<li><strong>model:</strong> <span class="math inline">\(\widehat p(x)\)</span>;</li>
-<li><strong>estimand:</strong> population accuracy, sensitivity, or expected loss;</li>
-<li><strong>estimate:</strong> the value computed on evaluation data;</li>
-<li><strong>decision rule:</strong> classify, send for review, or collect more information.</li>
-</ul>
-<p>Changing a threshold changes the decision rule, not the fitted model.</p>
-</section>
-<section id="derive-a-logistic-regression-boundary" class="slide level2 smaller">
-<h2>Derive a logistic-regression boundary</h2>
-<p>At threshold <span class="math inline">\(c\)</span>,</p>
-<p><span class="math display">\[\widehat y=\mathbf 1\{\widehat p(x)\ge c\}
-=\mathbf 1\{\beta_0+x^T\beta\ge\operatorname{logit}(c)\},\]</span></p>
-<p>because the sigmoid is increasing. Therefore the boundary satisfies</p>
-<p><span class="math display">\[\beta_0+x^T\beta=\operatorname{logit}(c).\]</span></p>
-<p>Changing <span class="math inline">\(c\)</span> changes this decision boundary, not <span class="math inline">\(\widehat p(x)\)</span>.</p>
-</section>
-<section id="worked-boundary-draw-the-line-and-the-side" class="slide level2 smaller">
-<h2>Worked boundary: draw the line and the side</h2>
-<div class="columns">
-<div class="column" style="width:38%;">
-<p>At <span class="math inline">\(c=0.5\)</span>, the boundary for</p>
-<p><span class="math display">\[\widehat p(x)=\sigma(-0.6+1.5x_1-0.5x_2)\]</span></p>
-<p>is</p>
-<p><span class="math display">\[x_2=3x_1-1.2.\]</span></p>
-<p><span class="math inline">\((0,0)\)</span> has score <span class="math inline">\(-0.6\)</span>; <span class="math inline">\((1,0)\)</span> has score <span class="math inline">\(0.9\)</span>. The region <strong>below</strong> the line is classified as 1.</p>
-<p class="compact-note">
-Parallel example: HW1 uses different coefficients.
-</p>
-</div><div class="column" style="width:62%;">
-<svg class="boundary-plot" viewbox="0 0 700 400" role="img" aria-label="Decision boundary x2 equals 3 x1 minus 1.2, with the region below the line classified as one">
-<polygon class="boundary-positive" points="129,350 650,42 650,350"></polygon> <line class="boundary-grid" x1="60" y1="234" x2="650" y2="234"></line> <line class="boundary-grid" x1="208" y1="30" x2="208" y2="350"></line> <line class="boundary-axis" x1="60" y1="234" x2="665" y2="234"></line> <line class="boundary-axis" x1="208" y1="360" x2="208" y2="22"></line> <line class="boundary-line" x1="129" y1="350" x2="650" y2="42"></line> <circle class="boundary-point" cx="208" cy="234" r="8"></circle> <circle class="boundary-point positive" cx="503" cy="234" r="8"></circle> <text class="boundary-label" x="219" y="222">(0,0): 0</text> <text class="boundary-label" x="514" y="222">(1,0): 1</text> <text class="boundary-note" x="475" y="310">classified as 1</text> <text class="boundary-label" x="561" y="91">x₂ = 3x₁ − 1.2</text> <text class="boundary-label" x="665" y="256">x₁</text> <text class="boundary-label" x="181" y="25">x₂</text> <text class="boundary-label" x="199" y="258">0</text> <text class="boundary-label" x="494" y="258">1</text> <text class="boundary-label" x="178" y="180">1</text> <text class="boundary-label" x="170" y="122">2</text>
-</svg>
-</div></div>
-</section>
-<section id="the-perceptron-same-boundary-algebra" class="slide level2 smaller">
-<h2>The perceptron: same boundary algebra</h2>
-<p><span class="math display">\[\widehat y=\mathbf 1\{\beta_0+x^T\beta&gt;0\}.\]</span></p>
-<p>To find its boundary:</p>
-<ol type="1">
-<li>set the linear score equal to zero;</li>
-<li>solve for one coordinate in terms of the other;</li>
-<li>substitute a point not on the line to determine the side classified as 1.</li>
-</ol>
-<p>Multiplying every coefficient by a positive constant changes the score’s scale, but not the boundary or classifications.</p>
-<p>Same linear score as logistic regression; fewer probability claims. What disappears when we retain only the classification boundary?</p>
-<aside class="notes">
-<p>In-class transfer: use <span class="math inline">\(s(x)=2-x_1-2x_2\)</span>. Students should obtain <span class="math inline">\(x_2=1-x_1/2\)</span>, then check <span class="math inline">\((0,0)\)</span> to determine that the region below the line is classified as 1. Ask what disappears relative to logistic regression: likelihood, calibrated probability interpretation, coefficient uncertainty, and threshold flexibility.</p>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="check-draw-a-different-boundary" class="slide level2 smaller">
-<h2>Check: draw a different boundary</h2>
-<div class="columns">
-<div class="column" style="width:42%;">
-<p>A perceptron predicts 1 when</p>
-<p><span class="math display">\[s(x)=2-x_1-2x_2&gt;0.\]</span></p>
-<p>Before revealing the graph:</p>
-<ol type="1">
-<li>derive the boundary;</li>
-<li>label the positive side;</li>
-<li>classify <span class="math inline">\((0,0)\)</span>, <span class="math inline">\((2,0)\)</span>, and <span class="math inline">\((0,2)\)</span>;</li>
-<li>multiply every coefficient by 5.</li>
-</ol>
-<p class="compact-note">
-This is deliberately different from the HW1 boundary.
-</p>
-</div><div class="column" style="width:58%;">
-<div class="fragment">
-<svg class="boundary-plot" viewbox="0 0 700 360" role="img" aria-label="Perceptron boundary x2 equals 1 minus one half x1, with the region below the line classified as one">
-<polygon class="boundary-positive" points="60,109 650,278 650,320 60,320"></polygon> <line class="boundary-grid" x1="60" y1="236" x2="650" y2="236"></line> <line class="boundary-grid" x1="208" y1="25" x2="208" y2="320"></line> <line class="boundary-axis" x1="60" y1="236" x2="665" y2="236"></line> <line class="boundary-axis" x1="208" y1="330" x2="208" y2="18"></line> <line class="boundary-line" x1="60" y1="109" x2="650" y2="278"></line> <circle class="boundary-point positive" cx="208" cy="236" r="8"></circle> <circle class="boundary-point" cx="503" cy="236" r="8"></circle> <circle class="boundary-point" cx="208" cy="67" r="8"></circle> <text class="boundary-label" x="220" y="256">(0,0): 1</text> <text class="boundary-label" x="514" y="224">(2,0): boundary → 0</text> <text class="boundary-label" x="220" y="58">(0,2): 0</text> <text class="boundary-note" x="442" y="308">classified as 1</text> <text class="boundary-label" x="442" y="150">x₂ = 1 − x₁/2</text> <text class="boundary-label" x="665" y="257">x₁</text> <text class="boundary-label" x="181" y="23">x₂</text>
-</svg>
-</div>
-</div></div>
-</section>
-<section id="basis-expansion-means-choosing-fx" class="slide level2 smaller">
-<h2>Basis expansion means choosing <span class="math inline">\(f(x)\)</span></h2>
-<div class="columns">
-<div class="column" style="width:52%;">
-<p>Replace <span class="math inline">\(x\)</span> with a specified transformation <span class="math inline">\(f(x)\)</span>:</p>
-<p><span class="math display">\[
-f(x)=\left(x_1,x_2,x_1^2,x_1x_2,x_2^2\right).
-\]</span></p>
-<p>Then fit ordinary logistic regression on those transformed features:</p>
-<p><span class="math display">\[\operatorname{logit}(p_i)=\beta_0+\beta^T f(x_i).\]</span></p>
-</div><div class="column" style="width:48%;">
-<p>This is a <strong>quadratic</strong> model, not an arbitrary function.</p>
-<p>The analyst chooses the transformation family—polynomials, splines, interactions, or something else. Fitting estimates coefficients <em>within</em> that family.</p>
-<p>Neural networks retain this architectural choice; they parameterize the transformations differently.</p>
-</div></div>
-</section>
-<section id="one-hidden-layer-two-hidden-units" class="slide level2 smaller">
-<h2>One hidden layer, two hidden units</h2>
-<div class="columns">
-<div class="column" style="width:43%;">
-<p>One <strong>layer</strong> may contain several <strong>units</strong>. Here the width is two:</p>
-<p><span class="math display">\[
-\begin{aligned}
-h_1(x)&amp;=g(w_{10}+x^Tw_1),\\
-h_2(x)&amp;=g(w_{20}+x^Tw_2),\\
-\widehat p(x)&amp;=\sigma(\alpha_0+\alpha_1h_1+\alpha_2h_2).
-\end{aligned}
-\]</span></p>
-<p>Set <span class="math inline">\(g(z)=z^2\)</span> and simple weights, for example, and the hidden units can be <span class="math inline">\(x_1^2\)</span> and <span class="math inline">\(x_2^2\)</span>.</p>
-</div><div class="column" style="width:57%;">
-<svg class="nn-diagram" viewbox="0 0 720 390" role="img" aria-label="A neural network with two inputs, one hidden layer containing two square-activation units, and one probability output">
-<line class="nn-edge" x1="105" y1="105" x2="345" y2="115"></line> <line class="nn-edge" x1="105" y1="105" x2="345" y2="275"></line> <line class="nn-edge" x1="105" y1="285" x2="345" y2="115"></line> <line class="nn-edge" x1="105" y1="285" x2="345" y2="275"></line> <line class="nn-edge" x1="455" y1="115" x2="625" y2="195"></line> <line class="nn-edge" x1="455" y1="275" x2="625" y2="195"></line> <circle class="nn-node" cx="85" cy="105" r="48"></circle> <circle class="nn-node" cx="85" cy="285" r="48"></circle> <circle class="nn-node" cx="400" cy="115" r="58"></circle> <circle class="nn-node" cx="400" cy="275" r="58"></circle> <circle class="nn-node output" cx="660" cy="195" r="48"></circle> <text class="nn-label" x="68" y="112">x₁</text> <text class="nn-label" x="68" y="292">x₂</text> <text class="nn-label" x="362" y="108">h₁</text> <text class="nn-note" x="367" y="137">x₁²</text> <text class="nn-label" x="362" y="268">h₂</text> <text class="nn-note" x="367" y="297">x₂²</text> <text class="nn-label" x="644" y="202">p̂</text> <text class="nn-note" x="315" y="30">one hidden layer</text> <text class="nn-label" x="35" y="370">inputs</text> <text class="nn-label" x="337" y="370">two units</text> <text class="nn-label" x="616" y="370">output</text>
-</svg>
-<p class="compact-note">
-You set the activation, width, and connectivity. Training learns weights within that specified family; the network is not free to represent “anything.”
-</p>
-</div></div>
-</section>
-<section id="what-staysand-what-changes" class="slide level2 smaller">
-<h2>What stays—and what changes</h2>
+<section id="every-analysis-has-five-stages" class="slide level2 smaller">
+<h2>Every analysis has five stages</h2>
 <table class="caption-top">
 <colgroup>
 <col style="width: 50%">
@@ -399,44 +367,140 @@ You set the activation, width, and connectivity. Training learns weights within 
 </colgroup>
 <thead>
 <tr class="header">
-<th>Continuity</th>
-<th>Change</th>
+<th>Stage</th>
+<th>The sepsis alarm</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>fitted conditional function</td>
-<td>learned representation</td>
+<td>1. Define the question, hypotheses, and estimands</td>
+<td>Will the alarm catch sepsis earlier for our patients?</td>
 </tr>
 <tr class="even">
-<td>regularization and validation</td>
-<td>much greater flexibility</td>
+<td>2. Explore the data and assess its quality</td>
+<td>Whose patients was it built on? How is sepsis recorded, and when?</td>
 </tr>
 <tr class="odd">
-<td>prediction on new observations</td>
-<td>weaker direct parameter interpretation</td>
+<td>3. Model the data, make inferences, and evaluate performance</td>
+<td>Cases caught, false alarms, and AUC, with uncertainty</td>
 </tr>
 <tr class="even">
-<td>probability and decision layers</td>
-<td>classical standard errors do not arrive automatically</td>
+<td>4. Test how sensitive the conclusions are</td>
+<td>Does it hold with another definition of sepsis, or at another hospital?</td>
+</tr>
+<tr class="odd">
+<td>5. Make a decision and state its limitations</td>
+<td>Turn the alerts on? For which units?</td>
 </tr>
 </tbody>
 </table>
+<p>Every homework and the final project follow these five stages.</p>
 </section>
-<section id="flexibility-through-bias-and-variance" class="slide level2 smaller">
-<h2>Flexibility through bias and variance</h2>
-<p>At fixed <span class="math inline">\(x\)</span>, <span class="math inline">\(D\)</span> is random training data and <span class="math inline">\(Y\)</span> is an independent new response. The expected value averages over repeated <span class="math inline">\(D\)</span> and the new <span class="math inline">\(Y\)</span>:</p>
-<p><span class="math display">\[
-\begin{aligned}
-\mathbb E[(Y-\widehat p_D(x))^2\mid x]
-&amp;=\underbrace{p(x)(1-p(x))}_{\text{irreducible}}\\[0.25em]
-&amp;\quad+\underbrace{\{\mathbb E[\widehat p_D(x)\mid x]-p(x)\}^2}_{\text{squared bias}}\\[0.25em]
-&amp;\quad+\underbrace{\operatorname{Var}\{\widehat p_D(x)\mid x\}}_{\text{variance}}.
-\end{aligned}
-\]</span></p>
-<p><strong>HW1 derives this identity step by step.</strong> For today, read it as a warning: a richer specified family may reduce bias while the fitting procedure increases variance.</p>
+<section id="how-the-course-runs" class="slide level2 smaller">
+<h2>How the course runs</h2>
+<ul>
+<li><strong>Tuesday.</strong> A statistical problem and worked examples.</li>
+<li><strong>Thursday.</strong> A shorter lecture, then a lab in Google Colab. The homework starts where the lab leaves off.</li>
+<li><strong>Checkpoint.</strong> A short online quiz on the week’s lectures opens after Thursday’s class. It takes 20 minutes, you may use your notes, and AI is not allowed. Your two lowest scores are dropped.</li>
+<li><strong>Homework</strong>, due Tuesdays. Problem 1 is by hand without AI. Problem 2 is a data analysis. Problem 3 asks you to use AI, then check and fix what it produced.</li>
+<li><strong>After spring break</strong>, the course turns to a team project, and one class a week becomes a project work session.</li>
+</ul>
+</section>
+<section id="grades" class="slide level2 smaller">
+<h2>Grades</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Component</th>
+<th style="text-align: right;">Weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Homework (seven, lowest dropped)</td>
+<td style="text-align: right;">15%</td>
+</tr>
+<tr class="even">
+<td>Weekly checkpoints (ten, lowest two dropped)</td>
+<td style="text-align: right;">20%</td>
+</tr>
+<tr class="odd">
+<td>Midterm, in class Thursday, March 4</td>
+<td style="text-align: right;">25%</td>
+</tr>
+<tr class="even">
+<td>Final project, including peer assessment</td>
+<td style="text-align: right;">40%</td>
+</tr>
+</tbody>
+</table>
+<p>Homework is where you practice, with AI where it is allowed. Checkpoints, the midterm, and the project’s oral defense are where you show the reasoning is your own.</p>
+</section>
+<section id="the-final-project" class="slide level2 smaller">
+<h2>The final project</h2>
+<p>After spring break, you work in a team of four as a research team for a client. The client has an AI system, some data, and a decision to make. Your team studies whether the AI system is good enough for that decision.</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Track</th>
+<th>The client’s question</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Food tagging</td>
+<td>Should a marketplace tag food photos automatically?</td>
+</tr>
+<tr class="even">
+<td>Pet tagging</td>
+<td>Can the system tag breeds, or only cats versus dogs?</td>
+</tr>
+<tr class="odd">
+<td>Human preferences</td>
+<td>Does an LLM judge measure what people prefer?</td>
+</tr>
+<tr class="even">
+<td>Instruction following</td>
+<td>Can an LLM judge check whether responses follow instructions?</td>
+</tr>
+</tbody>
+</table>
+<p>You build it in steps: two milestones along the way, then a short video with slides and a conversation with me about your work.</p>
+</section>
+<section id="ai-in-this-course" class="slide level2 smaller">
+<h2>AI in this course</h2>
+<ul>
+<li><strong>Allowed, and sometimes required,</strong> on homework Problems 2 and 3 and on the project. Each assignment says how.</li>
+<li><strong>Not allowed</strong> on homework Problem 1, checkpoints, or the midterm. Turn off the Colab assistant and autocomplete too.</li>
+<li><strong>Always</strong> keep an AI-use record: the tool, your first prompt, what you checked, and what you changed.</li>
+<li>You are responsible for every number, sentence, and line of code you turn in. Be ready to explain any of it without the tool.</li>
+</ul>
+<p>“The AI said so” is never statistical evidence.</p>
+</section>
+<section id="our-first-ai-system-sorting-camera-trap-photos" class="slide level2 smaller">
+<h2>Our first AI system: sorting camera-trap photos</h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<ul>
+<li>Wildlife biologists put motion-triggered cameras along trails. Each time something moves, a camera takes a burst of three photos.</li>
+<li>Most photos are empty. Wind moved a branch, or the light changed. Someone has to look through all of them.</li>
+<li>A team is considering an AI model, <strong>MegaDetector</strong>, to sort the photos. Photos it calls empty may never be looked at.</li>
+</ul>
+</div><div class="column" style="width:45%;">
+<p><img data-src="assets/cct_bobcat.jpg" alt="A bobcat walking toward a motion-triggered wildlife camera through brush in daylight"></p>
+</div></div>
+<p>Before trusting the model, the team wants to know how often it is right on photos like theirs.</p>
+</section>
+<section id="animal-or-empty" class="slide level2 smaller">
+<h2>Animal or empty?</h2>
+
+<img data-src="assets/animal_or_empty.jpg" class="quarto-figure quarto-figure-center r-stretch" style="width:72.0%" alt="Four camera-trap photos labeled A through D"><p>Vote on each photo: animal or empty?</p>
 <aside class="notes">
-<p>Notation note for class: subscripts on <span class="math inline">\(\mathbb E\)</span> are common in machine-learning writing. We will state the source of randomness in words and use ordinary <span class="math inline">\(\mathbb E[\cdot]\)</span>. Bill Eddy’s terminology reminder was to say <strong>expected value</strong>, not <strong>expectation</strong>.</p>
+<p>Give the room a minute. A and D are hard. Hands for “animal” on each, then reveal.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -449,9 +513,323 @@ You set the activation, width, and connectivity. Training learns weights within 
           display:block!important;
       }</style></aside>
 </section>
-<section id="worked-comparison-lower-bias-can-still-lose" class="slide level2 smaller">
-<h2>Worked comparison: lower bias can still lose</h2>
-<p>At one <span class="math inline">\(x\)</span>, suppose <span class="math inline">\(p(x)=0.40\)</span>. The irreducible term is <span class="math inline">\(0.40(0.60)=0.24\)</span>.</p>
+<section id="the-answers" class="slide level2 smaller">
+<h2>The answers</h2>
+
+<img data-src="assets/animal_or_empty_boxes.jpg" class="quarto-figure quarto-figure-center r-stretch" style="width:84.0%" alt="The same four photos with the person's label and the model's probability that an animal is present"><p>The model got all four right, but it was more sure about some than others. A probability is not yet a decision: the team still has to pick a cutoff.</p>
+<p class="compact-note">
+Yellow boxes show where MegaDetector found each animal (LILA BC’s published MegaDetector v5a results).
+</p>
+<aside class="notes">
+<p>A is a lizard lying along the dirt at the lower left; the close-up shows its head at the left and its tail running to the right. D is a bird at the far left edge of the frame, mostly out of view. The model’s probabilities are 0.87, 0.00, 0.76, and 0.69. The boxes are MegaDetector’s own detections, so they show what the model found, not a person’s outline. Ask: what would you need before saying the model is “good”? Many more photos, photos like the team’s, and a rule for when to send a photo to a person.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-model-you-know-logistic-regression" class="slide level2 smaller">
+<h2>A model you know: logistic regression</h2>
+<p>Let <span class="math inline">Y_i = 1</span> if photo <span class="math inline">i</span> has an animal, and let <span class="math inline">x_i</span> be features of the photo, such as brightness.</p>
+<p><span class="math display">Y_i \mid x_i \sim \operatorname{Bernoulli}(p_i), \qquad \operatorname{logit}(p_i) = \log\frac{p_i}{1-p_i} = \beta_0 + x_i^T\beta.</span></p>
+<div id="0174f338" class="cell" data-fig-height="1.6" data-fig-width="9" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_a_files/figure-revealjs/cell-2-output-1.png" width="855" height="146"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Three pieces:</p>
+<ul>
+<li>the linear predictor <span class="math inline">\beta_0 + x^T\beta</span>;</li>
+<li>a <strong>probability</strong>, <span class="math inline">p = \sigma(\beta_0 + x^T\beta) = 1/\{1+e^{-(\beta_0 + x^T\beta)}\}</span>;</li>
+<li>a <strong>decision</strong>, made by comparing <span class="math inline">p</span> with a cutoff <span class="math inline">c</span>.</li>
+</ul>
+</section>
+<section id="odds-and-log-odds" class="slide level2 smaller">
+<h2>Odds and log-odds</h2>
+<ul>
+<li>The <strong>odds</strong> of an animal are <span class="math inline">p/(1-p)</span>, the chance of an animal divided by the chance of none. If <span class="math inline">p = 0.7</span>, the odds are <span class="math inline">0.7/0.3 = 2.33</span>: about 7 animal photos for every 3 empty ones.</li>
+<li>The <strong>log-odds</strong> are <span class="math inline">\operatorname{logit}(p) = \log\{p/(1-p)\}</span>. Logistic regression is a straight line on this scale: <span class="math display">\operatorname{logit}(p) = \beta_0 + x^T\beta.</span></li>
+</ul>
+<p><strong>How a statistician reads a coefficient.</strong> Adding 1 to <span class="math inline">x_j</span> adds <span class="math inline">\beta_j</span> to the log-odds, which multiplies the odds by <span class="math inline">e^{\beta_j}</span>. If the coefficient on a night indicator is <span class="math inline">0.69</span>, night photos have <span class="math inline">e^{0.69} \approx 2</span> times the odds of showing an animal.</p>
+<p><strong>What ML calls it.</strong> The log-odds are the <strong>logits</strong>. A network’s last layer outputs logits, then applies the sigmoid. Same quantity, different name, and usually nobody interprets it.</p>
+</section>
+<section id="fitting-it-maximum-likelihood" class="slide level2 smaller">
+<h2>Fitting it: maximum likelihood</h2>
+<p>With no features, every photo has the same <span class="math inline">p</span>. If <span class="math inline">k</span> of <span class="math inline">n</span> photos have an animal,</p>
+<p><span class="math display">L(p) = p^k(1-p)^{n-k}, \qquad \ell(p) = k\log p + (n-k)\log(1-p).</span></p>
+<div id="c041f694" class="cell" data-fig-height="2.2" data-fig-width="9" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_a_files/figure-revealjs/cell-3-output-1.png" width="855" height="202"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>For 7 of 10, the peak is at <span class="math inline">\hat p = 0.7</span>. In HW1 you show the peak is always at <span class="math inline">k/n</span>. Because <span class="math inline">\beta_0 = \operatorname{logit}(p)</span>, the intercept estimate is <span class="math inline">\hat\beta_0 = \operatorname{logit}(0.7) = 0.85</span>.</p>
+<p class="compact-note">
+If k = 0 or k = n, the peak sits at p = 0 or 1, and the intercept estimate runs off to −∞ or +∞.
+</p>
+</section>
+<section id="drawing-the-boundary" class="slide level2 smaller">
+<h2>Drawing the boundary</h2>
+<div class="columns">
+<div class="column" style="width:44%;">
+<p>Predict 1 when <span class="math inline">\hat p(x) \ge c</span>, which is the same as <span class="math inline">\beta_0 + x^T\beta \ge \operatorname{logit}(c)</span>.</p>
+<p>For <span class="math inline">\sigma(-0.6 + 1.5x_1 - 0.5x_2)</span> at <span class="math inline">c = 0.5</span>, the boundary is <span class="math display">x_2 = 3x_1 - 1.2.</span></p>
+<p>Test a point. At <span class="math inline">(1,0)</span>, <span class="math inline">-0.6 + 1.5 = 0.9 &gt; 0</span>, so <strong>below</strong> the line is class 1.</p>
+<p>Changing <span class="math inline">c</span> moves the line, not the probabilities.</p>
+</div><div class="column" style="width:56%;">
+<svg class="boundary-plot" viewbox="0 0 700 400" role="img" aria-label="Decision boundary x2 equals 3 x1 minus 1.2, with the region below the line classified as one">
+<polygon class="boundary-positive" points="129,350 650,42 650,350"></polygon> <line class="boundary-grid" x1="60" y1="234" x2="650" y2="234"></line> <line class="boundary-grid" x1="208" y1="30" x2="208" y2="350"></line> <line class="boundary-axis" x1="60" y1="234" x2="665" y2="234"></line> <line class="boundary-axis" x1="208" y1="360" x2="208" y2="22"></line> <line class="boundary-line" x1="129" y1="350" x2="650" y2="42"></line> <circle class="boundary-point" cx="208" cy="234" r="8"></circle> <circle class="boundary-point positive" cx="503" cy="234" r="8"></circle> <text class="boundary-label" x="219" y="222">(0,0): 0</text> <text class="boundary-label" x="514" y="222">(1,0): 1</text> <text class="boundary-note" x="475" y="310">classified as 1</text> <text class="boundary-label" x="561" y="91">x₂ = 3x₁ − 1.2</text> <text class="boundary-label" x="665" y="256">x₁</text> <text class="boundary-label" x="181" y="25">x₂</text> <text class="boundary-label" x="199" y="258">0</text> <text class="boundary-label" x="494" y="258">1</text> <text class="boundary-label" x="178" y="180">1</text> <text class="boundary-label" x="170" y="122">2</text>
+</svg>
+</div></div>
+</section>
+<section id="check-move-the-cutoff" class="slide level2 smaller">
+<h2>Check: move the cutoff</h2>
+<div class="columns">
+<div class="column" style="width:42%;">
+<p>A fitted logistic regression is <span class="math inline">\hat p(x) = \sigma(2 - x_1 - 2x_2)</span>.</p>
+<ol type="1">
+<li>At <span class="math inline">c = 0.5</span>, find the boundary.</li>
+<li>Which side is classified as 1?</li>
+<li>Classify <span class="math inline">(0,0)</span>, <span class="math inline">(2,0)</span>, and <span class="math inline">(0,2)</span>.</li>
+<li>Raise the cutoff to <span class="math inline">c = \sigma(1) \approx 0.73</span>. Where does the line go?</li>
+</ol>
+</div><div class="column" style="width:58%;">
+<div class="fragment">
+<svg class="boundary-plot" viewbox="0 0 700 360" role="img" aria-label="Logistic regression boundary x2 equals 1 minus one half x1 at cutoff 0.5, with the region below the line classified as one">
+<polygon class="boundary-positive" points="60,109 650,278 650,320 60,320"></polygon> <line class="boundary-grid" x1="60" y1="236" x2="650" y2="236"></line> <line class="boundary-grid" x1="208" y1="25" x2="208" y2="320"></line> <line class="boundary-axis" x1="60" y1="236" x2="665" y2="236"></line> <line class="boundary-axis" x1="208" y1="330" x2="208" y2="18"></line> <line class="boundary-line" x1="60" y1="109" x2="650" y2="278"></line> <circle class="boundary-point positive" cx="208" cy="236" r="8"></circle> <circle class="boundary-point positive" cx="503" cy="236" r="8"></circle> <circle class="boundary-point" cx="208" cy="67" r="8"></circle> <text class="boundary-label" x="220" y="256">(0,0): 1</text> <text class="boundary-label" x="514" y="224">(2,0): on the line → 1</text> <text class="boundary-label" x="220" y="58">(0,2): 0</text> <text class="boundary-note" x="442" y="308">classified as 1</text> <text class="boundary-label" x="442" y="150">x₂ = 1 − x₁/2</text> <text class="boundary-label" x="665" y="257">x₁</text> <text class="boundary-label" x="181" y="23">x₂</text>
+</svg>
+<p>At <span class="math inline">c \approx 0.73</span> the boundary is <span class="math inline">2 - x_1 - 2x_2 = 1</span>, or <span class="math inline">x_2 = (1 - x_1)/2</span>: the same slope, shifted down. Fewer points are called 1, and the fitted probabilities do not change.</p>
+</div>
+</div></div>
+<aside class="notes">
+<p>Answers. At c = 0.5 the boundary is 2 − x1 − 2x2 = 0, so x2 = 1 − x1/2, and the region below the line is classified 1. (0,0) has p̂ = σ(2) = 0.88, so 1. (2,0) has p̂ = σ(0) = 0.5, on the line; with “predict 1 when p̂ ≥ c” it is 1. (0,2) has p̂ = σ(−2) = 0.12, so 0. Raising the cutoff to σ(1) moves the line to x2 = (1 − x1)/2, parallel and lower, and (2,0) becomes 0.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="add-a-hidden-layer-a-neural-network" class="slide level2 smaller">
+<h2>Add a hidden layer: a neural network</h2>
+<div class="columns">
+<div class="column" style="width:43%;">
+<p>Logistic regression on transformed features, such as <span class="math inline">x_1^2</span> and <span class="math inline">x_2^2</span>, is still logistic regression. You choose the transformations.</p>
+<p>Add a hidden layer that <strong>learns</strong> them, and you have a <strong>neural network</strong>. One hidden layer with two units:</p>
+<p><span class="math display">
+\begin{aligned}
+h_1(x)&amp;=g(w_{10}+x^Tw_1),\\
+h_2(x)&amp;=g(w_{20}+x^Tw_2),\\
+\hat p(x)&amp;=\sigma(\alpha_0+\alpha_1h_1+\alpha_2h_2).
+\end{aligned}
+</span></p>
+</div><div class="column" style="width:57%;">
+<svg class="nn-diagram" viewbox="0 0 720 390" role="img" aria-label="A neural network with two inputs, one hidden layer containing two square-activation units, and one probability output">
+<line class="nn-edge" x1="105" y1="105" x2="345" y2="115"></line> <line class="nn-edge" x1="105" y1="105" x2="345" y2="275"></line> <line class="nn-edge" x1="105" y1="285" x2="345" y2="115"></line> <line class="nn-edge" x1="105" y1="285" x2="345" y2="275"></line> <line class="nn-edge" x1="455" y1="115" x2="625" y2="195"></line> <line class="nn-edge" x1="455" y1="275" x2="625" y2="195"></line> <circle class="nn-node" cx="85" cy="105" r="48"></circle> <circle class="nn-node" cx="85" cy="285" r="48"></circle> <circle class="nn-node" cx="400" cy="115" r="58"></circle> <circle class="nn-node" cx="400" cy="275" r="58"></circle> <circle class="nn-node output" cx="660" cy="195" r="48"></circle> <text class="nn-label" x="68" y="112">x₁</text> <text class="nn-label" x="68" y="292">x₂</text> <text class="nn-label" x="362" y="108">h₁</text> <text class="nn-note" x="367" y="137">x₁²</text> <text class="nn-label" x="362" y="268">h₂</text> <text class="nn-note" x="367" y="297">x₂²</text> <text class="nn-label" x="644" y="202">p̂</text> <text class="nn-note" x="315" y="30">one hidden layer</text> <text class="nn-label" x="35" y="370">inputs</text> <text class="nn-label" x="337" y="370">two units</text> <text class="nn-label" x="616" y="370">output</text>
+</svg>
+<p>Each <strong>hidden unit</strong> takes a linear combination of the inputs and passes it through a function <span class="math inline">g</span>, the <strong>activation</strong>. Common choices are <span class="math inline">\max(0, z)</span> and the sigmoid. The output uses the sigmoid, as in logistic regression.</p>
+</div></div>
+</section>
+<section id="a-hidden-layer-by-hand" class="slide level2 smaller">
+<h2>A hidden layer by hand</h2>
+<div class="columns">
+<div class="column" style="width:56%;">
+<ul>
+<li><strong>Activation:</strong> squaring, <span class="math inline">g(z) = z^2</span>.</li>
+<li><strong>Unit 1:</strong> <span class="math inline">w_{10} = 0</span>, <span class="math inline">w_1 = (1, 0)</span>, so <span class="math inline">h_1 = (0 + 1\cdot x_1 + 0\cdot x_2)^2 = x_1^2</span>.</li>
+<li><strong>Unit 2:</strong> <span class="math inline">w_{20} = 0</span>, <span class="math inline">w_2 = (0, 1)</span>, so <span class="math inline">h_2 = x_2^2</span>.</li>
+<li><strong>Output:</strong> <span class="math inline">\alpha_0 = 1</span>, <span class="math inline">\alpha_1 = \alpha_2 = -1</span>, so <span class="math display">\hat p(x) = \sigma(1 - x_1^2 - x_2^2).</span></li>
+</ul>
+</div><div class="column" style="width:44%;">
+<div id="b3567b53" class="cell" data-fig-height="3.2" data-fig-width="3.2" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_a_files/figure-revealjs/cell-4-output-1.png" width="311" height="281"></p>
+</figure>
+</div>
+</div>
+</div>
+</div></div>
+<p><strong>Boundary at <span class="math inline">c = 0.5</span>.</strong> <span class="math inline">\sigma(0) = 0.5</span> and <span class="math inline">\sigma</span> only increases, so <span class="math inline">\sigma(z) \ge 0.5</span> exactly when <span class="math inline">z \ge 0</span>: <span class="math display">\hat p(x) \ge 0.5 \iff 1 - x_1^2 - x_2^2 \ge 0 \iff x_1^2 + x_2^2 \le 1, \text{ inside the circle.}</span></p>
+<p class="compact-note">
+Weights chosen by hand; training learns them from data. Logistic regression on x₁ and x₂ alone cannot draw a circle.
+</p>
+</section>
+<section id="side-by-side-add-a-hidden-layer" class="slide level2 smaller">
+<h2>Side by side: add a hidden layer</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Logistic regression</th>
+<th>Neural network</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Linear predictor</td>
+<td><span class="math inline">\beta_0 + x^T\beta</span></td>
+<td><span class="math inline">\alpha_0 + \sum_j \alpha_j h_j(x)</span></td>
+</tr>
+<tr class="even">
+<td>Output</td>
+<td><span class="math inline">\sigma(\text{linear predictor})</span></td>
+<td><span class="math inline">\sigma(\text{linear predictor})</span></td>
+</tr>
+<tr class="odd">
+<td>How it is fit</td>
+<td>maximize the Bernoulli likelihood</td>
+<td>minimize binary cross-entropy</td>
+</tr>
+<tr class="even">
+<td>Decision boundary</td>
+<td>a straight line</td>
+<td>can curve</td>
+</tr>
+<tr class="odd">
+<td>Standard errors</td>
+<td>printed by <code>summary()</code></td>
+<td>exist, but software rarely computes them</td>
+</tr>
+<tr class="even">
+<td>Interpretation</td>
+<td>each coefficient has a meaning</td>
+<td>individual weights are hard to read</td>
+</tr>
+</tbody>
+</table>
+<p>With <strong>no</strong> hidden layer, the network is logistic regression: same model, and binary cross-entropy is the negative log-likelihood. In HW1 you show this.</p>
+<p class="compact-note">
+“Same” can mean two things. Same model: the same set of functions. Same fit: the same estimates. A penalty or early stopping changes the fit without changing the model.
+</p>
+<aside class="notes">
+<p>On standard errors: a network fit by maximum likelihood has standard errors from the same Fisher-information argument as logistic regression, or from a bootstrap. They are rarely computed because there are many weights, the weights are not identifiable (swap the two hidden units and nothing changes), and common software does not report them. The honest statement is “not routinely available,” not “do not exist.”</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="two-cultures" class="slide level2 smaller">
+<h2>Two cultures</h2>
+<p>Breiman, <a href="https://projecteuclid.org/journals/statistical-science/volume-16/issue-3/Statistical-Modeling--The-Two-Cultures-with-comments-and-a/10.1214/ss/1009213726.full">“Statistical Modeling: The Two Cultures”</a> (2001), described two ways to learn from data. Today’s two models sit on either side.</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Data modeling</th>
+<th>Algorithmic modeling</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>The goal</td>
+<td>write down a model for how the data were generated</td>
+<td>find whatever predicts best</td>
+</tr>
+<tr class="even">
+<td>How it is judged</td>
+<td>interpret parameters and check assumptions</td>
+<td>test predictions on held-out cases</td>
+</tr>
+<tr class="odd">
+<td>Today’s example</td>
+<td>logistic regression</td>
+<td>the one-hidden-layer network</td>
+</tr>
+</tbody>
+</table>
+<p>The line is about how a model is used, at least popularly. We just saw that the network is fit by the same likelihood as logistic regression.</p>
+<p>We do not pick a team. We hold predictions to statistical standards: which population, how measured, how precise, and compared with what.</p>
+<aside class="notes">
+<p>Push on “at least popularly.” A neural network is a likelihood model, and logistic regression is often used purely to predict. What puts a model in a culture is what you ask of it: interpretable parameters and checked assumptions, or held-out predictive accuracy. Breiman is the Thursday reading.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="where-the-flexibility-comes-from" class="slide level2 smaller">
+<h2>Where the flexibility comes from</h2>
+<p>Logistic regression always draws a straight line. In a network, the hidden units <span class="math inline">h_j(x) = g(w_{j0} + x^Tw_j)</span> are <strong>learned</strong>. With other activations and more units, the <span class="math inline">h_j</span> can be a very broad class of functions, and the boundary can take almost any shape.</p>
+<div id="c5f91ad9" class="cell" data-fig-height="2.9" data-fig-width="9" data-execution_count="4">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_a_files/figure-revealjs/cell-5-output-1.png" width="807" height="277"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Shaded regions are classified 1. That flexibility is the appeal: a network can fit patterns a line misses. It is also the risk.</p>
+</section>
+<section id="more-flexible-is-not-automatically-better" class="slide level2 smaller">
+<h2>More flexible is not automatically better</h2>
+<p>Fit the model to a random training set <span class="math inline">D</span> and get <span class="math inline">\hat p_D(x)</span> at a fixed <span class="math inline">x</span>. For a new response <span class="math inline">Y</span>,</p>
+<p><span class="math display">\mathbb E\bigl[(Y-\hat p_D(x))^2 \mid x\bigr] = \underbrace{p(x)\{1-p(x)\}}_{\text{noise}} + \text{bias}^2 + \text{variance}.</span></p>
+<ul>
+<li><strong>Bias</strong> <span class="math inline">= \mathbb E[\hat p_D(x)\mid x] - p(x)</span>: how far the average fit is from the truth.</li>
+<li><strong>Variance</strong> <span class="math inline">= \operatorname{Var}\{\hat p_D(x)\mid x\}</span>: how much the fit changes from one training set to another.</li>
+</ul>
+<p>More hidden units and a broader class of <span class="math inline">h</span> usually lower the bias and raise the variance. Which wins depends on the data. In HW1 you derive this identity.</p>
+<aside class="notes">
+<p>Say “expected value,” not “expectation” (Bill Eddy’s reminder). The expected value averages over repeated training sets and the new response.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="worked-example-lower-bias-can-still-lose" class="slide level2 smaller compact-table">
+<h2>Worked example: lower bias can still lose</h2>
+<p>At one <span class="math inline">x</span>, suppose <span class="math inline">p(x) = 0.40</span>. The noise term is <span class="math inline">0.40 \times 0.60 = 0.24</span>.</p>
 <table class="caption-top">
 <colgroup>
 <col style="width: 20%">
@@ -462,87 +840,68 @@ You set the activation, width, and connectivity. Training learns weights within 
 <thead>
 <tr class="header">
 <th>Procedure</th>
-<th style="text-align: right;">Mean fitted probability</th>
+<th style="text-align: right;">Average fitted probability</th>
 <th style="text-align: right;">Variance</th>
 <th style="text-align: right;">Expected squared error</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Logistic</td>
+<td>Logistic regression</td>
 <td style="text-align: right;">0.35</td>
 <td style="text-align: right;">0.010</td>
-<td style="text-align: right;"><span class="math inline">\(0.24+0.05^2+0.010=0.2525\)</span></td>
+<td style="text-align: right;"><span class="math inline">0.24 + 0.05^2 + 0.010 = 0.2525</span></td>
 </tr>
 <tr class="even">
-<td>Flexible net</td>
+<td>Flexible network</td>
 <td style="text-align: right;">0.39</td>
 <td style="text-align: right;">0.018</td>
-<td style="text-align: right;"><span class="math inline">\(0.24+0.01^2+0.018=0.2581\)</span></td>
+<td style="text-align: right;"><span class="math inline">0.24 + 0.01^2 + 0.018 = 0.2581</span></td>
 </tr>
 </tbody>
 </table>
-<p>The net has lower bias; logistic has lower expected squared error here. The comparison is about the entire fitting procedure under repeated training data, not flexibility in isolation.</p>
+<p>The network has less bias, but logistic regression has lower expected error here, because its variance is smaller.</p>
 </section>
-<section id="check-lower-bias-can-still-lose" class="slide level2">
-<h2>Check: lower bias can still lose</h2>
-<p>At one <span class="math inline">\(x\)</span>, <span class="math inline">\(p(x)=0.50\)</span>. Procedure A has mean fitted probability <span class="math inline">\(0.45\)</span> and variance <span class="math inline">\(0.010\)</span>; Procedure B has mean <span class="math inline">\(0.49\)</span> and variance <span class="math inline">\(0.016\)</span>.</p>
-<p>Compute the expected squared prediction error for each procedure. Which has lower bias? Which has lower expected error?</p>
-</section>
-<section id="flexibility-creates-an-evaluation-burden" class="slide level2">
-<h2>Flexibility creates an evaluation burden</h2>
-<p>A flexible system can find signal that a linear model misses. It can also exploit:</p>
-<ul>
-<li>camera backgrounds;</li>
-<li>duplicated sequences;</li>
-<li>preprocessing artifacts;</li>
-<li>label conventions;</li>
-<li>an unrepresentative benchmark.</li>
-</ul>
-<p>The more flexible the fitted function, the more consequential the study design.</p>
-</section>
-<section id="our-image-setting-camera-traps" class="slide level2 smaller">
-<h2>Our image setting: Camera Traps</h2>
-<p>Client decision: can an AI system reduce expert sorting work without silently discarding animal images?</p>
-<ul>
-<li>scored observation and accuracy denominator: image frame;</li>
-<li>dependence: trigger sequence;</li>
-<li>protected split and new-location target: camera location;</li>
-<li>statistical baseline: logistic regression on documented image summaries;</li>
-<li>AI system: supplied vision-model probabilities.</li>
-</ul>
-<p>Our reported accuracy is pooled over frames, so represented cameras are weighted by their numbers of frames; it is not an equally weighted camera average.</p>
-</section>
-<section id="why-keep-the-simple-baseline" class="slide level2">
-<h2>Why keep the simple baseline?</h2>
-<p>The baseline tells us:</p>
-<ul>
-<li>what brightness, color, edges, and night conditions already explain;</li>
-<li>whether the AI adds meaningful predictive information;</li>
-<li>whether both systems exploit the same shortcut;</li>
-<li>how expensive flexibility is to justify.</li>
-</ul>
-<p>It need not win to be useful.</p>
-</section>
-<section id="reading-breiman-as-a-statistician-in-2027" class="slide level2">
-<h2>Reading Breiman as a statistician in 2027</h2>
-<p>For discussion:</p>
+<section id="check-which-procedure-wins" class="slide level2 smaller">
+<h2>Check: which procedure wins?</h2>
+<p>At one <span class="math inline">x</span>, <span class="math inline">p(x) = 0.50</span>. Procedure A averages <span class="math inline">0.45</span> with variance <span class="math inline">0.010</span>. Procedure B averages <span class="math inline">0.49</span> with variance <span class="math inline">0.016</span>.</p>
 <ol type="1">
-<li>What did prediction culture correctly demand of statistics?</li>
-<li>Which statistical responsibilities remain after prediction becomes the goal?</li>
-<li>Where would each culture locate the Camera Traps failure caused by a random frame split?</li>
+<li>Compute the expected squared error for each.</li>
+<li>Which has less bias? Which has lower expected error?</li>
 </ol>
+<aside class="notes">
+<p>A: 0.25 + 0.0025 + 0.010 = 0.2625. B: 0.25 + 0.0001 + 0.016 = 0.2661. B has less bias; A has lower expected error.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="why-keep-a-simple-baseline" class="slide level2 smaller">
+<h2>Why keep a simple baseline?</h2>
+<p>A simple model earns its place even when it predicts worse.</p>
+<ul>
+<li><strong>Inference.</strong> Its coefficients have meanings and standard errors. We can state a hypothesis about how things work, such as “photos taken at night are more likely to show an animal,” test it, and say how sure we are.</li>
+<li><strong>A reference point.</strong> A logistic regression on brightness, color, and edges shows how much those simple features already explain, and whether the AI adds anything beyond them.</li>
+<li><strong>A shortcut check.</strong> A flexible model can latch onto things that will not hold up, such as one camera’s background, near-copies of the same burst in training and test data, or how the labels were made. If the simple model does just as well, ask why.</li>
+</ul>
+<p>It does not need to win to be useful.</p>
 </section>
 <section id="thursday" class="slide level2">
 <h2>Thursday</h2>
-<p>We will:</p>
+<p>First, how statistics and ML fit these models, and where each one stops. Then the lab:</p>
 <ol type="1">
-<li>inspect frames and trigger sequences;</li>
-<li>fit the logistic baseline;</li>
-<li>compare it descriptively with supplied AI predictions;</li>
-<li>save the paired table that starts HW1.</li>
+<li>look at the photos and their bursts;</li>
+<li>fit the logistic regression baseline;</li>
+<li>compare it with MegaDetector on cameras the models have not seen.</li>
 </ol>
-<p>The lab result is a rehearsal, not the homework answer.</p>
+<p><strong>Read before Thursday:</strong> Breiman, <a href="https://projecteuclid.org/journals/statistical-science/volume-16/issue-3/Statistical-Modeling--The-Two-Cultures-with-comments-and-a/10.1214/ss/1009213726.full">“Statistical Modeling: The Two Cultures”</a>, pp.&nbsp;199–208, plus one discussant. Come with one thing the prediction culture got right.</p>
 
 </section>
     </div>
@@ -559,13 +918,13 @@ You set the activation, width, and connectivity. Training learns weights within 
   <script src="lecture_a_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
   <script src="lecture_a_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
   <script src="lecture_a_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
   <script src="lecture_a_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
   <script src="lecture_a_files/libs/revealjs/plugin/notes/notes.js"></script>
   <script src="lecture_a_files/libs/revealjs/plugin/search/search.js"></script>
   <script src="lecture_a_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="lecture_a_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
@@ -580,7 +939,8 @@ You set the activation, width, and connectivity. Training learns weights within 
 'autoAnimateDuration': 1,
 'autoAnimateUnmatched': true,
 'jumpToSlide': true,
-'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
 'smaller': false,
  
         // Display controls in the bottom right corner
@@ -733,27 +1093,9 @@ You set the activation, width, and connectivity. Training learns weights within 
         // Factor of the display size that should remain empty around the content
         margin: 0.1,
 
-        math: {
-          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
-          config: 'TeX-AMS_HTML-full',
-          tex2jax: {
-            inlineMath: [['\\(','\\)']],
-            displayMath: [['\\[','\\]']],
-            balanceBraces: true,
-            processEscapes: false,
-            processRefs: true,
-            processEnvironments: true,
-            preview: 'TeX',
-            skipTags: ['script','noscript','style','textarea','pre','code'],
-            ignoreClass: 'tex2jax_ignore',
-            processClass: 'tex2jax_process'
-          },
-        },
-
         // reveal.js plugins
-        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
 
-          RevealMath,
           RevealNotes,
           RevealSearch,
           RevealZoom

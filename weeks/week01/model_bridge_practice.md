@@ -11,6 +11,7 @@ In 16 independent binary observations, 4 outcomes equal 1.
    $p$, differentiate, and find $\widehat p$.
 2. If $p=\sigma(\beta_0)$, find $\widehat\beta_0$ exactly as a log ratio.
 3. Explain what happens to the finite intercept MLE if all 16 outcomes are 0.
+4. Use the delta method to find the approximate standard error of $\widehat\beta_0$.
 
 ## 2. Same model class, different fit
 
@@ -25,15 +26,15 @@ $$\widehat p_i=\sigma(w_0+x_i^Tw).$$
    logistic regression and whether the fitted coefficients must equal the
    unpenalized MLE.
 
-## 3. Linear decision boundary
+## 3. Decision boundary and cutoff
 
-A perceptron predicts 1 when
+A fitted logistic regression is $\widehat p(x)=\sigma(1+x_1-x_2)$, and the rule
+predicts 1 when $\widehat p(x)\ge c$.
 
-$$s(x)=2-x_1-2x_2>0.$$
-
-Derive the boundary, identify the side classified as 1, and classify $(0,0)$,
-$(2,0)$, and $(0,2)$. State what changes if all three coefficients are multiplied
-by 5.
+1. At $c=0.5$, derive the boundary and identify the side classified as 1.
+2. Classify $(0,0)$, $(0,2)$, and $(1,2)$.
+3. Lower the cutoff to $c=\sigma(-1)\approx0.27$. Find the new boundary and say
+   what changed and what did not.
 
 ## 4. Bias and variance
 
