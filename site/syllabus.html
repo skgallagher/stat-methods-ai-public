@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
-    <link rel="stylesheet" href="styles.css?v=5">
+    <link rel="stylesheet" href="styles.css?v=6">
   </head>
   <body>
     <header class="site-header">
@@ -172,49 +172,16 @@ statistical baseline it can explain, compares it fairly with the AI
 system, quantifies uncertainty, tests whether its conclusion survives a
 reasonable alternative analysis, and makes a recommendation that matches
 the evidence.</p>
-<p>Teams choose one of four tracks:</p>
-<table>
-<colgroup>
-<col style="width: 21%" />
-<col style="width: 42%" />
-<col style="width: 35%" />
-</colgroup>
-<thead>
-<tr>
-<th>Track</th>
-<th>Client question</th>
-<th>Data and AI system</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Food tagging</td>
-<td>Should an online marketplace tag food photos automatically?</td>
-<td>Food-101 images; CLIP image classifier</td>
-</tr>
-<tr>
-<td>Pet tagging</td>
-<td>Can the system tag pet breeds, or only cats versus dogs?</td>
-<td>Oxford-IIIT Pet images; CLIP image classifier</td>
-</tr>
-<tr>
-<td>Human preferences</td>
-<td>Does an LLM judge measure what people actually prefer?</td>
-<td>Stanford Human Preferences pairs from Reddit; LLM judge</td>
-</tr>
-<tr>
-<td>Instruction following</td>
-<td>Is an LLM judge a trustworthy way to check whether responses follow
-instructions?</td>
-<td>IFEval-style prompts and responses; rule checker and LLM judge</td>
-</tr>
-</tbody>
-</table>
-<p>Data, cached AI outputs, and starter code are provided for every
-track. Teams and track choices are set by the midterm. The project then
-runs through the end of the semester, with two milestones, a short
-ending artifact, a recorded video with its slides, and an oral
-defense.</p>
+<p>Teams choose one of four tracks: food tagging, pet tagging, human
+preferences, or instruction following. Data, cached AI outputs, and
+starter code are provided for every track. The study is built in three
+milestones and presented to the client as slides and a five-minute
+video, followed by an oral defense.</p>
+<p>Two documents on the <a
+href="https://www.stat.cmu.edu/~sgallagh/courses/stat-ai-spring-2027/project.html">course
+website’s project page</a> hold every project requirement: the
+<strong>Project Description</strong> (what to do and when) and the
+<strong>Project Rubric</strong> (how it is graded, in points).</p>
 <h2 id="major-topics">Major topics</h2>
 <ul>
 <li>From regression to neural networks</li>
@@ -440,53 +407,12 @@ logistic regression. It also includes uncertainty for each key estimate,
 a fair comparison between the baseline and the AI system, one
 sensitivity analysis that could change the conclusion, and a
 recommendation that matches the evidence.</p>
-<p>The project is 40% of the course grade, divided as follows:</p>
-<table>
-<thead>
-<tr>
-<th>Deliverable</th>
-<th style="text-align: right;">Share of project grade</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Milestone 1: questions, estimands, EDA, and design</td>
-<td style="text-align: right;">15%</td>
-</tr>
-<tr>
-<td>Milestone 2: modeling, inference, and evaluation</td>
-<td style="text-align: right;">20%</td>
-</tr>
-<tr>
-<td>Ending artifact: sensitivity analysis and decision</td>
-<td style="text-align: right;">5% (completion)</td>
-</tr>
-<tr>
-<td>Five-minute recorded video</td>
-<td style="text-align: right;">20%</td>
-</tr>
-<tr>
-<td>Oral discussion and defense</td>
-<td style="text-align: right;">20%</td>
-</tr>
-<tr>
-<td>Slides submitted with the video</td>
-<td style="text-align: right;">10%</td>
-</tr>
-<tr>
-<td>Within-team peer assessment</td>
-<td style="text-align: right;">10%</td>
-</tr>
-</tbody>
-</table>
-<p>The video and its slides are the polished argument for the client.
-The oral defense checks that every team member understands it. The
-ending artifact is a small completion grade meant to keep teams from
-starting the final argument in the last week.</p>
-<p>For the peer assessment, each student privately evaluates their own
-teammates, with specific examples. Ratings are not averaged
-mechanically, and documented, substantial non-contribution can lower an
-individual’s project grade.</p>
+<p>The project is 40% of the course grade, including an individual peer
+assessment. The Project Rubric lists every deliverable and its points,
+and the Project Description says what each one contains. Both are on the
+<a
+href="https://www.stat.cmu.edu/~sgallagh/courses/stat-ai-spring-2027/project.html">project
+page</a>.</p>
 <h2 id="course-calendar">Course calendar</h2>
 <p>Dates follow CMU’s official Spring 2027 academic calendar. Homework
 is due Tuesdays at 11:59 pm unless noted. Each week’s checkpoint opens
@@ -572,8 +498,7 @@ teams finalized</td>
 <td>Mar 16 / 18</td>
 <td>Distribution shift and project launch</td>
 <td>CP7</td>
-<td>Shift exercise · project question and initial EDA due Thu Mar
-18</td>
+<td>Shift exercise · project launch session Thu</td>
 </tr>
 <tr>
 <td style="text-align: right;">10</td>
@@ -587,14 +512,15 @@ teams finalized</td>
 <td>Mar 30 / Apr 1</td>
 <td>Designed AI evaluations</td>
 <td>CP9</td>
-<td>Substudy design due Thu Apr 1</td>
+<td>Project work session Thu</td>
 </tr>
 <tr>
 <td style="text-align: right;">12</td>
 <td>Apr 6 / 8</td>
 <td>LLM judges as measurement instruments</td>
 <td>CP10</td>
-<td>Project Milestone 2 due Apr 6 · HW7 due Apr 13</td>
+<td>Project Milestone 2 due Apr 6 · project work session Thu · HW7 due
+Apr 13</td>
 </tr>
 <tr>
 <td style="text-align: right;">13</td>
@@ -609,14 +535,15 @@ Carnival)</td>
 <td>Apr 20 / 22</td>
 <td>Statistical argument and recommendation</td>
 <td>—</td>
-<td>Ending artifact due Apr 20 · video dry run Thu</td>
+<td>Storyboard in class Tue · Project Milestone 3 due Apr 20 · dry run
+Thu</td>
 </tr>
 <tr>
 <td style="text-align: right;">15</td>
 <td>Apr 27 / 29</td>
 <td>Oral defenses and course synthesis</td>
 <td>—</td>
-<td>Video and slides due Sun Apr 25 · oral defenses Tue and Thu</td>
+<td>Slides and video due Sun Apr 25 · oral defenses Tue and Thu</td>
 </tr>
 </tbody>
 </table>
@@ -813,7 +740,7 @@ planning document.</p>
       <div class="wrap">Statistical Evaluation of AI · Carnegie Mellon University · Spring 2027. Canvas has the official deadlines.</div>
     </footer>
 
-    <script src="course-data.js?v=5"></script>
-    <script src="site.js?v=5"></script>
+    <script src="course-data.js?v=6"></script>
+    <script src="site.js?v=6"></script>
   </body>
 </html>

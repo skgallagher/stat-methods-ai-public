@@ -181,7 +181,7 @@ After spring break, you work in a team of four as a research team for a client. 
 | Human preferences | Does an LLM judge measure what people prefer? |
 | Instruction following | Can an LLM judge check whether responses follow instructions? |
 
-You build it in steps: two milestones along the way, then a short video with slides and a conversation with me about your work.
+You build it in steps: three milestones along the way, then a short video with slides and a conversation with me about your work.
 
 ## AI in this course {.smaller}
 

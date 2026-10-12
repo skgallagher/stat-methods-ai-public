@@ -74,21 +74,28 @@ const weeklyMaterials = [
   { week: 11, dates: "Mar 30 / Apr 1", publishDate: "2027-03-28", topic: "Designed AI evaluations" },
   { week: 12, dates: "Apr 6 / 8", publishDate: "2027-04-04", topic: "LLM judges as measurement instruments", note: "Project Milestone 2 due Apr 6" },
   { week: 13, dates: "Apr 13", publishDate: "2027-04-11", topic: "Human-centered and responsible AI", note: "Guest lecture Tue · no class Thu (Spring Carnival)" },
-  { week: 14, dates: "Apr 20 / 22", publishDate: "2027-04-18", topic: "Statistical argument and recommendation", note: "Ending artifact due Apr 20" },
-  { week: 15, dates: "Apr 27 / 29", publishDate: "2027-04-25", topic: "Oral defenses and course synthesis", note: "Video and slides due Apr 25" }
+  { week: 14, dates: "Apr 20 / 22", publishDate: "2027-04-18", topic: "Statistical argument and recommendation", note: "Project Milestone 3 due Apr 20" },
+  { week: 15, dates: "Apr 27 / 29", publishDate: "2027-04-25", topic: "Oral defenses and course synthesis", note: "Slides and video due Sun Apr 25" }
 ];
 
 const projectDocs = [
+  {
+    label: "Project Description",
+    href: "project_description.pdf",
+    actionLabel: "PDF",
+    status: "The client, the four tracks, how to tell the study as one story, and what each deliverable contains, with dates."
+  },
+  {
+    label: "Project Rubric",
+    href: "project_rubric.pdf",
+    actionLabel: "PDF",
+    status: "How every deliverable is graded, in points."
+  },
   {
     label: "Project data",
     href: courseLinks.projectDataBox,
     actionLabel: "Box folder",
     openDate: "2027-03-14",
     status: "Data, cached AI outputs, and starter notebooks for all four tracks. Opens with the project launch in Week 9."
-  },
-  {
-    label: "Project handbook",
-    href: null,
-    status: "Deliverables, rubrics, and examples. Coming later."
   }
 ];
