@@ -8,8 +8,8 @@ format: pdf
 |---|---|
 | **Out / due** | Tue Jan 19 / Tue Jan 26, 11:59pm |
 | **Points** | 100: Problem 1 (50), Problem 2 (30), Problem 3 (20) |
-| **Expected time** | About 4.5–5.5 hours after completing Lab 1; contact course staff if setup/debugging alone exceeds 30 minutes |
-| **Reading** | Breiman (2001), pp. 199–208 and one discussant; Bishop & Bishop neural-network sections as reference |
+| **Expected time** | About 4–5 hours after completing Lab 1; contact course staff if setup/debugging alone exceeds 30 minutes |
+| **Reading** | Optional: Breiman (2001), pp. 199–208 and one discussant. Bishop & Bishop neural-network sections as reference. |
 | **AI policy** | No AI for Problem 1. AI is optional in Problem 2(a–d) and required for the 5-point attempt in Problem 2(e) and for Problem 3. Submit the AI-use record at the end. |
 | **Working file** | Complete all work in `hw01_starter.ipynb`; the PDF is a read-only prompt copy. |
 | **Submit** | Notebook PDF + completed `.ipynb` in one Gradescope submission. |
@@ -32,31 +32,23 @@ For $0<q<1$, the logit function is $\operatorname{logit}(q)=\log\{q/(1-q)\}$. Th
 
 Each numbered item is a separate grading checkpoint. Show your setup and intended next step; correct partial work can earn substantial credit.
 
-a. **Bernoulli likelihood, the intercept, and its standard error (13 points).** Let $Y_1,\ldots,Y_n$ be independent $\operatorname{Bernoulli}(p)$ observations and let $k=\sum_{i=1}^nY_i$, with $0<k<n$.
+a. **Bernoulli likelihood and the intercept (9 points).** Let $Y_1,\ldots,Y_n$ be independent $\operatorname{Bernoulli}(p)$ observations and let $k=\sum_{i=1}^nY_i$, with $0<k<n$.
 
-   **(i) Likelihood setup (2 points).** Write the likelihood $L(p)$ and log-likelihood $\ell(p)$, simplifying both in terms of $k$ and $n$.
+   **(i) Likelihood setup (3 points).** Write the likelihood $L(p)$ and log-likelihood $\ell(p)$, simplifying both in terms of $k$ and $n$.
 
-   **(ii) Maximize over $p$ (3 points).** Set the derivative of $\ell(p)$ equal to zero and solve for $p$. Use the second derivative to show that $\widehat p=k/n$ is a maximum.
+   **(ii) Maximize over $p$ (4 points).** Set the derivative of $\ell(p)$ equal to zero and solve for $p$. Use the second derivative to show that $\widehat p=k/n$ is a maximum.
 
-   **(iii) Transform to an intercept (1 point).** In an intercept-only logistic regression, $p=\sigma(\beta_0)$, so $\beta_0=\operatorname{logit}(p)$. Write the MLE $\widehat\beta_0$.
+   **(iii) Transform to an intercept (2 points).** In an intercept-only logistic regression, $p=\sigma(\beta_0)$, so $\beta_0=\operatorname{logit}(p)$. Write the MLE $\widehat\beta_0$. Compute it for $k=36$ of $n=40$, and say in one sentence what happens to $\widehat\beta_0$ as $k$ approaches $0$ or $n$.
 
-   **(iv) Standard error by the delta method (4 points).** You know $\operatorname{Var}(\widehat p)=p(1-p)/n$. The delta method says that for a smooth function $g$,
-   $$\operatorname{Var}\{g(\widehat p)\}\approx g'(p)^2\operatorname{Var}(\widehat p).$$
-   Show that the derivative of $\operatorname{logit}(p)$ is $1/\{p(1-p)\}$. Then show that
-   $$\operatorname{SE}(\widehat\beta_0)\approx\frac{1}{\sqrt{n\,\widehat p(1-\widehat p)}},$$
-   where you plug in $\widehat p$ for $p$ at the end.
+   *Optional check.* An intercept-only logistic regression in `statsmodels` on 36 ones and 4 zeros reports the same estimate.
 
-   **(v) Numbers, an interval, and the endpoints (3 points).** Suppose $k=36$ of $n=40$. Compute $\widehat\beta_0$ and its standard error. Form the 95% interval $\widehat\beta_0\pm1.96\,\operatorname{SE}$ for $\beta_0$, then apply $\sigma$ to both endpoints to get an interval for $p$. In one sentence, say what happens to $\widehat\beta_0$ and its standard error as $k$ approaches $0$ or $n$.
-
-   *Optional check.* An intercept-only logistic regression in `statsmodels` on 36 ones and 4 zeros reports the same estimate and standard error.
-
-b. **No-hidden-layer network and logistic regression (13 points).** Consider a sigmoid network with no hidden layer,
+b. **No-hidden-layer network and logistic regression (14 points).** Consider a sigmoid network with no hidden layer,
 
 $$\widehat p_i=\sigma(w_0+x_i^Tw).$$
 
    **(i) Model-class equivalence (4 points).** Apply the logit transformation to show that this model is exactly logistic regression. Identify the corresponding logistic-regression coefficients.
 
-   **(ii) Fitting equivalence (5 points).** Write the Bernoulli log-likelihood in terms of $\widehat p_i$. Then show that minimizing binary cross-entropy,
+   **(ii) Fitting equivalence (6 points).** Write the Bernoulli log-likelihood in terms of $\widehat p_i$. Then show that minimizing binary cross-entropy,
 
 $$-\sum_{i=1}^n\left\{y_i\log(\widehat p_i)+(1-y_i)\log(1-\widehat p_i)\right\},$$
 
@@ -64,13 +56,13 @@ $$-\sum_{i=1}^n\left\{y_i\log(\widehat p_i)+(1-y_i)\log(1-\widehat p_i)\right\},
 
    **(iii) Separate architecture from fitting (4 points).** Give one architecture change that breaks equality of the model classes and one fitting change that can make the fitted coefficients differ from the unpenalized MLE. For each change, state which equivalence it breaks.
 
-c. **Decision boundary and cutoff (10 points).** A fitted logistic regression is
+c. **Decision boundary and cutoff (11 points).** A fitted logistic regression is
 
 $$\widehat p(x)=\sigma(-1+2x_1-x_2),$$
 
 and the rule predicts 1 when $\widehat p(x)\ge c$.
 
-   **(i) Boundary equation (2 points).** At $c=0.5$, show that the rule predicts 1 exactly when $-1+2x_1-x_2\ge0$. Write the decision boundary as an equation for $x_2$ in terms of $x_1$.
+   **(i) Boundary equation (3 points).** At $c=0.5$, show that the rule predicts 1 exactly when $-1+2x_1-x_2\ge0$. Write the decision boundary as an equation for $x_2$ in terms of $x_1$.
 
    **(ii) Draw and label (3 points).** Draw the boundary on labeled $x_1$ and $x_2$ axes and clearly label the side classified as 1. You may draw it on the computer or insert a clear photo of a hand-drawn graph in the notebook.
 
@@ -78,13 +70,13 @@ and the rule predicts 1 when $\widehat p(x)\ge c$.
 
    **(iv) Move the cutoff (2 points).** Raise the cutoff to $c=0.8$. Find the new boundary, add it to your drawing, and explain in one sentence what changed and what did not.
 
-d. **Bias, variance, and flexibility (14 points).** Fix a feature vector $x$. Let $p(x)=\Pr(Y=1\mid X=x)$ and let $\widehat p_D(x)$ be an estimated probability fitted using a random training dataset $D$. Assume the new response $Y$ and $D$ are conditionally independent given $x$.
+d. **Bias, variance, and flexibility (16 points).** Fix a feature vector $x$. Let $p(x)=\Pr(Y=1\mid X=x)$ and let $\widehat p_D(x)$ be an estimated probability fitted using a random training dataset $D$. Assume the new response $Y$ and $D$ are conditionally independent given $x$.
 
    In this problem, expected values involving only $\widehat p_D(x)$ average over repeated training datasets. The expected value of prediction error averages over both the repeated training datasets and the new response. We state the source of randomness in words rather than decorating $\mathbb E$ with subscripts.
 
-   **(i) First decomposition step (3 points).** Add and subtract $p(x)$ inside $Y-\widehat p_D(x)$, expand the square, and explain why the expected value of the cross-term is zero.
+   **(i) First decomposition step (4 points).** Add and subtract $p(x)$ inside $Y-\widehat p_D(x)$, expand the square, and explain why the expected value of the cross-term is zero.
 
-   **(ii) Bias--variance step (2 points).** Decompose $\mathbb E[(p(x)-\widehat p_D(x))^2\mid x]$ into squared bias and variance. Combine your result with part (i) to show that
+   **(ii) Bias--variance step (3 points).** Decompose $\mathbb E[(p(x)-\widehat p_D(x))^2\mid x]$ into squared bias and variance. Combine your result with part (i) to show that
 
 $$
 \begin{aligned}
@@ -101,7 +93,7 @@ $$
 
    **(iv) Compare the methods (2 points).** State which method has lower bias and which has lower expected squared prediction error.
 
-   **(v) Interpret (4 points).** In 2-3 sentences, connect this result to Breiman's two cultures and explain why flexibility alone does not determine the better statistical analysis.
+   **(v) Interpret (4 points).** In 2-3 sentences, connect this result to the two cultures from Lecture 1A and explain why flexibility alone does not determine the better statistical analysis.
 
 # Problem 2 — Baseline and AI system on new cameras (30 points)
 
@@ -115,9 +107,13 @@ c. **Reproducible error inspection (8 points).** Select four errors using the la
 
 d. **Five-sentence report (6 points).** Write a five-sentence provisional report: statistical baseline; observed performance; comparison with the AI system; population to which the comparison applies; most important limitation.
 
-e. **Ambitious AI-assisted attempt (5 points).** Attempting this part is required to earn these 5 points; improvement is not required. Before asking AI or running code, choose one substantial departure from the documented baseline: either fit a nonlinear classifier using the same image summaries or construct one additional feature from supplied metadata and refit the logistic model. Use AI to help with the attempt, preserve the relevant prompt or suggestion, keep the official split unchanged, and show enough code and output to reproduce successes or failures. In 2-3 sentences, state what changed, what happened on `homework_holdout`, and why an extension chosen after access to this holdout cannot replace the primary comparison without new untouched evidence.
+e. **Ambitious AI-assisted attempt (5 points).** You earn these points for a real attempt; the new model does not have to do better. Before asking AI or running code, choose one change and write it down: either fit one nonlinear classifier (for example, a random forest) to the same four image summaries, or add one feature built from the supplied metadata to the logistic model. Use AI to help write the code, and keep your prompt or its suggestion.
 
-# Problem 3 — Use AI, then audit the explanation (20 points)
+   **Where to stop.** Fit the new model once on the `analysis` rows, using the software's default settings, and score it once on `homework_holdout`. Then stop. Do not tune settings, try a second model, or change the split after you see the score. If the code still does not run after about 30 minutes, stop there as well and report what went wrong; a clearly described failure can earn full credit.
+
+   In 2-3 sentences, state what you changed, what happened on `homework_holdout`, and why a change chosen after seeing this holdout cannot replace the primary comparison without new photos that neither model has seen.
+
+# Problem 3 — Use AI, then check the explanation (20 points)
 
 a. **Generate and check an explanation (8 points).** Before using AI, choose one aspect of the explanation to watch closely: the observation unit, source of dependence, split, target population, or expected direction of bias. In one sentence, predict what the assistant might get wrong or leave out. Then ask an AI assistant to explain why a random frame split can exaggerate estimated camera-trap performance for new camera locations. Preserve your initial prompt and the assistant's complete first response.
 

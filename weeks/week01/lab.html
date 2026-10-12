@@ -111,25 +111,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>What does something simple already get right?</strong> We fit a logistic regression that uses only a few basic summaries of each photo, such as how bright and how green it is. If that simple model does nearly as well, the AI is not adding much.</li>
 <li><strong>Are we testing on the right photos?</strong> The team will use the model at cameras it has never seen. So we judge both models on cameras that were not used to fit anything, and we look at what goes wrong if we split the photos at random instead.</li>
 </ol>
-<p><strong>Before lab:</strong> finish HW0, the Colab and Gradescope practice run. <strong>Before you leave:</strong> save <code>lab1_handoff.csv</code> and your handoff sentences. HW1 repeats today’s steps on a different set of cameras.</p>
-</section>
-<section id="before-you-start-name-the-pieces" class="level2">
-<h2 class="anchored" data-anchor-id="before-you-start-name-the-pieces">Before you start: name the pieces</h2>
-<p><strong>Why this step:</strong> lecture separated four things that are easy to blur together. Naming them for the wildlife team keeps us clear about what we are estimating.</p>
-<ol type="1">
-<li>the <strong>model</strong>: a fitted probability that a photo contains an animal;</li>
-<li>the <strong>performance</strong> we estimate: how often the model is right on photos from new cameras;</li>
-<li>the <strong>threshold</strong>: the probability above which we call a photo “animal”;</li>
-<li>the <strong>action</strong>: sending flagged photos to a person, and possibly never looking at the rest.</li>
-</ol>
-<p>Each photo is called a <strong>frame</strong> and counts once in the accuracy. Frames from the same sequence are related, and camera locations decide which photos we fit on and which we test on. So the accuracy below weights each camera by how many frames it has; it is not an average over cameras.</p>
-<p><strong>Your turn:</strong> in one or two sentences, describe the four pieces for this task in your own words.</p>
-<p><strong>Your answer:</strong> TODO</p>
+<p><strong>Before lab:</strong> finish HW0, the Colab and Gradescope practice run. <strong>Before you leave:</strong> save <code>lab1_handoff.csv</code> and write the one-sentence handoff. HW1 repeats today’s steps on a different set of cameras.</p>
 </section>
 <section id="load-the-photos" class="level2">
 <h2 class="anchored" data-anchor-id="load-the-photos">Load the photos</h2>
-<p>Each row is one photo. <code>image_features.csv</code> holds the four simple summaries the logistic regression uses.</p>
-<div id="a1978954" class="cell" data-execution_count="1">
+<p>Each row is one photo, called a <strong>frame</strong>, and each frame counts once in the accuracy. Frames from the same sequence are related, and whole cameras decide which photos we fit on and which we test on. <code>image_features.csv</code> holds the four simple summaries the logistic regression uses.</p>
+<div id="8433f568" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -154,7 +141,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>explain why photos from the same sequence should not be split between fitting and testing;</li>
 <li>find the share of photos with the most common label. A “model” that always guesses that label gets this accuracy, so it is the simplest reference point.</li>
 </ul>
-<div id="0ce3755a" class="cell" data-execution_count="2">
+<div id="6c9ebbbb" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>analysis <span class="op">=</span> dat.query(<span class="st">"split == 'analysis'"</span>).copy()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>holdout <span class="op">=</span> dat.query(<span class="st">"split == 'holdout_camera'"</span>).copy()</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>analysis_majority_reference <span class="op">=</span> analysis[<span class="st">"animal_present"</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>).<span class="bu">max</span>()</span>
@@ -194,8 +181,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="fit-the-simple-model" class="level2">
 <h2 class="anchored" data-anchor-id="fit-the-simple-model">Fit the simple model</h2>
-<p><strong>Why this step:</strong> this is the statistician’s baseline, a model we fully understand. It uses only brightness, edge density, greenness, and whether the photo was taken at night. Check that only the analysis cameras are used to fit it. The coefficient signs describe changes in the fitted log-odds holding the other listed summaries fixed; they are not causal effects.</p>
-<div id="3cbfa9dc" class="cell" data-execution_count="3">
+<p><strong>Why this step:</strong> this is the statistician’s baseline, a model we fully understand. It uses only brightness, edge density, greenness, and whether the photo was taken at night. Check that only the analysis cameras are used to fit it.</p>
+<div id="4ca61a64" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>baseline <span class="op">=</span> LogisticRegression(max_iter<span class="op">=</span><span class="dv">2000</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>baseline.fit(analysis[FEATURES], analysis[<span class="st">"animal_present"</span>])</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -207,9 +194,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="compare-the-two-models" class="level2">
 <h2 class="anchored" data-anchor-id="compare-the-two-models">Compare the two models</h2>
 <p><strong>Why this step:</strong> this is the main question for the team. Does the AI do better than the simple model on cameras neither one has seen, and on which photos do they disagree?</p>
-<p>Complete the supplied table with analysis and held-out-camera accuracy for the baseline and supplied vision model. The denominator is the number of frames. Include the denominator and the observed majority-class reference computed separately within each displayed split. This reference describes class balance after seeing the split’s labels; it is not a fitted, deployable rule.</p>
-<p>Interpret two coefficient signs as features of the fitted prediction surface, holding the other listed summaries fixed. Then explain which performance number is merely an in-sample fit diagnostic and which describes frames from the represented held-out camera locations.</p>
-<div id="8889a05f" class="cell" data-execution_count="4">
+<p>The first table gives each model’s accuracy on the analysis cameras and on the held-out cameras. The denominator is the number of frames. The majority reference is the share of the most common label in that split. It describes the class balance, not a model anyone could use.</p>
+<p>The second table is the paired table. It counts the held-out photos that both models got right, that only one got right, and that both got wrong.</p>
+<p>In one sentence, say which accuracy only checks how well the model fits its own photos and which one describes photos from new cameras.</p>
+<div id="5700d9c7" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> performance_rows(data, split_name):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    majority_reference <span class="op">=</span> data[<span class="st">"animal_present"</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>).<span class="bu">max</span>()</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    rows <span class="op">=</span> []</span>
@@ -238,43 +226,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    ignore_index<span class="op">=</span><span class="va">True</span>,</span>
 <span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>coefficient_table <span class="op">=</span> pd.DataFrame(</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>        <span class="st">"feature"</span>: FEATURES,</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>        <span class="st">"fitted_log_odds_coefficient"</span>: baseline.coef_[<span class="dv">0</span>],</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> paired_correctness_table(data):</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    paired <span class="op">=</span> data.assign(</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>        baseline_correct<span class="op">=</span>data[<span class="st">"baseline_pred"</span>].eq(data[<span class="st">"animal_present"</span>]),</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>        ai_correct<span class="op">=</span>data[<span class="st">"vision_pred"</span>].eq(data[<span class="st">"animal_present"</span>]),</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (</span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>        paired.groupby([<span class="st">"baseline_correct"</span>, <span class="st">"ai_correct"</span>])</span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>              .size()</span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>              .reindex(</span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>                  pd.MultiIndex.from_product(</span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>                      [[<span class="va">True</span>, <span class="va">False</span>], [<span class="va">True</span>, <span class="va">False</span>]],</span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>                      names<span class="op">=</span>[<span class="st">"baseline_correct"</span>, <span class="st">"ai_correct"</span>],</span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>                  ),</span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>                  fill_value<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>              )</span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>              .rename(<span class="st">"n"</span>)</span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>              .reset_index()</span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>paired_table <span class="op">=</span> paired_correctness_table(holdout)</span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>display(performance_table)</span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>display(coefficient_table)</span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>display(paired_table)</span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">set</span>(analysis[<span class="st">"camera_id"</span>]).isdisjoint(<span class="bu">set</span>(holdout[<span class="st">"camera_id"</span>]))</span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> dat.groupby(<span class="st">"sequence_id"</span>)[<span class="st">"split"</span>].nunique().<span class="bu">max</span>() <span class="op">==</span> <span class="dv">1</span></span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> paired_table[<span class="st">"n"</span>].<span class="bu">sum</span>() <span class="op">==</span> <span class="bu">len</span>(holdout)</span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(paired_table) <span class="op">==</span> <span class="dv">4</span></span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"split checks passed"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> paired_correctness_table(data):</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    paired <span class="op">=</span> data.assign(</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>        baseline_correct<span class="op">=</span>data[<span class="st">"baseline_pred"</span>].eq(data[<span class="st">"animal_present"</span>]),</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>        ai_correct<span class="op">=</span>data[<span class="st">"vision_pred"</span>].eq(data[<span class="st">"animal_present"</span>]),</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>        paired.groupby([<span class="st">"baseline_correct"</span>, <span class="st">"ai_correct"</span>])</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>              .size()</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>              .reindex(</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>                  pd.MultiIndex.from_product(</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>                      [[<span class="va">True</span>, <span class="va">False</span>], [<span class="va">True</span>, <span class="va">False</span>]],</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>                      names<span class="op">=</span>[<span class="st">"baseline_correct"</span>, <span class="st">"ai_correct"</span>],</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>                  ),</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>                  fill_value<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>              )</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>              .rename(<span class="st">"n"</span>)</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>              .reset_index()</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>paired_table <span class="op">=</span> paired_correctness_table(holdout)</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>display(performance_table)</span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>display(paired_table)</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">set</span>(analysis[<span class="st">"camera_id"</span>]).isdisjoint(<span class="bu">set</span>(holdout[<span class="st">"camera_id"</span>]))</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> dat.groupby(<span class="st">"sequence_id"</span>)[<span class="st">"split"</span>].nunique().<span class="bu">max</span>() <span class="op">==</span> <span class="dv">1</span></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> paired_table[<span class="st">"n"</span>].<span class="bu">sum</span>() <span class="op">==</span> <span class="bu">len</span>(holdout)</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(paired_table) <span class="op">==</span> <span class="dv">4</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"split checks passed"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>What you found:</strong> TODO</p>
 </section>
@@ -282,7 +262,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="instructor-run-what-if-we-split-the-photos-at-random">Instructor run: what if we split the photos at random?</h2>
 <p><strong>Why this step:</strong> many tutorials split data at random. Here that would put photos from the same sequence, and the same camera, on both sides of the split. The test would then be easier than the job the team actually faces.</p>
 <p>The instructor runs the contrast below. It deliberately allows cameras and trigger sequences to cross the random train/test boundary. Before running it, predict how its accuracy might compare with the camera-held-out accuracy and name one reason; the direction is not guaranteed in every finite dataset.</p>
-<div id="48d51d2e" class="cell" data-execution_count="5">
+<div id="16cc3eab" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>comparison_pool <span class="op">=</span> dat.query(<span class="st">"split in ['analysis', 'holdout_camera']"</span>).copy()</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>random_train, random_test <span class="op">=</span> train_test_split(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    comparison_pool,</span>
@@ -318,18 +298,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="stop-and-discuss" class="level2">
 <h2 class="anchored" data-anchor-id="stop-and-discuss">Stop and discuss</h2>
-<p>Whole-class questions:</p>
-<ul>
-<li>How does performance change from the analysis rows to the held-out cameras for each system?</li>
-<li>Which explanations involve estimation variability and which involve a population difference? What can one split not distinguish?</li>
-<li>Why does a more accurate AI system not make the simple model useless to the team?</li>
-</ul>
-<p>Explain why the random-frame test accuracy and camera-held-out accuracy target different populations, using the observed camera and sequence overlap in the table.</p>
+<p>Use the shared cameras and sequences in the table to explain why the random-split accuracy and the held-out-camera accuracy describe different populations of photos.</p>
 </section>
-<section id="choose-which-mistakes-to-look-at" class="level2">
-<h2 class="anchored" data-anchor-id="choose-which-mistakes-to-look-at">Choose which mistakes to look at</h2>
-<p><strong>Why this step:</strong> the team cares most about mistakes, especially animals the model missed. But if we browse until we find a striking photo, we will tell a misleading story. So the code below chooses mistakes <strong>before</strong> displaying them: one reproducibly random error and one highest-confidence error from each system. Read the function together and identify where the rule is locked.</p>
-<div id="29d04621" class="cell" data-execution_count="6">
+<section id="look-at-the-mistakes-together" class="level2">
+<h2 class="anchored" data-anchor-id="look-at-the-mistakes-together">Look at the mistakes together</h2>
+<p><strong>Why this step:</strong> the team cares most about mistakes, especially animals the model missed. But if we browse until we find a striking photo, we will tell a misleading story. So the code chooses the mistakes <strong>before</strong> showing them: one random error and the most confident error from each model.</p>
+<p>The instructor runs this part. Watch for the line where the rule is fixed. Four chosen photos can suggest why a model fails, but they cannot tell us how often it fails that way. In HW1 you run the same code on the homework cameras and describe what you see.</p>
+<div id="553b27c4" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> select_system_errors(data, system, seed<span class="op">=</span>SEED):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    columns <span class="op">=</span> {</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"baseline"</span>: (<span class="st">"baseline_prob"</span>, <span class="st">"baseline_pred"</span>),</span>
@@ -369,12 +344,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>]</span>
 <span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>selected_errors[gallery_fields]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-<section id="look-at-the-mistakes" class="level2">
-<h2 class="anchored" data-anchor-id="look-at-the-mistakes">Look at the mistakes</h2>
-<p>Display exactly the cases selected above. Do not browse first and then invent a selection rule. Then change <code>seed</code> once and explain which selections can change and which cannot.</p>
-<p>Write one visible similarity or contrast and one fact these four purposively selected cases cannot establish about the target population.</p>
-<div id="4eb7f048" class="cell" data-execution_count="7">
+<div id="a25f0f9b" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="dv">8</span>))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, (_, row) <span class="kw">in</span> <span class="bu">zip</span>(axes.flat, selected_errors.iterrows()):</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    image_path <span class="op">=</span> data_dir <span class="op">/</span> row[<span class="st">"image_path"</span>]</span>
@@ -393,55 +363,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>What you noticed:</strong> TODO</p>
-</section>
-<section id="check-an-ais-explanation" class="level2">
-<h2 class="anchored" data-anchor-id="check-an-ais-explanation">Check an AI’s explanation</h2>
-<p><strong>Why this step:</strong> an AI assistant will happily explain your results. Before any explanation goes into a report to the team, check each claim against the evidence.</p>
-<p>An AI assistant gives this explanation:</p>
-<blockquote class="blockquote">
-<p>“Random frame splits always cause leakage because the model memorizes each animal. Therefore, held-out-camera accuracy is unbiased for all wildlife cameras.”</p>
-</blockquote>
-<p>Do not rate the paragraph as a whole. Break it into checkable claims and complete the audit table. A checkable claim is a short statement that the displayed sequence, split check, documentation, or analysis could support, contradict, or qualify. Then rewrite the explanation in 2-3 sentences using <strong>frame</strong>, <strong>sequence</strong>, <strong>camera</strong>, and the expected direction of bias.</p>
-<p>Preserve the original paragraph, completed table, and rewrite. Verification means checking course evidence—not asking a second AI assistant.</p>
-<div id="9a88890d" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>claim_audit <span class="op">=</span> pd.DataFrame(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"claim"</span>: [</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Random frame splits always cause leakage."</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">"The model memorizes each animal."</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Held-out-camera accuracy is unbiased for all wildlife cameras."</span>,</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        ],</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"course_evidence"</span>: [<span class="st">"TODO"</span>, <span class="st">"TODO"</span>, <span class="st">"TODO"</span>],</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"verdict_supported_revise_or_not_established"</span>: [<span class="st">"TODO"</span>, <span class="st">"TODO"</span>, <span class="st">"TODO"</span>],</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"correction_or_qualification"</span>: [<span class="st">"TODO"</span>, <span class="st">"TODO"</span>, <span class="st">"TODO"</span>],</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>claim_audit</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p><strong>Your rewrite:</strong> TODO</p>
 </section>
 <section id="handoff" class="level2">
 <h2 class="anchored" data-anchor-id="handoff">Handoff</h2>
-<p>Save the four-cell table from “Compare the two models.” HW1 gives you the same helper and table. Then write four sentences to the wildlife team:</p>
-<ol type="1">
-<li>what the logistic regression models;</li>
-<li>what population the pooled frame accuracy describes;</li>
-<li>how the AI system compares descriptively;</li>
-<li>the largest remaining limitation.</li>
-</ol>
-<div id="dfaf3832" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>handoff <span class="op">=</span> paired_table.copy()</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> handoff[<span class="st">"n"</span>].<span class="bu">sum</span>() <span class="op">==</span> <span class="bu">len</span>(holdout)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(handoff) <span class="op">==</span> <span class="dv">4</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>handoff.to_csv(<span class="st">"lab1_handoff.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>handoff</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Save the paired table from “Compare the two models.” HW1 gives you the same helper and table. Then finish this sentence as your handoff: “The AI system’s held-out-camera accuracy is an estimate of ______ for ______; it does not establish ______.”</p>
+<div id="335b02fd" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>handoff <span class="op">=</span> paired_table.copy()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> handoff[<span class="st">"n"</span>].<span class="bu">sum</span>() <span class="op">==</span> <span class="bu">len</span>(holdout)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(handoff) <span class="op">==</span> <span class="dv">4</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>handoff.to_csv(<span class="st">"lab1_handoff.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>handoff</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-</section>
-<section id="exit-ticket" class="level2">
-<h2 class="anchored" data-anchor-id="exit-ticket">Exit ticket</h2>
-<p>Complete: “The AI system’s held-out-camera accuracy is an estimate of ______ for ______; it does not establish ______.”</p>
-<p><strong>HW1 begins here:</strong> reuse the loader, the simple model, and the paired table on the homework cameras, then choose and interpret the mistakes yourself. Today’s result does not justify a claim about all wildlife cameras.</p>
+<p><strong>HW1 begins here:</strong> reuse the loader, the simple model, and the paired table on the homework cameras, then choose and describe the mistakes yourself. HW1 Problem 3 asks you to check an AI’s explanation of why a random split can make a model look better, using what you saw today. Today’s result does not justify a claim about all wildlife cameras.</p>
 </section>
 
 </main>

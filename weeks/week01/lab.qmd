@@ -15,26 +15,11 @@ Before trusting the AI, a statistician asks two questions:
 1. **What does something simple already get right?** We fit a logistic regression that uses only a few basic summaries of each photo, such as how bright and how green it is. If that simple model does nearly as well, the AI is not adding much.
 2. **Are we testing on the right photos?** The team will use the model at cameras it has never seen. So we judge both models on cameras that were not used to fit anything, and we look at what goes wrong if we split the photos at random instead.
 
-**Before lab:** finish HW0, the Colab and Gradescope practice run. **Before you leave:** save `lab1_handoff.csv` and your handoff sentences. HW1 repeats today's steps on a different set of cameras.
-
-## Before you start: name the pieces
-
-**Why this step:** lecture separated four things that are easy to blur together. Naming them for the wildlife team keeps us clear about what we are estimating.
-
-1. the **model**: a fitted probability that a photo contains an animal;
-2. the **performance** we estimate: how often the model is right on photos from new cameras;
-3. the **threshold**: the probability above which we call a photo "animal";
-4. the **action**: sending flagged photos to a person, and possibly never looking at the rest.
-
-Each photo is called a **frame** and counts once in the accuracy. Frames from the same sequence are related, and camera locations decide which photos we fit on and which we test on. So the accuracy below weights each camera by how many frames it has; it is not an average over cameras.
-
-**Your turn:** in one or two sentences, describe the four pieces for this task in your own words.
-
-**Your answer:** TODO
+**Before lab:** finish HW0, the Colab and Gradescope practice run. **Before you leave:** save `lab1_handoff.csv` and write the one-sentence handoff. HW1 repeats today's steps on a different set of cameras.
 
 ## Load the photos
 
-Each row is one photo. `image_features.csv` holds the four simple summaries the logistic regression uses.
+Each row is one photo, called a **frame**, and each frame counts once in the accuracy. Frames from the same sequence are related, and whole cameras decide which photos we fit on and which we test on. `image_features.csv` holds the four simple summaries the logistic regression uses.
 
 ```{python}
 #| eval: false
@@ -103,7 +88,7 @@ display_frames(sequence_frames, f"Adjacent frames: {example_sequence_id}")
 
 ## Fit the simple model
 
-**Why this step:** this is the statistician's baseline, a model we fully understand. It uses only brightness, edge density, greenness, and whether the photo was taken at night. Check that only the analysis cameras are used to fit it. The coefficient signs describe changes in the fitted log-odds holding the other listed summaries fixed; they are not causal effects.
+**Why this step:** this is the statistician's baseline, a model we fully understand. It uses only brightness, edge density, greenness, and whether the photo was taken at night. Check that only the analysis cameras are used to fit it.
 
 ```{python}
 #| eval: false
@@ -119,9 +104,11 @@ for d in [analysis, holdout]:
 
 **Why this step:** this is the main question for the team. Does the AI do better than the simple model on cameras neither one has seen, and on which photos do they disagree?
 
-Complete the supplied table with analysis and held-out-camera accuracy for the baseline and supplied vision model. The denominator is the number of frames. Include the denominator and the observed majority-class reference computed separately within each displayed split. This reference describes class balance after seeing the split's labels; it is not a fitted, deployable rule.
+The first table gives each model's accuracy on the analysis cameras and on the held-out cameras. The denominator is the number of frames. The majority reference is the share of the most common label in that split. It describes the class balance, not a model anyone could use.
 
-Interpret two coefficient signs as features of the fitted prediction surface, holding the other listed summaries fixed. Then explain which performance number is merely an in-sample fit diagnostic and which describes frames from the represented held-out camera locations.
+The second table is the paired table. It counts the held-out photos that both models got right, that only one got right, and that both got wrong.
+
+In one sentence, say which accuracy only checks how well the model fits its own photos and which one describes photos from new cameras.
 
 ```{python}
 #| eval: false
@@ -153,13 +140,6 @@ performance_table = pd.concat(
     ignore_index=True,
 )
 
-coefficient_table = pd.DataFrame(
-    {
-        "feature": FEATURES,
-        "fitted_log_odds_coefficient": baseline.coef_[0],
-    }
-)
-
 def paired_correctness_table(data):
     paired = data.assign(
         baseline_correct=data["baseline_pred"].eq(data["animal_present"]),
@@ -182,7 +162,6 @@ def paired_correctness_table(data):
 paired_table = paired_correctness_table(holdout)
 
 display(performance_table)
-display(coefficient_table)
 display(paired_table)
 
 assert set(analysis["camera_id"]).isdisjoint(set(holdout["camera_id"]))
@@ -237,17 +216,13 @@ random_frame_contrast
 
 ## Stop and discuss
 
-Whole-class questions:
+Use the shared cameras and sequences in the table to explain why the random-split accuracy and the held-out-camera accuracy describe different populations of photos.
 
-- How does performance change from the analysis rows to the held-out cameras for each system?
-- Which explanations involve estimation variability and which involve a population difference? What can one split not distinguish?
-- Why does a more accurate AI system not make the simple model useless to the team?
+## Look at the mistakes together
 
-Explain why the random-frame test accuracy and camera-held-out accuracy target different populations, using the observed camera and sequence overlap in the table.
+**Why this step:** the team cares most about mistakes, especially animals the model missed. But if we browse until we find a striking photo, we will tell a misleading story. So the code chooses the mistakes **before** showing them: one random error and the most confident error from each model.
 
-## Choose which mistakes to look at
-
-**Why this step:** the team cares most about mistakes, especially animals the model missed. But if we browse until we find a striking photo, we will tell a misleading story. So the code below chooses mistakes **before** displaying them: one reproducibly random error and one highest-confidence error from each system. Read the function together and identify where the rule is locked.
+The instructor runs this part. Watch for the line where the rule is fixed. Four chosen photos can suggest why a model fails, but they cannot tell us how often it fails that way. In HW1 you run the same code on the homework cameras and describe what you see.
 
 ```{python}
 #| eval: false
@@ -291,12 +266,6 @@ gallery_fields = [
 selected_errors[gallery_fields]
 ```
 
-## Look at the mistakes
-
-Display exactly the cases selected above. Do not browse first and then invent a selection rule. Then change `seed` once and explain which selections can change and which cannot.
-
-Write one visible similarity or contrast and one fact these four purposively selected cases cannot establish about the target population.
-
 ```{python}
 #| eval: false
 fig, axes = plt.subplots(2, 2, figsize=(11, 8))
@@ -318,47 +287,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-**What you noticed:** TODO
-
-## Check an AI's explanation
-
-**Why this step:** an AI assistant will happily explain your results. Before any explanation goes into a report to the team, check each claim against the evidence.
-
-An AI assistant gives this explanation:
-
-> “Random frame splits always cause leakage because the model memorizes each animal. Therefore, held-out-camera accuracy is unbiased for all wildlife cameras.”
-
-Do not rate the paragraph as a whole. Break it into checkable claims and complete the audit table. A checkable claim is a short statement that the displayed sequence, split check, documentation, or analysis could support, contradict, or qualify. Then rewrite the explanation in 2-3 sentences using **frame**, **sequence**, **camera**, and the expected direction of bias.
-
-Preserve the original paragraph, completed table, and rewrite. Verification means checking course evidence—not asking a second AI assistant.
-
-```{python}
-#| eval: false
-claim_audit = pd.DataFrame(
-    {
-        "claim": [
-            "Random frame splits always cause leakage.",
-            "The model memorizes each animal.",
-            "Held-out-camera accuracy is unbiased for all wildlife cameras.",
-        ],
-        "course_evidence": ["TODO", "TODO", "TODO"],
-        "verdict_supported_revise_or_not_established": ["TODO", "TODO", "TODO"],
-        "correction_or_qualification": ["TODO", "TODO", "TODO"],
-    }
-)
-claim_audit
-```
-
-**Your rewrite:** TODO
-
 ## Handoff
 
-Save the four-cell table from "Compare the two models." HW1 gives you the same helper and table. Then write four sentences to the wildlife team:
-
-1. what the logistic regression models;
-2. what population the pooled frame accuracy describes;
-3. how the AI system compares descriptively;
-4. the largest remaining limitation.
+Save the paired table from "Compare the two models." HW1 gives you the same helper and table. Then finish this sentence as your handoff: "The AI system's held-out-camera accuracy is an estimate of ______ for ______; it does not establish ______."
 
 ```{python}
 #| eval: false
@@ -369,8 +300,4 @@ handoff.to_csv("lab1_handoff.csv", index=False)
 handoff
 ```
 
-## Exit ticket
-
-Complete: “The AI system's held-out-camera accuracy is an estimate of ______ for ______; it does not establish ______.”
-
-**HW1 begins here:** reuse the loader, the simple model, and the paired table on the homework cameras, then choose and interpret the mistakes yourself. Today's result does not justify a claim about all wildlife cameras.
+**HW1 begins here:** reuse the loader, the simple model, and the paired table on the homework cameras, then choose and describe the mistakes yourself. HW1 Problem 3 asks you to check an AI's explanation of why a random split can make a model look better, using what you saw today. Today's result does not justify a claim about all wildlife cameras.

@@ -538,7 +538,7 @@ Yellow boxes show where MegaDetector found each animal (LILA BC’s published Me
 <h2>A model you know: logistic regression</h2>
 <p>Let <span class="math inline">Y_i = 1</span> if photo <span class="math inline">i</span> has an animal, and let <span class="math inline">x_i</span> be features of the photo, such as brightness.</p>
 <p><span class="math display">Y_i \mid x_i \sim \operatorname{Bernoulli}(p_i), \qquad \operatorname{logit}(p_i) = \log\frac{p_i}{1-p_i} = \beta_0 + x_i^T\beta.</span></p>
-<div id="f546608b" class="cell" data-fig-height="1.6" data-fig-width="9" data-execution_count="1">
+<div id="06feef58" class="cell" data-fig-height="1.6" data-fig-width="9" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -567,7 +567,7 @@ Yellow boxes show where MegaDetector found each animal (LILA BC’s published Me
 <h2>Fitting it: maximum likelihood</h2>
 <p>With no features, every photo has the same <span class="math inline">p</span>. If <span class="math inline">k</span> of <span class="math inline">n</span> photos have an animal,</p>
 <p><span class="math display">L(p) = p^k(1-p)^{n-k}, \qquad \ell(p) = k\log p + (n-k)\log(1-p).</span></p>
-<div id="e0fc3ec2" class="cell" data-fig-height="2.2" data-fig-width="9" data-execution_count="2">
+<div id="8d992eb5" class="cell" data-fig-height="2.2" data-fig-width="9" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -659,7 +659,7 @@ h_2(x)&amp;=g(w_{20}+x^Tw_2),\\
 <li><strong>Output:</strong> <span class="math inline">\alpha_0 = 1</span>, <span class="math inline">\alpha_1 = \alpha_2 = -1</span>, so <span class="math display">\hat p(x) = \sigma(1 - x_1^2 - x_2^2).</span></li>
 </ul>
 </div><div class="column" style="width:44%;">
-<div id="bfbf21f2" class="cell" data-fig-height="3.2" data-fig-width="3.2" data-execution_count="3">
+<div id="59651772" class="cell" data-fig-height="3.2" data-fig-width="3.2" data-execution_count="3">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -777,7 +777,7 @@ Weights chosen by hand; training learns them from data. Logistic regression on x
 <p>The line is about how a model is used, at least popularly. We just saw that the network is fit by the same likelihood as logistic regression.</p>
 <p>We do not pick a team. We hold predictions to statistical standards: which population, how measured, how precise, and compared with what.</p>
 <aside class="notes">
-<p>Push on “at least popularly.” A neural network is a likelihood model, and logistic regression is often used purely to predict. What puts a model in a culture is what you ask of it: interpretable parameters and checked assumptions, or held-out predictive accuracy. Breiman is the Thursday reading.</p>
+<p>Push on “at least popularly.” A neural network is a likelihood model, and logistic regression is often used purely to predict. What puts a model in a culture is what you ask of it: interpretable parameters and checked assumptions, or held-out predictive accuracy. Breiman is optional reading.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -793,7 +793,7 @@ Weights chosen by hand; training learns them from data. Logistic regression on x
 <section id="where-the-flexibility-comes-from" class="slide level2 smaller">
 <h2>Where the flexibility comes from</h2>
 <p>Logistic regression always draws a straight line. In a network, the hidden units <span class="math inline">h_j(x) = g(w_{j0} + x^Tw_j)</span> are <strong>learned</strong>. With other activations and more units, the <span class="math inline">h_j</span> can be a very broad class of functions, and the boundary can take almost any shape.</p>
-<div id="f9a930d2" class="cell" data-fig-height="2.9" data-fig-width="9" data-execution_count="4">
+<div id="14676265" class="cell" data-fig-height="2.9" data-fig-width="9" data-execution_count="4">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -901,7 +901,7 @@ Weights chosen by hand; training learns them from data. Logistic regression on x
 <li>fit the logistic regression baseline;</li>
 <li>compare it with MegaDetector on cameras the models have not seen.</li>
 </ol>
-<p><strong>Read before Thursday:</strong> Breiman, <a href="https://projecteuclid.org/journals/statistical-science/volume-16/issue-3/Statistical-Modeling--The-Two-Cultures-with-comments-and-a/10.1214/ss/1009213726.full">“Statistical Modeling: The Two Cultures”</a>, pp.&nbsp;199–208, plus one discussant. Come with one thing the prediction culture got right.</p>
+<p><strong>Optional reading:</strong> Breiman, <a href="https://projecteuclid.org/journals/statistical-science/volume-16/issue-3/Statistical-Modeling--The-Two-Cultures-with-comments-and-a/10.1214/ss/1009213726.full">“Statistical Modeling: The Two Cultures”</a>, pp.&nbsp;199–208, plus one discussant.</p>
 
 </section>
     </div>

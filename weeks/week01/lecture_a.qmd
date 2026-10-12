@@ -500,7 +500,7 @@ The line is about how a model is used, at least popularly. We just saw that the 
 We do not pick a team. We hold predictions to statistical standards: which population, how measured, how precise, and compared with what.
 
 ::: notes
-Push on "at least popularly." A neural network is a likelihood model, and logistic regression is often used purely to predict. What puts a model in a culture is what you ask of it: interpretable parameters and checked assumptions, or held-out predictive accuracy. Breiman is the Thursday reading.
+Push on "at least popularly." A neural network is a likelihood model, and logistic regression is often used purely to predict. What puts a model in a culture is what you ask of it: interpretable parameters and checked assumptions, or held-out predictive accuracy. Breiman is optional reading.
 :::
 
 ## Where the flexibility comes from {.smaller}
@@ -595,4 +595,4 @@ First, how statistics and ML fit these models, and where each one stops. Then th
 2. fit the logistic regression baseline;
 3. compare it with MegaDetector on cameras the models have not seen.
 
-**Read before Thursday:** Breiman, ["Statistical Modeling: The Two Cultures"](https://projecteuclid.org/journals/statistical-science/volume-16/issue-3/Statistical-Modeling--The-Two-Cultures-with-comments-and-a/10.1214/ss/1009213726.full), pp. 199–208, plus one discussant. Come with one thing the prediction culture got right.
+**Optional reading:** Breiman, ["Statistical Modeling: The Two Cultures"](https://projecteuclid.org/journals/statistical-science/volume-16/issue-3/Statistical-Modeling--The-Two-Cultures-with-comments-and-a/10.1214/ss/1009213726.full), pp. 199–208, plus one discussant.

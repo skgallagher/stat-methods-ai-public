@@ -18,7 +18,7 @@ execute:
 ## Today {.smaller}
 
 1. How statistics and ML fit the same model, and why they stop in different places.
-2. How precise an estimate is: curvature and the delta method.
+2. How precise an estimate is: curvature and the standard error.
 3. What exactly we compare in the lab.
 
 Then the lab.
@@ -145,64 +145,6 @@ $$\operatorname{SE}(\hat\theta) \approx \frac{1}{\sqrt{-\ell''(\hat\theta)}}.$$
 
 **Check with $p$.** At $\hat p = k/n$, $-\ell''(\hat p) = n/\{\hat p(1-\hat p)\}$, so $\operatorname{SE}(\hat p) = \sqrt{\hat p(1-\hat p)/n}$: the formula you already know. This is where the standard errors in `summary()` come from.
 
-## How precise is a function of $\hat p$? {.smaller}
-
-Curvature gave us the precision of $\hat p$:
-
-$$\operatorname{SE}(\hat p) = \sqrt{\frac{\hat p(1-\hat p)}{n}}.$$
-
-But we often report a **function** of $\hat p$, such as Tuesday's odds $\hat p/(1-\hat p)$, or the log-odds $\operatorname{logit}(\hat p)$, which is the logistic regression intercept $\hat\beta_0$.
-
-How precise are those?
-
-## The idea: zoom in until the curve is a line {.smaller}
-
-```{python}
-#| fig-width: 9
-#| fig-height: 3.0
-p_grid = np.linspace(0.5, 0.82, 200)
-odds = p_grid / (1 - p_grid)
-p0, se_p = 0.7, np.sqrt(0.7 * 0.3 / 100)
-g0, deriv = p0 / (1 - p0), 1 / (1 - p0) ** 2
-
-fig, ax = plt.subplots(figsize=(9, 3.0))
-ax.plot(p_grid, odds, color="#155a8a", linewidth=2.2, label="odds  g(p) = p/(1 − p)")
-ax.plot(p_grid, g0 + deriv * (p_grid - p0), color="#c41230", linestyle="--", linewidth=1.5,
-        label=f"tangent line at p̂ = 0.7 (derivative {deriv:.1f})")
-ax.axvspan(p0 - se_p, p0 + se_p, color="#155a8a", alpha=0.12)
-ax.axhspan(g0 - deriv * se_p, g0 + deriv * se_p, color="#c41230", alpha=0.10)
-ax.text(p0 + se_p + 0.004, 0.6, "where p̂ typically lands (±1 SE)", color="#155a8a", fontsize=10)
-ax.text(0.505, g0 + deriv * se_p + 0.08, "where the estimated odds land", color="#c41230", fontsize=10)
-ax.set_xlabel("p̂")
-ax.set_ylabel("estimated odds")
-ax.set_ylim(0, 4.6)
-ax.legend(frameon=False, fontsize=9, loc="upper left")
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
-plt.show()
-```
-
-The same tangent-line idea we used to fit. Near $\hat p$, the curve is almost its tangent line, and the tangent stretches the spread of $\hat p$ by the derivative $g'(\hat p)$:
-
-$$\operatorname{SE}\{g(\hat p)\} \approx |g'(\hat p)|\;\operatorname{SE}(\hat p).$$
-
-This is the **delta method**.
-
-<p class="compact-note">The formal version expands around the true p: g(p̂) ≈ g(p) + g′(p)(p̂ − p), so Var{g(p̂)} ≈ g′(p)² p(1 − p)/n. In practice we plug in p̂.</p>
-
-## Worked example: the odds {.smaller}
-
-With 70 animal photos out of 100, $\hat p = 0.7$ and
-$$\operatorname{SE}(\hat p) = \sqrt{\frac{0.7 \times 0.3}{100}} = 0.046.$$
-
-1. **Estimate.** The odds are $0.7/0.3 = 2.33$, about 7 animal photos for every 3 empty ones.
-2. **Derivative.** For $g(p) = p/(1-p)$, $g'(p) = 1/(1-p)^2$. The tangent to the curve at $\hat p = 0.7$ has $g'(0.7) = 1/0.3^2 = 11.1$.
-3. **Standard error.** Multiply the derivative by $\operatorname{SE}(\hat p)$: $11.1 \times 0.046 = 0.51$.
-
-In HW1 you do the same for the intercept $\hat\beta_0 = \operatorname{logit}(\hat p)$.
-
-<p class="compact-note">Standard errors return in force in Week 4, when we ask how precise a benchmark score is.</p>
-
 ## Remember Tuesday's bobcat? {.smaller}
 
 :::: {.columns}
@@ -274,17 +216,15 @@ In HW1 you try one bigger change with AI help, such as a nonlinear model or a ne
 - It is not a fair win, because you chose it after seeing the held-out data.
 - Confirming it would take new photos that neither model has seen.
 
-You earn the points for a real attempt, shown honestly, whether or not it does better.
+You earn the points for a real attempt, shown honestly, whether or not it does better. Pick one change, fit it once with default settings, score it once, and stop.
 
 ## Today's lab {.smaller}
 
-1. Name the four pieces for the wildlife team.
-2. Look at random photos and one full burst.
-3. Fit the simple model and compare it with the AI on new cameras.
-4. See what changes if photos are split at random.
-5. Choose mistakes by a rule, then look at them.
-6. Check an AI's explanation against the evidence.
-7. Write the handoff to the team.
+1. Look at random photos and one full burst.
+2. Fit the simple model and compare it with the AI on new cameras.
+3. See what changes if photos are split at random.
+4. Look at mistakes chosen by a rule.
+5. Write a one-sentence handoff to the team.
 
 ## HW1 handoff {.smaller}
 

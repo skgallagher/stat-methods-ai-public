@@ -11,7 +11,6 @@ In 16 independent binary observations, 4 outcomes equal 1.
    $p$, differentiate, and find $\widehat p$.
 2. If $p=\sigma(\beta_0)$, find $\widehat\beta_0$ exactly as a log ratio.
 3. Explain what happens to the finite intercept MLE if all 16 outcomes are 0.
-4. Use the delta method to find the approximate standard error of $\widehat\beta_0$.
 
 ## 2. Same model class, different fit
 
