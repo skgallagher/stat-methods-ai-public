@@ -1,0 +1,9 @@
+column,model,developer,parameters_billion,memory_gb_16bit,license,leaderboard_run_date,details_dataset
+llama31_70b,meta-llama/Llama-3.1-70B-Instruct,Meta,70.55,141.1,Llama 3.1 Community License,2024-08-16,open-llm-leaderboard/meta-llama__Llama-3.1-70B-Instruct-details
+gemma2_9b,google/gemma-2-9b-it,Google,9.24,18.5,Gemma Terms of Use,2024-08-09,open-llm-leaderboard/google__gemma-2-9b-it-details
+llama31_8b,meta-llama/Llama-3.1-8B-Instruct,Meta,8.03,16.1,Llama 3.1 Community License,2025-02-06,open-llm-leaderboard/meta-llama__Llama-3.1-8B-Instruct-details
+qwen25_7b,Qwen/Qwen2.5-7B-Instruct,Alibaba (Qwen),7.62,15.2,Apache 2.0,2024-09-19,open-llm-leaderboard/Qwen__Qwen2.5-7B-Instruct-details
+mistral_7b,mistralai/Mistral-7B-Instruct-v0.3,Mistral AI,7.25,14.5,Apache 2.0,2024-06-17,open-llm-leaderboard/mistralai__Mistral-7B-Instruct-v0.3-details
+phi35_mini,microsoft/Phi-3.5-mini-instruct,Microsoft,3.82,7.6,MIT,2024-08-21,open-llm-leaderboard/microsoft__Phi-3.5-mini-instruct-details
+llama32_3b,meta-llama/Llama-3.2-3B-Instruct,Meta,3.21,6.4,Llama 3.2 Community License,2024-09-27,open-llm-leaderboard/meta-llama__Llama-3.2-3B-Instruct-details
+gemma2_2b,google/gemma-2-2b-it,Google,2.61,5.2,Gemma Terms of Use,2024-07-29,open-llm-leaderboard/gg-hf__gemma-2-2b-it-details

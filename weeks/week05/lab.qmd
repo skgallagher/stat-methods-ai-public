@@ -1,0 +1,414 @@
+---
+title: "Lab 5: Is the Difference Real?"
+subtitle: "Week 5 · Language models on BIG-Bench Hard"
+format: html
+---
+
+## The situation
+
+A team is building a tool that answers reasoning questions. It runs an open-weight language model on its own computers. The team has already downloaded Meta's Llama-3.1-8B-Instruct, with 8.0 billion parameters, and built a first version of the tool with it. Alibaba's Qwen2.5-7B-Instruct, with 7.6 billion, is about the same size.
+
+On a public benchmark, Qwen scores about 3 percentage points higher. The team asks:
+
+1. Is Qwen really better, or could a gap like this come from which questions happened to be on the benchmark?
+2. Switching models takes work. Can the team keep Llama? That is, is Llama at least not much worse?
+
+The benchmark is [BIG-Bench Hard](https://aclanthology.org/2023.findings-acl.824/) (BBH): 5,761 multiple-choice questions in 24 tasks, such as putting adjectives in the right order, tracking objects that are swapped around, and judging what caused an event. Its authors chose tasks on which earlier language models did worse than the average human rater.
+
+The results come from the [Open LLM Leaderboard](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard), which Hugging Face ran. It tested many open models on the same questions and published whether each model got each question right. Its code and settings are public, so with a GPU we could [repeat the evaluation](https://huggingface.co/docs/leaderboards/open_llm_leaderboard/about#reproducibility) on our own computer.
+
+**Optional reading:** Suzgun et al. (2023), ["Challenging BIG-Bench Tasks and Whether Chain-of-Thought Can Solve Them"](https://aclanthology.org/2023.findings-acl.824/), Sections 1 and 2, on what BBH is and how its tasks were chosen. The paper counts 23 tasks. The leaderboard left out three tasks where the model writes its own answer, and it counts the three-, five-, and seven-object versions of two tasks separately, which gives 24.
+
+Homework 5 picks up the story after the team chooses a model, and asks whether a smaller model could replace it.
+
+## 1. Load the results
+
+`correct.csv` has one row per question, with a 1 if a model got it right and a 0 if not. `questions.csv` has the question text and the right answer. `models.csv` has one row per model.
+
+```{python}
+#| eval: false
+# Additional library for this lab
+from scipy.stats import binomtest
+
+bbh_dir = data_dir / "llm_bbh"
+correct = pd.read_csv(bbh_dir / "correct.csv")
+questions = pd.read_csv(bbh_dir / "questions.csv")
+models = pd.read_csv(bbh_dir / "models.csv")
+
+print("Questions:", len(correct))
+print("Tasks:    ", correct["task"].nunique())
+display(models[["column", "model", "parameters_billion", "license"]])
+
+# The accuracy of every model, largest model first.
+for column in models["column"]:
+    print(column, round(correct[column].mean(), 3))
+```
+
+## 2. Look at the questions
+
+**Why this step:** before comparing two numbers, we need to know what a question looks like, what counts as right, and which questions are hard.
+
+Every BBH question is multiple choice, but the model never writes a reply. Here is a real question from the adjective-order task:
+
+```
+Which sentence has the correct adjective order:
+Options:
+(A) big square ship
+(B) square big ship
+```
+
+The right answer is (A). The leaderboard shows the model three worked examples and then this question. It does not let the model write anything. Instead it asks: how likely is the model to write "(A)" next, and how likely is it to write "(B)"? The more likely option is the model's answer. For example, if a model gives "(A)" a probability of 0.3 and "(B)" a probability of 0.6, its answer is (B), and it is scored wrong. (These two numbers are made up. Our data record only right or wrong.) On this question, Llama's answer was (A) and Qwen's was (B).
+
+In most tasks the options are labeled by letter, as here. In a few, the options are words such as Yes and No. There the leaderboard adjusts for length, because a longer option gets a lower probability just by having more letters.
+
+Here are two questions only Llama got right, and two only Qwen got right.
+
+```{python}
+#| eval: false
+llama = correct["llama31_8b"]
+qwen = correct["qwen25_7b"]
+
+only_llama = correct[(llama == 1) & (qwen == 0)].sample(2, random_state=SEED)
+only_qwen = correct[(llama == 0) & (qwen == 1)].sample(2, random_state=SEED)
+
+def show_question(question_id):
+    """Print a question, its task, and the right answer."""
+    question = questions[questions["question_id"] == question_id]
+    print("---", question["task"].iloc[0], "---")
+    print(question["input"].iloc[0][:700])   # the first 700 characters
+    print("Right answer:", question["target"].iloc[0])
+    print()
+
+print("ONLY LLAMA RIGHT\n")
+for question_id in only_llama["question_id"]:
+    show_question(question_id)
+
+print("ONLY QWEN RIGHT\n")
+for question_id in only_qwen["question_id"]:
+    show_question(question_id)
+```
+
+Change `random_state` and look at a few more. Could you answer them? Do the questions only one model got right look easy or hard?
+
+**What you notice:** TODO
+
+The tasks have different numbers of answer options. A model that guessed at random would get a two-option task right half the time, but a 19-option task right only 1 time in 19.
+
+```{python}
+#| eval: false
+by_task = correct.groupby("task")[["llama31_8b", "qwen25_7b"]].mean()
+by_task["n_questions"] = correct.groupby("task").size()
+by_task["n_options"] = questions.groupby("task")["n_options"].first()
+by_task["guessing"] = 1 / by_task["n_options"]
+display(by_task.round(3))
+```
+
+Find the tasks where a model does **worse than guessing**. What could make a model do worse than picking an option at random? Then pick one task and describe how the two models compare.
+
+**Your answer:** TODO
+
+## 3. Instructor run: the paired table
+
+**Why this step:** both models answered every question, so each question gives us a pair of results. Questions both models got right, or both got wrong, say nothing about which model is better. All the evidence is in the questions where they disagree.
+
+```{python}
+#| eval: false
+n = len(correct)
+n11 = ((llama == 1) & (qwen == 1)).sum()   # both right
+n10 = ((llama == 1) & (qwen == 0)).sum()   # only Llama right
+n01 = ((llama == 0) & (qwen == 1)).sum()   # only Qwen right
+n00 = ((llama == 0) & (qwen == 0)).sum()   # both wrong
+
+table = pd.DataFrame({"Qwen right": [n11, n01], "Qwen wrong": [n10, n00]},
+                     index=["Llama right", "Llama wrong"])
+display(table)
+
+difference = qwen.mean() - llama.mean()
+print("Qwen minus Llama:          ", round(difference, 4))
+print("(n01 - n10) / n:           ", round((n01 - n10) / n, 4))
+
+# McNemar's exact test: if the two models are equally accurate, each disagreement
+# is a fair coin flip between "only Llama right" and "only Qwen right".
+mcnemar = binomtest(int(n01), int(n10 + n01), 0.5)
+print("Disagreements:             ", n10 + n01)
+print("McNemar exact p-value:     ", round(mcnemar.pvalue, 4))
+```
+
+The p-value is tiny. McNemar's test treats every disagreement as a separate, independent coin flip. Keep that assumption in mind; section 5 tests it.
+
+## 4. Why pairing helps
+
+**Why this step:** a question that is hard for one model is often hard for the other. Comparing the models on the same questions cancels out that shared difficulty, so the comparison is more precise than if each model had answered different questions.
+
+The paired standard error uses the difference for each question, $D_i = \text{Qwen}_i - \text{Llama}_i$. The unpaired formula is what we would use if the two accuracies came from different questions.
+
+```{python}
+#| eval: false
+D = qwen - llama
+se_paired = D.std(ddof=1) / np.sqrt(n)
+
+p_llama = llama.mean()
+p_qwen = qwen.mean()
+se_unpaired = np.sqrt((p_llama * (1 - p_llama) + p_qwen * (1 - p_qwen)) / n)
+
+print("Correlation of the two models' results:", round(np.corrcoef(llama, qwen)[0, 1], 3))
+print("Paired SE:  ", round(se_paired, 5))
+print("Unpaired SE:", round(se_unpaired, 5))
+```
+
+Now break the pairs. Within each task, shuffle Qwen's results so that each Llama result is matched with Qwen's result on a **different** question from the same task. Then compute the "paired" standard error again.
+
+```{python}
+#| eval: false
+rng = np.random.default_rng(SEED)
+qwen_shuffled = qwen.copy()
+for task in np.sort(correct["task"].unique()):
+    task_rows = correct.index[correct["task"] == task]
+    qwen_shuffled.loc[task_rows] = rng.permutation(qwen.loc[task_rows].to_numpy())
+
+D_shuffled = qwen_shuffled - llama
+print("Correlation after shuffling:", round(np.corrcoef(llama, qwen_shuffled)[0, 1], 3))
+print("SE after shuffling:         ", round(D_shuffled.std(ddof=1) / np.sqrt(n), 5))
+```
+
+Why does the standard error go up when the pairs are broken? Use the formula $\operatorname{Var}(D)=\operatorname{Var}(A)+\operatorname{Var}(B)-2\operatorname{Cov}(A,B)$.
+
+**Your answer:** TODO
+
+The correlation after shuffling is small, but it is not zero. Shuffle once more, this time ignoring tasks, so each Llama result can be matched with Qwen's result on any question.
+
+```{python}
+#| eval: false
+qwen_shuffled_all = qwen.copy()
+qwen_shuffled_all.loc[:] = rng.permutation(qwen.to_numpy())
+
+D_shuffled_all = qwen_shuffled_all - llama
+print("Correlation after shuffling across all questions:", round(np.corrcoef(llama, qwen_shuffled_all)[0, 1], 3))
+print("SE after shuffling across all questions:         ", round(D_shuffled_all.std(ddof=1) / np.sqrt(n), 5))
+print("Unpaired SE, for comparison:                     ", round(se_unpaired, 5))
+```
+
+Why does shuffling within tasks leave some correlation, while shuffling across all questions leaves almost none? Use the law of total covariance from Week 2,
+$$\operatorname{Cov}(A,B)=E\bigl[\operatorname{Cov}(A,B \mid \text{task})\bigr]+\operatorname{Cov}\bigl(E[A \mid \text{task}],\,E[B \mid \text{task}]\bigr),$$
+and say which term each shuffle removes.
+
+**Your answer:** TODO
+
+## 5. Questions come in tasks
+
+**Why this step:** section 2 showed that questions in the same task share a format and a skill, and that some tasks are hard for both models. If the gap between the models changes a lot from task to task, then 5,761 questions in 24 tasks carry less information than 5,761 independent questions. It is the same idea as the photos in a camera-trap burst in Lab 4.
+
+First, the gap in each task:
+
+```{python}
+#| eval: false
+by_task["difference"] = by_task["qwen25_7b"] - by_task["llama31_8b"]
+
+# The paired standard error within each task, from the differences D in section 4.
+by_task["se"] = D.groupby(correct["task"]).std(ddof=1) / np.sqrt(by_task["n_questions"])
+by_task = by_task.sort_values("difference")
+
+fig, ax = plt.subplots(figsize=(7, 7))
+# Each bar is a 95% interval for one task: the difference plus or minus 1.96 standard errors.
+ax.errorbar(100 * by_task["difference"], by_task.index,
+            xerr=100 * 1.96 * by_task["se"], fmt="o", capsize=3)
+ax.axvline(0, color="gray", linestyle="--")
+ax.axvline(100 * difference, color="tab:red", label="all 5,761 questions")
+ax.set_xlabel("Qwen minus Llama, percentage points, with 95% intervals")
+ax.set_title("Difference in accuracy, by BBH task")
+ax.legend()
+plt.tight_layout()
+plt.show()
+```
+
+Each bar is a 95% interval for one task, treating that task's questions as independent. Count the tasks whose interval is entirely above 0, entirely below 0, and the ones that include 0. If Qwen were better by the same 3 points on every task, would you expect to see tasks where Llama is clearly better? (With 24 intervals, about one could miss by chance.)
+
+**What you notice:** TODO
+
+The **task bootstrap** resamples whole tasks instead of single questions. Each row keeps both models' results, so the pairs stay together. You will reuse this function in Homework 5.
+
+```{python}
+#| eval: false
+def task_bootstrap(data, model_a, model_b, B=2000, seed=2027):
+    """Resample whole tasks and return B bootstrap differences, model_b minus model_a."""
+    rng = np.random.default_rng(seed)
+
+    # The distinct task names, sorted so the results are reproducible.
+    task_names = np.sort(data["task"].unique())
+    n_tasks = len(task_names)
+
+    differences = np.zeros(B)
+    for b in range(B):
+        # Draw n_tasks task names with replacement.
+        drawn_tasks = rng.choice(task_names, size=n_tasks, replace=True)
+
+        # Collect every question from each drawn task. Each row keeps
+        # both models' results, so the pairs stay together.
+        pieces = []
+        for task in drawn_tasks:
+            task_rows = data[data["task"] == task]
+            pieces.append(task_rows)
+        bootstrap_sample = pd.concat(pieces)
+
+        # The difference in accuracy in this bootstrap sample.
+        differences[b] = bootstrap_sample[model_b].mean() - bootstrap_sample[model_a].mean()
+
+    return differences
+```
+
+Compare it with the interval that treats questions as independent. The bootstrap takes about 10 seconds.
+
+```{python}
+#| eval: false
+differences = task_bootstrap(correct, "llama31_8b", "qwen25_7b")
+boot_lower, boot_upper = np.quantile(differences, [0.025, 0.975])
+se_task = np.std(differences, ddof=1)
+
+print("Difference:", round(difference, 4))
+print("Paired, questions independent:", round(difference - 1.96 * se_paired, 4), "to",
+      round(difference + 1.96 * se_paired, 4))
+print("Task bootstrap:               ", round(boot_lower, 4), "to", round(boot_upper, 4))
+print("Task SE / paired SE:", round(se_task / se_paired, 2))
+```
+
+McNemar's test said the difference is real. Does the task bootstrap agree? The two intervals answer different questions: one is about **new questions from these 24 tasks**, the other about **new tasks like these**. Which is which, and which matters for a team whose users will ask their own kinds of questions?
+
+**What you found:** TODO
+
+## 6. Can the team keep Llama?
+
+**Why this step:** the team already has Llama running. Switching to Qwen means downloading a new model, testing it, and changing their code. So Llama does not have to be the best model, only not much worse. Before looking at the data, the team decided to keep Llama if it is at most 1 percentage point less accurate than Qwen. This is a **non-inferiority** question, and the 1 point is the **margin**.
+
+Section 5 measured Qwen minus Llama. Here we flip the sign, so the question is about Llama. The 5th percentile of the bootstrap differences is a **one-sided 95% lower bound**: we are about 95% confident the true difference is above it. If the lower bound is above −1 point, Llama is shown to be at most 1 point worse.
+
+```{python}
+#| eval: false
+# Llama minus Qwen in each bootstrap sample: flip the sign of section 5's differences.
+llama_minus_qwen = -differences
+
+margin = 0.01   # the team keeps Llama if it is at most 1 point worse than Qwen
+lower_bound = np.quantile(llama_minus_qwen, 0.05)
+
+print("Llama minus Qwen, all questions:", round(-difference, 4))
+print("One-sided 95% lower bound:      ", round(lower_bound, 4))
+print("The team's limit:               ", -margin)
+print("Lower bound above the limit?    ", lower_bound > -margin)
+
+fig, ax = plt.subplots(figsize=(7, 3.5))
+ax.hist(100 * llama_minus_qwen, bins=40, color="lightgray")
+ax.axvline(-100 * margin, color="tab:red", label="the team's limit: 1 point worse")
+ax.axvline(100 * lower_bound, color="black", linestyle="--", label="one-sided 95% lower bound")
+ax.set_xlabel("Llama minus Qwen, percentage points (task bootstrap)")
+ax.set_ylabel("Bootstrap samples")
+ax.legend()
+plt.tight_layout()
+plt.show()
+```
+
+Is Llama shown to be at most 1 point worse than Qwen? Section 5 could not show that Qwen is better. Why does that not mean the team can keep Llama? How large would the margin have to be before these data would let the team keep it?
+
+**Your answer:** TODO
+
+## 7. Picking the task to brag about
+
+**Why this step:** after seeing the results, it is tempting to report the task where your favorite model looks best. Here we see what that does to the number.
+
+We are back to Qwen minus Llama, as in section 5. The code splits each task's questions in half at random. On the first half, it picks the task where Qwen beats Llama by the most. Then it checks the same task on the second half, which played no part in picking it. This is the idea behind a training set and a test set: choose on one half, check on the other.
+
+```{python}
+#| eval: false
+task_names = np.sort(correct["task"].unique())
+
+def split_in_half(data, rng):
+    """Split each task's questions at random into two halves, so every task
+    appears in both. Returns two tables: the first half and the second half."""
+    first_pieces = []
+    second_pieces = []
+    for task in task_names:
+        # This task's questions, shuffled into a random order.
+        task_questions = data[data["task"] == task]
+        random_order = rng.permutation(len(task_questions))
+        shuffled = task_questions.iloc[random_order]
+
+        # The first half of the shuffled questions go in the first half, the rest in the second.
+        n_first = len(shuffled) // 2   # // divides and rounds down
+        first_pieces.append(shuffled.iloc[:n_first])
+        second_pieces.append(shuffled.iloc[n_first:])
+
+    # Stack the pieces from all 24 tasks into two tables.
+    first = pd.concat(first_pieces)
+    second = pd.concat(second_pieces)
+    return first, second
+
+def qwen_minus_llama(data):
+    """Qwen's accuracy minus Llama's on these questions."""
+    return data["qwen25_7b"].mean() - data["llama31_8b"].mean()
+
+rng = np.random.default_rng(SEED)
+first, second = split_in_half(correct, rng)
+
+# Qwen minus Llama in each task, on the first half only.
+first_gaps = first.groupby("task")["qwen25_7b"].mean() - first.groupby("task")["llama31_8b"].mean()
+picked_task = first_gaps.sort_values(ascending=False).index[0]
+
+print("Picked task:                  ", picked_task)
+print("Its gap on the first half:    ", round(first_gaps[picked_task], 3))
+print("Its gap on the second half:   ", round(qwen_minus_llama(second[second["task"] == picked_task]), 3))
+print("All questions, all tasks:     ", round(difference, 3))
+```
+
+One split could be lucky. The next cell repeats the whole process 200 times. The seed is set once, before the loop. After that, `rng` moves on to new random numbers every time it is used, so each repeat gets a different split. Because we start from the same seed as above, the first of the 200 splits is the one above.
+
+```{python}
+#| eval: false
+rng = np.random.default_rng(SEED)   # start over, so the first split matches the one above
+
+first_half_gap = []
+second_half_gap = []
+picked_tasks = []
+for repeat in range(200):
+    # rng picks up where it left off, so this split is different from the last one.
+    first, second = split_in_half(correct, rng)
+
+    # Pick the task where Qwen looks best on the first half.
+    first_gaps = first.groupby("task")["qwen25_7b"].mean() - first.groupby("task")["llama31_8b"].mean()
+    picked_task = first_gaps.sort_values(ascending=False).index[0]
+    picked_tasks.append(picked_task)
+
+    # The picked task's gap on each half.
+    first_half_gap.append(first_gaps[picked_task])
+    second_half_gap.append(qwen_minus_llama(second[second["task"] == picked_task]))
+
+print("Average over the 200 splits")
+print("Picked task's gap, first half:  ", round(np.mean(first_half_gap), 3))
+print("Picked task's gap, second half: ", round(np.mean(second_half_gap), 3))
+print("All questions, all tasks:       ", round(difference, 3))
+
+picked_counts = pd.Series(picked_tasks).value_counts()
+display(pd.DataFrame({"times picked (of 200)": picked_counts}))
+```
+
+Which task was picked most often? Find it in section 5's plot. Why is the picked task's gap smaller on the second half? The second-half gap is still much bigger than the gap over all questions. Is the picked task a fair summary of how the two models compare?
+
+**Your answer:** TODO
+
+## 8. Stop and discuss
+
+1. McNemar's p-value was 0.0002, but the task bootstrap interval includes 0. Which would you report to the team, and why might the answer depend on how the team's users will use the tool?
+2. Pairing (section 4) made the standard error smaller, and tasks (section 5) made it larger. Which effect was bigger here?
+3. In section 2, some models did worse than guessing on some tasks. What does that suggest about the way answers are scored?
+4. Every number today comes from one prompt format and one way of scoring answers. What would you want to check before trusting these numbers for the team's own questions?
+
+## 9. Handoff
+
+Write what you would tell the team:
+
+> On [which questions], [model B] answered [difference] percentage points more questions correctly than [model A] ([interval type] 95% CI [limits]). [What the interval does and does not cover, in plain words.]
+
+**Your result:** TODO
+
+**Homework 5 starts here.** The team went with Qwen. Problem 2 asks whether a smaller model could replace it, and reuses the paired table, `task_bootstrap()`, and the one-sided lower bound.
+
+## Exit ticket
+
+In one sentence: why can McNemar's test say a difference is real when the task bootstrap is not sure?

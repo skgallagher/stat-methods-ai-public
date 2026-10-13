@@ -1,0 +1,336 @@
+---
+title: "Week 5B: Tasks, Lucky Picks, and Costs"
+subtitle: "A 40-minute lecture, then Lab 5"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{python}
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import binomtest
+
+correct = pd.read_csv("../../data/course/llm_bbh/correct.csv")
+small_a = correct["gemma2_2b"]    # Gemma-2-2B
+small_b = correct["llama32_3b"]   # Llama-3.2-3B
+D = small_b - small_a             # Llama 3B minus Gemma 2B
+n = len(correct)
+```
+
+## Today: three questions, then the lab {.smaller}
+
+1. **Are the disagreements really independent?** Benchmark questions come in tasks, so we resample whole tasks.
+2. **Does picking the best overstate it?** The winner's curse, and choosing what to report after seeing the results.
+3. **What else does switching cost?** Memory, hardware, speed, and more.
+
+Then Lab 5: a team decides whether to switch from Llama-3.1-8B to Qwen2.5-7B.
+
+**In HW5:** question 1 is Problem 2(c), question 2 is Problem 1(d) and 2(e), and question 3 is Problem 2(d).
+
+::: notes
+About 1 minute. Same structure as Tuesday: say the three questions, and where each one shows up in the homework.
+:::
+
+## Today's data: BIG-Bench Hard {.smaller}
+
+- 5,761 multiple-choice questions in 24 tasks, such as putting adjectives in the right order, tracking objects that are swapped around, and judging what caused an event.
+- Eight open models of different sizes, all run the same way by Hugging Face's Open LLM Leaderboard. We know whether each model got each question right.
+- A model's answer is the option it rates as most likely. It does not write a reply.
+
+The tasks were chosen because earlier models did worse on them than the average human rater.
+
+<p class="compact-note">Optional reading: Suzgun et al. (2023), Sections 1–2. Lab 5 shows a question and explains the scoring.</p>
+
+::: notes
+About 2 minutes. Every model answered every question, so any two models can be compared question by question, as on Tuesday.
+:::
+
+# 1. Are the disagreements really independent?
+
+## A small model for a laptop {.smaller}
+
+A team needs a model that fits in a laptop's memory. Two candidates: Google's Gemma-2-2B (5.2 GB) and Meta's Llama-3.2-3B (6.4 GB).
+
+```{python}
+n11 = int(((small_a == 1) & (small_b == 1)).sum())
+n10 = int(((small_a == 1) & (small_b == 0)).sum())
+n01 = int(((small_a == 0) & (small_b == 1)).sum())
+n00 = int(((small_a == 0) & (small_b == 0)).sum())
+mcnemar_p = binomtest(n01, n10 + n01, 0.5).pvalue
+se_paired = D.std(ddof=1) / np.sqrt(n)
+```
+
+| | Llama 3B right | Llama 3B wrong |
+|---|---:|---:|
+| **Gemma 2B right** | `{python} f"{n11:,}"` | `{python} f"{n10:,}"` |
+| **Gemma 2B wrong** | `{python} f"{n01:,}"` | `{python} f"{n00:,}"` |
+
+Llama 3B answers `{python} f"{100 * D.mean():.1f}"` points more questions correctly (`{python} f"{100 * small_b.mean():.1f}"`% versus `{python} f"{100 * small_a.mean():.1f}"`%). McNemar's exact p-value is $2 \times 10^{-8}$, and the paired 95% interval is `{python} f"[{100 * (D.mean() - 1.96 * se_paired):.1f}, {100 * (D.mean() + 1.96 * se_paired):.1f}]"` points.
+
+Both treat the `{python} f"{n10 + n01:,}"` disagreements as independent tosses.
+
+::: notes
+About 2 minutes. Ask: is there anything about how this benchmark was built that makes you doubt "independent"? Steer toward the 24 tasks.
+:::
+
+## The gap changes from task to task {.smaller}
+
+```{python}
+#| fig-width: 10
+#| fig-height: 5.0
+by_task = pd.DataFrame({
+    "difference": D.groupby(correct["task"]).mean(),
+    "se": D.groupby(correct["task"]).std(ddof=1) / np.sqrt(D.groupby(correct["task"]).size()),
+}).sort_values("difference")
+
+fig, ax = plt.subplots(figsize=(10, 5.0))
+y = np.arange(len(by_task))
+ax.errorbar(100 * by_task["difference"], y, xerr=100 * 1.96 * by_task["se"],
+            fmt="o", color="#155a8a", capsize=2, markersize=4)
+ax.axvline(0, color="#667085", linestyle="--", linewidth=1)
+ax.axvline(100 * D.mean(), color="#c41230", linewidth=1.5, label="all 5,761 questions")
+ax.set_yticks(y)
+ax.set_yticklabels(by_task.index.str.replace("_", " "), fontsize=10.5)
+ax.tick_params(axis="x", labelsize=11)
+ax.set_xlabel("Llama 3B minus Gemma 2B, percentage points, with 95% intervals", fontsize=12)
+ax.legend(frameon=False, loc="lower right", fontsize=12)
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+From `{python} f"−{-100 * by_task['difference'].min():.0f}"` points on disambiguation to `{python} f"+{100 * by_task['difference'].max():.0f}"` on ruin names. A task that tilts toward one model tilts all its disagreements together.
+
+::: notes
+About 3 minutes. Each interval treats the questions within one task as independent, which is reasonable. Across tasks, the gap clearly differs, by far more than the intervals allow. This is Week 4's clusters again: the task plays the role of the camera burst or the reading passage.
+:::
+
+## The task bootstrap {.smaller}
+
+Week 4's cluster bootstrap, with each question's pair of results kept together.
+
+1. Draw 24 task names, with replacement, from the 24 tasks.
+2. Take every question in each drawn task, with **both** models' results.
+3. Compute the difference in accuracy.
+4. Repeat 2,000 times. The middle 95% of the differences is the interval.
+
+Keeping the pairs together keeps the benefit of pairing. Resampling whole tasks keeps the variation between tasks.
+
+::: notes
+About 3 minutes. Ask what would go wrong if step 2 resampled each model's results separately: the pairs would break, and the interval would ignore that hard questions are hard for both. The lab gives students a `task_bootstrap()` function that they reuse in HW5.
+:::
+
+## Two intervals answer two questions {.smaller}
+
+```{python}
+task_names = np.sort(correct["task"].unique())
+task_sum_a = small_a.groupby(correct["task"]).sum().loc[task_names].to_numpy()
+task_sum_b = small_b.groupby(correct["task"]).sum().loc[task_names].to_numpy()
+task_size = correct.groupby("task").size().loc[task_names].to_numpy()
+
+rng = np.random.default_rng(2027)
+boot = np.zeros(2000)
+for b in range(2000):
+    drawn = rng.integers(0, len(task_names), size=len(task_names))
+    boot[b] = (task_sum_b[drawn].sum() - task_sum_a[drawn].sum()) / task_size[drawn].sum()
+boot_lo, boot_hi = np.quantile(boot, [0.025, 0.975])
+ratio = np.std(boot, ddof=1) / se_paired
+```
+
+| | 95% interval for Llama 3B minus Gemma 2B | Population it describes |
+|---|---:|---|
+| Paired, questions independent | `{python} f"[{100 * (D.mean() - 1.96 * se_paired):.1f}, {100 * (D.mean() + 1.96 * se_paired):.1f}]"` points | new questions from **these 24 tasks** |
+| Task bootstrap | `{python} f"[{100 * boot_lo:.1f}, {100 * boot_hi:.1f}]"` points | new **tasks like these** |
+
+The task bootstrap interval is `{python} f"{ratio:.1f}"` times as wide. Here both exclude 0. In the lab, check whether they agree for Llama-3.1-8B and Qwen2.5-7B.
+
+Which population matters depends on the users. A team whose users ask their own kinds of questions cares about new tasks.
+
+::: notes
+About 3 minutes. Neither interval is wrong; they answer different questions. The task bootstrap treats the 24 tasks as a sample from a larger population of possible tasks, which is a strong assumption of its own: BBH's tasks were chosen, not sampled. Mention that, briefly, as the limit of both.
+:::
+
+# 2. Does picking the best overstate it?
+
+## The winner's curse {.smaller}
+
+A team tries two prompts with the **same** true accuracy $p$. Each estimate has a standard error of $\sigma = 2$ points, and the team reports whichever scores higher.
+
+The higher of two noisy estimates is usually the luckier one. On average it overstates $p$ by
+$$E\bigl[\max(\hat p_1, \hat p_2)\bigr] - p = \sigma \sqrt{\frac{1 - \rho}{\pi}},$$
+where $\rho$ is the correlation between the two estimates. This is the **winner's curse**.
+
+- Prompts scored on different questions, $\rho = 0$: **1.1 points** too high.
+- Prompts scored on the same questions, $\rho = 0.8$: **0.5 points** too high.
+
+<p class="compact-note">HW5 1(d) derives this, with its own numbers, and asks why the same questions help.</p>
+
+::: notes
+About 3 minutes. Do not derive it; that is HW5 1(d). The numbers: 2 × sqrt(1/π) = 1.13 and 2 × sqrt(0.2/π) = 0.50. Ask for an intuition for why the same questions make the overstatement smaller, but let students work it out in the homework.
+:::
+
+## Picking the best of many versions {.smaller}
+
+Now the team tries $k$ **versions** instead of two prompts. A version can be a prompt, a model, or a set of settings. All $k$ have the same true accuracy and a standard error of 2 points, each is scored on different questions, and the team reports the best.
+
+```{python}
+#| fig-width: 9
+#| fig-height: 3.0
+rng = np.random.default_rng(2027)
+tries = np.arange(1, 31)
+overstatement = [2 * rng.standard_normal((40000, k)).max(axis=1).mean() for k in tries]
+
+fig, ax = plt.subplots(figsize=(9, 3.0))
+ax.plot(tries, overstatement, color="#155a8a", linewidth=2)
+for k in [2, 27]:
+    ax.plot(k, overstatement[k - 1], "o", color="#c41230")
+    ax.annotate(f"{k} versions: +{overstatement[k - 1]:.1f} points", xy=(k, overstatement[k - 1]),
+                xytext=(k + 1.5, overstatement[k - 1] - 0.5) if k == 2 else (k - 7, overstatement[k - 1] - 1.3),
+                fontsize=12)
+ax.set_xlabel("number of equally good versions tried, k", fontsize=12)
+ax.set_ylabel("how much the best one\nis overstated, points", fontsize=11)
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+Even when no version is better than the others, the best of 27 is overstated by about 4 points on average.
+
+::: notes
+About 2 minutes. The curve is a simulation: the average of the largest of k independent normal estimates, times the 2-point standard error. It grows slowly, roughly like the square root of log k, but it never stops growing.
+:::
+
+## Benchmaxxing {.smaller}
+
+Pushing a benchmark number as high as possible, instead of measuring how good the model is, is called **benchmaxxing**.
+
+**One way: try many versions and publish the best.** Before releasing Llama 4, Meta tested **27 private versions** of its model on Chatbot Arena, a leaderboard built from head-to-head votes, and could publish only the best. As the last slide shows, the published score is inflated even if no version is better than the rest.
+
+**Another way: choose which tasks to report after seeing the results.** That is next.
+
+<p class="compact-note">Singh et al. (2025), "The Leaderboard Illusion," abstract and the section on private testing; the paper calls the versions "variants." Optional.</p>
+
+::: notes
+About 2 minutes. The paper's own claim is about selective disclosure: test many versions privately, publish the best, and the published score is biased upward. Arena scores are ratings from votes, not accuracies, so do not carry the 4-point number over; the direction of the bias is the point.
+
+Widely reported, but not checked here against Meta's or LMArena's own pages: Meta's launch cited an Arena score for an "experimental chat version" of Llama 4 Maverick that differed from the released model. Check Meta's Llama 4 announcement before saying this in class.
+:::
+
+## Choosing which tasks to report {.smaller}
+
+The second way to benchmax: choose which **tasks** to report after seeing the results. The same curse applies.
+
+Gemma-2-2B is 4.2 points **worse** than Llama-3.2-3B overall. But "Gemma-2-2B beats Llama-3.2-3B by 18 points on disambiguation" is true.
+
+**The check:** split each task's questions in half at random. Choose the task on the first half, then measure it on the second half, which played no part in choosing it. Repeat with many random splits.
+
+```{python}
+first_gap, second_gap = [], []
+rng = np.random.default_rng(2027)
+for repeat in range(200):
+    first_parts, second_parts = [], []
+    for task in task_names:
+        task_questions = correct[correct["task"] == task]
+        shuffled = task_questions.iloc[rng.permutation(len(task_questions))]
+        half = len(shuffled) // 2
+        first_parts.append(shuffled.iloc[:half])
+        second_parts.append(shuffled.iloc[half:])
+    first, second = pd.concat(first_parts), pd.concat(second_parts)
+    gaps = first.groupby("task")["gemma2_2b"].mean() - first.groupby("task")["llama32_3b"].mean()
+    picked = gaps.idxmax()
+    first_gap.append(gaps[picked])
+    picked_second = second[second["task"] == picked]
+    second_gap.append(picked_second["gemma2_2b"].mean() - picked_second["llama32_3b"].mean())
+```
+
+Gemma's best task gains `{python} f"{100 * np.mean(first_gap):.0f}"` points on the half used to choose it and `{python} f"{100 * np.mean(second_gap):.0f}"` on the other half. The task is real, and Gemma is better at it. But one chosen task is not a summary of two models.
+
+::: notes
+About 3 minutes. Here the shrinkage is small because one task stands out so clearly; disambiguation was picked in 190 of 200 splits. In the lab, the picked task's advantage shrinks much more. Both lessons matter: the chosen number is inflated, and even a real advantage on a chosen task says little about the overall comparison. HW5 2(e) picks five tasks.
+:::
+
+# 3. What else does switching cost?
+
+## Accuracy is one cost among several {.smaller .compact-table}
+
+| | Llama-3.1-70B | Llama-3.1-8B |
+|---|---:|---:|
+| Parameters | 70.6 billion | 8.0 billion |
+| Memory for the weights at 16-bit, 2 bytes per parameter | 141 GB | 16 GB |
+| Hardware for the weights alone | at least two 80-GB GPUs | one 24-GB GPU |
+| Accuracy on BBH | 69.2% | 50.8% |
+
+The larger model is 18 points more accurate and needs about 9 times the memory. Other costs:
+
+- **speed:** how long a user waits for an answer;
+- **electricity** and the price of the hardware;
+- **online or batch:** answering while the user waits, or overnight in bulk;
+- **license terms**, and the **work of testing and switching** to a new model.
+
+::: notes
+About 3 minutes. Ask: for which uses is 18 points worth the hardware? A medical-coding tool run overnight in batch might say yes; a phone app cannot run 70B at all. The cost that matters depends on the use, like the margin on Tuesday.
+:::
+
+## Some costs cannot be chosen separately {.smaller}
+
+**Example:** storing each parameter in 8 bits instead of 16, called **quantization**, halves the memory. Llama-3.1-8B would need about 8 GB. It can also lower accuracy, so memory and accuracy have to be chosen together.
+
+**Discuss:** name another pair of costs that move together.
+
+::: notes
+About 3 minutes. Answers to draw out: memory and hardware; hardware and electricity; model size and speed; speed and online use (a slow model may be fine in batch). HW5 2(d) asks for one example, so collect several here but let students write their own.
+:::
+
+## Ask an AI to make the call {.smaller}
+
+**Live demo.** Ask an AI assistant which model the laptop team should use.
+
+1. Give it only the two accuracies and the two models' sizes.
+2. In the same conversation, add the paired table, both intervals, the range of the per-task gaps, and the team's memory limit.
+
+**Discuss:** What changed in its answer? Which piece of evidence changed it? Is any claim stronger than the evidence?
+
+<p class="compact-note">HW5 Problem 3 asks you to do this for Qwen and Phi, and then rewrite the recommendation yourself.</p>
+
+::: notes
+About 5 minutes. Run it live with whatever assistant the class uses, and do not script the answer in advance. Typical first answers pick the higher accuracy and call it "better" or "outperforms." Typical second answers mention uncertainty but may still overstate. Ask students to point to the exact sentence that claims too much.
+:::
+
+## Today's lab {.smaller}
+
+The team built its tool on Llama-3.1-8B. Should it switch to Qwen2.5-7B?
+
+1. Look at the questions, and how answers are scored.
+2. The paired table and McNemar's test.
+3. Why pairing helps: break the pairs and watch the standard error.
+4. The task bootstrap: do McNemar and the bootstrap agree?
+5. Can the team keep Llama? A non-inferiority check with a 1-point margin.
+6. Picking the task to brag about.
+
+You will end with what you would tell the team.
+
+## HW5 handoff {.smaller}
+
+- **Problem 1 (no AI):** McNemar's test, Fisher's exact test, non-inferiority, and the winner's curse. Tuesday's lecture and today's first half.
+- **Problem 2:** the team went with Qwen. Could Phi-3.5-mini, at half the memory, replace it? Reuse the lab's paired table, `task_bootstrap()`, and one-sided lower bound.
+- **Problem 3:** ask an AI to make the call, then rewrite its recommendation.
+
+Do Problem 1 first. Problems 2 and 3 use its results.
+
+## What we did today {.smaller}
+
+1. Benchmark questions come in tasks. The task bootstrap resamples whole tasks and keeps the pairs together.
+2. A question-level interval describes new questions from these tasks; a task-bootstrap interval describes new tasks like these.
+3. Reporting the best of several tries overstates it, and more tries overstate it more. Scoring the tries on the same questions helps.
+4. A task chosen after seeing the results can be real and still unrepresentative.
+5. Accuracy is one cost among several, and some costs move together.

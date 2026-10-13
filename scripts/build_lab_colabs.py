@@ -24,7 +24,7 @@ DATA_GROUPS = {
     "02": ["dynasent"],
     "03": ["cfpb"],
     "04": ["camera_traps"],
-    "05": ["cfpb"],
+    "05": ["llm_bbh"],
     "06": ["cfpb"],
     "09": ["cfpb"],
     "10": ["cfpb"],

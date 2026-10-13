@@ -25,7 +25,7 @@ DATA_GROUPS = {
     "hw02": ["dynasent"],
     "hw03": ["cfpb", "github_issues"],
     "hw04": ["camera_traps"],
-    "hw05": ["cfpb"],
+    "hw05": ["llm_bbh"],
     "hw06": ["cfpb"],
     "hw07": ["designed_eval"],
 }
@@ -158,22 +158,25 @@ STARTER_LINES = {
         "print(\"Cameras:  \", homework[\"camera_id\"].nunique())",
     ],
     "hw05": [
-        "# HW5: paired arithmetic and paired-row bootstrap",
-        "both_correct, baseline_only, ai_only, both_wrong = 390, 35, 55, 20",
-        "n_cases = both_correct + baseline_only + ai_only + both_wrong",
-        "baseline_accuracy = (both_correct + baseline_only) / n_cases",
-        "ai_accuracy = (both_correct + ai_only) / n_cases",
-        "observed_difference = ai_accuracy - baseline_accuracy",
-        "def paired_difference(data):",
-        "    return data['ai_correct'].mean() - data['baseline_correct'].mean()",
-        "def paired_bootstrap(data, B=2000, seed=2027):",
-        "    rng = np.random.default_rng(seed)",
-        "    estimates = []",
-        "    for _ in range(B):",
-        "        idx = rng.integers(0, len(data), len(data))",
-        "        estimates.append(paired_difference(data.iloc[idx]))",
-        "    return np.quantile(estimates, [0.025, 0.975])",
-        "cfpb_root = data_dir / 'cfpb'",
+        "# Additional library for this homework",
+        "from scipy.stats import binomtest",
+        "",
+        "# Read the three BBH tables.",
+        "bbh_dir = data_dir / \"llm_bbh\"",
+        "correct = pd.read_csv(bbh_dir / \"correct.csv\")      # one row per question; 1 = right, 0 = wrong",
+        "questions = pd.read_csv(bbh_dir / \"questions.csv\")  # question text, answer, number of options",
+        "models = pd.read_csv(bbh_dir / \"models.csv\")        # one row per model",
+        "",
+        "print(\"Questions:\", len(correct))",
+        "print(\"Tasks:    \", correct[\"task\"].nunique())",
+        "display(models[[\"column\", \"model\", \"parameters_billion\", \"memory_gb_16bit\"]])",
+        "",
+        "# Look at one question from each of two tasks. Try other question_id values.",
+        "for question_id in [\"hyperbaton_000\", \"tracking_shuffled_objects_three_objects_000\"]:",
+        "    question = questions[questions[\"question_id\"] == question_id]",
+        "    print(\"\\n---\", question_id, \"---\")",
+        "    print(question[\"input\"].iloc[0])",
+        "    print(\"Right answer:\", question[\"target\"].iloc[0])",
     ],
     "hw06": [
         "# HW6: save the pre-specification before revealing held-back output",
@@ -257,7 +260,7 @@ HW1_P3A_RESPONSE = "\n".join([
     "**Assistant's complete first response:**  ",
     "TODO — paste the complete first response here",
     "",
-    "#### Checkable-claim audit",
+    "#### Claim-by-claim check",
     "",
     "Use at least two rows. Copy only a short claim excerpt in the first column; do not paste the full response again.",
     "",
@@ -933,6 +936,289 @@ HW4_AI_RECORD = "\n".join([
     "| Problem 3 | TODO | TODO | TODO | TODO | TODO | TODO |",
 ])
 
+
+HW5_P1_RESPONSES = {
+    "a": _hw4_p1_response("a", ["(i)", "(ii)", "(iii) 1.", "(iii) 2.", "(iii) 3.", "(iv)"]),
+    "b": _hw4_p1_response("b", ["(i)", "(ii)", "(iii)"]),
+    "c": _hw4_p1_response("c", ["(i)", "(ii) 1.", "(ii) 2.", "(iii)", "(iv)", "(v)"]),
+    "d": _hw4_p1_response("d", ["(i)", "(ii)"]),
+}
+
+HW5_P2A_CODE = "\n".join([
+    "# Problem 2(a): reference points",
+    "print(\"Questions:\", len(correct))",
+    "print(\"Tasks:    \", correct[\"task\"].nunique())",
+    "",
+    "# Guessing at random gets a question right with probability 1 / (number of options).",
+    "guess_accuracy = (1 / questions[\"n_options\"]).mean()",
+    "print(\"Random guessing:\", round(guess_accuracy, 3))",
+    "",
+    "# The accuracy of every model, largest model first.",
+    "for column in models[\"column\"]:",
+    "    print(column, round(correct[column].mean(), 3))",
+])
+
+HW5_P2B_CODE = "\n".join([
+    "# Problem 2(b): the paired table",
+    "qwen = correct[\"qwen25_7b\"]   # model A, the team's current model",
+    "phi = correct[\"phi35_mini\"]   # model B, the smaller candidate",
+    "n = len(correct)",
+    "",
+    "n11 = ((qwen == 1) & (phi == 1)).sum()   # both right",
+    "n10 = ((qwen == 1) & (phi == 0)).sum()   # only Qwen right",
+    "n01 = ((qwen == 0) & (phi == 1)).sum()   # only Phi right",
+    "n00 = ((qwen == 0) & (phi == 0)).sum()   # both wrong",
+    "",
+    "table = pd.DataFrame({\"Phi right\": [n11, n01], \"Phi wrong\": [n10, n00]},",
+    "                     index=[\"Qwen right\", \"Qwen wrong\"])",
+    "display(table)",
+    "",
+    "delta_hat = (n01 - n10) / n",
+    "print(\"Difference, Phi minus Qwen:\", round(delta_hat, 4))",
+    "",
+    "# Exact McNemar test: if the models are equally accurate,",
+    "# n01 is Binomial(n10 + n01, 1/2), as in Problem 1(a).",
+    "mcnemar = binomtest(int(n01), int(n10 + n01), 0.5)",
+    "print(\"McNemar exact p-value:\", round(mcnemar.pvalue, 4))",
+    "",
+    "# TODO: the paired standard error, s_D / sqrt(n), with D = phi - qwen",
+    "se_paired = np.nan",
+    "",
+    "# TODO: the standard error if the two accuracies came from different questions",
+    "se_unpaired = np.nan",
+    "",
+    "print(\"Paired SE:  \", se_paired)",
+    "print(\"Unpaired SE:\", se_unpaired)",
+    "print(\"Ratio:      \", se_unpaired / se_paired)",
+])
+
+HW5_P2C_CODE = "\n".join([
+    "# Problem 2(c), step 1: the difference in each task",
+    "by_task = correct.groupby(\"task\")[[\"qwen25_7b\", \"phi35_mini\"]].mean()",
+    "by_task[\"difference\"] = by_task[\"phi35_mini\"] - by_task[\"qwen25_7b\"]",
+    "by_task = by_task.sort_values(\"difference\")",
+    "",
+    "fig, ax = plt.subplots(figsize=(7, 7))",
+    "ax.scatter(100 * by_task[\"difference\"], by_task.index)",
+    "ax.axvline(0, color=\"gray\", linestyle=\"--\")",
+    "ax.axvline(100 * delta_hat, color=\"tab:red\", label=\"all 5,761 questions\")",
+    "ax.set_xlabel(\"Phi minus Qwen, percentage points\")",
+    "ax.set_title(\"Difference in accuracy, by BBH task\")",
+    "ax.legend()",
+    "plt.tight_layout()",
+    "plt.show()",
+    "",
+    "",
+    "# Problem 2(c), step 2: the paired task bootstrap",
+    "# The Lab 5 task bootstrap. You may reuse it as is.",
+    "def task_bootstrap(data, model_a, model_b, B=2000, seed=2027):",
+    "    \"\"\"Resample whole tasks and return B bootstrap differences, model_b minus model_a.\"\"\"",
+    "    rng = np.random.default_rng(seed)",
+    "",
+    "    # The distinct task names, sorted so the results are reproducible.",
+    "    task_names = np.sort(data[\"task\"].unique())",
+    "    n_tasks = len(task_names)",
+    "",
+    "    differences = np.zeros(B)",
+    "    for b in range(B):",
+    "        # Draw n_tasks task names with replacement.",
+    "        drawn_tasks = rng.choice(task_names, size=n_tasks, replace=True)",
+    "",
+    "        # Collect every question from each drawn task. Each row keeps",
+    "        # both models' results, so the pairs stay together.",
+    "        pieces = []",
+    "        for task in drawn_tasks:",
+    "            task_rows = data[data[\"task\"] == task]",
+    "            pieces.append(task_rows)",
+    "        bootstrap_sample = pd.concat(pieces)",
+    "",
+    "        # The difference in accuracy in this bootstrap sample.",
+    "        differences[b] = bootstrap_sample[model_b].mean() - bootstrap_sample[model_a].mean()",
+    "",
+    "    return differences",
+    "",
+    "",
+    "differences = task_bootstrap(correct, \"qwen25_7b\", \"phi35_mini\")   # Phi minus Qwen; takes about 10 seconds",
+    "lower, upper = np.quantile(differences, [0.025, 0.975])",
+    "se_task = np.std(differences, ddof=1)",
+    "",
+    "print(\"Tasks resampled in each draw:\", correct[\"task\"].nunique())",
+    "print(\"95% percentile interval:\", round(lower, 4), round(upper, 4))",
+    "print(\"Task bootstrap SE:\", round(se_task, 5))",
+    "",
+    "# TODO: how many times larger is se_task than se_paired from 2(b)?",
+])
+
+HW5_P2D_CODE = "\n".join([
+    "# Problem 2(d): non-inferiority",
+    "margin = 0.03   # set by the team before seeing the data",
+    "",
+    "# The 5th percentile of the bootstrap differences is a one-sided 95% lower bound.",
+    "lower_bound_task = np.quantile(differences, 0.05)",
+    "print(\"One-sided lower bound, task bootstrap:\", round(lower_bound_task, 4))",
+    "print(\"Margin:\", -margin)",
+    "",
+    "# TODO for part 3: the lower bound from the paired SE, delta_hat - 1.645 * se_paired,",
+    "# and both conclusions at a 1-point margin.",
+    "",
+    "# For part 4: each model's size and memory for its weights at 16-bit precision.",
+    "display(models[[\"column\", \"parameters_billion\", \"memory_gb_16bit\", \"license\"]])",
+])
+
+HW5_P2E_CODE = "\n".join([
+    "# Problem 2(e): picking the tasks to report",
+    "def phi_advantage(data):",
+    "    \"\"\"Phi's accuracy minus Qwen's accuracy.\"\"\"",
+    "    return data[\"phi35_mini\"].mean() - data[\"qwen25_7b\"].mean()",
+    "",
+    "",
+    "def pick_tasks(data, n_picked=5, B=500, seed=2027):",
+    "    \"\"\"Split each task in half at random, pick the n_picked tasks where Phi looks best",
+    "    on the first half, and score those tasks on both halves. Repeat B times.\"\"\"",
+    "    rng = np.random.default_rng(seed)",
+    "    task_names = np.sort(data[\"task\"].unique())",
+    "",
+    "    first_half_advantage = np.zeros(B)",
+    "    second_half_advantage = np.zeros(B)",
+    "    for b in range(B):",
+    "        # Put each question in half 1 or half 2, splitting every task evenly.",
+    "        half = pd.Series(0, index=data.index)",
+    "        for task in task_names:",
+    "            task_rows = data.index[data[\"task\"] == task]",
+    "            shuffled = rng.permutation(task_rows)",
+    "            n_first = len(task_rows) // 2",
+    "            half.loc[shuffled[:n_first]] = 1",
+    "            half.loc[shuffled[n_first:]] = 2",
+    "        first = data[half == 1]",
+    "        second = data[half == 2]",
+    "",
+    "        # Phi's advantage in each task, using the first half only.",
+    "        phi_by_task = first.groupby(\"task\")[\"phi35_mini\"].mean()",
+    "        qwen_by_task = first.groupby(\"task\")[\"qwen25_7b\"].mean()",
+    "        gaps = phi_by_task - qwen_by_task",
+    "",
+    "        # The n_picked tasks where Phi looks best.",
+    "        picked = gaps.sort_values(ascending=False).index[:n_picked]",
+    "",
+    "        # Score the picked tasks on each half.",
+    "        first_half_advantage[b] = phi_advantage(first[first[\"task\"].isin(picked)])",
+    "        second_half_advantage[b] = phi_advantage(second[second[\"task\"].isin(picked)])",
+    "",
+    "    return first_half_advantage, second_half_advantage",
+    "",
+    "",
+    "first_half_advantage, second_half_advantage = pick_tasks(correct)   # takes a few seconds",
+    "print(\"Picked tasks, first half: \", round(first_half_advantage.mean(), 4))",
+    "print(\"Picked tasks, second half:\", round(second_half_advantage.mean(), 4))",
+    "print(\"All questions:            \", round(phi_advantage(correct), 4))",
+])
+
+HW5_P2A_RESPONSE = "\n".join([
+    "### Your response - Problem 2(a)",
+    "",
+    "**Questions, tasks, and the five accuracies (random guessing, Qwen, Phi, Llama-3.1-70B):**  ",
+    "TODO",
+    "",
+    "**Why random guessing is a useful reference (1 sentence):**  ",
+    "TODO",
+])
+
+HW5_P2B_RESPONSE = "\n".join([
+    "### Your response - Problem 2(b)",
+    "",
+    "**Difference and McNemar p-value:**  ",
+    "TODO",
+    "",
+    "**Paired SE, unpaired SE, and how many times wider the unpaired SE is:**  ",
+    "TODO",
+    "",
+    "**What McNemar's test does and does not tell the team (2 sentences):**  ",
+    "TODO",
+])
+
+HW5_P2C_RESPONSE = "\n".join([
+    "### Your response - Problem 2(c)",
+    "",
+    "**1. The task that favors Phi most, and the task that favors Qwen most:**  ",
+    "TODO",
+    "",
+    "**2. 95% task bootstrap interval:**  ",
+    "TODO",
+    "",
+    "**3. Task bootstrap SE compared with the paired SE:**  ",
+    "TODO",
+    "",
+    "**4. The assumption from Problem 1(a)(ii) that resampling tasks relaxes, what it assumes instead, and why the pairs stay together (2-3 sentences):**  ",
+    "TODO",
+])
+
+HW5_P2D_RESPONSE = "\n".join([
+    "### Your response - Problem 2(d)",
+    "",
+    "**1. Lower bound, and is Phi non-inferior at 3 points?**  ",
+    "TODO",
+    "",
+    "**2. Not significant vs. non-inferior (2 sentences):**  ",
+    "TODO",
+    "",
+    "**3. At a 1-point margin: both conclusions, which to trust, and why the margin comes first (2 sentences):**  ",
+    "TODO",
+    "",
+    "**4. Two other costs and how each changes the recommendation, plus two costs that cannot be chosen separately:**  ",
+    "TODO",
+])
+
+HW5_P2E_RESPONSE = "\n".join([
+    "### Your response - Problem 2(e)",
+    "",
+    "**1. First half, second half, and all questions:**  ",
+    "TODO",
+    "",
+    "**2. Why the first-half number is larger, using Problem 1(d):**  ",
+    "TODO",
+    "",
+    "**3. Why the second-half number is still large, and what is misleading about the blog post (2 sentences):**  ",
+    "TODO",
+    "",
+    "**4. What a fair comparison should report (1 sentence):**  ",
+    "TODO",
+])
+
+HW5_P3A_RESPONSE = "\n".join([
+    "### Your response - Problem 3(a)",
+    "",
+    "**My prompt:**  ",
+    "TODO",
+    "",
+    "**The assistant's complete first response:**  ",
+    "TODO",
+])
+
+HW5_P3B_RESPONSE = "\n".join([
+    "### Your response - Problem 3(b)",
+    "",
+    "**My follow-up prompt with the full evidence:**  ",
+    "TODO",
+    "",
+    "**The assistant's response:**  ",
+    "TODO",
+    "",
+    "**What changed, and which evidence changed it (2 sentences):**  ",
+    "TODO",
+])
+
+HW5_P3C_RESPONSE = "\n".join([
+    "### Your response - Problem 3(c)",
+    "",
+    "**My recommendation (2-3 sentences):**  ",
+    "TODO",
+    "",
+    "**One claim from an AI response that the evidence does not support:**  ",
+    "TODO",
+])
+
+HW5_AI_RECORD = HW4_AI_RECORD
+
 SPECIAL_RESPONSES = {
     ("hw01", "3", "a"): HW1_P3A_RESPONSE,
     ("hw01", "3", "b"): HW1_P3B_RESPONSE,
@@ -956,6 +1242,18 @@ SPECIAL_RESPONSES = {
     ("hw04", "2", "c"): HW4_P2C_RESPONSE,
     ("hw04", "3", "a"): HW4_P3A_RESPONSE,
     ("hw04", "3", "b"): HW4_P3B_RESPONSE,
+    ("hw05", "1", "a"): HW5_P1_RESPONSES["a"],
+    ("hw05", "1", "b"): HW5_P1_RESPONSES["b"],
+    ("hw05", "1", "c"): HW5_P1_RESPONSES["c"],
+    ("hw05", "1", "d"): HW5_P1_RESPONSES["d"],
+    ("hw05", "2", "a"): HW5_P2A_RESPONSE,
+    ("hw05", "2", "b"): HW5_P2B_RESPONSE,
+    ("hw05", "2", "c"): HW5_P2C_RESPONSE,
+    ("hw05", "2", "d"): HW5_P2D_RESPONSE,
+    ("hw05", "2", "e"): HW5_P2E_RESPONSE,
+    ("hw05", "3", "a"): HW5_P3A_RESPONSE,
+    ("hw05", "3", "b"): HW5_P3B_RESPONSE,
+    ("hw05", "3", "c"): HW5_P3C_RESPONSE,
 }
 
 SPECIAL_CODE_BEFORE_RESPONSE = {
@@ -970,6 +1268,11 @@ SPECIAL_CODE_BEFORE_RESPONSE = {
     ("hw04", "2", "a"): HW4_P2A_CODE,
     ("hw04", "2", "b"): HW4_P2B_CODE,
     ("hw04", "3", "a"): HW4_P3A_CODE,
+    ("hw05", "2", "a"): HW5_P2A_CODE,
+    ("hw05", "2", "b"): HW5_P2B_CODE,
+    ("hw05", "2", "c"): HW5_P2C_CODE,
+    ("hw05", "2", "d"): HW5_P2D_CODE,
+    ("hw05", "2", "e"): HW5_P2E_CODE,
 }
 
 FINAL = "\n".join([
@@ -1068,13 +1371,13 @@ def build_notebook(qmd_path: Path, hw_id: str, label: str) -> dict:
                 cell["source"] = ("".join(cell["source"]) + HW3_AI_TABLE).splitlines(True)
                 break
         cells.append(markdown_cell(HW3_AI_APPENDIX))
-    if hw_id == "hw04":
+    if hw_id in ("hw04", "hw05"):
         for cell in cells:
             text = "".join(cell["source"])
             if cell["cell_type"] == "markdown" and "## Required AI-use record" in text:
                 cell["source"] = text.split("## Required AI-use record")[0].rstrip().splitlines(True)
                 break
-        cells.append(markdown_cell(HW4_AI_RECORD))
+        cells.append(markdown_cell(HW4_AI_RECORD if hw_id == "hw04" else HW5_AI_RECORD))
     cells.append(markdown_cell(FINAL))
     for index, cell in enumerate(cells):
         cell["id"] = f"{hw_id}-{index:03d}"

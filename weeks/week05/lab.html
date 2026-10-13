@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Lab 5: Is the Difference Real?</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="lab_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lab_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="lab_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="lab_files/libs/quarto-html/popper.min.js"></script>
+<script src="lab_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="lab_files/libs/quarto-html/anchor.min.js"></script>
+<link href="lab_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lab_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lab_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="lab_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="lab_files/libs/bootstrap/bootstrap-138a6193a3bd40baf1e627da441a4734.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Lab 5: Is the Difference Real?</h1>
+<p class="subtitle lead">Week 5 · Language models on BIG-Bench Hard</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="the-situation" class="level2">
+<h2 class="anchored" data-anchor-id="the-situation">The situation</h2>
+<p>A team is building a tool that answers reasoning questions. It runs an open-weight language model on its own computers. The team has already downloaded Meta’s Llama-3.1-8B-Instruct, with 8.0 billion parameters, and built a first version of the tool with it. Alibaba’s Qwen2.5-7B-Instruct, with 7.6 billion, is about the same size.</p>
+<p>On a public benchmark, Qwen scores about 3 percentage points higher. The team asks:</p>
+<ol type="1">
+<li>Is Qwen really better, or could a gap like this come from which questions happened to be on the benchmark?</li>
+<li>Switching models takes work. Can the team keep Llama? That is, is Llama at least not much worse?</li>
+</ol>
+<p>The benchmark is <a href="https://aclanthology.org/2023.findings-acl.824/">BIG-Bench Hard</a> (BBH): 5,761 multiple-choice questions in 24 tasks, such as putting adjectives in the right order, tracking objects that are swapped around, and judging what caused an event. Its authors chose tasks on which earlier language models did worse than the average human rater.</p>
+<p>The results come from the <a href="https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard">Open LLM Leaderboard</a>, which Hugging Face ran. It tested many open models on the same questions and published whether each model got each question right. Its code and settings are public, so with a GPU we could <a href="https://huggingface.co/docs/leaderboards/open_llm_leaderboard/about#reproducibility">repeat the evaluation</a> on our own computer.</p>
+<p><strong>Optional reading:</strong> Suzgun et al.&nbsp;(2023), <a href="https://aclanthology.org/2023.findings-acl.824/">“Challenging BIG-Bench Tasks and Whether Chain-of-Thought Can Solve Them”</a>, Sections 1 and 2, on what BBH is and how its tasks were chosen. The paper counts 23 tasks. The leaderboard left out three tasks where the model writes its own answer, and it counts the three-, five-, and seven-object versions of two tasks separately, which gives 24.</p>
+<p>Homework 5 picks up the story after the team chooses a model, and asks whether a smaller model could replace it.</p>
+</section>
+<section id="load-the-results" class="level2">
+<h2 class="anchored" data-anchor-id="load-the-results">1. Load the results</h2>
+<p><code>correct.csv</code> has one row per question, with a 1 if a model got it right and a 0 if not. <code>questions.csv</code> has the question text and the right answer. <code>models.csv</code> has one row per model.</p>
+<div id="ecc24654" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Additional library for this lab</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> binomtest</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>bbh_dir <span class="op">=</span> data_dir <span class="op">/</span> <span class="st">"llm_bbh"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>correct <span class="op">=</span> pd.read_csv(bbh_dir <span class="op">/</span> <span class="st">"correct.csv"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>questions <span class="op">=</span> pd.read_csv(bbh_dir <span class="op">/</span> <span class="st">"questions.csv"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>models <span class="op">=</span> pd.read_csv(bbh_dir <span class="op">/</span> <span class="st">"models.csv"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Questions:"</span>, <span class="bu">len</span>(correct))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Tasks:    "</span>, correct[<span class="st">"task"</span>].nunique())</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>display(models[[<span class="st">"column"</span>, <span class="st">"model"</span>, <span class="st">"parameters_billion"</span>, <span class="st">"license"</span>]])</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># The accuracy of every model, largest model first.</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> column <span class="kw">in</span> models[<span class="st">"column"</span>]:</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(column, <span class="bu">round</span>(correct[column].mean(), <span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="look-at-the-questions" class="level2">
+<h2 class="anchored" data-anchor-id="look-at-the-questions">2. Look at the questions</h2>
+<p><strong>Why this step:</strong> before comparing two numbers, we need to know what a question looks like, what counts as right, and which questions are hard.</p>
+<p>Every BBH question is multiple choice, but the model never writes a reply. Here is a real question from the adjective-order task:</p>
+<pre><code>Which sentence has the correct adjective order:
+Options:
+(A) big square ship
+(B) square big ship</code></pre>
+<p>The right answer is (A). The leaderboard shows the model three worked examples and then this question. It does not let the model write anything. Instead it asks: how likely is the model to write “(A)” next, and how likely is it to write “(B)”? The more likely option is the model’s answer. For example, if a model gives “(A)” a probability of 0.3 and “(B)” a probability of 0.6, its answer is (B), and it is scored wrong. (These two numbers are made up. Our data record only right or wrong.) On this question, Llama’s answer was (A) and Qwen’s was (B).</p>
+<p>In most tasks the options are labeled by letter, as here. In a few, the options are words such as Yes and No.&nbsp;There the leaderboard adjusts for length, because a longer option gets a lower probability just by having more letters.</p>
+<p>Here are two questions only Llama got right, and two only Qwen got right.</p>
+<div id="42dfe549" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>llama <span class="op">=</span> correct[<span class="st">"llama31_8b"</span>]</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>qwen <span class="op">=</span> correct[<span class="st">"qwen25_7b"</span>]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>only_llama <span class="op">=</span> correct[(llama <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (qwen <span class="op">==</span> <span class="dv">0</span>)].sample(<span class="dv">2</span>, random_state<span class="op">=</span>SEED)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>only_qwen <span class="op">=</span> correct[(llama <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (qwen <span class="op">==</span> <span class="dv">1</span>)].sample(<span class="dv">2</span>, random_state<span class="op">=</span>SEED)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_question(question_id):</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Print a question, its task, and the right answer."""</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    question <span class="op">=</span> questions[questions[<span class="st">"question_id"</span>] <span class="op">==</span> question_id]</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"---"</span>, question[<span class="st">"task"</span>].iloc[<span class="dv">0</span>], <span class="st">"---"</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(question[<span class="st">"input"</span>].iloc[<span class="dv">0</span>][:<span class="dv">700</span>])   <span class="co"># the first 700 characters</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Right answer:"</span>, question[<span class="st">"target"</span>].iloc[<span class="dv">0</span>])</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"ONLY LLAMA RIGHT</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> question_id <span class="kw">in</span> only_llama[<span class="st">"question_id"</span>]:</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    show_question(question_id)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"ONLY QWEN RIGHT</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> question_id <span class="kw">in</span> only_qwen[<span class="st">"question_id"</span>]:</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    show_question(question_id)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Change <code>random_state</code> and look at a few more. Could you answer them? Do the questions only one model got right look easy or hard?</p>
+<p><strong>What you notice:</strong> TODO</p>
+<p>The tasks have different numbers of answer options. A model that guessed at random would get a two-option task right half the time, but a 19-option task right only 1 time in 19.</p>
+<div id="6379d92b" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>by_task <span class="op">=</span> correct.groupby(<span class="st">"task"</span>)[[<span class="st">"llama31_8b"</span>, <span class="st">"qwen25_7b"</span>]].mean()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>by_task[<span class="st">"n_questions"</span>] <span class="op">=</span> correct.groupby(<span class="st">"task"</span>).size()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>by_task[<span class="st">"n_options"</span>] <span class="op">=</span> questions.groupby(<span class="st">"task"</span>)[<span class="st">"n_options"</span>].first()</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>by_task[<span class="st">"guessing"</span>] <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> by_task[<span class="st">"n_options"</span>]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>display(by_task.<span class="bu">round</span>(<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Find the tasks where a model does <strong>worse than guessing</strong>. What could make a model do worse than picking an option at random? Then pick one task and describe how the two models compare.</p>
+<p><strong>Your answer:</strong> TODO</p>
+</section>
+<section id="instructor-run-the-paired-table" class="level2">
+<h2 class="anchored" data-anchor-id="instructor-run-the-paired-table">3. Instructor run: the paired table</h2>
+<p><strong>Why this step:</strong> both models answered every question, so each question gives us a pair of results. Questions both models got right, or both got wrong, say nothing about which model is better. All the evidence is in the questions where they disagree.</p>
+<div id="497c5bd6" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(correct)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>n11 <span class="op">=</span> ((llama <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (qwen <span class="op">==</span> <span class="dv">1</span>)).<span class="bu">sum</span>()   <span class="co"># both right</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>n10 <span class="op">=</span> ((llama <span class="op">==</span> <span class="dv">1</span>) <span class="op">&amp;</span> (qwen <span class="op">==</span> <span class="dv">0</span>)).<span class="bu">sum</span>()   <span class="co"># only Llama right</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>n01 <span class="op">=</span> ((llama <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (qwen <span class="op">==</span> <span class="dv">1</span>)).<span class="bu">sum</span>()   <span class="co"># only Qwen right</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>n00 <span class="op">=</span> ((llama <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (qwen <span class="op">==</span> <span class="dv">0</span>)).<span class="bu">sum</span>()   <span class="co"># both wrong</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> pd.DataFrame({<span class="st">"Qwen right"</span>: [n11, n01], <span class="st">"Qwen wrong"</span>: [n10, n00]},</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>                     index<span class="op">=</span>[<span class="st">"Llama right"</span>, <span class="st">"Llama wrong"</span>])</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>display(table)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>difference <span class="op">=</span> qwen.mean() <span class="op">-</span> llama.mean()</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Qwen minus Llama:          "</span>, <span class="bu">round</span>(difference, <span class="dv">4</span>))</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"(n01 - n10) / n:           "</span>, <span class="bu">round</span>((n01 <span class="op">-</span> n10) <span class="op">/</span> n, <span class="dv">4</span>))</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co"># McNemar's exact test: if the two models are equally accurate, each disagreement</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># is a fair coin flip between "only Llama right" and "only Qwen right".</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>mcnemar <span class="op">=</span> binomtest(<span class="bu">int</span>(n01), <span class="bu">int</span>(n10 <span class="op">+</span> n01), <span class="fl">0.5</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Disagreements:             "</span>, n10 <span class="op">+</span> n01)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"McNemar exact p-value:     "</span>, <span class="bu">round</span>(mcnemar.pvalue, <span class="dv">4</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The p-value is tiny. McNemar’s test treats every disagreement as a separate, independent coin flip. Keep that assumption in mind; section 5 tests it.</p>
+</section>
+<section id="why-pairing-helps" class="level2">
+<h2 class="anchored" data-anchor-id="why-pairing-helps">4. Why pairing helps</h2>
+<p><strong>Why this step:</strong> a question that is hard for one model is often hard for the other. Comparing the models on the same questions cancels out that shared difficulty, so the comparison is more precise than if each model had answered different questions.</p>
+<p>The paired standard error uses the difference for each question, <span class="math inline">\(D_i = \text{Qwen}_i - \text{Llama}_i\)</span>. The unpaired formula is what we would use if the two accuracies came from different questions.</p>
+<div id="a60584e3" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> qwen <span class="op">-</span> llama</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>se_paired <span class="op">=</span> D.std(ddof<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> np.sqrt(n)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>p_llama <span class="op">=</span> llama.mean()</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>p_qwen <span class="op">=</span> qwen.mean()</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>se_unpaired <span class="op">=</span> np.sqrt((p_llama <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> p_llama) <span class="op">+</span> p_qwen <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> p_qwen)) <span class="op">/</span> n)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Correlation of the two models' results:"</span>, <span class="bu">round</span>(np.corrcoef(llama, qwen)[<span class="dv">0</span>, <span class="dv">1</span>], <span class="dv">3</span>))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Paired SE:  "</span>, <span class="bu">round</span>(se_paired, <span class="dv">5</span>))</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Unpaired SE:"</span>, <span class="bu">round</span>(se_unpaired, <span class="dv">5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Now break the pairs. Within each task, shuffle Qwen’s results so that each Llama result is matched with Qwen’s result on a <strong>different</strong> question from the same task. Then compute the “paired” standard error again.</p>
+<div id="3602aa03" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(SEED)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>qwen_shuffled <span class="op">=</span> qwen.copy()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> task <span class="kw">in</span> np.sort(correct[<span class="st">"task"</span>].unique()):</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    task_rows <span class="op">=</span> correct.index[correct[<span class="st">"task"</span>] <span class="op">==</span> task]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    qwen_shuffled.loc[task_rows] <span class="op">=</span> rng.permutation(qwen.loc[task_rows].to_numpy())</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>D_shuffled <span class="op">=</span> qwen_shuffled <span class="op">-</span> llama</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Correlation after shuffling:"</span>, <span class="bu">round</span>(np.corrcoef(llama, qwen_shuffled)[<span class="dv">0</span>, <span class="dv">1</span>], <span class="dv">3</span>))</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"SE after shuffling:         "</span>, <span class="bu">round</span>(D_shuffled.std(ddof<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> np.sqrt(n), <span class="dv">5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Why does the standard error go up when the pairs are broken? Use the formula <span class="math inline">\(\operatorname{Var}(D)=\operatorname{Var}(A)+\operatorname{Var}(B)-2\operatorname{Cov}(A,B)\)</span>.</p>
+<p><strong>Your answer:</strong> TODO</p>
+<p>The correlation after shuffling is small, but it is not zero. Shuffle once more, this time ignoring tasks, so each Llama result can be matched with Qwen’s result on any question.</p>
+<div id="d4522f13" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>qwen_shuffled_all <span class="op">=</span> qwen.copy()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>qwen_shuffled_all.loc[:] <span class="op">=</span> rng.permutation(qwen.to_numpy())</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>D_shuffled_all <span class="op">=</span> qwen_shuffled_all <span class="op">-</span> llama</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Correlation after shuffling across all questions:"</span>, <span class="bu">round</span>(np.corrcoef(llama, qwen_shuffled_all)[<span class="dv">0</span>, <span class="dv">1</span>], <span class="dv">3</span>))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"SE after shuffling across all questions:         "</span>, <span class="bu">round</span>(D_shuffled_all.std(ddof<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> np.sqrt(n), <span class="dv">5</span>))</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Unpaired SE, for comparison:                     "</span>, <span class="bu">round</span>(se_unpaired, <span class="dv">5</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Why does shuffling within tasks leave some correlation, while shuffling across all questions leaves almost none? Use the law of total covariance from Week 2, <span class="math display">\[\operatorname{Cov}(A,B)=E\bigl[\operatorname{Cov}(A,B \mid \text{task})\bigr]+\operatorname{Cov}\bigl(E[A \mid \text{task}],\,E[B \mid \text{task}]\bigr),\]</span> and say which term each shuffle removes.</p>
+<p><strong>Your answer:</strong> TODO</p>
+</section>
+<section id="questions-come-in-tasks" class="level2">
+<h2 class="anchored" data-anchor-id="questions-come-in-tasks">5. Questions come in tasks</h2>
+<p><strong>Why this step:</strong> section 2 showed that questions in the same task share a format and a skill, and that some tasks are hard for both models. If the gap between the models changes a lot from task to task, then 5,761 questions in 24 tasks carry less information than 5,761 independent questions. It is the same idea as the photos in a camera-trap burst in Lab 4.</p>
+<p>First, the gap in each task:</p>
+<div id="289f82ff" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>by_task[<span class="st">"difference"</span>] <span class="op">=</span> by_task[<span class="st">"qwen25_7b"</span>] <span class="op">-</span> by_task[<span class="st">"llama31_8b"</span>]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># The paired standard error within each task, from the differences D in section 4.</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>by_task[<span class="st">"se"</span>] <span class="op">=</span> D.groupby(correct[<span class="st">"task"</span>]).std(ddof<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> np.sqrt(by_task[<span class="st">"n_questions"</span>])</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>by_task <span class="op">=</span> by_task.sort_values(<span class="st">"difference"</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">7</span>))</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Each bar is a 95% interval for one task: the difference plus or minus 1.96 standard errors.</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>ax.errorbar(<span class="dv">100</span> <span class="op">*</span> by_task[<span class="st">"difference"</span>], by_task.index,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>            xerr<span class="op">=</span><span class="dv">100</span> <span class="op">*</span> <span class="fl">1.96</span> <span class="op">*</span> by_task[<span class="st">"se"</span>], fmt<span class="op">=</span><span class="st">"o"</span>, capsize<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"gray"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="dv">100</span> <span class="op">*</span> difference, color<span class="op">=</span><span class="st">"tab:red"</span>, label<span class="op">=</span><span class="st">"all 5,761 questions"</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Qwen minus Llama, percentage points, with 95</span><span class="sc">% i</span><span class="st">ntervals"</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Difference in accuracy, by BBH task"</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Each bar is a 95% interval for one task, treating that task’s questions as independent. Count the tasks whose interval is entirely above 0, entirely below 0, and the ones that include 0. If Qwen were better by the same 3 points on every task, would you expect to see tasks where Llama is clearly better? (With 24 intervals, about one could miss by chance.)</p>
+<p><strong>What you notice:</strong> TODO</p>
+<p>The <strong>task bootstrap</strong> resamples whole tasks instead of single questions. Each row keeps both models’ results, so the pairs stay together. You will reuse this function in Homework 5.</p>
+<div id="6d02dd43" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> task_bootstrap(data, model_a, model_b, B<span class="op">=</span><span class="dv">2000</span>, seed<span class="op">=</span><span class="dv">2027</span>):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Resample whole tasks and return B bootstrap differences, model_b minus model_a."""</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    rng <span class="op">=</span> np.random.default_rng(seed)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The distinct task names, sorted so the results are reproducible.</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    task_names <span class="op">=</span> np.sort(data[<span class="st">"task"</span>].unique())</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    n_tasks <span class="op">=</span> <span class="bu">len</span>(task_names)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    differences <span class="op">=</span> np.zeros(B)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> b <span class="kw">in</span> <span class="bu">range</span>(B):</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Draw n_tasks task names with replacement.</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        drawn_tasks <span class="op">=</span> rng.choice(task_names, size<span class="op">=</span>n_tasks, replace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Collect every question from each drawn task. Each row keeps</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># both models' results, so the pairs stay together.</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>        pieces <span class="op">=</span> []</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> task <span class="kw">in</span> drawn_tasks:</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>            task_rows <span class="op">=</span> data[data[<span class="st">"task"</span>] <span class="op">==</span> task]</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>            pieces.append(task_rows)</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>        bootstrap_sample <span class="op">=</span> pd.concat(pieces)</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>        <span class="co"># The difference in accuracy in this bootstrap sample.</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>        differences[b] <span class="op">=</span> bootstrap_sample[model_b].mean() <span class="op">-</span> bootstrap_sample[model_a].mean()</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> differences</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Compare it with the interval that treats questions as independent. The bootstrap takes about 10 seconds.</p>
+<div id="43503697" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>differences <span class="op">=</span> task_bootstrap(correct, <span class="st">"llama31_8b"</span>, <span class="st">"qwen25_7b"</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>boot_lower, boot_upper <span class="op">=</span> np.quantile(differences, [<span class="fl">0.025</span>, <span class="fl">0.975</span>])</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>se_task <span class="op">=</span> np.std(differences, ddof<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Difference:"</span>, <span class="bu">round</span>(difference, <span class="dv">4</span>))</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Paired, questions independent:"</span>, <span class="bu">round</span>(difference <span class="op">-</span> <span class="fl">1.96</span> <span class="op">*</span> se_paired, <span class="dv">4</span>), <span class="st">"to"</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>      <span class="bu">round</span>(difference <span class="op">+</span> <span class="fl">1.96</span> <span class="op">*</span> se_paired, <span class="dv">4</span>))</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Task bootstrap:               "</span>, <span class="bu">round</span>(boot_lower, <span class="dv">4</span>), <span class="st">"to"</span>, <span class="bu">round</span>(boot_upper, <span class="dv">4</span>))</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Task SE / paired SE:"</span>, <span class="bu">round</span>(se_task <span class="op">/</span> se_paired, <span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>McNemar’s test said the difference is real. Does the task bootstrap agree? The two intervals answer different questions: one is about <strong>new questions from these 24 tasks</strong>, the other about <strong>new tasks like these</strong>. Which is which, and which matters for a team whose users will ask their own kinds of questions?</p>
+<p><strong>What you found:</strong> TODO</p>
+</section>
+<section id="can-the-team-keep-llama" class="level2">
+<h2 class="anchored" data-anchor-id="can-the-team-keep-llama">6. Can the team keep Llama?</h2>
+<p><strong>Why this step:</strong> the team already has Llama running. Switching to Qwen means downloading a new model, testing it, and changing their code. So Llama does not have to be the best model, only not much worse. Before looking at the data, the team decided to keep Llama if it is at most 1 percentage point less accurate than Qwen. This is a <strong>non-inferiority</strong> question, and the 1 point is the <strong>margin</strong>.</p>
+<p>Section 5 measured Qwen minus Llama. Here we flip the sign, so the question is about Llama. The 5th percentile of the bootstrap differences is a <strong>one-sided 95% lower bound</strong>: we are about 95% confident the true difference is above it. If the lower bound is above −1 point, Llama is shown to be at most 1 point worse.</p>
+<div id="b0cddb6d" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Llama minus Qwen in each bootstrap sample: flip the sign of section 5's differences.</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>llama_minus_qwen <span class="op">=</span> <span class="op">-</span>differences</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>margin <span class="op">=</span> <span class="fl">0.01</span>   <span class="co"># the team keeps Llama if it is at most 1 point worse than Qwen</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>lower_bound <span class="op">=</span> np.quantile(llama_minus_qwen, <span class="fl">0.05</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Llama minus Qwen, all questions:"</span>, <span class="bu">round</span>(<span class="op">-</span>difference, <span class="dv">4</span>))</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"One-sided 95</span><span class="sc">% lo</span><span class="st">wer bound:      "</span>, <span class="bu">round</span>(lower_bound, <span class="dv">4</span>))</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"The team's limit:               "</span>, <span class="op">-</span>margin)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Lower bound above the limit?    "</span>, lower_bound <span class="op">&gt;</span> <span class="op">-</span>margin)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="fl">3.5</span>))</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>ax.hist(<span class="dv">100</span> <span class="op">*</span> llama_minus_qwen, bins<span class="op">=</span><span class="dv">40</span>, color<span class="op">=</span><span class="st">"lightgray"</span>)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="op">-</span><span class="dv">100</span> <span class="op">*</span> margin, color<span class="op">=</span><span class="st">"tab:red"</span>, label<span class="op">=</span><span class="st">"the team's limit: 1 point worse"</span>)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="dv">100</span> <span class="op">*</span> lower_bound, color<span class="op">=</span><span class="st">"black"</span>, linestyle<span class="op">=</span><span class="st">"--"</span>, label<span class="op">=</span><span class="st">"one-sided 95</span><span class="sc">% lo</span><span class="st">wer bound"</span>)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Llama minus Qwen, percentage points (task bootstrap)"</span>)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Bootstrap samples"</span>)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Is Llama shown to be at most 1 point worse than Qwen? Section 5 could not show that Qwen is better. Why does that not mean the team can keep Llama? How large would the margin have to be before these data would let the team keep it?</p>
+<p><strong>Your answer:</strong> TODO</p>
+</section>
+<section id="picking-the-task-to-brag-about" class="level2">
+<h2 class="anchored" data-anchor-id="picking-the-task-to-brag-about">7. Picking the task to brag about</h2>
+<p><strong>Why this step:</strong> after seeing the results, it is tempting to report the task where your favorite model looks best. Here we see what that does to the number.</p>
+<p>We are back to Qwen minus Llama, as in section 5. The code splits each task’s questions in half at random. On the first half, it picks the task where Qwen beats Llama by the most. Then it checks the same task on the second half, which played no part in picking it. This is the idea behind a training set and a test set: choose on one half, check on the other.</p>
+<div id="5783e126" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>task_names <span class="op">=</span> np.sort(correct[<span class="st">"task"</span>].unique())</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> split_in_half(data, rng):</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Split each task's questions at random into two halves, so every task</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">    appears in both. Returns two tables: the first half and the second half."""</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    first_pieces <span class="op">=</span> []</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    second_pieces <span class="op">=</span> []</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> task <span class="kw">in</span> task_names:</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        <span class="co"># This task's questions, shuffled into a random order.</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        task_questions <span class="op">=</span> data[data[<span class="st">"task"</span>] <span class="op">==</span> task]</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        random_order <span class="op">=</span> rng.permutation(<span class="bu">len</span>(task_questions))</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        shuffled <span class="op">=</span> task_questions.iloc[random_order]</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># The first half of the shuffled questions go in the first half, the rest in the second.</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>        n_first <span class="op">=</span> <span class="bu">len</span>(shuffled) <span class="op">//</span> <span class="dv">2</span>   <span class="co"># // divides and rounds down</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>        first_pieces.append(shuffled.iloc[:n_first])</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>        second_pieces.append(shuffled.iloc[n_first:])</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Stack the pieces from all 24 tasks into two tables.</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    first <span class="op">=</span> pd.concat(first_pieces)</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    second <span class="op">=</span> pd.concat(second_pieces)</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> first, second</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> qwen_minus_llama(data):</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Qwen's accuracy minus Llama's on these questions."""</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> data[<span class="st">"qwen25_7b"</span>].mean() <span class="op">-</span> data[<span class="st">"llama31_8b"</span>].mean()</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(SEED)</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>first, second <span class="op">=</span> split_in_half(correct, rng)</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Qwen minus Llama in each task, on the first half only.</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>first_gaps <span class="op">=</span> first.groupby(<span class="st">"task"</span>)[<span class="st">"qwen25_7b"</span>].mean() <span class="op">-</span> first.groupby(<span class="st">"task"</span>)[<span class="st">"llama31_8b"</span>].mean()</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>picked_task <span class="op">=</span> first_gaps.sort_values(ascending<span class="op">=</span><span class="va">False</span>).index[<span class="dv">0</span>]</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Picked task:                  "</span>, picked_task)</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Its gap on the first half:    "</span>, <span class="bu">round</span>(first_gaps[picked_task], <span class="dv">3</span>))</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Its gap on the second half:   "</span>, <span class="bu">round</span>(qwen_minus_llama(second[second[<span class="st">"task"</span>] <span class="op">==</span> picked_task]), <span class="dv">3</span>))</span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"All questions, all tasks:     "</span>, <span class="bu">round</span>(difference, <span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>One split could be lucky. The next cell repeats the whole process 200 times. The seed is set once, before the loop. After that, <code>rng</code> moves on to new random numbers every time it is used, so each repeat gets a different split. Because we start from the same seed as above, the first of the 200 splits is the one above.</p>
+<div id="bd9dac96" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(SEED)   <span class="co"># start over, so the first split matches the one above</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>first_half_gap <span class="op">=</span> []</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>second_half_gap <span class="op">=</span> []</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>picked_tasks <span class="op">=</span> []</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> repeat <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">200</span>):</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># rng picks up where it left off, so this split is different from the last one.</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    first, second <span class="op">=</span> split_in_half(correct, rng)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Pick the task where Qwen looks best on the first half.</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    first_gaps <span class="op">=</span> first.groupby(<span class="st">"task"</span>)[<span class="st">"qwen25_7b"</span>].mean() <span class="op">-</span> first.groupby(<span class="st">"task"</span>)[<span class="st">"llama31_8b"</span>].mean()</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    picked_task <span class="op">=</span> first_gaps.sort_values(ascending<span class="op">=</span><span class="va">False</span>).index[<span class="dv">0</span>]</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    picked_tasks.append(picked_task)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># The picked task's gap on each half.</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    first_half_gap.append(first_gaps[picked_task])</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    second_half_gap.append(qwen_minus_llama(second[second[<span class="st">"task"</span>] <span class="op">==</span> picked_task]))</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Average over the 200 splits"</span>)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Picked task's gap, first half:  "</span>, <span class="bu">round</span>(np.mean(first_half_gap), <span class="dv">3</span>))</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Picked task's gap, second half: "</span>, <span class="bu">round</span>(np.mean(second_half_gap), <span class="dv">3</span>))</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"All questions, all tasks:       "</span>, <span class="bu">round</span>(difference, <span class="dv">3</span>))</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>picked_counts <span class="op">=</span> pd.Series(picked_tasks).value_counts()</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>display(pd.DataFrame({<span class="st">"times picked (of 200)"</span>: picked_counts}))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Which task was picked most often? Find it in section 5’s plot. Why is the picked task’s gap smaller on the second half? The second-half gap is still much bigger than the gap over all questions. Is the picked task a fair summary of how the two models compare?</p>
+<p><strong>Your answer:</strong> TODO</p>
+</section>
+<section id="stop-and-discuss" class="level2">
+<h2 class="anchored" data-anchor-id="stop-and-discuss">8. Stop and discuss</h2>
+<ol type="1">
+<li>McNemar’s p-value was 0.0002, but the task bootstrap interval includes 0. Which would you report to the team, and why might the answer depend on how the team’s users will use the tool?</li>
+<li>Pairing (section 4) made the standard error smaller, and tasks (section 5) made it larger. Which effect was bigger here?</li>
+<li>In section 2, some models did worse than guessing on some tasks. What does that suggest about the way answers are scored?</li>
+<li>Every number today comes from one prompt format and one way of scoring answers. What would you want to check before trusting these numbers for the team’s own questions?</li>
+</ol>
+</section>
+<section id="handoff" class="level2">
+<h2 class="anchored" data-anchor-id="handoff">9. Handoff</h2>
+<p>Write what you would tell the team:</p>
+<blockquote class="blockquote">
+<p>On [which questions], [model B] answered [difference] percentage points more questions correctly than [model A] ([interval type] 95% CI [limits]). [What the interval does and does not cover, in plain words.]</p>
+</blockquote>
+<p><strong>Your result:</strong> TODO</p>
+<p><strong>Homework 5 starts here.</strong> The team went with Qwen. Problem 2 asks whether a smaller model could replace it, and reuses the paired table, <code>task_bootstrap()</code>, and the one-sided lower bound.</p>
+</section>
+<section id="exit-ticket" class="level2">
+<h2 class="anchored" data-anchor-id="exit-ticket">Exit ticket</h2>
+<p>In one sentence: why can McNemar’s test say a difference is real when the task bootstrap is not sure?</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

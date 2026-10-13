@@ -17,7 +17,7 @@ const siteSettings = {
   // "beta": show Weeks 1 through betaThroughWeek with every link open, for testers.
   moduleReleaseMode: "beta",
   previewWeek: 2,
-  betaThroughWeek: 4
+  betaThroughWeek: 5
 };
 
 // Helpers so each week below stays short.
@@ -65,7 +65,14 @@ const weeklyMaterials = [
     homework: { label: "HW4", due: "Feb 16", pdf: `${courseLinks.publicBlob}/weeks/week04/hw04.pdf`, links: notebook("weeks/week04/hw04_starter.ipynb", "2027-02-11"), openDate: "2027-02-11" },
     data: [dataRelease("Camera Traps data", "camera_traps")]
   },
-  { week: 5, dates: "Feb 16 / 18", publishDate: "2027-02-14", topic: "Paired system comparison" },
+  {
+    week: 5, dates: "Feb 16 / 18", publishDate: "2027-02-14",
+    topic: "Paired system comparison",
+    slides: slides("week05"),
+    lab: notebook("weeks/week05/lab_starter.ipynb", "2027-02-18"),
+    homework: { label: "HW5", due: "Feb 23", pdf: `${courseLinks.publicBlob}/weeks/week05/hw05.pdf`, links: notebook("weeks/week05/hw05_starter.ipynb", "2027-02-18"), openDate: "2027-02-18" },
+    data: [dataRelease("BIG-Bench Hard data", "llm_bbh")]
+  },
   { week: 6, dates: "Feb 23 / 25", publishDate: "2027-02-21", topic: "Calibration and decision-rule sensitivity" },
   { week: 7, dates: "Mar 2 / 4", publishDate: "2027-02-28", topic: "First-half synthesis", note: "In-class midterm Thu Mar 4" },
   { week: 8, dates: "Mar 9 / 11", publishDate: null, topic: "Spring break", isBreak: true },

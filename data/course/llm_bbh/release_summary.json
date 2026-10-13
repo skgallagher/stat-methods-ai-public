@@ -1,0 +1,30 @@
+{
+  "source": "Open LLM Leaderboard v2 details datasets (Hugging Face), BBH task files",
+  "source_sha256_by_model": {
+    "meta-llama__Llama-3.1-70B-Instruct": "ce867e22bfdb17c14153f7ad3d72dc6d383c1aa8f1bc56c81721578edf8d4e9d",
+    "google__gemma-2-9b-it": "b7464de8fadfc5b48c3d9669c9b16aab19768dd47c46591a798a9d8906e6cc7c",
+    "meta-llama__Llama-3.1-8B-Instruct": "f7c8bd54caadabaabc4ce46f581a1dd7cc6be631d849999043842e742fc43955",
+    "Qwen__Qwen2.5-7B-Instruct": "ce22ba16e7e98e100ac49ded5002701114d596b00c8f9033d574c8cecb2338cf",
+    "mistralai__Mistral-7B-Instruct-v0.3": "236f4aa357ff925155063c87b98f772fcf480efe7f186c09349ef46932524673",
+    "microsoft__Phi-3.5-mini-instruct": "3ed88405636e84eb0f125d2ca83795773894200d12fc94f36f970d7ced55ec07",
+    "meta-llama__Llama-3.2-3B-Instruct": "0c5120e7b6b25ada6a5795e0e29f71a47a06c17104400c0a6d77bf42ff112a2f",
+    "gg-hf__gemma-2-2b-it": "0c6b76d15b7ed1232d8612bee109f98186000c96716f91e51063118f2dabae58"
+  },
+  "questions": 5761,
+  "tasks": 24,
+  "chance_accuracy": 0.2885,
+  "accuracy": {
+    "llama31_70b": 0.6915,
+    "gemma2_9b": 0.598,
+    "llama31_8b": 0.5077,
+    "qwen25_7b": 0.5369,
+    "mistral_7b": 0.4701,
+    "phi35_mini": 0.5501,
+    "llama32_3b": 0.4586,
+    "gemma2_2b": 0.4162
+  },
+  "task_range_phi35_minus_qwen25": [
+    -0.124,
+    0.292
+  ]
+}

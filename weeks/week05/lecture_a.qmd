@@ -1,0 +1,502 @@
+---
+title: "Week 5A: Is the Difference Real, in Which Direction, and Is It Enough?"
+subtitle: "Comparing the accuracy of two models"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+## Recap: Week 4's leaderboard {.smaller}
+
+| Model | Accuracy on 1,000 test questions |
+|---|---:|
+| Model A | 86.4% |
+| Model B | 85.9% |
+
+In Week 4, each score had a standard error of about 1.1 points, so a 95% interval of about $\pm 2.1$ points. The 0.5-point gap was well inside that.
+
+We left something out: **both models answered the same 1,000 questions.** Today we use that.
+
+::: notes
+About 2 minutes. This is the slide that opened Week 4, which ended with "comparing two models properly needs paired methods; that is Week 5." Today pays that off. Ask: if both models answered the same questions, what could we look at that a leaderboard hides? Steer toward "which questions each one got right."
+:::
+
+## Today: three scenarios {.smaller}
+
+We will compare two models in three scenarios.
+
+1. **Both models answered the same questions.** Is the difference real, and which model does it favor? Only the questions where the models disagree carry evidence, and McNemar's test and the paired standard error use exactly those questions.
+2. **The models answered different questions.** Then there are no disagreements to count, so we use Fisher's exact test.
+3. **The team has to decide whether the difference is enough.** A significant difference can be too small to matter. And a cheaper model may only need to be not much worse, which a **non-inferiority** test can show.
+
+HW5 Problem 1 follows the same order: part (a) is the first scenario, part (b) the second, and part (c) the third. Part (d) comes Thursday.
+
+<p class="compact-note">Every difference today is model B minus model A, in percentage points.</p>
+
+::: notes
+About 2 minutes. Say the plan out loud and point to the HW mapping, so students know which part of the homework each section prepares. Come back to this slide at each section break.
+:::
+
+# Scenario 1: both models answered the same questions
+
+## The leaderboard, question by question {.smaller}
+
+| | B right | B wrong |
+|---|---:|---:|
+| **A right** | 820 | 44 |
+| **A wrong** | 39 | 97 |
+
+A answered $820 + 44 = 864$ right (86.4%), and B answered $820 + 39 = 859$ right (85.9%).
+
+The 820 questions both got right and the 97 both got wrong count the same for both models, so they cancel:
+$$\widehat\Delta = \hat p_B - \hat p_A = \frac{n_{01} - n_{10}}{n} = \frac{39 - 44}{1000} = -0.5 \text{ points}.$$
+
+All the evidence about which model is better is in the **83 questions where they disagree**.
+
+<p class="compact-note">Week 3 previewed this table. Today we test it.</p>
+
+::: notes
+About 3 minutes. Have students check the two accuracies from the table before showing the formula. Then ask: if we added 1,000 more questions that both models get right, what happens to the difference? (It shrinks toward 0 in size, but the evidence about which is better does not change.) The cells are named by (A, B): n10 is "A right, B wrong."
+:::
+
+## Condition on the disagreements {.smaller}
+
+Let $m = n_{10} + n_{01}$, the number of disagreements. Here $m = 83$.
+
+$m$ is random, but it says how often the models differ, not which one is better. So McNemar's test **conditions on $m$** and asks only how the 83 split.
+
+If A and B are equally accurate, each disagreement is a fair coin toss:
+$$n_{01} \mid m \;\sim\; \operatorname{Binomial}\left(m, \tfrac12\right).$$
+
+**Discuss:** what has to be true about the questions for this to be a binomial?
+
+::: notes
+About 5 minutes. Say the conditioning out loud: m is a random count, and we hold it fixed. If asked why each disagreement is a fair coin: write p10 for the chance a question is "A right, B wrong," and so on. Equal accuracy means p11 + p10 = p11 + p01, so p10 = p01, and a disagreement goes B's way with probability p01 / (p10 + p01) = 1/2.
+
+Take answers to the discussion question. The one to reach: the tosses must be independent, so the questions must be independent of one another. A binomial is a count of independent trials with the same probability. Do not resolve whether that holds here; that is the "What McNemar's test assumes" slide, and Thursday's lab checks it on real data.
+
+Conditioning on m is what makes the test exact: once the 83 are fixed, the binomial is the whole distribution, with no unknown parameters left. HW5 1(a)(ii) asks students to explain this step in their own words.
+:::
+
+## The exact test {.smaller}
+
+Holding the $m = 83$ disagreements fixed: if the models were equally accurate, how often would they split at least as unevenly as 39 to 44?
+
+```{python}
+#| fig-width: 9
+#| fig-height: 3.0
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import binom, binomtest
+
+m = 83
+x = np.arange(22, 62)
+pmf = binom.pmf(x, m, 0.5)
+extreme = (x <= 39) | (x >= 44)
+p_value = binomtest(39, m, 0.5).pvalue
+
+fig, ax = plt.subplots(figsize=(9, 3.0))
+ax.bar(x[~extreme], pmf[~extreme], color="#c9d3df", width=0.85)
+ax.bar(x[extreme], pmf[extreme], color="#155a8a", width=0.85)
+ax.annotate("observed: 39 went B's way", xy=(39, binom.pmf(39, m, 0.5)), xytext=(22, 0.085),
+            arrowprops=dict(arrowstyle="->", color="#252525"), fontsize=14)
+ax.text(56, 0.06, f"blue bars add to\np = {p_value:.2f}", ha="center", fontsize=14, color="#155a8a")
+ax.tick_params(labelsize=12)
+ax.set_xlabel("disagreements that went B's way, out of 83, if A and B were equally accurate", fontsize=13)
+ax.set_yticks([])
+ax.spines[["top", "right", "left"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+A split this uneven, in either direction, happens 66% of the time when the models are equally good. **No evidence that either model is more accurate.**
+
+::: notes
+About 3 minutes. This is McNemar's exact test: a binomial test on the disagreements. In Python, `scipy.stats.binomtest(39, 83, 0.5)`, which the lab uses. The two tails are 39 or fewer and 44 or more, the splits at least as far from 41.5 as the one we saw.
+:::
+
+## A shortcut for large counts: standardize {.smaller}
+
+A different setting with the same math. In a head-to-head vote, 400 people each read two chatbots' answers to the same prompt and pick the better one. 223 pick B.
+
+If the chatbots are equally good, the number picking B is $X \sim \operatorname{Binomial}(400, \tfrac12)$, with
+
+$$\text{mean} = \frac{m}{2} = 200, \qquad \text{SD} = \sqrt{m \cdot \tfrac12 \cdot \tfrac12} = \frac{\sqrt m}{2} = 10.$$
+
+For large $m$ the binomial is close to normal, so
+
+$$z = \frac{X - m/2}{\sqrt m / 2} = \frac{223 - 200}{10} = 2.3, \qquad \text{two-sided } p \approx 0.02.$$
+
+The exact binomial p-value is 0.024.
+
+<p class="compact-note">HW5 1(a) asks you to do the same for McNemar's test and simplify the result.</p>
+
+::: notes
+About 4 minutes. This is the sign test, and head-to-head votes are how Chatbot Arena ranks models (Thursday). Point out that ties, people with no preference, would be dropped first, just as McNemar drops the questions both models got right or both got wrong.
+
+Do not do the McNemar substitution here; it is HW5 1(a)(iii).
+:::
+
+## Check {.smaller}
+
+Two models disagree on $m = 50$ questions. B wins 32 of them and A wins 18. Compute $z$. Is the difference significant at the 5% level?
+
+::: {.fragment}
+If the models were equally good, B would win $m/2 = 25$ on average, with SD $\sqrt{m}/2 = 3.54$:
+$$z = \frac{32 - 25}{3.54} = 1.98, \qquad p \approx 0.048.$$
+
+The exact binomial p-value is 0.065. With only 50 disagreements the normal shortcut is a little optimistic, and the two land on opposite sides of 0.05. When the counts are small, report the exact test.
+:::
+
+::: notes
+About 3 minutes. Give a minute to compute. The lesson is not that 0.05 is sacred; it is that the shortcut is an approximation, and the exact test is one line of code.
+:::
+
+## How big is the difference, and which way does it go? {.smaller}
+
+McNemar's test says whether the difference is real. The team also wants to know how big it is and which model it favors. That takes an interval.
+
+Each question gives one difference, $D_i = B_i - A_i$: $+1$ if only B is right, $-1$ if only A is right, and 0 otherwise. The estimate $\widehat\Delta$ is the average of the $D_i$, so
+$$\operatorname{SE}(\widehat\Delta) = \frac{s_D}{\sqrt n} = 0.9 \text{ points}.$$
+
+The 95% interval is $-0.5 \pm 1.96(0.9)$, or **[−2.3, 1.3] points**. It includes 0, so **we cannot tell which model is better**: either could be ahead by up to about 2 points. That answers Week 4's question.
+
+::: notes
+About 3 minutes. Paired SE: s_D^2 = (83/1000 − 0.005^2) × 1000/999, so SE = 0.0091. This is Week 3's paired difference; the new part is reading the interval for direction. An interval that excluded 0 would say which model is ahead and by roughly how much, which a p-value alone does not.
+:::
+
+## Why pairing makes the interval narrower {.smaller}
+
+From Week 3,
+$$\operatorname{Var}(D_i) = \operatorname{Var}(A_i) + \operatorname{Var}(B_i) - 2\operatorname{Cov}(A_i, B_i).$$
+
+Easy questions are easy for both models. Here the correlation between A's and B's results is 0.65, so the covariance term is large, and subtracting it makes the variance small.
+
+| | Standard error of B − A | 95% interval |
+|---|---:|---:|
+| Unpaired, as if the questions differed | 1.5 points | [−3.5, 2.5] |
+| Paired, $s_D / \sqrt n$ | 0.9 points | [−2.3, 1.3] |
+
+Pairing makes the interval 1.7 times narrower.
+
+<p class="compact-note">Each $D_i$ is −1, 0, or +1, so $s_D^2 \approx (n_{10} + n_{01})/n - \widehat\Delta^2$. The more often the models disagree, the larger the paired standard error.</p>
+
+::: notes
+About 3 minutes. Unpaired: sqrt((0.864 × 0.136 + 0.859 × 0.141) / 1000) = 0.0154. The footnote is worth a sentence: the paired SE is driven by the disagreement rate, which ties back to "the evidence is in the disagreements."
+:::
+
+## What McNemar's test assumes {.smaller}
+
+The coin-toss argument treats the 83 disagreements as **83 independent tosses**.
+
+Benchmarks often break that. Questions come in groups, like Week 4's camera bursts and reading passages. If a whole group of questions tilts toward one model, its disagreements are not separate tosses, and:
+
+- McNemar's p-value is too small;
+- the paired interval is too narrow.
+
+On Thursday you will check this on a real benchmark, with a bootstrap that resamples whole groups of questions.
+
+::: notes
+About 2 minutes. This answers the "Discuss" question from the coin-flip slide. Keep it short; Thursday develops it.
+:::
+
+# Scenario 2: the models answered different questions
+
+## Sometimes the questions are not shared {.smaller}
+
+- Two papers report accuracy on different samples of a benchmark.
+- In an A/B test, each user's question goes to only one model.
+- A pilot gives each model its own small batch of questions.
+
+Then there are no pairs and no disagreements to count. Each model has only a count of right and wrong answers.
+
+With large samples, use the unpaired standard error from the last table. With small samples, use **Fisher's exact test**.
+
+::: notes
+About 2 minutes. Back to the roadmap: this is the second scenario. Ask for one more example of unshared questions from students' own experience.
+:::
+
+## Fisher's exact test began with a cup of tea {.smaller}
+
+A colleague of R. A. Fisher said she could taste whether the milk had been poured before the tea. Fisher's test: 8 cups, 4 milk-first and 4 tea-first, in random order. She knows there are 4 of each, and picks the 4 she thinks are milk-first.
+
+If she is guessing, her 4 picks are a random 4 of the 8 cups. The number of milk-first cups among her picks, $X$, has the **hypergeometric** distribution:
+$$P(X = x) = \frac{\binom{4}{x}\binom{4}{4-x}}{\binom{8}{4}}, \qquad \binom{8}{4} = 70.$$
+
+- All 4 right: $P(X = 4) = 1/70 = 0.014$.
+- 3 right: $P(X \ge 3) = (16 + 1)/70 = 0.24$, so 3 of 4 would not be convincing.
+
+<p class="compact-note">Fisher (1935), *The Design of Experiments*, Chapter 2. Hypergeometric means drawing without replacement.</p>
+
+::: notes
+About 4 minutes. Work P(X = 3) on the board: choose 3 of the 4 milk-first cups and 1 of the 4 tea-first cups, 4 × 4 = 16 ways. The key move is the same as in McNemar's test: under "no ability," everything is fixed except which cups she happened to pick.
+:::
+
+## Fisher's test for two models {.smaller}
+
+A pilot gives model A 12 questions and model B 12 **different** questions from the same task.
+
+| | Right | Wrong | Total |
+|---|---:|---:|---:|
+| **A** | 11 | 1 | 12 |
+| **B** | 7 | 5 | 12 |
+| **Total** | 18 | 6 | 24 |
+
+If A and B are equally accurate, then given that 18 of the 24 questions were answered right, which 12 questions went to A is like drawing 12 of the 24 at random. The number A got right is hypergeometric:
+$$P(X = x) = \frac{\binom{18}{x}\binom{6}{12-x}}{\binom{24}{12}}, \qquad P(X \ge 11) = 0.071 + 0.007 = 0.077.$$
+
+92% versus 58% looks like a big gap, but 24 questions cannot show it.
+
+::: notes
+About 4 minutes. The analogy: the 18 right answers are the milk-first cups, and A's 12 questions are the lady's picks. One-sided because the question was whether A is more accurate. In Python, `scipy.stats.fisher_exact([[11, 1], [7, 5]], alternative="greater")`.
+:::
+
+## Match the test to how the questions were assigned {.smaller .compact-table}
+
+| | Same questions | Different questions |
+|---|---|---|
+| The evidence | the disagreements | each model's right and wrong counts |
+| Exact test | McNemar's: holds the number of disagreements fixed | Fisher's: holds each model's number of questions and the total right fixed |
+| Large samples | paired standard error, $s_D / \sqrt n$ | unpaired standard error |
+
+::: notes
+About 2 minutes. HW5 1(b)(iii) asks why Fisher's test is the wrong tool when both models answer the same questions. Do not answer it here; the table and the paired-versus-unpaired slide have what students need.
+:::
+
+# Scenario 3: is the difference enough?
+
+## Significant is not the same as important {.smaller}
+
+> A new model beats the current one by 0.4 points (95% interval [0.2, 0.6]) on 50,000 questions.
+
+> A new model beats the current one by 3 points (95% interval [−1, 7]) on 400 questions.
+
+The first is statistically significant and may be too small to matter. The second is not significant and might matter a lot.
+
+Whether a difference matters depends on the decision: what switching costs, and what an error costs. **Decide what size matters before looking at the results.**
+
+::: notes
+About 3 minutes. Ask which result they would act on, and what they would want to know first. For the second, the answer is more data, not "no difference." For the first, it depends on what 0.4 points buys and what switching costs. Week 14 returns to this when teams write recommendations.
+:::
+
+## Sometimes "not much worse" is enough {.smaller}
+
+In drug trials, a new treatment that is cheaper, safer, or easier to take, such as a pill instead of an injection, does not need to beat the standard treatment. It needs to be **not much worse**. This is a **non-inferiority** trial.
+
+AI teams face the same question:
+
+- a smaller model that needs half the memory;
+- a newer version, because the old one is being retired;
+- a model with simpler license terms.
+
+The **margin** $\delta$ is how much accuracy the team will give up for the savings. It is a decision, set in advance, not something estimated from the data.
+
+::: notes
+About 3 minutes. Personal aside here: PredictTB (NCT02821832), the TB treatment-shortening trial you worked on, was a non-inferiority trial. People with drug-sensitive TB and less extensive disease on PET/CT were randomized at week 16 to stop treatment at 4 months or continue to the standard 6. A shorter course is easier to finish, so it only had to be not much worse. The margin, set in the 2017 design paper before any data: the lower confidence bound for the difference in treatment success had to be above −7 points. The trial was stopped early at a planned interim analysis because the 4-month arm was worse: TB-specific unfavorable outcomes in 17 of 141 (12.1%) at 4 months versus 2 of 132 (1.5%) at 6; treatment success 86.7% versus 98.4%, a difference of −11.7 points (95% CI [−18.2, −5.3]). On the next slides' number line, the whole interval is below 0, so the shorter course was shown worse, not just not shown non-inferior. Sources: Chen et al. (2017), Gates Open Research 1:9 (design); Malherbe et al. (2026), Science Translational Medicine 18:eadt5626 (results).
+
+Then ask students for a margin they would accept for a model that costs half as much to run, and why. There is no right number; the point is that someone has to choose it, and it depends on the use.
+:::
+
+## The hypotheses put the burden on the new treatment {.smaller}
+
+A trial compares a new pill with a standard injection. Let $\Delta$ be the pill's cure rate minus the injection's, and let the margin be $\delta = 5$ points.
+
+$$H_0: \Delta \le -\delta \quad \text{(the pill is worse by at least 5 points)}$$
+$$H_1: \Delta > -\delta \quad \text{(the pill is worse by less than 5 points, or better)}$$
+
+The null hypothesis is that the new treatment is **too much worse**, and the data have to show otherwise.
+
+::: notes
+About 2 minutes. HW5 1(c)(i) asks for the AI version of these hypotheses.
+:::
+
+## Why not test "no difference"? {.smaller}
+
+Suppose we test $H_0: \Delta = 0$ instead, and switch to the pill whenever we cannot reject it. What could go wrong?
+
+::: {.fragment}
+With 20 patients per arm, the pill cures 14 (70%) and the injection cures 17 (85%). So $\widehat\Delta = -15$ points, with $\text{SE} = \sqrt{0.70(0.30)/20 + 0.85(0.15)/20} = 13$ points.
+
+| | "No difference" test | Non-inferiority test |
+|----------|------------------------------|------------------------------------------------|
+| Hypotheses | $H_0: \Delta = 0$ vs. $H_1: \Delta \ne 0$ | $H_0: \Delta \le -5$ vs. $H_1: \Delta > -5$ |
+| Result | Fisher's exact test: $p = 0.45$ | $z = (-15 + 5)/13 = -0.77$, $p = 0.78$ |
+| Decision | cannot reject, so switch to the pill | cannot reject, so keep the injection |
+
+A small, noisy trial almost never rejects "no difference," so the first rule lets almost any treatment through. Failing to find a difference is not evidence that there is none.
+:::
+
+::: notes
+About 3 minutes. Take answers before revealing. Fisher's test fits because each arm has different patients, as in scenario 2. This is the same lesson as Week 4's zero-error bound. The z in the table previews the next slide: (estimate − null value)/SE, with the null value at the edge of H0, −5. One-sided p = P(Z > −0.77) = 0.78. The pill's one-sided lower bound is about −36 points.
+:::
+
+## Two ways to run the test {.smaller}
+
+**A $z$ test.** Like any $z$ statistic, $z = (\text{estimate} - \text{null value}) / \text{SE}$, with the null value at the edge of $H_0$:
+$$z = \frac{\widehat\Delta + \delta}{\text{SE}}.$$
+Reject $H_0$ when $z > 1.645$: one-sided, at the 5% level.
+
+**A lower bound.** The **one-sided 95% lower bound** is $\widehat\Delta - 1.645\,\text{SE}$: we are about 95% confident the true difference is above it. Reject $H_0$ when the bound is above $-\delta$.
+
+The two always agree.
+
+<p class="compact-note">HW5 1(c)(ii) asks you to show why.</p>
+
+::: notes
+About 3 minutes. Draw the number line on the board: 0, −δ, the estimate, and the lower bound. Most teams find the bound easier to explain than z, and it is what the lab uses.
+:::
+
+## Example: a smaller model {.smaller}
+
+On 2,000 questions, the smaller model minus the current one is $\widehat\Delta = -0.4$ points, with SE $= 0.3$. The margin is $\delta = 1$ point.
+
+- $z = (-0.4 + 1)/0.3 = 2.0 > 1.645$.
+- The lower bound is $-0.4 - 1.645(0.3) = -0.89$, above $-1$.
+
+**Shown to be non-inferior.**
+
+The two-sided 95% interval, $[-0.99, 0.19]$, includes 0. So the models are not shown to differ either.
+
+"Not shown to differ" and "shown to be not much worse" are different claims. Only the second supports switching.
+
+::: notes
+About 3 minutes. Ask which sentence a team could put in a recommendation. "The models are not significantly different" sounds like support for switching but is not; a tiny test set would say it about any two models.
+:::
+
+## Five scenarios for the point estimate and its bounds {.smaller}
+
+```{python}
+#| fig-width: 10.5
+#| fig-height: 3.8
+# name, estimate, standard error, label; bounds are estimate -/+ 1.645 SE
+rows = [
+    ("A", 1.2, 0.8 / 1.645, "better than the current model"),
+    ("B", -0.3, 0.5 / 1.645, "not much worse; not shown to be better"),
+    ("C", -0.8, 1.0 / 1.645, "not shown to be within the margin"),
+    ("D", 0.5, 2.1 / 1.645, "looks better, but too uncertain to say"),
+    ("E", -0.5, 0.25 / 1.645, "worse, but within the margin"),
+]
+fig, ax = plt.subplots(figsize=(10.5, 3.8))
+for i, (name, estimate, se, label) in enumerate(rows):
+    y = len(rows) - i
+    lower, upper = estimate - 1.645 * se, estimate + 1.645 * se
+    ax.plot([lower, upper], [y, y], color="#155a8a", linewidth=2.5)
+    for end in [lower, upper]:
+        ax.plot([end, end], [y - 0.18, y + 0.18], color="#155a8a", linewidth=2)
+    ax.plot(estimate, y, "o", color="#252525", markersize=7)
+    ax.text(-2.75, y, name, va="center", fontsize=15, fontweight="bold")
+    ax.text(3.2, y, label, va="center", fontsize=14)
+ax.axvline(0, color="#667085", linestyle="--", linewidth=1.2)
+ax.axvline(-1, color="#c41230", linewidth=1.6)
+ax.text(-1.05, 5.75, "margin, −δ", color="#c41230", ha="right", fontsize=14)
+ax.text(0.05, 5.75, "0", color="#667085", ha="left", fontsize=14)
+ax.set_xlim(-2.9, 7.6)
+ax.set_ylim(0.4, 6.1)
+ax.set_xticks([-2, -1, 0, 1, 2, 3])
+ax.tick_params(labelsize=12)
+ax.set_xlabel("new model minus current model, percentage points", fontsize=13)
+ax.set_yticks([])
+ax.spines[["top", "right", "left"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+Each dot is $\widehat\Delta$, and each bar runs from the one-sided 95% lower bound to the upper bound. Left end above $-\delta$: not much worse. Right end below 0: shown worse.
+
+::: notes
+About 5 minutes. Ask which rows support switching to the new model: A, B, and E. Row C is the case "not shown," which is different from "shown worse." Row D surprises people: the new model looks better, but the data are too thin to rule out that it is more than 1 point worse. More data would settle D; nothing about the point estimate does.
+
+Row E is the strangest: both tests reject. The new model is shown to be worse (the whole bar is below 0) and shown to be not much worse (the left end is above −1). For example, an estimate of −0.5 with SE 0.15 gives the two-sided 95% interval [−0.79, −0.21] and the lower bound −0.75. Large test sets produce this often. "Significantly worse" and "worse than we care about" are different claims.
+
+Compare B with the "no difference" test: in B, the test of Δ = 0 cannot reject (the bar crosses 0) but the non-inferiority test does. The worked example two slides back is a B.
+:::
+
+## Check {.smaller}
+
+The new model looks better: $\widehat\Delta = +0.2$ points, SE $= 0.8$, margin $\delta = 1$ point. Is it shown to be non-inferior?
+
+::: {.fragment}
+The lower bound is $0.2 - 1.645(0.8) = -1.12$, below $-1$. **No.** With this much uncertainty the new model could be more than 1 point worse. This is row D.
+:::
+
+::: notes
+About 2 minutes.
+:::
+
+## How many questions would it take? {.smaller}
+
+The standard error shrinks like $1/\sqrt n$.
+
+**Example.** On 1,500 questions, $\widehat\Delta = -0.5$ points and SE $= 0.4$, with margin $\delta = 1$. The lower bound is $-0.5 - 1.645(0.4) = -1.16$: not shown.
+
+If the gap stayed at $-0.5$, the bound would pass when
+$$-0.5 - 1.645\,\text{SE} > -1 \quad\Longleftrightarrow\quad \text{SE} < \frac{0.5}{1.645} = 0.30.$$
+
+With $\text{SE} = 0.4\sqrt{1500/n}$, that needs
+$$n > 1500 \left(\frac{0.4}{0.30}\right)^2 \approx 2{,}600 \text{ questions.}$$
+
+::: notes
+About 3 minutes. This assumes the estimate stays at −0.5, which it will not exactly. The calculation says how much data would make the answer clear if the current estimate is about right. HW5 1(c)(iv) does the same with its own numbers.
+:::
+
+## Set the margin before you look {.smaller}
+
+After seeing a lower bound of $-1.16$, it is tempting to decide that a 1.5-point margin is fine.
+
+A margin chosen after seeing the bound can always be made to pass. So write down the margin, and the reason for it, before running the comparison: what the team gains by switching, and how much accuracy that is worth.
+
+This is Week 3's locked evaluation plan again.
+
+::: notes
+About 2 minutes. In Thursday's lab, the team sets its margin before seeing any data, and the homework asks why that matters.
+:::
+
+## Small concessions add up {.smaller}
+
+A shop checks its scale once a year against last year's scale, and keeps it if the two agree within half an ounce.
+
+Every year, the scale passes. After four years, how far could it be from the original?
+
+::: {.fragment}
+Up to 2 ounces. Each check compares against the previous scale, not the original, so small allowed errors can pile up in one direction.
+:::
+
+<p class="compact-note">HW5 1(c)(v) asks what this means for a series of model versions.</p>
+
+::: notes
+About 2 minutes. In drug trials this is called biocreep; let the homework name it for models.
+:::
+
+## What we did today {.smaller}
+
+1. When two models answer the same questions, only the disagreements say which is better. McNemar's test treats each disagreement as a coin toss.
+2. Pairing makes the comparison more precise, because easy questions are easy for both. Even paired, Week 4's 0.5-point gap is too small to call.
+3. When the models answered different questions, Fisher's exact test uses the hypergeometric distribution.
+4. A significant difference can be too small to matter, and a non-significant one can be large.
+5. Non-inferiority asks whether a model is not much worse. It passes when the one-sided lower bound is above $-\delta$, and $\delta$ is set in advance.
+
+::: notes
+About 2 minutes.
+:::
+
+## Thursday, and reading {.smaller}
+
+**Thursday:** benchmark questions come in tasks, so are the disagreements really independent? Picking the best of several tries overstates it, and accuracy is not the only cost. Then Lab 5 on BIG-Bench Hard.
+
+**HW5** is out today and due Tue Feb 23.
+
+**Reading:** Miller (2024), ["Adding Error Bars to Evals"](https://arxiv.org/abs/2411.00640), Section 4: comparing models, unpaired and paired.
+
+**Optional:**
+
+- Agresti, *An Introduction to Categorical Data Analysis* (3rd ed.), Section 8.1 (McNemar's test) and Chapter 2 (Fisher's exact test).
+- Wasserman, *All of Statistics*, Section 10.1, the examples comparing two prediction algorithms.
+- Suzgun et al. (2023), ["Challenging BIG-Bench Tasks and Whether Chain-of-Thought Can Solve Them"](https://aclanthology.org/2023.findings-acl.824/), Sections 1–2: what Thursday's benchmark is and how its tasks were chosen.

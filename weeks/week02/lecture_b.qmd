@@ -1,5 +1,5 @@
 ---
-title: "Week 2B: From Probability Model to Label Audit"
+title: "Week 2B: From Probability Model to Checking the Labels"
 subtitle: "Applying dependence and Brier-score ideas to DynaSent"
 author: "Shannon Gallagher"
 format:

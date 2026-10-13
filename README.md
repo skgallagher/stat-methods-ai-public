@@ -1,76 +1,23 @@
-# Statistical Methods for AI
+# Statistical Thinking for the AI Era
 
-Senior Undergraduate Special Topics  
-Department of Statistics
+Carnegie Mellon University · Statistics & Data Science · Spring 2027  
+Instructor: Shannon Gallagher
 
----
+This repository holds the student materials for the course: lecture slides, lab and homework notebooks, and the course data. The course website has the schedule, the syllabus, and a link to every week's materials:
 
-## Course Overview
+**https://www.stat.cmu.edu/~sgallagh/courses/stat-ai-spring-2027/**
 
-This course examines modern artificial intelligence systems through the lens of statistical reasoning.
+## Where things are
 
-We emphasize:
+- `weeks/weekNN/` has each week's lecture slides (`lecture_a` for Tuesday, `lecture_b` for Thursday), the lab notebook, the homework prompt and its starter notebook, and the lecture checks.
+- `data/course/` has the course data. The notebooks download what they need and check each file against `data/course/manifest.json`, so you do not need to download anything yourself.
+- `course_helpers/` has the small helper the notebooks use to download the data.
+- `site/` is the source of the course website.
+- `scripts/` has the scripts that build the notebooks and freeze the data releases.
+- `projects/` has the script that assembles the final project's data release.
 
-- Data-generating processes  
-- Evaluation as estimation  
-- Benchmark reliability  
-- Uncertainty quantification  
-- Generalization and distribution shift  
-- Interpretability and fairness  
+## Working on the notebooks
 
-Image and text datasets serve as primary case studies.
+Open a lab or homework notebook in Google Colab from the course website. Every notebook runs on Colab's free CPU runtime. The syllabus explains how to submit homework.
 
----
-
-## Official Computing Environment
-
-- **Runtime:** Google Colab  
-- **Language:** Python  
-- **Core libraries:** numpy, scikit-learn, torch, torchvision, transformers, matplotlib, plotly, seaborn  
-- GPU use is optional and limited.
-
-All assignments are solvable on CPU.
-
----
-
-## Weekly Materials
-
-### Week 01 — Logistic Regression to Neural Networks
-
-Lecture drafts:
-
-- `lecture_drafts/week01a_logistic_to_neural_nets.qmd`
-- `lecture_drafts/week01b_accuracy_baselines_benchmarks.qmd`
-
-Lab:
-
-[![Open Lab in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main/weeks/week01/lab.ipynb)
-
-Homework:
-
-[![Open HW01 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/skgallagher/stat-methods-ai-public/blob/main/homeworks/hw01.ipynb)
-
----
-
-## Homework Submission
-
-- Complete homework in the provided Colab notebook.
-- Submit the completed notebook as a **PDF** to Gradescope.
-- Optional: submit the completed `.ipynb` for reproducibility.
-
----
-
-## Repository Structure
-
-- `weeks/` — weekly materials (slides + labs)
-- `labs/` — lab templates
-- `lecture_drafts/` — two lecture drafts per week (`weekXXa`, `weekXXb`)
-- `homeworks/` — homework notebooks plus lightweight prompt pages
-- `code/` — shared utilities
-- `data/` — small datasets
-
----
-
-## About This Course
-
-This course highlights what statistical thinking contributes to modern AI practice and research.
+Solutions are not posted here.

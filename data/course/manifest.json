@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "release_status": "student_release",
-  "release_id": "spring27-week03-draft-v2",
+  "release_id": "spring27-week05-v1",
   "delivery": "individual files from the public GitHub repository; no ZIP archive",
   "files": [
     {
@@ -1143,6 +1143,26 @@
       "path": "github_issues/release_summary.json",
       "bytes": 693,
       "sha256": "5449009ef71d1a16202c1338ea09566ea6c7cf47cd3d8d02dd5fe84b3013ee8f"
+    },
+    {
+      "path": "llm_bbh/correct.csv",
+      "bytes": 376513,
+      "sha256": "84c4b0f95e05c80726cc7728a6195413a36d66d90000d0b66813da87c6472f51"
+    },
+    {
+      "path": "llm_bbh/models.csv",
+      "bytes": 1276,
+      "sha256": "8710864ef99a7e4055f5ff7a2fe518cb1103a6554c1027dcf3cd3ea867af1276"
+    },
+    {
+      "path": "llm_bbh/questions.csv",
+      "bytes": 2661798,
+      "sha256": "1f658ff2c209b81c9ed58a9800ed0709817b02ae294e47c4c9290f2e83706fc4"
+    },
+    {
+      "path": "llm_bbh/release_summary.json",
+      "bytes": 1319,
+      "sha256": "1a6e11ecf3a7af019c1de9544fd9d9d9f5be2cebbbe0b4fa1b6e76a7c3cd678c"
     }
   ]
 }

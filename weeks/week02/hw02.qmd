@@ -276,7 +276,7 @@ highest-probability labels matching the majority; keep the denominator of ten
 visible. Briefly explain what information is lost when $\widehat q$ is replaced
 by $Y_{\mathrm{maj}}$ and why neither target becomes literal ground truth.
 
-d. **Measurement audit and synthesis (4 points).** Select one case where the
+d. **Measurement check and synthesis (4 points).** Select one case where the
 models disagree and quote only the shortest phrase needed to identify its
 ambiguity. For that case, report $\widehat q$, $Y_{\mathrm{maj}}$, and the three
 forecasters' highest-probability labels. Explain what the soft target records

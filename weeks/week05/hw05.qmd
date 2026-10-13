@@ -1,0 +1,141 @@
+---
+title: "Homework 5: Is the Smaller Model Good Enough?"
+subtitle: "Statistical Evaluation of AI · Spring 2027"
+format:
+  pdf:
+    geometry:
+      - top=0.8in
+      - bottom=1in
+      - left=1in
+      - right=1in
+---
+
+**Do not use AI for Problem 1.** Work the derivations yourself. AI is allowed in Problem 2 and required in Problem 3.
+
+| | |
+|---|---|
+| **Out / due** | Tue Feb 16 / Tue Feb 23, 11:59pm |
+| **Points** | 100: Problem 1 (46), Problem 2 (39), Problem 3 (15) |
+| **Expected time** | About 4 hours after Lab 5. Contact course staff if setup or debugging alone takes more than 30 minutes. |
+| **Reading** | Miller (2024), ["Adding Error Bars to Evals"](https://arxiv.org/abs/2411.00640), Section 4. Optional: Agresti, *An Introduction to Categorical Data Analysis* (3rd ed.), Section 8.1; Wasserman, *All of Statistics*, Section 10.1, the examples comparing two prediction algorithms; Smith and Winkler (2006), ["The Optimizer's Curse"](https://doi.org/10.1287/mnsc.1050.0451), on the winner's curse; Singh et al. (2025), ["The Leaderboard Illusion"](https://arxiv.org/abs/2504.20879), abstract and the section on private testing |
+| **AI policy** | No AI for Problem 1. AI is allowed in Problem 2 and required in Problem 3. Submit the AI-use record at the end. |
+| **Working file** | `hw05_starter.ipynb`. The PDF is a read-only copy of the prompt. |
+| **Submit** | Notebook PDF and completed `.ipynb` in one Gradescope submission. |
+
+## The situation
+
+A team runs Qwen2.5-7B-Instruct, an open-weight language model with 7.6 billion parameters, inside a tool that answers reasoning questions. Microsoft's Phi-3.5-mini-instruct has 3.8 billion parameters, so it needs about half the memory and runs faster. The team wants to know whether switching would cost them accuracy, and what else switching would cost.
+
+The data come from the Open LLM Leaderboard, which ran both models, and six others, on BIG-Bench Hard (BBH): 5,761 multiple-choice questions in 24 tasks, such as putting adjectives in the right order, tracking objects that are swapped around, and judging what caused an event. The `llm_bbh` data have one row per question, with a 1 if a model got it right and a 0 if not. Every question is multiple choice, and the model never writes a reply: its answer is the option it rates as most likely. Lab 5 walks through an example.
+
+In Lab 5 you compared Llama-3.1-8B and Qwen2.5-7B on these questions, and the team went with Qwen. This homework asks whether a smaller model could replace it. You may reuse the lab's code, including `task_bootstrap()`.
+
+Problems 2 and 3 use your results from Problem 1, so do Problem 1 first.
+
+# Problem 1 - Comparing two models on the same questions (46 points, no AI)
+
+Show your work. A correct number without the steps behind it earns little credit. Part (a) is adapted from Agresti (2019), Section 8.1, and part (b) from Agresti (2019), Chapter 2. Part (c) uses the non-inferiority setup common in drug trials.
+
+Throughout, two models, A and B, answer the same $n$ questions. Record each question in a $2\times2$ table:
+
+| | B right | B wrong |
+|---|---:|---:|
+| **A right** | $n_{11}$ | $n_{10}$ |
+| **A wrong** | $n_{01}$ | $n_{00}$ |
+
+a. **Where the difference lives (14 points).**
+
+   **(i) (3 points)** Let $\widehat\Delta=\hat p_B-\hat p_A$ be the difference in accuracy. Show that $\widehat\Delta=(n_{01}-n_{10})/n$, and explain in one sentence why $n_{11}$ and $n_{00}$ drop out.
+
+   **(ii) (4 points)** Suppose the two models are equally accurate, so a question is as likely to be "only A right" as "only B right." Condition on the number of questions where they disagree, $m=n_{10}+n_{01}$. Explain why $n_{01}\sim\operatorname{Binomial}(m,\tfrac12)$. Which assumption about the questions does this use?
+
+   **(iii) (4 points)** Derive McNemar's statistic,
+   $$z=\frac{n_{01}-n_{10}}{\sqrt{n_{10}+n_{01}}},$$
+   in three steps.
+
+   1. Using the binomial in (ii), write the mean and the variance of $n_{01}$ in terms of $m$. (1 point)
+   2. Standardize: write $z=(n_{01}-\text{mean})/\text{SD}$. For large $m$, the normal approximation to the binomial says $z$ is approximately standard normal. (1 point)
+   3. Substitute $m=n_{10}+n_{01}$. Show that $n_{01}-\tfrac{m}{2}=\tfrac12(n_{01}-n_{10})$, and simplify $z$ to McNemar's statistic. (2 points)
+
+   **(iv) (3 points)** In a different study of $n=1{,}000$ questions, $n_{10}=30$ and $n_{01}=15$. Compute $\widehat\Delta$ and $z$, and say whether the evidence favors one model at the 5% level.
+
+b. **When the questions are not shared: Fisher's exact test (10 points).** A small pilot gives model A 10 questions from one task and model B 10 *different* questions from the same task.
+
+   | | Right | Wrong | Total |
+   |---|---:|---:|---:|
+   | **A** | 9 | 1 | 10 |
+   | **B** | 6 | 4 | 10 |
+   | **Total** | 15 | 5 | 20 |
+
+   **(i) (4 points)** Suppose A and B are equally accurate. Given that 15 of the 20 questions were answered right, which 10 questions went to A is like drawing 10 of the 20 at random. Explain why the number A got right, $X$, has the hypergeometric distribution
+   $$P(X=x)=\frac{\binom{15}{x}\binom{5}{10-x}}{\binom{20}{10}}.$$
+
+   **(ii) (3 points)** Compute Fisher's one-sided p-value, $P(X\ge9)=P(X=9)+P(X=10)$. You may use $\binom{15}{9}=5{,}005$, $\binom{15}{10}=3{,}003$, and $\binom{20}{10}=184{,}756$. Does the pilot show that A is more accurate?
+
+   **(iii) (3 points)** What does McNemar's test in (a) condition on, and what does Fisher's test condition on? Then say in one sentence why Fisher's test is the wrong tool when both models answer the same questions.
+
+c. **Good enough: non-inferiority (16 points).** A new drug is often approved if it is cheaper or safer and *not much worse* than the standard treatment. The same reasoning applies to a cheaper or smaller AI model. Model B is **non-inferior** to model A if it is worse by less than a margin $\delta$ chosen in advance.
+
+   **(i) (3 points)** Write the null and alternative hypotheses for "B is non-inferior to A with margin $\delta$" in terms of $\Delta=p_B-p_A$. In one sentence, explain why the null hypothesis is that B is worse by at least $\delta$, rather than that the two are equal.
+
+   **(ii) (4 points)** Like any $z$-statistic, the test statistic is (estimate $-$ null value)/SE. The null value is the edge of the null hypothesis, $\Delta=-\delta$; if the data rule out $\Delta=-\delta$, they also rule out every $\Delta$ below it. So
+   $$z=\frac{\widehat\Delta-(-\delta)}{\mathrm{SE}}=\frac{\widehat\Delta+\delta}{\mathrm{SE}}.$$
+   The test is one-sided: it rejects the null at the 5% level when $z>1.645$.
+
+   1. Show that $z>1.645$ is the same as $\widehat\Delta-1.645\,\mathrm{SE}>-\delta$. (2 points)
+   2. The quantity $\widehat\Delta-1.645\,\mathrm{SE}$ is the one-sided 95% lower confidence bound for $\Delta$. In one sentence, say how the team can check non-inferiority from this bound without computing $z$. (2 points)
+
+   **(iii) (4 points)** On 1,200 questions, $\widehat\Delta=-0.002$ with standard error $0.006$, and the team's margin is $\delta=0.01$. Compute $z$ and the lower bound. Is B shown to be non-inferior? Then compute the two-sided 95% interval for $\Delta$. Is the difference significant? Say in one sentence what the team can conclude.
+
+   **(iv) (3 points)** If $\widehat\Delta$ stayed the same, about how many questions would it take for B to be shown non-inferior? Use the fact that the standard error shrinks like $1/\sqrt n$.
+
+   **(v) (2 points)** A company shows v2 of its model is non-inferior to v1 with a 1-point margin, then v3 is non-inferior to v2, then v4 is non-inferior to v3. In 2 sentences, explain what could go wrong. (In drug trials this is called *biocreep*.)
+
+d. **The winner's curse (6 points).** Two prompts have the *same* true accuracy $p$. Treat their estimated accuracies, $\hat p_1$ and $\hat p_2$, as normal with mean $p$, standard deviation $\sigma$, and correlation $\rho$. You report whichever is larger.
+
+   **(i) (3 points)** Show that $\max(\hat p_1,\hat p_2)=\tfrac12(\hat p_1+\hat p_2)+\tfrac12|\hat p_1-\hat p_2|$. Hint: check the case $\hat p_1\ge\hat p_2$ and the case $\hat p_1<\hat p_2$.
+
+   **(ii) (3 points)** Taking the expected value of (i) gives
+   $$E\bigl[\max(\hat p_1,\hat p_2)\bigr]=p+\sigma\sqrt{\frac{1-\rho}{\pi}}.$$
+   Take $\sigma=0.01$. Compute the overstatement, in percentage points, when the two estimates come from different questions ($\rho=0$) and when they come from the same questions ($\rho=0.95$). In 2 sentences, explain why picking the best prompt overstates its accuracy, and why using the same questions makes the overstatement smaller.
+
+# Problem 2 - Compare Qwen and Phi on BBH (39 points)
+
+Use `correct.csv` from the `llm_bbh` data. Model A is the team's current model, Qwen2.5-7B (`qwen25_7b`), and model B is Phi-3.5-mini (`phi35_mini`), so $\Delta=p_{\text{Phi}}-p_{\text{Qwen}}$. AI help with code is allowed. Record any substantial help in the AI-use table.
+
+a. **Reference points (3 points).** Report the number of questions and tasks, the accuracy of guessing at random (the starter averages $1/\text{number of options}$ over the questions), and the accuracy of Qwen2.5-7B, Phi-3.5-mini, and the largest model, Llama-3.1-70B. In one sentence, say why the random-guessing accuracy is a useful reference here.
+
+b. **The paired table (7 points).** Make the $2\times2$ table of right and wrong for the two models. Compute $\widehat\Delta$ and McNemar's test (the starter uses the exact binomial version from Problem 1(a)). Then compute the paired standard error, $s_D/\sqrt n$ with $D_i=B_i-A_i$, and the standard error you would get if the two accuracies came from different questions, $\sqrt{\{\hat p_A(1-\hat p_A)+\hat p_B(1-\hat p_B)\}/n}$. How many times wider is the second? In 2 sentences, say what McNemar's test does and does not tell the team.
+
+c. **An interval that respects the tasks (10 points).** As you saw in Lab 5, questions in the same task share a format and a skill.
+
+   1. The starter plots the difference between the two models in each task. Which task favors Phi most, and which favors Qwen most? (2 points)
+   2. Run the starter's task bootstrap, which resamples whole tasks and keeps both models' results for each question together. Report the 95% percentile interval for $\Delta$. (2 points)
+   3. Compare its standard error with the paired standard error from (b). How many times larger is it? (2 points)
+   4. In 2 or 3 sentences, explain which assumption from Problem 1(a)(ii) resampling tasks relaxes, what it assumes instead about the questions the team will see, and why the bootstrap must keep the two models' results together. (4 points)
+
+d. **Is Phi good enough? (9 points).** Before seeing the data, the team set a non-inferiority margin of 3 percentage points.
+
+   1. Using the 5th percentile of your bootstrap differences as the one-sided lower bound, is Phi shown to be non-inferior to Qwen? (2 points)
+   2. In 2 sentences, explain how "McNemar's test is not significant" differs from "Phi is non-inferior to Qwen," using your results. (2 points)
+   3. Suppose the margin had been 1 point. What would you conclude using the task bootstrap? What would you conclude using the paired standard error from (b), with lower bound $\widehat\Delta-1.645\,\mathrm{SE}$? In 2 sentences, say which answer the team should trust and why the margin has to be set before looking at the data. (2 points)
+   4. Accuracy is not the only cost. The starter's model table lists each model's memory at 16-bit precision, 2 bytes per parameter, and its license. Name two other costs of running a model, such as speed, electricity, hardware, license terms, or the work of testing a new model, and say how each would change your recommendation. Then give one example of two costs that cannot be chosen separately. (3 points)
+
+e. **Picking the tasks to report (10 points).** A blog post reports: "On five BBH tasks, Phi-3.5-mini beats Qwen2.5-7B by 14 points." Choosing which benchmarks or tasks to report after seeing the results is sometimes called *benchmaxxing*. The starter imitates how such a claim gets made. It splits each task's questions in half at random, finds the five tasks where Phi beats Qwen by the most on the first half, and records Phi's advantage on those five tasks in the first half and in the second half. It repeats this 500 times.
+
+   1. Report the average advantage on the first half and on the second half, and the advantage over all 5,761 questions. (3 points)
+   2. Use Problem 1(d) to explain why the first-half number is larger than the second-half number. (3 points)
+   3. The second-half number is still far above the overall advantage. In 2 sentences, explain why, and say what is misleading about the blog post even though those five tasks really do favor Phi. (2 points)
+   4. In one sentence, say what a fair comparison of the two models should report. (2 points)
+
+# Problem 3 - Ask an AI to make the call (15 points)
+
+a. **Accuracies only (5 points).** Give an AI assistant only the two overall accuracies from Problem 2(a) and the two models' sizes, and ask which model the team should use. Preserve your prompt and its first response.
+
+b. **The full evidence (5 points).** In the same conversation, add the paired table, your task bootstrap interval, the range of the per-task differences, the team's 3-point non-inferiority margin, and the two costs from Problem 2(d). Ask again, and preserve the response. In 2 sentences, say what changed in its answer and which piece of evidence changed it.
+
+c. **Your verdict (3 points).** Rewrite the final recommendation in 2 or 3 sentences so the strength of the language matches the evidence. Point out one claim from either AI response that the evidence does not support.
+
+## Required AI-use record (2 points)
+
+Complete the AI-use table in the notebook for Problems 2 and 3. Record the tool, its purpose, your **initial prompt only**, what you checked, what changed after checking, and one decision you made yourself.

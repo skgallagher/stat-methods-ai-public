@@ -47,7 +47,7 @@ That one sentence fixes several choices:
 > file. Try several queue groupings and model settings. Report the setup with
 > the highest test accuracy and use the language model if it wins.
 
-Nothing here looks absurd. That is why it needs an audit.
+Nothing here looks absurd. That is why it needs checking.
 
 Before discussing code, underline every phrase that quietly makes a study
 decision.
@@ -352,7 +352,7 @@ A stronger test of the prompt effect would use:
 - a rule for scoring plan quality;
 - a comparison of the two distributions of scores.
 
-For Homework 3, the goal is careful auditing—not a full prompt experiment.
+For Homework 3, the goal is careful checking, not a full prompt experiment.
 
 ## Keep a short AI-use record {.smaller}
 
