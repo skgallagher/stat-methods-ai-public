@@ -1,0 +1,54 @@
+---
+title: "Midterm Review: One Evaluation Study"
+subtitle: "Statistical Thinking for the AI Era · Spring 2027"
+format: pdf
+---
+
+| | |
+|---|---|
+| **Out / due** | Tue Feb 23 / Tue Mar 2 for optional feedback |
+| **Grading** | Ungraded practice; not one of the seven homeworks |
+| **AI policy** | Complete once without AI. Afterward, AI may be used to generate additional practice, which you should verify. |
+
+This packet provides broad Weeks 1-6 synthesis inside one evaluation study. Complete it before the harder `midterm_theory_practice.qmd`, which mirrors the live exam's theory / printed-code / AI-check structure. Both use three major problems like the graded homework. Complete each once without outside assistance, then use your reference sheet and the solution keys to diagnose what is missing.
+
+# Problem 1 — Name the object and the threat
+
+For each short scenario, identify the most relevant object or problem and justify your answer in one or two sentences.
+
+1. A camera-trap model's threshold moves from 0.5 to 0.8 without refitting.
+2. Adjacent frames from one trigger sequence enter different splits.
+3. A CFPB vocabulary is constructed before the future holdout is separated.
+4. A DynaSent item has a 3–2 rater split.
+5. An accuracy interval treats 1,000 frames from 100 sequences as independent.
+6. Two systems are evaluated on the same complaints, but their accuracies are compared as independent proportions.
+7. A classifier is accurate but assigns probability 0.95 to cases that are correct only 80% of the time.
+8. Pooled calibration is acceptable while one pre-specified product category is systematically overconfident.
+
+For each, also state whether the problem primarily concerns measurement, target population, dependence, leakage, estimation, comparison, or calibration. Some scenarios have more than one defensible label; defend the primary one.
+
+# Problem 2 — By-hand integrated analysis
+
+An evaluation contains 500 future complaints. The TF-IDF logistic baseline is correct on 390; the transformer is correct on 410. Both are correct on 360, only the baseline on 30, only the transformer on 50, and both are wrong on 60. Among 100 transformer predictions with mean confidence 0.90, 82 are correct.
+
+1. Compute both accuracies, the majority-floor-adjusted improvement if the floor is 0.55, and the paired difference.
+2. Explain why the discordant counts—not only the two marginal accuracies—determine evidence about the comparison. Compute McNemar's large-sample statistic.
+3. Compute the plug-in standard error for the transformer's accuracy under independent complaints. State the repeated-sampling assumption.
+4. Using a supplied Wilson formula, calculate a 95% interval for the 82/100 high-confidence-bin accuracy. Assess the 0.90 probability claim.
+
+   Use
+
+   $$\frac{\widehat p+z^2/(2n)\ \pm\ z\sqrt{\widehat p(1-\widehat p)/n+z^2/(4n^2)}}{1+z^2/n}$$
+
+   with $z=2$.
+5. The client requires at least a 3-point improvement and no more than 10% error among automatically routed high-confidence cases. Write a bounded decision statement from the available evidence and name one quantity still missing.
+
+# Problem 3 — Critique and repair the report
+
+Critique this paragraph:
+
+> The transformer is definitively better because it achieved 82% accuracy versus 78% for logistic regression. Its 90% confidence is close enough to its 82% accuracy, so all high-confidence complaints can be routed automatically. These 500 complaints show that the system will work for all future consumers. We also checked several product groups and reported the largest gain.
+
+1. Identify at least five mismatches between claim and evidence.
+2. Rewrite the paragraph in no more than 150 words. Include the paired comparison, uncertainty, population, probability claim, practical threshold, and multiplicity issue.
+3. Name the one additional analysis you would prioritize and explain why it is more consequential than simply fitting another algorithm.

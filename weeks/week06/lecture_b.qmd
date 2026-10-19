@@ -1,0 +1,271 @@
+---
+title: "Week 6B: Choosing the Threshold"
+subtitle: "Costs, recalibration, and confidence from language models"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+## Recap {.smaller}
+
+On Tuesday, Gemma-2-2B was badly overconfident on BIG-Bench Hard. At a threshold of 0.90, the tool would answer 39% of questions on its own, and 42% of those answers would be wrong (95% interval 40% to 44%). Gemma's confidence promised about 3%.
+
+Suppose the team finds a better-calibrated model and checks it on 1,000 questions its own users asked, with known answers. The team still has to **choose** a threshold. Today we work out how.
+
+::: notes
+About 2 minutes. Ask a student to say Tuesday's client sentence from memory: estimate, interval, and what it means for the 10% limit. The 1,000-question model in this lecture is made up, so the arithmetic works by hand; Lab 6 then uses real models.
+:::
+
+## Today {.smaller}
+
+1. **We choose a threshold by putting a cost on a person's time and on a wrong answer.** Then we see how far the costs can move before the choice changes.
+2. **We separate the decisions that need calibrated probabilities from the ones that need only the order of the confidences.** That tells us when recalibration helps.
+3. **We look at the two ways a language model states confidence, and grade a vendor's claim.**
+
+Then Lab 6 checks whether two larger language models' confidence means what it says.
+
+::: notes
+About 1 minute. This lecture is about 40 minutes. Part 1 is the decision-rule sensitivity that Week 10 generalizes.
+:::
+
+# Choosing a threshold
+
+## The team's table of thresholds {.smaller}
+
+The better-calibrated model, on the team's 1,000 questions:
+
+| Answer on its own if confidence is at least | Share answered on its own | Error rate among those answers |
+|---|---:|---:|
+| 0.97 | 20% | 2.0% |
+| 0.95 | 30% | 3.0% |
+| 0.90 | 60% | 8.0% |
+| 0.80 | 80% | 11.5% |
+| 0.70 | 90% | 13.6% |
+
+Every row is a possible rule. Raising the threshold buys a lower error rate with more of a person's time.
+
+Statistics cannot pick the row alone. It depends on what a person's time costs and what a wrong answer costs.
+
+::: notes
+About 2 minutes. The counts behind the rows: 4 of 200, 9 of 300, 48 of 600, 92 of 800, and 122 of 900 wrong; 164 of 1,000 wrong if the tool answers everything. The 0.97 row is Tuesday's last check. At 0.90 the answers' average confidence is 0.95, so this model promises 5% and delivers 8%: better than Gemma, still somewhat overconfident.
+:::
+
+## Put a cost on each row {.smaller}
+
+Measure cost in units of one person answering one question. Let $r$ be the cost of one wrong answer the tool gives, in those units. Assume a person always gets the answer right. Then for 1,000 questions,
+
+$$\text{cost} = (\text{questions a person answers}) + r \times (\text{wrong answers the tool gives on its own}).$$
+
+| Threshold | Questions a person answers | Wrong answers | Cost if $r = 5$ | Cost if $r = 10$ | Cost if $r = 30$ |
+|---|---:|---:|---:|---:|---:|
+| 0.97 | 800 | 4 | 820 | 840 | **920** |
+| 0.95 | 700 | 9 | 745 | **790** | 970 |
+| 0.90 | 400 | 48 | **640** | 880 | 1,840 |
+| 0.80 | 200 | 92 | 660 | 1,120 | 2,960 |
+| a person answers every question | 1,000 | 0 | 1,000 | 1,000 | 1,000 |
+
+Three values of $r$ give three different best thresholds.
+
+::: notes
+About 4 minutes. Work one cell on the board: at r = 10 and threshold 0.95, cost = 700 + 10 × 9 = 790. Ask what r is for this team. A wrong answer that a user trusts and acts on may cost far more than a person's minute; nobody in the room knows r exactly, and that is the point of the next slide.
+
+The assumption that a person is always right is not true either (Week 2). Ask how the formula would change if people made mistakes too.
+:::
+
+## Where the best threshold changes {.smaller}
+
+```{python}
+#| fig-width: 9
+#| fig-height: 3.4
+import numpy as np
+import matplotlib.pyplot as plt
+
+r = np.linspace(1, 60, 400)
+rules = [("0.80", 200, 92, "#c9d3df"), ("0.90", 400, 48, "#7fa3c4"), ("0.95", 700, 9, "#155a8a"),
+         ("0.97", 800, 4, "#c41230"), ("a person answers every question", 1000, 0, "#667085")]
+
+fig, ax = plt.subplots(figsize=(9, 3.4))
+for name, person, wrong, color in rules:
+    ax.plot(r, person + r * wrong, color=color, linewidth=2.2, label=name)
+ax.axvspan(300 / 39, 20, color="#155a8a", alpha=0.08)
+for flip in [300 / 39, 20, 50]:
+    ax.axvline(flip, color="#252525", linestyle=":", linewidth=1)
+ax.annotate("shaded: 0.95 is cheapest\nfor r from 7.7 to 20", xy=(19.5, 560), xytext=(23, 560), va="center", fontsize=12, color="#155a8a", arrowprops=dict(arrowstyle="->", color="#155a8a"))
+ax.set_xlim(1, 55)
+ax.set_ylim(400, 1600)
+ax.tick_params(labelsize=12)
+ax.set_xlabel("r, the cost of one wrong answer, in units of one person's answer", fontsize=13)
+ax.set_ylabel("cost per 1,000 questions", fontsize=13)
+ax.legend(fontsize=11, frameon=False, loc="upper left", bbox_to_anchor=(1.01, 1.0), title="answer on its own if\nconfidence is at least", title_fontsize=11, alignment="left")
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+| If $r$ is between | 2.4 and 3.3 | 3.3 and 4.5 | 4.5 and 7.7 | 7.7 and 20 | 20 and 50 | above 50 |
+|---|---:|---:|---:|---:|---:|---:|
+| the cheapest threshold is | 0.70 | 0.80 | 0.90 | 0.95 | 0.97 | a person answers every question |
+
+::: notes
+About 4 minutes. Each dotted line is where two rules cost the same. For 0.90 against 0.95: 400 + 48r = 700 + 9r, so r = 300/39 = 7.7. For 0.95 against 0.97: 700 + 9r = 800 + 4r, so r = 20. For 0.97 against a person answering everything: 800 + 4r = 1,000, so r = 50. Below r = 2.4, letting the tool answer everything is cheapest (164 wrong answers out of 1,000).
+
+This is a sensitivity analysis: we varied the assumption we were least sure of and found where the answer changes. Week 10 does the same for whole analyses.
+:::
+
+## Check {.smaller}
+
+The team decides a wrong answer costs about 15 times a person's answer. Which threshold is cheapest, and how much would $r$ have to change to change the answer?
+
+::: {.fragment}
+At $r = 15$: threshold 0.95 costs $700 + 15 \times 9 = 835$, threshold 0.97 costs $800 + 15 \times 4 = 860$, and threshold 0.90 costs $400 + 15 \times 48 = 1{,}120$. **Use 0.95.**
+
+The answer stays 0.95 as long as $r$ is between 7.7 and 20. So the team does not need to know $r$ exactly. It only needs to agree that a wrong answer costs between about 8 and 20 times a person's answer.
+:::
+
+::: notes
+About 3 minutes. The second paragraph is the useful part for a client: what they have to agree on is a range, not a number.
+:::
+
+## Report the range, not one threshold {.smaller}
+
+What to tell the team:
+
+> If a wrong answer costs between about 8 and 20 times a person's answer, a threshold of 0.95 is cheapest: the tool would answer about 30% of questions on its own, with about 3% of those answers wrong (95% interval 1.6% to 5.6%). If wrong answers cost more than that, raise the threshold to 0.97. Above about 50, the tool should not answer anything on its own.
+
+The costs also rest on **estimated** error counts. With only 9 and 4 errors behind the 0.95 and 0.97 rows, the flip point at 20 is itself uncertain. More questions with known answers at high confidence would sharpen it.
+
+::: notes
+About 3 minutes. The interval for 9 of 300 is Wilson [1.6%, 5.6%]. A team could redo the cost comparison at the ends of the error-rate intervals and see whether the best row changes. That is a second sensitivity analysis.
+:::
+
+## An aside: when one kind of mistake costs more {.smaller}
+
+Back to Week 4's wildlife team, which makes a two-way call on each photo. A wrong **"empty"** call means a missed animal. A wrong **"animal"** call costs a person a few seconds later on.
+
+Call a photo "animal" when that has the lower expected cost:
+
+$$p \times C_{\text{miss}} \;>\; (1 - p) \times C_{\text{false alarm}} \quad\Longleftrightarrow\quad p \;>\; \frac{C_{\text{false alarm}}}{C_{\text{false alarm}} + C_{\text{miss}}}.$$
+
+If a missed animal costs 4 times a false alarm, call "animal" whenever $p > 1/5 = 0.2$, not 0.5. **The cutoff need not be 0.5.**
+
+This formula reads $p$ as a probability, so **it is only right if $p$ is calibrated**. If the detector's low probabilities are too low, a cutoff chosen this way misses more animals than planned.
+
+::: notes
+About 4 minutes. Week 1 said "a probability is not yet a decision: the team still has to pick a cutoff." This is how to pick it. If the costs are equal, the cutoff is 0.5; if a miss costs 9 times a false alarm, it is 0.1. The same reasoning applies to any yes-or-no question where one mistake costs more than the other.
+
+The contrast with the next slide is the main idea of the second part: the threshold table only needs the order of the confidences, but this formula needs the probabilities themselves to be right.
+:::
+
+# Which decisions need calibration?
+
+## The threshold table uses only the order {.smaller}
+
+The threshold table asks only which questions have the highest confidence. Suppose we replace every confidence with a new number but **keep the order**. At any share of questions the tool answers, the same questions are answered, with the same error rate. Only the label on each threshold changes.
+
+So there are two different uses of a confidence:
+
+- **Ranking questions** for a rule like "the tool answers the 30% the model is most sure of" needs only the right order.
+- **Reading a number as a probability**, as in the cutoff formula or a promise of "at most 5% wrong," needs calibration.
+
+An overconfident model can still rank questions well. Know which use you are making.
+
+::: notes
+About 3 minutes. Point back to Tuesday's Gemma diagram: the points sit far below the diagonal (the probabilities are off) but rise from left to right (the order is right). Both facts are in one picture.
+:::
+
+## Recalibration is a fitted model {.smaller}
+
+**Recalibration** replaces the model's confidences with new ones that match observed accuracy. The most common method, **temperature scaling**, divides the model's internal score by one fitted number. For a question with two options, it keeps the order of the confidences.
+
+So recalibration can fix the numbers printed on the thresholds, but it cannot change which questions the tool answers at a given share.
+
+Because it is fitted to data:
+
+1. Fit it on **separate questions**, not the test questions. Fitting it on the test questions is Week 3's leakage.
+2. Check the new confidences on **fresh questions** before calling them calibrated.
+3. It cannot fix a change in population. Confidences recalibrated on BBH need not be calibrated on the team's users' questions.
+
+::: notes
+About 3 minutes. This week's reading, Guo et al. (2017), recommends temperature scaling. The third point is Week 9's topic. Another common method, Platt scaling, is a logistic regression of "answer is right" on the model's score. If asked: with more than two options, temperature scaling keeps each question's chosen answer but need not keep the order of confidences across questions.
+:::
+
+## When the order fails {.smaller}
+
+The threshold rule needs the reliability diagram's points to **rise from left to right**. If answers with confidence 0.95 were less accurate than answers with confidence 0.85, raising the threshold would let *worse* answers through.
+
+This happens when one kind of question fools the model in a consistent way: a task it is confidently bad at, or a question unlike anything in its training data. A model always picks some option, even when it has no idea.
+
+Check the order in the reliability diagram, with its intervals, before selling a threshold rule.
+
+::: notes
+About 2 minutes. Week 1 warned that a model always gives some answer. A dip in a small top bin may be noise; check its interval before describing it. Lab 6 shows a real model whose points do not rise steadily.
+:::
+
+# Language models
+
+## Language models state confidence in two ways {.smaller}
+
+**Token probabilities.** On a multiple-choice question, a language model gives a probability to each answer option, A through D. These come from the model's softmax, so reliability diagrams apply directly. The API has to return them; they are often called log-probabilities.
+
+**Confidence in words.** Asked how sure it is, the model may write "I'm 90% sure." That is **generated text**, produced the same way as the rest of its answer. It is a claim about a claim, and it has to be checked like any other claim.
+
+Confidence stated in words tends to be overconfident and to bunch at round numbers like 90% and 95%. Do not mix the two kinds in one diagram.
+
+::: notes
+About 3 minutes. Source for the last paragraph: Xiong et al. (2024), "Can LLMs Express Their Uncertainty? An Empirical Evaluation of Confidence Elicitation in LLMs," ICLR. Project teams on language-model tracks should know which kind they have before drawing a diagram. Some APIs return log-probabilities only for the few most likely tokens, so the probabilities over A to D may need to be rescaled to add to 1, as Tuesday's were.
+:::
+
+## Grade this claim {.smaller}
+
+In pairs, find the problems and rank them by how much damage they do.
+
+> "Our model's confidence threshold is set at 0.90, so the questions it answers on its own have at most a 10% error rate. Across all questions, its average confidence is 88% and its accuracy is 87%, so it is nearly perfectly calibrated. No one needs to check the answers it gives on its own."
+
+::: notes
+About 5 minutes. Answers, most damaging first:
+
+1. "No one needs to check" removes the only data that could show the rule failing. Keep checking a random sample of the answers the tool gives on its own.
+2. "Threshold 0.90, so at most 10% errors" assumes calibration. The threshold is not the error rate. Gemma promised 3% above 0.90 and was wrong 42% of the time; even the better model in today's table promised 5% and had 8%.
+3. A 1-point gap between the overall averages can hide large gaps in bins that cancel (Tuesday's "What ECE hides"). Ask for the reliability diagram with counts.
+4. There is no number of questions, no interval, and no check of groups such as one task.
+5. Which questions? Calibration on the vendor's benchmark need not hold for the client's users.
+
+This is the same task as the midterm review packet, Problem 3.
+:::
+
+## What we did today {.smaller}
+
+1. Choosing a threshold needs costs: a person's time and a wrong answer. The cheapest threshold changes as the cost ratio changes.
+2. Report the range of costs over which the choice holds, not one threshold. That is a sensitivity analysis.
+3. When one kind of mistake costs more than the other, the cutoff for a two-way call need not be 0.5. Reading $p$ as a probability that way requires calibration.
+4. A threshold rule needs only the right order. Recalibration changes the numbers but not the order, so fit it on separate data and check it again on fresh data.
+5. A language model's token probabilities can be checked with a reliability diagram. Its confidence in words is generated text.
+
+::: notes
+About 1 minute.
+:::
+
+## Today's lab {.smaller}
+
+Two larger models from Lab 5, on BIG-Bench Hard: Qwen2.5-7B, which the team chose in Homework 5, and Llama-3.1-8B. Each answer comes with the model's confidence, computed the same way as Gemma's on Tuesday. The team wants the tool to answer on its own only when the model is confident.
+
+1. You will build Qwen's reliability table and compute its ECE.
+2. You will put Qwen and Llama on one reliability diagram with the same bins.
+3. You will build the threshold table and compare it with the team's 10% limit.
+4. You will check whether calibration changes from task to task.
+
+You will end with what you would tell the team.
+
+**Checkpoint 6** covers this week's two lectures. It opens after class today and is due Tue Mar 2. **Midterm: Thu Mar 4**, in class. **Teams and track preferences** are due the same day.
+
+::: notes
+About 2 minutes. Don't give away the results. Qwen, the more accurate model, is badly overconfident (ECE 0.38), with half its answers at confidence 0.999 or more and points that do not rise steadily. Llama is close to calibrated (ECE 0.08). Let the diagram in part 2 show it.
+:::

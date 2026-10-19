@@ -1,0 +1,302 @@
+---
+title: "Lab 6: Does the Model's Confidence Mean What It Says?"
+subtitle: "Week 6 · Language models on BIG-Bench Hard"
+format: html
+---
+
+## The situation
+
+In Lab 5 and Homework 5, a team building a tool that answers reasoning questions compared open-weight language models on BIG-Bench Hard (BBH). The team went with Alibaba's Qwen2.5-7B-Instruct, which answered about 3 percentage points more questions correctly than Meta's Llama-3.1-8B-Instruct.
+
+Now the team wants the tool to answer on its own only when the model is confident, and to send every other question to a person. A person's time costs money, so every question the tool answers on its own saves some. But a wrong answer from the tool is worse than a slow one, because users trust it. The team's limit is **at most 10% wrong among the answers the tool gives on its own**.
+
+The team asks:
+
+1. Does Qwen's confidence mean what it says? When Qwen is 90% sure, is it right about 90% of the time?
+2. Is there a confidence threshold at which Qwen's own answers are at most 10% wrong? How many questions would the tool answer on its own there?
+3. The team still has Llama running from Lab 5. Would Llama's confidence work better?
+
+## 1. Load the confidences
+
+**Why this step:** for every question, we need the model's answer, how sure it was, and whether it was right.
+
+Lab 5 showed how the leaderboard scores a question. It asks how likely the model is to write each option, and the most likely option is the model's answer. Lab 5's data recorded only right or wrong. This week's file adds each model's **confidence**: the probability the model gave its own answer, after the option probabilities are rescaled to add to 1. These are the token probabilities from today's lecture, not a confidence the model wrote in words.
+
+One change from Lab 5: here the model's answer is simply its most likely option, without the leaderboard's adjustment for option length, so that the confidence belongs to the answer the model gave. Right and wrong agree with Lab 5's data on 99.8% of questions for Qwen and 97.6% for Llama. The file also has Gemma-2-2B, the model from Tuesday's lecture.
+
+```{python}
+#| eval: false
+# Additional library for this lab
+from statsmodels.stats.proportion import proportion_confint
+
+bbh_dir = data_dir / "llm_bbh"
+conf = pd.read_csv(bbh_dir / "confidence.csv")
+questions = pd.read_csv(bbh_dir / "questions.csv")
+display(conf.head())
+
+for model in ["qwen25_7b", "llama31_8b"]:
+    accuracy = conf[model + "_right"].mean()
+    average_confidence = conf[model + "_confidence"].mean()
+    print(model, "  accuracy:", round(accuracy, 3), "  average confidence:", round(average_confidence, 3))
+```
+
+Before going further: what do these four numbers already suggest about each model's confidence?
+
+**Your answer:** TODO
+
+Here are three questions Qwen got wrong while at least 99.9% sure.
+
+```{python}
+#| eval: false
+def show_question(question_id):
+    """Print a question, the right answer, and each model's confidence and result."""
+    question = questions[questions["question_id"] == question_id]
+    row = conf[conf["question_id"] == question_id]
+    print("---", question["task"].iloc[0], "---")
+    print(question["input"].iloc[0][:600])   # the first 600 characters
+    print("Right answer:", question["target"].iloc[0])
+    print("Qwen:  confidence", row["qwen25_7b_confidence"].iloc[0], "  right?", row["qwen25_7b_right"].iloc[0])
+    print("Llama: confidence", row["llama31_8b_confidence"].iloc[0], "  right?", row["llama31_8b_right"].iloc[0])
+    print()
+
+sure_but_wrong = conf[(conf["qwen25_7b_confidence"] >= 0.999) & (conf["qwen25_7b_right"] == 0)]
+print("Questions Qwen got wrong with confidence of at least 0.999:", len(sure_but_wrong))
+print()
+for question_id in sure_but_wrong["question_id"].sample(3, random_state=SEED):
+    show_question(question_id)
+```
+
+Change `random_state` and look at a few more. Are these questions ones a model should be sure about?
+
+**What you notice:** TODO
+
+## 2. Instructor run: Qwen's reliability table
+
+**Why this step:** one question cannot show whether a confidence means what it says. As in Tuesday's lecture, we group questions with similar confidence into bins and compare each bin's average confidence with its accuracy. Each bin's accuracy is an estimated proportion, so it gets a Wilson interval.
+
+BBH tasks have between 2 and 19 options, and a model's confidence in its answer can be as low as 1 divided by the number of options. So the bins run from 0 to 1.
+
+```{python}
+#| eval: false
+def reliability_table(confidence, right, n_bins=10):
+    """Group questions into equal-width confidence bins from 0 to 1. For each bin,
+    return the number of questions, the average confidence, the accuracy,
+    and a 95% Wilson interval for the accuracy."""
+    edges = np.linspace(0, 1, n_bins + 1)
+    rows = []
+    for b in range(n_bins):
+        low_edge = edges[b]
+        high_edge = edges[b + 1]
+        # The last bin also includes confidence exactly 1.
+        if b == n_bins - 1:
+            in_bin = (confidence >= low_edge) & (confidence <= high_edge)
+        else:
+            in_bin = (confidence >= low_edge) & (confidence < high_edge)
+
+        n_questions = in_bin.sum()
+        if n_questions == 0:
+            continue   # skip empty bins
+
+        n_right = right[in_bin].sum()
+        lower, upper = proportion_confint(n_right, n_questions, method="wilson")
+        rows.append({
+            "bin": f"{low_edge:.1f}-{high_edge:.1f}",
+            "questions": n_questions,
+            "average confidence": confidence[in_bin].mean(),
+            "accuracy": n_right / n_questions,
+            "wilson lower": lower,
+            "wilson upper": upper,
+        })
+    return pd.DataFrame(rows)
+
+qwen_table = reliability_table(conf["qwen25_7b_confidence"], conf["qwen25_7b_right"])
+display(qwen_table.round(3))
+```
+
+Now the expected calibration error from Tuesday: the gap between average confidence and accuracy in each bin, averaged with each bin weighted by its number of questions.
+
+```{python}
+#| eval: false
+def expected_calibration_error(table):
+    """Weighted average over bins of |accuracy - average confidence|,
+    weighting each bin by its share of the questions."""
+    total = table["questions"].sum()
+    ece = 0
+    for b in range(len(table)):
+        row = table.iloc[b]
+        gap = abs(row["accuracy"] - row["average confidence"])
+        ece = ece + (row["questions"] / total) * gap
+    return ece
+
+print("Qwen ECE:", round(expected_calibration_error(qwen_table), 3))
+
+share_very_sure = (conf["qwen25_7b_confidence"] >= 0.999).mean()
+print("Share of Qwen's answers with confidence of at least 0.999:", round(share_very_sure, 3))
+```
+
+Which bin holds most of Qwen's answers? In which bins is the gap clearly not chance?
+
+## 3. Both models on one reliability diagram
+
+**Why this step:** to compare two models fairly, put them on one display with the same bins, and show how many questions are behind each point.
+
+```{python}
+#| eval: false
+llama_table = reliability_table(conf["llama31_8b_confidence"], conf["llama31_8b_right"])
+print("Llama ECE:", round(expected_calibration_error(llama_table), 3))
+
+fig, ax = plt.subplots(figsize=(6.5, 6.5))
+ax.plot([0, 1], [0, 1], color="gray", linestyle="--", label="calibrated: accuracy = confidence")
+
+for table, name, color in [(qwen_table, "Qwen", "tab:red"), (llama_table, "Llama", "tab:blue")]:
+    below = table["accuracy"] - table["wilson lower"]
+    above = table["wilson upper"] - table["accuracy"]
+    ax.errorbar(table["average confidence"], table["accuracy"], yerr=[below, above],
+                fmt="o-", color=color, capsize=3, label=name)
+    # Write the number of questions next to each point.
+    for b in range(len(table)):
+        x = table["average confidence"].iloc[b]
+        y = table["accuracy"].iloc[b]
+        ax.annotate(str(table["questions"].iloc[b]), (x, y), textcoords="offset points",
+                    xytext=(6, -12), fontsize=8, color=color)
+
+ax.set_xlabel("average confidence in the bin")
+ax.set_ylabel("accuracy in the bin")
+ax.set_title("BBH reliability diagram, same bins for both models")
+ax.legend(loc="upper left")
+plt.tight_layout()
+plt.show()
+```
+
+1. Which model's points are closer to the diagonal?
+2. Which model's points rise from left to right? That is the order a threshold rule needs, from today's lecture.
+3. Lab 5 found Qwen more accurate. Is it also better calibrated?
+
+**Your answer:** TODO
+
+## 4. Pairs: the threshold table
+
+**Why this step:** the team's rule is "answer on its own when the model's confidence is at least $t$." For each threshold we need the share of questions the tool would answer on its own, the error rate among them, and a Wilson interval to compare with the 10% limit. We also compare that error rate with the one the model's confidence promises.
+
+```{python}
+#| eval: false
+def threshold_table(confidence, right, thresholds):
+    """For each threshold t: how many questions have confidence >= t, what share of
+    all questions that is, the error rate the confidence promises, and the actual
+    error rate among them with a 95% Wilson interval."""
+    rows = []
+    for t in thresholds:
+        answered = confidence >= t
+        n_answered = answered.sum()
+        if n_answered == 0:
+            continue
+        n_wrong = n_answered - right[answered].sum()
+        lower, upper = proportion_confint(n_wrong, n_answered, method="wilson")
+        rows.append({
+            "threshold": t,
+            "answered on its own": n_answered,
+            "share answered": n_answered / len(confidence),
+            "promised error rate": 1 - confidence[answered].mean(),
+            "error rate": n_wrong / n_answered,
+            "wilson lower": lower,
+            "wilson upper": upper,
+        })
+    return pd.DataFrame(rows)
+
+limit = 0.10   # the team's limit on the error rate
+thresholds = [0.5, 0.7, 0.8, 0.9, 0.95, 0.99, 0.999]
+
+print("QWEN")
+display(threshold_table(conf["qwen25_7b_confidence"], conf["qwen25_7b_right"], thresholds).round(3))
+print("LLAMA")
+display(threshold_table(conf["llama31_8b_confidence"], conf["llama31_8b_right"], thresholds).round(3))
+```
+
+Remember the denominator: the error rate counts wrong answers among the questions the tool answered, not among all questions.
+
+1. Is there any threshold at which Qwen's error rate is below the 10% limit? Llama's?
+2. At which threshold, if any, is the whole Wilson interval below 10%? What does that mean for what the team can promise?
+3. Compare the promised error rate with the actual one for each model. Which model's promises can the team believe?
+4. Change `limit` to 0.15 and then 0.05, and add thresholds if you need them. How does the answer change?
+
+## 5. Questions come in tasks
+
+**Why this step:** calibration belongs to a model and a population of questions together. BBH is 24 tasks, and the team's users will ask their own kinds of questions. If calibration changes a lot from task to task, one diagram over all of BBH says little about the team's questions.
+
+```{python}
+#| eval: false
+columns = ["qwen25_7b_confidence", "qwen25_7b_right", "llama31_8b_confidence", "llama31_8b_right"]
+by_task = conf.groupby("task")[columns].mean()
+by_task["qwen gap"] = by_task["qwen25_7b_confidence"] - by_task["qwen25_7b_right"]
+by_task["llama gap"] = by_task["llama31_8b_confidence"] - by_task["llama31_8b_right"]
+by_task["guessing"] = 1 / conf.groupby("task")["n_options"].first()
+by_task = by_task.sort_values("qwen gap")
+display(by_task.round(3))
+```
+
+The same gaps as a picture, like the per-task plot in Lab 5. Each point is a model's gap on one task: its average confidence minus its accuracy. A point to the right of the dashed line means the model is overconfident on that task, and a point to the left means it is underconfident.
+
+The bar is a 95% interval for the gap. The average confidence is the model's own statement, so only the accuracy is uncertain; the interval comes from the task's Wilson interval for accuracy, treating the task's questions as independent.
+
+```{python}
+#| eval: false
+fig, ax = plt.subplots(figsize=(8, 9))
+task_names = list(by_task.index)
+models = [("qwen25_7b", "Qwen", "tab:red", 0.15), ("llama31_8b", "Llama", "tab:blue", -0.15)]
+
+for i in range(len(task_names)):
+    in_task = conf["task"] == task_names[i]
+    n_questions = in_task.sum()
+
+    # Qwen just above the task's row, Llama just below.
+    for model, name, color, offset in models:
+        n_right = conf.loc[in_task, model + "_right"].sum()
+        accuracy = n_right / n_questions
+        average_confidence = conf.loc[in_task, model + "_confidence"].mean()
+        gap = average_confidence - accuracy
+
+        # A high accuracy means a small gap, so the interval's ends swap.
+        lower, upper = proportion_confint(n_right, n_questions, method="wilson")
+        gap_low = average_confidence - upper
+        gap_high = average_confidence - lower
+
+        # Label only the first row, for the legend.
+        ax.errorbar(gap, i + offset, xerr=[[gap - gap_low], [gap_high - gap]], fmt="o",
+                    color=color, capsize=3, label=name if i == 0 else None)
+
+ax.axvline(0, color="gray", linestyle="--", label="confidence matches accuracy")
+ax.set_yticks(range(len(task_names)))
+ax.set_yticklabels(task_names, fontsize=8)
+ax.set_xlabel("average confidence minus accuracy, with 95% intervals")
+ax.set_title("Calibration gap by BBH task, sorted by Qwen's gap")
+ax.legend(loc="lower right")
+plt.tight_layout()
+plt.show()
+```
+
+On which tasks is Qwen most overconfident? Compare its accuracy there with guessing. Do Llama's gaps vary as much from task to task?
+
+The Wilson intervals in sections 2 to 4 treat the 5,761 questions as independent. In Lab 5, questions in the same task tended to go the same way. Would accounting for tasks make those intervals wider or narrower?
+
+**Your answer:** TODO
+
+## 6. Stop and discuss
+
+1. **Recalibration.** Suppose the team recalibrates Qwen by replacing each confidence with the accuracy observed in its bin. Using your table from section 2, what would Qwen's highest recalibrated confidence be, roughly? Could recalibration let the tool answer any question on its own within the 10% limit? Why not?
+2. **Which model?** Qwen answered more questions correctly. Llama's confidence is closer to the truth. If the tool always answers, which would you use? If it answers on its own only when confident, which would you use? Could the team use one model's answers and the other's confidence?
+3. **Scope.** Every number today comes from one prompt format and one way of scoring options, on a public benchmark the models may have seen. What would you check before trusting these results for the team's own questions?
+4. **Words.** If the team asked Qwen "how sure are you?" and used the number it wrote, how would that differ from today's confidence?
+
+## 7. Handoff
+
+Write what you would tell the team:
+
+> On BBH, [model]'s confidence [does / does not] mean what it says: its answers average [average confidence] confidence but are right [accuracy] of the time (ECE [value]). If the tool answers on its own only when [model]'s confidence is at least [threshold], it would answer [share] of questions, and [error rate] of those answers would be wrong (95% interval [limits]). [What that means for the 10% limit, and what BBH cannot tell us about the team's own questions.]
+
+**Your result:** TODO
+
+The midterm's calibration question asks the same two things in a new setting: does the stated confidence hold up, and is the client's limit met?
+
+## Exit ticket
+
+In one sentence: why can the less accurate model be the better choice for a tool that answers on its own only when it is confident?

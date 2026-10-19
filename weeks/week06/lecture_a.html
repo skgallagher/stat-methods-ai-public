@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="lecture_a_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lecture_a_files/libs/quarto-html/tabby.min.js"></script>
+<script src="lecture_a_files/libs/quarto-html/popper.min.js"></script>
+<script src="lecture_a_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="lecture_a_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lecture_a_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="lecture_a_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.38">
+
+  <meta name="author" content="Shannon Gallagher">
+  <title>Week 6A: When the Model Says 0.9, Is It Right 90% of the Time?</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="lecture_a_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="lecture_a_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="lecture_a_files/libs/revealjs/dist/theme/quarto-0427d8d92a431aa6a6430e53ec02a470.css">
+  <link rel="stylesheet" href="lecture.css">
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+  <link href="lecture_a_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="lecture_a_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="lecture_a_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="lecture_a_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Week 6A: When the Model Says 0.9, Is It Right 90% of the Time?</h1>
+  <p class="subtitle">Calibration, and when to let the model answer on its own</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Shannon Gallagher 
+</div>
+</div>
+</div>
+
+</section>
+<section id="recap-the-numbers-lab-5-didnt-have" class="slide level2 smaller">
+<h2>Recap: the numbers Lab 5 didn’t have</h2>
+<p>In Lab 5, the leaderboard asked how likely a model was to write each answer option, and the most likely option was its answer. We had only right or wrong. This week we have the probabilities.</p>
+<p>Here is a real BIG-Bench Hard question and Google’s Gemma-2-2B, the smallest model from Lab 5:</p>
+<blockquote>
+<p>If you follow these instructions, do you return to the starting point? Take 8 steps. Turn around. Take 8 steps.</p>
+<p>Options: Yes, No</p>
+</blockquote>
+<p>Gemma answers <strong>No</strong> with <strong>confidence 0.96</strong>. The right answer is Yes.</p>
+<p>In Week 4 we called a model’s “confidence” a false friend: a probability for one item, not a statement about the model’s accuracy. This week asks whether it means what it says. When Gemma says 0.9 on many questions, is it right about 90% of the time? That question is called <strong>calibration</strong>.</p>
+<aside class="notes">
+<p>About 3 minutes. Read the question aloud and let the room answer. One wrong answer at 0.96 proves nothing about calibration (next slides), but it makes the question concrete. Lab 5’s section 2 said “these two numbers are made up; our data record only right or wrong.” Now they are real.</p>
+<p>Source: question navigate_005 in <code>data/course/llm_bbh</code>; Gemma’s confidence 0.9627. Qwen got it right at 1.00 and Llama at 0.79.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="today-three-questions" class="slide level2 smaller">
+<h2>Today: three questions</h2>
+<ol type="1">
+<li><strong>What does a confidence of 0.9 claim, and how do we check it?</strong> We compare the stated confidence with the accuracy over many questions, and put a Week 4 interval on each comparison.</li>
+<li><strong>How do we summarize calibration in one number, and what does that number hide?</strong> We compute the expected calibration error and return to Week 2’s Brier score.</li>
+<li><strong>When can a tool let the model answer on its own?</strong> We count how many questions a confidence rule lets the model answer and how many of those it gets wrong, with an interval.</li>
+</ol>
+<p>Checkpoint 6 follows the same order, and so does the calibration question on the midterm.</p>
+<aside class="notes">
+<p>About 2 minutes. Everything the midterm asks about Week 6 is in today’s lecture. The midterm review packet’s Problem 2, parts 4 and 5, is the matching practice. Thursday builds on the third question, and Lab 6 checks two larger models, Qwen and Llama.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section>
+<section id="question-1-what-does-a-confidence-of-0.9-claim" class="title-slide slide level1 center">
+<h1>Question 1: what does a confidence of 0.9 claim?</h1>
+
+</section>
+<section id="the-teams-next-decision" class="slide level2 smaller">
+<h2>The team’s next decision</h2>
+<p>In Lab 5 and Homework 5, a team chose a language model for a tool that answers reasoning questions. Now it wants a version small enough to run on a phone, and it is looking at Gemma-2-2B. Its plan:</p>
+<ul>
+<li>when the model is confident, <strong>the tool answers on its own</strong>;</li>
+<li>when it is not, <strong>a person answers</strong> the question.</li>
+</ul>
+<p>The model’s answer is its most likely option. Its <strong>confidence</strong> is that option’s probability, after the option probabilities are rescaled to add to 1. (The model also gives some probability to text that isn’t an option.) With <span class="math inline">K</span> options, the confidence is at least <span class="math inline">1/K</span>.</p>
+<p>The plan is safe only if a confidence of 0.9 means the answer is right about 90% of the time.</p>
+<aside class="notes">
+<p>About 2 minutes. Most classifiers report confidence this way: the probability of the answer they chose. The rescaling matters: Llama, for example, puts a median of only about 15% of its probability on the listed options. These are token probabilities, not a confidence the model writes in words; Thursday covers the difference.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-confidence-is-a-claim-about-many-questions" class="slide level2 smaller">
+<h2>A confidence is a claim about many questions</h2>
+<p>One answer with confidence 0.9 cannot show anything: it is either right or wrong. The claim is about <strong>all the questions</strong> that get confidence 0.9. A model is <strong>calibrated</strong> if</p>
+<p><span class="math display">P(\text{answer is right} \mid \text{confidence} = c) = c \qquad \text{for every } c.</span></p>
+<p>Among questions answered with confidence 0.9, about 90% of the answers should be right. Among questions answered with confidence 0.6, about 60% should be.</p>
+<p>This is the <strong>frequentist</strong> reading of probability: 0.9 is a long-run frequency over many similar answers. So we check it by counting outcomes on questions with known answers, without knowing how the model works.</p>
+<p class="compact-note">
+A Bayesian reads 0.9 as a degree of belief about one question, which no single outcome can refute. Even so, Dawid (1982) showed that a coherent Bayesian expects their own forecasts to be calibrated in the long run, so a calibration check tests a Bayesian’s model too. Little (2006) calls this “calibrated Bayes.”
+</p>
+<aside class="notes">
+<p>About 4 minutes. Write the conditional probability on the board. Because the claim is about pairs of a confidence and a right-or-wrong outcome, a statistician can check a closed model from its outputs and the outcomes alone. Ask: what data would you need? Questions with known answers, from the population where the tool will be used.</p>
+<p>On the footnote, if asked: for a Bayesian, a probability is a degree of belief, so “0.9” for one question is not a frequency claim. But Dawid showed that a coherent Bayesian assigns prior probability one to being well calibrated over a long sequence of their own forecasts. If the forecasts turn out badly calibrated, the forecaster’s model of the world was wrong. Rubin argued that applied Bayesians should check their models with frequency calculations like this one, and Little calls the combination, Bayesian inference with frequentist checks of the model, “calibrated Bayes.”</p>
+<p>References: Dawid, A. P. (1982), “The Well-Calibrated Bayesian,” <em>Journal of the American Statistical Association</em> 77, 605–610. Rubin, D. B. (1984), “Bayesianly Justifiable and Relevant Frequency Calculations for the Applied Statistician,” <em>Annals of Statistics</em> 12, 1151–1172. Little, R. J. (2006), “Calibrated Bayes: A Bayes/Frequentist Roadmap,” <em>The American Statistician</em> 60, 213–223.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gemma-on-all-of-big-bench-hard" class="slide level2 smaller">
+<h2>Gemma on all of BIG-Bench Hard</h2>
+<p>On the 5,761 BBH questions:</p>
+<table class="caption-top">
+<tbody>
+<tr class="odd">
+<td>Average confidence</td>
+<td style="text-align: right;"><strong>0.76</strong></td>
+</tr>
+<tr class="even">
+<td>Share of answers that are right</td>
+<td style="text-align: right;"><strong>0.43</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Gemma talks like a model that is right about three times in four, and it is right fewer than half the time.</p>
+<p><strong>Discuss:</strong> before concluding that Gemma’s confidence is too high, what would you check?</p>
+<aside class="notes">
+<p>About 4 minutes. Take answers. Ones to draw out:</p>
+<ul>
+<li>The scoring rule. The confidence comes from one prompt format with three worked examples, and here the answer is the most likely option without the leaderboard’s length adjustment. For Gemma, right and wrong under this rule match Lab 5’s data on 88% of questions.</li>
+<li>The tasks. The 5,761 questions come in 24 tasks (Lab 5), so they are not 5,761 independent pieces of evidence.</li>
+<li>The population. BBH is a public benchmark of hard tasks. The team’s users will ask their own questions, and calibration on BBH need not carry over.</li>
+<li>The answers. Some BBH tasks compute the right answer by rule (Boolean expressions, navigation, object tracking); others were labeled by people and may contain mistakes. Worth a look, but label errors are unlikely to explain a 33-point gap.</li>
+</ul>
+<p>None of these is likely to turn 0.76 into 0.43. Verified: accuracy 2,453 / 5,761 = 0.426; average confidence 0.761.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="group-the-answers-into-bins" class="slide level2 smaller compact-table">
+<h2>Group the answers into bins</h2>
+<p>Group the questions by Gemma’s confidence. Each bin’s accuracy is <span class="math inline">k</span> right out of <span class="math inline">n</span> questions, so it gets a Week 4 Wilson interval.</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Confidence</th>
+<th style="text-align: right;">Questions</th>
+<th style="text-align: right;">Average confidence</th>
+<th style="text-align: right;">Accuracy</th>
+<th style="text-align: right;">95% Wilson interval</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.1–0.2</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">0.19</td>
+<td style="text-align: right;">0.09</td>
+<td style="text-align: right;">[0.02, 0.38]</td>
+</tr>
+<tr class="even">
+<td>0.2–0.3</td>
+<td style="text-align: right;">140</td>
+<td style="text-align: right;">0.26</td>
+<td style="text-align: right;">0.14</td>
+<td style="text-align: right;">[0.09, 0.20]</td>
+</tr>
+<tr class="odd">
+<td>0.3–0.4</td>
+<td style="text-align: right;">294</td>
+<td style="text-align: right;">0.35</td>
+<td style="text-align: right;">0.18</td>
+<td style="text-align: right;">[0.14, 0.23]</td>
+</tr>
+<tr class="even">
+<td>0.4–0.5</td>
+<td style="text-align: right;">475</td>
+<td style="text-align: right;">0.45</td>
+<td style="text-align: right;">0.22</td>
+<td style="text-align: right;">[0.19, 0.26]</td>
+</tr>
+<tr class="odd">
+<td>0.5–0.6</td>
+<td style="text-align: right;">618</td>
+<td style="text-align: right;">0.55</td>
+<td style="text-align: right;">0.34</td>
+<td style="text-align: right;">[0.30, 0.38]</td>
+</tr>
+<tr class="even">
+<td>0.6–0.7</td>
+<td style="text-align: right;">589</td>
+<td style="text-align: right;">0.65</td>
+<td style="text-align: right;">0.34</td>
+<td style="text-align: right;">[0.30, 0.38]</td>
+</tr>
+<tr class="odd">
+<td>0.7–0.8</td>
+<td style="text-align: right;">597</td>
+<td style="text-align: right;">0.75</td>
+<td style="text-align: right;">0.37</td>
+<td style="text-align: right;">[0.33, 0.41]</td>
+</tr>
+<tr class="even">
+<td>0.8–0.9</td>
+<td style="text-align: right;">777</td>
+<td style="text-align: right;">0.85</td>
+<td style="text-align: right;">0.43</td>
+<td style="text-align: right;">[0.39, 0.46]</td>
+</tr>
+<tr class="odd">
+<td>0.9–1.0</td>
+<td style="text-align: right;">2,260</td>
+<td style="text-align: right;">0.97</td>
+<td style="text-align: right;">0.58</td>
+<td style="text-align: right;">[0.56, 0.60]</td>
+</tr>
+</tbody>
+</table>
+<p>For each bin, ask: <strong>is the average confidence inside the interval?</strong> In the top bin, 0.97 is far outside [0.56, 0.60], so that gap is real. In the bottom bin, 0.19 is inside [0.02, 0.38]: with 11 questions, its gap could be chance.</p>
+<aside class="notes">
+<p>About 4 minutes. Every bin except the smallest has its average confidence outside the interval, so Gemma is overconfident at every level we can measure. The bottom bin is the reminder from Week 5: the size of a gap and our certainty about it are different things.</p>
+<p>These intervals treat the questions as independent. Questions come in tasks, so the real intervals are somewhat wider; with gaps this large, that doesn’t change anything here. Verified by script from <code>confidence.csv</code>.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-reliability-diagram" class="slide level2 smaller">
+<h2>The reliability diagram</h2>
+<div id="7c71a2fa" class="cell" data-fig-height="3.7" data-fig-width="9" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_a_files/figure-revealjs/cell-2-output-1.png" width="855" height="346"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Points <strong>below the diagonal</strong> are overconfident, and points above it are underconfident. When a bin’s interval <strong>crosses the diagonal</strong>, that bin’s gap could be chance. The numbers are the questions in each bin; always show them.</p>
+<aside class="notes">
+<p>About 3 minutes. Two things are in this one picture. The points sit below the diagonal, so the probabilities are too high. But they rise from left to right, so a more confident answer really is more likely to be right. Thursday uses both facts. Most published reliability diagrams show neither intervals nor counts.</p>
+<p>Guo et al.&nbsp;(2017), this week’s reading, found the same shape for modern image classifiers.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="check" class="slide level2 smaller">
+<h2>Check</h2>
+<p>On the team’s date questions, 150 answers have average confidence 0.90, and 120 of them are right. The 95% Wilson interval for accuracy is [0.73, 0.86].</p>
+<p>Is the model overconfident on these questions? Could the gap be chance?</p>
+<div class="fragment">
+<p>Accuracy is <span class="math inline">120/150 = 0.80</span>, which is 10 points below the stated 0.90. The interval does not contain 0.90, so <strong>the model is overconfident on date questions, and the gap is not chance</strong>.</p>
+<p>A model can be close to calibrated over all questions and still be overconfident for one group, such as one kind of question.</p>
+</div>
+<aside class="notes">
+<p>About 3 minutes. Wilson for 120/150: [0.729, 0.856]. The last sentence sets up “What ECE hides” and matches the midterm review packet, Problem 1, item 8.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="accuracy-and-calibration-answer-different-questions" class="slide level2 smaller">
+<h2>Accuracy and calibration answer different questions</h2>
+<p><strong>Accurate but overconfident.</strong> A model’s answers are right 90% of the time, but it says 0.99 on every one. The answers are good, and the confidence is not.</p>
+<p><strong>Calibrated but useless.</strong> On yes-or-no questions, a model is 50% sure of every answer and right on half of them. That is <strong>perfectly calibrated</strong>, and it has told the team nothing.</p>
+<p>A useful model has to be calibrated, and it also has to <strong>separate</strong> easy questions from hard ones, saying 0.99 for some and 0.6 for others. Calibration is necessary, but it is not enough.</p>
+<p class="compact-note">
+Morris DeGroot and Stephen Fienberg, both of CMU Statistics, made this distinction precise for weather forecasters in 1983.
+</p>
+<aside class="notes">
+<p>About 3 minutes. Weather forecasters have published probability forecasts and been scored on them since the 1950s, and rain forecasts are close to calibrated. The “always 50%” model is the calibration version of Week 1’s floor. Reference: DeGroot and Fienberg (1983), “The Comparison and Evaluation of Forecasters,” <em>The Statistician</em> 32, 12–22.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="question-2-one-number-and-what-it-hides" class="title-slide slide level1 center">
+<h1>Question 2: one number, and what it hides</h1>
+
+</section>
+<section id="expected-calibration-error" class="slide level2 smaller">
+<h2>Expected calibration error</h2>
+<p>The <strong>expected calibration error (ECE)</strong> averages the bins’ gaps, weighting each bin by its number of questions:</p>
+<p><span class="math display">\text{ECE} = \sum_{b} \frac{n_b}{n}\,\bigl|\,\text{accuracy}_b - \text{confidence}_b\,\bigr|.</span></p>
+<p>For Gemma, every bin’s accuracy is below its average confidence, so every term has the same sign. Then ECE is just average confidence minus accuracy:</p>
+<p><span class="math display">\text{ECE} = 0.761 - 0.426 = 0.335.</span></p>
+<p>On an average question, Gemma’s confidence is off by about <strong>34 percentage points</strong>.</p>
+<aside class="notes">
+<p>About 3 minutes. Show the shortcut on the board: when all gaps are positive, the weighted average of (confidence − accuracy) over bins is the overall average confidence minus the overall accuracy. The script value with ten bins is 0.335. ECE is in percentage points, which a client can follow. This week’s reading, Guo et al.&nbsp;(2017), uses 15 equal-width bins.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-ece-hides" class="slide level2 smaller">
+<h2>What ECE hides</h2>
+<p>ECE is one number for a whole diagram, so it leaves things out.</p>
+<ol type="1">
+<li><strong>It depends on the bins.</strong> Ten bins and fifteen bins give different ECEs on the same questions. Report the bins you used.</li>
+<li><strong>It drops the direction.</strong> An ECE of 0.04 could come from overconfidence, underconfidence, or some of each.</li>
+<li><strong>Gaps in opposite directions can cancel in the overall averages.</strong> The shortcut on the last slide works only when every gap has the same sign. When the gaps have different signs, the overall averages can match while the bins are far off.</li>
+<li><strong>It averages over groups.</strong> A small ECE over all questions can hide one task where the model is 30 points overconfident.</li>
+</ol>
+<p>So report the diagram, with its counts, next to the number.</p>
+<aside class="notes">
+<p>About 4 minutes. Example for point 3: two bins of equal size, one 10 points overconfident and one 10 points underconfident. Average confidence equals accuracy, but ECE is 0.10. Thursday’s “grade this claim” uses this.</p>
+<p>One more point if there is time: ECE is itself an estimate, and it is biased upward. With small bins, even a perfectly calibrated model shows a positive ECE, because the absolute value of noise is positive.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="check-1" class="slide level2 smaller">
+<h2>Check</h2>
+<p>Another model answers 1,000 of the team’s questions:</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Confidence bin</th>
+<th style="text-align: right;">Questions</th>
+<th style="text-align: right;">Average confidence</th>
+<th style="text-align: right;">Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>low</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">0.70</td>
+<td style="text-align: right;">0.64</td>
+</tr>
+<tr class="even">
+<td>middle</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">0.85</td>
+<td style="text-align: right;">0.78</td>
+</tr>
+<tr class="odd">
+<td>high</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: right;">0.95</td>
+<td style="text-align: right;">0.90</td>
+</tr>
+</tbody>
+</table>
+<ol type="1">
+<li>Compute the ECE and the overall accuracy.</li>
+<li>Which bin’s gap would you trust most, and why?</li>
+</ol>
+<div class="fragment">
+<ol type="1">
+<li>ECE <span class="math inline">= (200 \times 0.06 + 300 \times 0.07 + 500 \times 0.05)/1000 = (12 + 21 + 25)/1000 = 0.058</span>. Accuracy <span class="math inline">= (128 + 234 + 450)/1000 = 0.812</span>.</li>
+<li>The high bin, because it has the most questions, so its accuracy has the narrowest interval. Its Wilson interval, [0.87, 0.92], is well below 0.95.</li>
+</ol>
+</div>
+<aside class="notes">
+<p>About 3 minutes. All three gaps have the same sign, so the shortcut works here too: 0.870 − 0.812 = 0.058. Wilson for 450/500: [0.871, 0.923].</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-brier-score-from-week-2" class="slide level2 smaller">
+<h2>The Brier score from Week 2</h2>
+<p>For one question, let <span class="math inline">Y = 1</span> if the answer is right and <span class="math inline">x</span> be the stated confidence. The Brier score is <span class="math inline">(x - Y)^2</span>. In Week 2 we showed that if the true probability is <span class="math inline">q</span>,</p>
+<p><span class="math display">E\big[(x - Y)^2\big] = \underbrace{(x - q)^2}_{\text{forecast mismatch}} + \underbrace{q(1 - q)}_{\text{outcome variability}}.</span></p>
+<p>The expected score is smallest at <span class="math inline">x = q</span>, so <strong>the honest probability gets the best score</strong>. With <span class="math inline">q = 0.7</span>:</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Stated <span class="math inline">x</span></th>
+<th style="text-align: right;">0.7 (honest)</th>
+<th style="text-align: right;">0.9 (overconfident)</th>
+<th style="text-align: right;">0.5 (hedging)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Expected Brier score</td>
+<td style="text-align: right;">0.21</td>
+<td style="text-align: right;">0.25</td>
+<td style="text-align: right;">0.25</td>
+</tr>
+</tbody>
+</table>
+<p>Accuracy does not reward honest probabilities: any <span class="math inline">x</span> above 0.5 gives the same answer, so it gets the same accuracy. <strong>Models get better at whatever they are graded on.</strong></p>
+<aside class="notes">
+<p>About 4 minutes. A score that is best at the honest probability is called proper. Weather forecasters have been graded on the Brier score since 1950, and leaderboards mostly grade accuracy. Ask which group you would expect to be better calibrated.</p>
+<p>The Brier score mixes calibration with how well the model separates easy questions from hard ones. A lower Brier score alone does not say which of the two improved, so report it with the diagram.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="question-3-when-can-the-model-answer-on-its-own" class="title-slide slide level1 center">
+<h1>Question 3: when can the model answer on its own?</h1>
+
+</section>
+<section id="a-rule-built-on-confidence" class="slide level2 smaller">
+<h2>A rule built on confidence</h2>
+<p><strong>The rule:</strong> the tool answers on its own when the model’s confidence is at least <span class="math inline">t</span>. A person answers every other question.</p>
+<p>Two numbers describe the rule:</p>
+<p><span class="math display">\text{share answered on its own} = \frac{\text{questions with confidence} \ge t}{\text{all questions}},</span></p>
+<p><span class="math display">\text{error rate among those questions} = \frac{\text{wrong answers with confidence} \ge t}{\text{questions with confidence} \ge t}.</span></p>
+<p>The error rate’s denominator is the questions the tool answered, <strong>not all questions</strong>. Raising <span class="math inline">t</span> lowers both numbers: the tool answers fewer questions and gets fewer of them wrong.</p>
+<aside class="notes">
+<p>About 3 minutes. Say the denominator twice. Dividing by all questions is the most common mistake on this kind of question. In ML papers the two numbers are called coverage and selective risk.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="gemmas-rule-at-a-threshold-of-0.90" class="slide level2 smaller">
+<h2>Gemma’s rule at a threshold of 0.90</h2>
+<p>Gemma answers 2,260 of the 5,761 questions with confidence of at least 0.9.</p>
+<ul>
+<li>The tool would answer <span class="math inline">2{,}260 / 5{,}761 = 39\%</span> of questions on its own.</li>
+<li>Their average confidence is 0.97, so Gemma <strong>promises</strong> about 3% wrong answers.</li>
+<li>The data show <span class="math inline">945 / 2{,}260 = 41.8\%</span> wrong, with 95% Wilson interval [39.8%, 43.9%].</li>
+</ul>
+<p>The team will accept <strong>at most 10% wrong</strong>. What to tell them:</p>
+<blockquote>
+<p>At a threshold of 0.90, the tool would answer about 39% of BBH questions on its own, and about 42% of those answers would be wrong (95% interval 40% to 44%). Gemma’s confidence promises about 3%, so it is badly overconfident here, and the tool would be far over your 10% limit. Even at 0.99, 30% of its answers are wrong.</p>
+</blockquote>
+<aside class="notes">
+<p>About 5 minutes. Two separate questions are answered here: whether the confidence holds up (it does not: 3% promised, 42% delivered) and whether the client’s limit is met (no). The midterm review packet, Problem 2, part 5, asks the same two questions about complaint routing.</p>
+<p>At 0.99: 680 questions (12%), 205 wrong, 30.1%, Wilson [26.8%, 33.7%]. The client sentence has the same three parts as Week 4’s: an estimate, an interval, and what it means for the decision. And it is about BBH; the team’s own questions could differ.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="check-2" class="slide level2 smaller">
+<h2>Check</h2>
+<p>A better-calibrated model answers 200 of 1,000 questions with confidence of at least 0.97. Their average confidence is 0.98, and 4 answers are wrong. The 95% Wilson interval for the error rate is [0.8%, 5.0%].</p>
+<ol type="1">
+<li>Does the model’s confidence hold up on these questions?</li>
+<li>Can the team promise at most 5% wrong answers at this threshold?</li>
+</ol>
+<div class="fragment">
+<ol type="1">
+<li>The model promises about 2% wrong answers, and it gets <span class="math inline">4/200 = 2.0\%</span> wrong. Here its confidence holds up.</li>
+<li>Not quite. The interval reaches 5.0%, so the data are consistent with an error rate right at the limit. More questions with known answers above 0.97 could settle it.</li>
+</ol>
+</div>
+<aside class="notes">
+<p>About 3 minutes. Wilson for 4/200: [0.0078, 0.0503]. Students should compare the interval with the limit, not the point estimate. Point out the pattern: the higher the threshold, the fewer questions the estimate rests on, so the interval is widest where the promise is strongest. That is Week 4’s lesson that better systems are harder to verify.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-we-did-today" class="slide level2 smaller">
+<h2>What we did today</h2>
+<ol type="1">
+<li>A confidence is a claim about many cases: among cases with confidence <span class="math inline">c</span>, about a fraction <span class="math inline">c</span> of the answers should be right. One case cannot check it.</li>
+<li>Each bin’s accuracy is an estimated proportion. A reliability diagram with Wilson intervals and counts shows which gaps are real.</li>
+<li>Accuracy and calibration are different. A calibrated model is useless if it never separates easy cases from hard ones.</li>
+<li>ECE summarizes the diagram in percentage points, but it depends on the bins, drops the direction, and averages over groups. The Brier score rewards honest probabilities.</li>
+<li>A rule that lets the model answer when confident is described by the share of cases it answers and the error rate among them. That error rate is an estimate, so compare its interval with the client’s limit.</li>
+<li>Calibration belongs to a model and a population together.</li>
+</ol>
+<aside class="notes">
+<p>About 2 minutes.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="thursday-and-reading" class="slide level2 smaller">
+<h2>Thursday, and reading</h2>
+<p><strong>Thursday:</strong> the team has to pick a threshold. We will add the costs of a person’s time and of a wrong answer, see where the best threshold changes, and look at recalibration and at how language models state confidence. Then Lab 6 checks two larger models, Qwen and Llama: is either one’s confidence usable?</p>
+<p><strong>HW5</strong> is due today. <strong>The midterm review packet</strong> is out today; Problem 2, parts 4 and 5, and Problem 3 practice today’s ideas on complaint routing.</p>
+<p><strong>Midterm: Thu Mar 4</strong>, in class, covering Weeks 1–6. Tuesday of Week 7 is review.</p>
+<p><strong>Reading:</strong> Guo et al.&nbsp;(2017), <a href="https://proceedings.mlr.press/v70/guo17a">“On Calibration of Modern Neural Networks”</a>, Section 1 and the reliability diagrams in Figure 1. As you read, ask whether their fix would still work on questions unlike the ones it was fitted on.</p>
+<p><strong>Optional:</strong> DeGroot and Fienberg (1983), “The Comparison and Evaluation of Forecasters,” <em>The Statistician</em> 32, 12–22, Sections 1–2.</p>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="lecture_a_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="lecture_a_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="lecture_a_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "release_status": "student_release",
-  "release_id": "spring27-week05-v1",
+  "release_id": "spring27-week06-v1",
   "delivery": "individual files from the public GitHub repository; no ZIP archive",
   "files": [
     {
@@ -1143,6 +1143,16 @@
       "path": "github_issues/release_summary.json",
       "bytes": 693,
       "sha256": "5449009ef71d1a16202c1338ea09566ea6c7cf47cd3d8d02dd5fe84b3013ee8f"
+    },
+    {
+      "path": "llm_bbh/confidence.csv",
+      "bytes": 443480,
+      "sha256": "209d7f58eceefe4cc24a8a7b81ca174667d9a21d51c1cf7e8148d5fe2e9d35c4"
+    },
+    {
+      "path": "llm_bbh/confidence_summary.json",
+      "bytes": 662,
+      "sha256": "fb5ef8d875d6c8e9149e9fe2b4023d29cdce6d3566f30f1a278a89733dd811ce"
     },
     {
       "path": "llm_bbh/correct.csv",

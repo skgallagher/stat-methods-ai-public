@@ -1,0 +1,22 @@
+{
+  "source": "Open LLM Leaderboard v2 details datasets (Hugging Face), the same BBH runs frozen in Week 5",
+  "rule": "answer = option with the highest probability, after rescaling the option probabilities to add to 1",
+  "questions": 5761,
+  "models": {
+    "qwen25_7b": {
+      "accuracy": 0.5367,
+      "mean_confidence": 0.9202,
+      "agreement_with_week5_right_wrong": 0.9984
+    },
+    "llama31_8b": {
+      "accuracy": 0.51,
+      "mean_confidence": 0.5935,
+      "agreement_with_week5_right_wrong": 0.9759
+    },
+    "gemma2_2b": {
+      "accuracy": 0.4258,
+      "mean_confidence": 0.7605,
+      "agreement_with_week5_right_wrong": 0.8828
+    }
+  }
+}

@@ -17,6 +17,12 @@ can be compared question by question.
   memory for the weights alone at 16-bit precision. `license` is the model's
   license as listed on its Hugging Face page in October 2026.
 - `release_summary.json`: frozen counts, accuracies, and source hashes.
+- `confidence.csv` (added for Week 6): one row per question for three models,
+  Qwen2.5-7B-Instruct, Llama-3.1-8B-Instruct, and Gemma-2-2B-it. `<model>_confidence` is the
+  model's probability for its own answer, and `<model>_right` is 1 if that
+  answer was right. See "Confidence" below.
+- `confidence_summary.json`: accuracy, average confidence, and agreement with
+  `correct.csv` for each model in `confidence.csv`.
 
 ## Source
 
@@ -47,6 +53,22 @@ leaderboard's displayed BBH score is computed differently: it subtracts the
 random-guessing rate in each task and averages over tasks, so its numbers do not
 match these.
 
+## Confidence
+
+`confidence.csv` comes from the same leaderboard runs as `correct.csv`
+(checked against the source hashes in `release_summary.json`). For each
+question, the model's log-probabilities for the answer options are turned into
+probabilities that add to 1 over the options. The model's answer is the option
+with the highest probability, and its confidence is that probability, rounded
+to four decimals. This rule has no length adjustment, so right and wrong can
+differ from `correct.csv`; they agree on 99.8% of questions for Qwen, 97.6%
+for Llama, and 88.3% for Gemma.
+
+The confidence is a token probability restricted to the options. It is not a
+confidence the model states in words. As with `correct.csv`, the release
+contains this one derived number per question and model, not the option
+scores or prompts.
+
 ## Limitations
 
 - The 24 tasks are a fixed, published benchmark, not a random sample of
@@ -57,5 +79,5 @@ match these.
   scoring rules can change the accuracies and the ranking.
 - Do not use `questions.csv` to train or tune a model.
 
-Rebuild with `scripts/freeze_week5_llm.py`. The source datasets can change, so
+Rebuild with `scripts/freeze_week5_llm.py`, then `scripts/freeze_week6_llm_confidence.py`. The source datasets can change, so
 the checked-in files and `release_summary.json` are the frozen course release.

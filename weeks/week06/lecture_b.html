@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="lecture_b_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lecture_b_files/libs/quarto-html/tabby.min.js"></script>
+<script src="lecture_b_files/libs/quarto-html/popper.min.js"></script>
+<script src="lecture_b_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="lecture_b_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lecture_b_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="lecture_b_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.38">
+
+  <meta name="author" content="Shannon Gallagher">
+  <title>Week 6B: Choosing the Threshold</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="lecture_b_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="lecture_b_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="lecture_b_files/libs/revealjs/dist/theme/quarto-0427d8d92a431aa6a6430e53ec02a470.css">
+  <link rel="stylesheet" href="lecture.css">
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+  <link href="lecture_b_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="lecture_b_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="lecture_b_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="lecture_b_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Week 6B: Choosing the Threshold</h1>
+  <p class="subtitle">Costs, recalibration, and confidence from language models</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Shannon Gallagher 
+</div>
+</div>
+</div>
+
+</section>
+<section id="recap" class="slide level2 smaller">
+<h2>Recap</h2>
+<p>On Tuesday, Gemma-2-2B was badly overconfident on BIG-Bench Hard. At a threshold of 0.90, the tool would answer 39% of questions on its own, and 42% of those answers would be wrong (95% interval 40% to 44%). Gemma’s confidence promised about 3%.</p>
+<p>Suppose the team finds a better-calibrated model and checks it on 1,000 questions its own users asked, with known answers. The team still has to <strong>choose</strong> a threshold. Today we work out how.</p>
+<aside class="notes">
+<p>About 2 minutes. Ask a student to say Tuesday’s client sentence from memory: estimate, interval, and what it means for the 10% limit. The 1,000-question model in this lecture is made up, so the arithmetic works by hand; Lab 6 then uses real models.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="today" class="slide level2 smaller">
+<h2>Today</h2>
+<ol type="1">
+<li><strong>We choose a threshold by putting a cost on a person’s time and on a wrong answer.</strong> Then we see how far the costs can move before the choice changes.</li>
+<li><strong>We separate the decisions that need calibrated probabilities from the ones that need only the order of the confidences.</strong> That tells us when recalibration helps.</li>
+<li><strong>We look at the two ways a language model states confidence, and grade a vendor’s claim.</strong></li>
+</ol>
+<p>Then Lab 6 checks whether two larger language models’ confidence means what it says.</p>
+<aside class="notes">
+<p>About 1 minute. This lecture is about 40 minutes. Part 1 is the decision-rule sensitivity that Week 10 generalizes.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section>
+<section id="choosing-a-threshold" class="title-slide slide level1 center">
+<h1>Choosing a threshold</h1>
+
+</section>
+<section id="the-teams-table-of-thresholds" class="slide level2 smaller">
+<h2>The team’s table of thresholds</h2>
+<p>The better-calibrated model, on the team’s 1,000 questions:</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 27%">
+<col style="width: 36%">
+<col style="width: 36%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Answer on its own if confidence is at least</th>
+<th style="text-align: right;">Share answered on its own</th>
+<th style="text-align: right;">Error rate among those answers</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.97</td>
+<td style="text-align: right;">20%</td>
+<td style="text-align: right;">2.0%</td>
+</tr>
+<tr class="even">
+<td>0.95</td>
+<td style="text-align: right;">30%</td>
+<td style="text-align: right;">3.0%</td>
+</tr>
+<tr class="odd">
+<td>0.90</td>
+<td style="text-align: right;">60%</td>
+<td style="text-align: right;">8.0%</td>
+</tr>
+<tr class="even">
+<td>0.80</td>
+<td style="text-align: right;">80%</td>
+<td style="text-align: right;">11.5%</td>
+</tr>
+<tr class="odd">
+<td>0.70</td>
+<td style="text-align: right;">90%</td>
+<td style="text-align: right;">13.6%</td>
+</tr>
+</tbody>
+</table>
+<p>Every row is a possible rule. Raising the threshold buys a lower error rate with more of a person’s time.</p>
+<p>Statistics cannot pick the row alone. It depends on what a person’s time costs and what a wrong answer costs.</p>
+<aside class="notes">
+<p>About 2 minutes. The counts behind the rows: 4 of 200, 9 of 300, 48 of 600, 92 of 800, and 122 of 900 wrong; 164 of 1,000 wrong if the tool answers everything. The 0.97 row is Tuesday’s last check. At 0.90 the answers’ average confidence is 0.95, so this model promises 5% and delivers 8%: better than Gemma, still somewhat overconfident.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="put-a-cost-on-each-row" class="slide level2 smaller">
+<h2>Put a cost on each row</h2>
+<p>Measure cost in units of one person answering one question. Let <span class="math inline">r</span> be the cost of one wrong answer the tool gives, in those units. Assume a person always gets the answer right. Then for 1,000 questions,</p>
+<p><span class="math display">\text{cost} = (\text{questions a person answers}) + r \times (\text{wrong answers the tool gives on its own}).</span></p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Threshold</th>
+<th style="text-align: right;">Questions a person answers</th>
+<th style="text-align: right;">Wrong answers</th>
+<th style="text-align: right;">Cost if <span class="math inline">r = 5</span></th>
+<th style="text-align: right;">Cost if <span class="math inline">r = 10</span></th>
+<th style="text-align: right;">Cost if <span class="math inline">r = 30</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.97</td>
+<td style="text-align: right;">800</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">820</td>
+<td style="text-align: right;">840</td>
+<td style="text-align: right;"><strong>920</strong></td>
+</tr>
+<tr class="even">
+<td>0.95</td>
+<td style="text-align: right;">700</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">745</td>
+<td style="text-align: right;"><strong>790</strong></td>
+<td style="text-align: right;">970</td>
+</tr>
+<tr class="odd">
+<td>0.90</td>
+<td style="text-align: right;">400</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;"><strong>640</strong></td>
+<td style="text-align: right;">880</td>
+<td style="text-align: right;">1,840</td>
+</tr>
+<tr class="even">
+<td>0.80</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">92</td>
+<td style="text-align: right;">660</td>
+<td style="text-align: right;">1,120</td>
+<td style="text-align: right;">2,960</td>
+</tr>
+<tr class="odd">
+<td>a person answers every question</td>
+<td style="text-align: right;">1,000</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1,000</td>
+<td style="text-align: right;">1,000</td>
+<td style="text-align: right;">1,000</td>
+</tr>
+</tbody>
+</table>
+<p>Three values of <span class="math inline">r</span> give three different best thresholds.</p>
+<aside class="notes">
+<p>About 4 minutes. Work one cell on the board: at r = 10 and threshold 0.95, cost = 700 + 10 × 9 = 790. Ask what r is for this team. A wrong answer that a user trusts and acts on may cost far more than a person’s minute; nobody in the room knows r exactly, and that is the point of the next slide.</p>
+<p>The assumption that a person is always right is not true either (Week 2). Ask how the formula would change if people made mistakes too.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="where-the-best-threshold-changes" class="slide level2 smaller">
+<h2>Where the best threshold changes</h2>
+<div id="54f4acb7" class="cell" data-fig-height="3.4" data-fig-width="9" data-execution_count="1">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_b_files/figure-revealjs/cell-2-output-1.png" width="841" height="317"></p>
+</figure>
+</div>
+</div>
+</div>
+<table class="caption-top">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>If <span class="math inline">r</span> is between</th>
+<th style="text-align: right;">2.4 and 3.3</th>
+<th style="text-align: right;">3.3 and 4.5</th>
+<th style="text-align: right;">4.5 and 7.7</th>
+<th style="text-align: right;">7.7 and 20</th>
+<th style="text-align: right;">20 and 50</th>
+<th style="text-align: right;">above 50</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>the cheapest threshold is</td>
+<td style="text-align: right;">0.70</td>
+<td style="text-align: right;">0.80</td>
+<td style="text-align: right;">0.90</td>
+<td style="text-align: right;">0.95</td>
+<td style="text-align: right;">0.97</td>
+<td style="text-align: right;">a person answers every question</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>About 4 minutes. Each dotted line is where two rules cost the same. For 0.90 against 0.95: 400 + 48r = 700 + 9r, so r = 300/39 = 7.7. For 0.95 against 0.97: 700 + 9r = 800 + 4r, so r = 20. For 0.97 against a person answering everything: 800 + 4r = 1,000, so r = 50. Below r = 2.4, letting the tool answer everything is cheapest (164 wrong answers out of 1,000).</p>
+<p>This is a sensitivity analysis: we varied the assumption we were least sure of and found where the answer changes. Week 10 does the same for whole analyses.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="check" class="slide level2 smaller">
+<h2>Check</h2>
+<p>The team decides a wrong answer costs about 15 times a person’s answer. Which threshold is cheapest, and how much would <span class="math inline">r</span> have to change to change the answer?</p>
+<div class="fragment">
+<p>At <span class="math inline">r = 15</span>: threshold 0.95 costs <span class="math inline">700 + 15 \times 9 = 835</span>, threshold 0.97 costs <span class="math inline">800 + 15 \times 4 = 860</span>, and threshold 0.90 costs <span class="math inline">400 + 15 \times 48 = 1{,}120</span>. <strong>Use 0.95.</strong></p>
+<p>The answer stays 0.95 as long as <span class="math inline">r</span> is between 7.7 and 20. So the team does not need to know <span class="math inline">r</span> exactly. It only needs to agree that a wrong answer costs between about 8 and 20 times a person’s answer.</p>
+</div>
+<aside class="notes">
+<p>About 3 minutes. The second paragraph is the useful part for a client: what they have to agree on is a range, not a number.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="report-the-range-not-one-threshold" class="slide level2 smaller">
+<h2>Report the range, not one threshold</h2>
+<p>What to tell the team:</p>
+<blockquote>
+<p>If a wrong answer costs between about 8 and 20 times a person’s answer, a threshold of 0.95 is cheapest: the tool would answer about 30% of questions on its own, with about 3% of those answers wrong (95% interval 1.6% to 5.6%). If wrong answers cost more than that, raise the threshold to 0.97. Above about 50, the tool should not answer anything on its own.</p>
+</blockquote>
+<p>The costs also rest on <strong>estimated</strong> error counts. With only 9 and 4 errors behind the 0.95 and 0.97 rows, the flip point at 20 is itself uncertain. More questions with known answers at high confidence would sharpen it.</p>
+<aside class="notes">
+<p>About 3 minutes. The interval for 9 of 300 is Wilson [1.6%, 5.6%]. A team could redo the cost comparison at the ends of the error-rate intervals and see whether the best row changes. That is a second sensitivity analysis.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="an-aside-when-one-kind-of-mistake-costs-more" class="slide level2 smaller">
+<h2>An aside: when one kind of mistake costs more</h2>
+<p>Back to Week 4’s wildlife team, which makes a two-way call on each photo. A wrong <strong>“empty”</strong> call means a missed animal. A wrong <strong>“animal”</strong> call costs a person a few seconds later on.</p>
+<p>Call a photo “animal” when that has the lower expected cost:</p>
+<p><span class="math display">p \times C_{\text{miss}} \;&gt;\; (1 - p) \times C_{\text{false alarm}} \quad\Longleftrightarrow\quad p \;&gt;\; \frac{C_{\text{false alarm}}}{C_{\text{false alarm}} + C_{\text{miss}}}.</span></p>
+<p>If a missed animal costs 4 times a false alarm, call “animal” whenever <span class="math inline">p &gt; 1/5 = 0.2</span>, not 0.5. <strong>The cutoff need not be 0.5.</strong></p>
+<p>This formula reads <span class="math inline">p</span> as a probability, so <strong>it is only right if <span class="math inline">p</span> is calibrated</strong>. If the detector’s low probabilities are too low, a cutoff chosen this way misses more animals than planned.</p>
+<aside class="notes">
+<p>About 4 minutes. Week 1 said “a probability is not yet a decision: the team still has to pick a cutoff.” This is how to pick it. If the costs are equal, the cutoff is 0.5; if a miss costs 9 times a false alarm, it is 0.1. The same reasoning applies to any yes-or-no question where one mistake costs more than the other.</p>
+<p>The contrast with the next slide is the main idea of the second part: the threshold table only needs the order of the confidences, but this formula needs the probabilities themselves to be right.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="which-decisions-need-calibration" class="title-slide slide level1 center">
+<h1>Which decisions need calibration?</h1>
+
+</section>
+<section id="the-threshold-table-uses-only-the-order" class="slide level2 smaller">
+<h2>The threshold table uses only the order</h2>
+<p>The threshold table asks only which questions have the highest confidence. Suppose we replace every confidence with a new number but <strong>keep the order</strong>. At any share of questions the tool answers, the same questions are answered, with the same error rate. Only the label on each threshold changes.</p>
+<p>So there are two different uses of a confidence:</p>
+<ul>
+<li><strong>Ranking questions</strong> for a rule like “the tool answers the 30% the model is most sure of” needs only the right order.</li>
+<li><strong>Reading a number as a probability</strong>, as in the cutoff formula or a promise of “at most 5% wrong,” needs calibration.</li>
+</ul>
+<p>An overconfident model can still rank questions well. Know which use you are making.</p>
+<aside class="notes">
+<p>About 3 minutes. Point back to Tuesday’s Gemma diagram: the points sit far below the diagonal (the probabilities are off) but rise from left to right (the order is right). Both facts are in one picture.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="recalibration-is-a-fitted-model" class="slide level2 smaller">
+<h2>Recalibration is a fitted model</h2>
+<p><strong>Recalibration</strong> replaces the model’s confidences with new ones that match observed accuracy. The most common method, <strong>temperature scaling</strong>, divides the model’s internal score by one fitted number. For a question with two options, it keeps the order of the confidences.</p>
+<p>So recalibration can fix the numbers printed on the thresholds, but it cannot change which questions the tool answers at a given share.</p>
+<p>Because it is fitted to data:</p>
+<ol type="1">
+<li>Fit it on <strong>separate questions</strong>, not the test questions. Fitting it on the test questions is Week 3’s leakage.</li>
+<li>Check the new confidences on <strong>fresh questions</strong> before calling them calibrated.</li>
+<li>It cannot fix a change in population. Confidences recalibrated on BBH need not be calibrated on the team’s users’ questions.</li>
+</ol>
+<aside class="notes">
+<p>About 3 minutes. This week’s reading, Guo et al.&nbsp;(2017), recommends temperature scaling. The third point is Week 9’s topic. Another common method, Platt scaling, is a logistic regression of “answer is right” on the model’s score. If asked: with more than two options, temperature scaling keeps each question’s chosen answer but need not keep the order of confidences across questions.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="when-the-order-fails" class="slide level2 smaller">
+<h2>When the order fails</h2>
+<p>The threshold rule needs the reliability diagram’s points to <strong>rise from left to right</strong>. If answers with confidence 0.95 were less accurate than answers with confidence 0.85, raising the threshold would let <em>worse</em> answers through.</p>
+<p>This happens when one kind of question fools the model in a consistent way: a task it is confidently bad at, or a question unlike anything in its training data. A model always picks some option, even when it has no idea.</p>
+<p>Check the order in the reliability diagram, with its intervals, before selling a threshold rule.</p>
+<aside class="notes">
+<p>About 2 minutes. Week 1 warned that a model always gives some answer. A dip in a small top bin may be noise; check its interval before describing it. Lab 6 shows a real model whose points do not rise steadily.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="language-models" class="title-slide slide level1 center">
+<h1>Language models</h1>
+
+</section>
+<section id="language-models-state-confidence-in-two-ways" class="slide level2 smaller">
+<h2>Language models state confidence in two ways</h2>
+<p><strong>Token probabilities.</strong> On a multiple-choice question, a language model gives a probability to each answer option, A through D. These come from the model’s softmax, so reliability diagrams apply directly. The API has to return them; they are often called log-probabilities.</p>
+<p><strong>Confidence in words.</strong> Asked how sure it is, the model may write “I’m 90% sure.” That is <strong>generated text</strong>, produced the same way as the rest of its answer. It is a claim about a claim, and it has to be checked like any other claim.</p>
+<p>Confidence stated in words tends to be overconfident and to bunch at round numbers like 90% and 95%. Do not mix the two kinds in one diagram.</p>
+<aside class="notes">
+<p>About 3 minutes. Source for the last paragraph: Xiong et al.&nbsp;(2024), “Can LLMs Express Their Uncertainty? An Empirical Evaluation of Confidence Elicitation in LLMs,” ICLR. Project teams on language-model tracks should know which kind they have before drawing a diagram. Some APIs return log-probabilities only for the few most likely tokens, so the probabilities over A to D may need to be rescaled to add to 1, as Tuesday’s were.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="grade-this-claim" class="slide level2 smaller">
+<h2>Grade this claim</h2>
+<p>In pairs, find the problems and rank them by how much damage they do.</p>
+<blockquote>
+<p>“Our model’s confidence threshold is set at 0.90, so the questions it answers on its own have at most a 10% error rate. Across all questions, its average confidence is 88% and its accuracy is 87%, so it is nearly perfectly calibrated. No one needs to check the answers it gives on its own.”</p>
+</blockquote>
+<aside class="notes">
+<p>About 5 minutes. Answers, most damaging first:</p>
+<ol type="1">
+<li>“No one needs to check” removes the only data that could show the rule failing. Keep checking a random sample of the answers the tool gives on its own.</li>
+<li>“Threshold 0.90, so at most 10% errors” assumes calibration. The threshold is not the error rate. Gemma promised 3% above 0.90 and was wrong 42% of the time; even the better model in today’s table promised 5% and had 8%.</li>
+<li>A 1-point gap between the overall averages can hide large gaps in bins that cancel (Tuesday’s “What ECE hides”). Ask for the reliability diagram with counts.</li>
+<li>There is no number of questions, no interval, and no check of groups such as one task.</li>
+<li>Which questions? Calibration on the vendor’s benchmark need not hold for the client’s users.</li>
+</ol>
+<p>This is the same task as the midterm review packet, Problem 3.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-we-did-today" class="slide level2 smaller">
+<h2>What we did today</h2>
+<ol type="1">
+<li>Choosing a threshold needs costs: a person’s time and a wrong answer. The cheapest threshold changes as the cost ratio changes.</li>
+<li>Report the range of costs over which the choice holds, not one threshold. That is a sensitivity analysis.</li>
+<li>When one kind of mistake costs more than the other, the cutoff for a two-way call need not be 0.5. Reading <span class="math inline">p</span> as a probability that way requires calibration.</li>
+<li>A threshold rule needs only the right order. Recalibration changes the numbers but not the order, so fit it on separate data and check it again on fresh data.</li>
+<li>A language model’s token probabilities can be checked with a reliability diagram. Its confidence in words is generated text.</li>
+</ol>
+<aside class="notes">
+<p>About 1 minute.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="todays-lab" class="slide level2 smaller">
+<h2>Today’s lab</h2>
+<p>Two larger models from Lab 5, on BIG-Bench Hard: Qwen2.5-7B, which the team chose in Homework 5, and Llama-3.1-8B. Each answer comes with the model’s confidence, computed the same way as Gemma’s on Tuesday. The team wants the tool to answer on its own only when the model is confident.</p>
+<ol type="1">
+<li>You will build Qwen’s reliability table and compute its ECE.</li>
+<li>You will put Qwen and Llama on one reliability diagram with the same bins.</li>
+<li>You will build the threshold table and compare it with the team’s 10% limit.</li>
+<li>You will check whether calibration changes from task to task.</li>
+</ol>
+<p>You will end with what you would tell the team.</p>
+<p><strong>Checkpoint 6</strong> covers this week’s two lectures. It opens after class today and is due Tue Mar 2. <strong>Midterm: Thu Mar 4</strong>, in class. <strong>Teams and track preferences</strong> are due the same day.</p>
+<aside class="notes">
+<p>About 2 minutes. Don’t give away the results. Qwen, the more accurate model, is badly overconfident (ECE 0.38), with half its answers at confidence 0.999 or more and points that do not rise steadily. Llama is close to calibrated (ECE 0.08). Let the diagram in part 2 show it.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="lecture_b_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="lecture_b_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="lecture_b_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="lecture_b_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="lecture_b_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="lecture_b_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="lecture_b_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="lecture_b_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="lecture_b_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
