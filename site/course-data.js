@@ -76,10 +76,9 @@ const weeklyMaterials = [
   {
     week: 6, dates: "Feb 23 / 25", publishDate: "2027-02-21",
     topic: "Calibration and decision-rule sensitivity",
-    note: "No homework; midterm practice instead",
+    note: "No homework; midterm practice on Canvas",
     slides: slides("week06"),
     lab: notebook("weeks/week06/lab_starter.ipynb", "2027-02-25"),
-    homework: { label: "Midterm practice", due: "Mar 2 for feedback", pdf: `${courseLinks.publicBlob}/weeks/week06/midterm_review.pdf`, links: [{ label: "exam-format practice", href: `${courseLinks.publicBlob}/weeks/week06/midterm_theory_practice.pdf`, openDate: "2027-02-23" }], openDate: "2027-02-23" },
     data: [dataRelease("BIG-Bench Hard data", "llm_bbh")]
   },
   { week: 7, dates: "Mar 2 / 4", publishDate: "2027-02-28", topic: "First-half synthesis", note: "In-class midterm Thu Mar 4" },

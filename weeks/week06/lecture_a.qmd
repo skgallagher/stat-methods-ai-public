@@ -361,7 +361,7 @@ About 2 minutes.
 
 **Thursday:** the team has to pick a threshold. We will add the costs of a person's time and of a wrong answer, see where the best threshold changes, and look at recalibration and at how language models state confidence. Then Lab 6 checks two larger models, Qwen and Llama: is either one's confidence usable?
 
-**HW5** is due today. **The midterm review packet** is out today; Problem 2, parts 4 and 5, and Problem 3 practice today's ideas on complaint routing.
+**HW5** is due today. **The midterm review packet** is out today on Canvas; Problem 2, parts 4 and 5, and Problem 3 practice today's ideas on complaint routing.
 
 **Midterm: Thu Mar 4**, in class, covering Weeks 1–6. Tuesday of Week 7 is review.
 
