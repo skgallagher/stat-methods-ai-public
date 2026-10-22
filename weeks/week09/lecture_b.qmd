@@ -1,0 +1,97 @@
+---
+title: "Week 9B: The Problem and EDA"
+subtitle: "Milestone 1 and the project launch"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+---
+
+## Today's plan {.smaller}
+
+**About 10 minutes:** what Milestone 1 asks for, using Tuesday's partner park so nobody's track gets answered for them.
+
+**About 30 minutes, together:** Lab 9. A tumor model built at three hospitals goes to a fourth. You run Tuesday's reweighting on tissue slides with me, using the same code that is in your project starter.
+
+**The rest of class:** your team opens its track and starts the Milestone 1 outline, following the work-session guide.
+
+Milestone 1 is due **Tue Mar 23**.
+
+::: notes
+About 1 minute. Midterms go back at the end of class, not the start, so they do not take over the work time.
+:::
+
+## What Milestone 1 asks for {.smaller}
+
+Milestone 1 shapes your team's ideas: the problem you are trying to solve, what your first look at the data showed, and how you might answer your questions. Write it as an outline in your own words. Short sentences and bullets are fine. Polish earns nothing; specific ideas earn credit.
+
+It has five parts: **the problem**, **who the numbers are about**, **EDA**, **ideas for the analysis**, and **open questions**. The Project Description, Section 5, says what each part contains, and the Rubric says how it is graded.
+
+Milestone 2 adds results to the same outline, and Milestone 3 adds the recommendation. The final slides and video then tell the whole story.
+
+::: notes
+About 2 minutes. Do not restate the list's details or the points; send students to the two documents. Instructor decision, Oct 20: the milestones are working outlines so that the writing stays the team's own; the storyboard, the video, and the oral are where the story gets told.
+:::
+
+## Example: the partner park's problem {.smaller}
+
+Here is the first part of a Milestone 1 outline for Tuesday's partner park.
+
+**Client and decision.** The park will not look at photos MegaDetector calls empty. It will adopt the model only if it misses at most 5% of animal photos, a limit it set before seeing any results.
+
+**Question 1.** How often does MegaDetector miss an animal photo at the park's cameras? *Quantity:* the share of the park's animal photos that it calls empty.
+
+**Question 2.** Does it do as well at the park's cameras as at the team's nine? *Quantity:* the difference between the two miss rates.
+
+Nothing here is polished. Each line is specific: whose photos, which mistake, and what the answer would change.
+
+::: notes
+About 3 minutes. The numbers behind it are real: on the team's 81 animal photos MegaDetector missed 8 (9.9%); on the park's first 27 it missed 8 (29.6%). The 5% limit is made up. Ask what makes each line specific, then what a vague version would look like ("How good is the model?").
+:::
+
+## EDA: findings that change the plan {.smaller .compact-table}
+
+In Milestone 1, each EDA finding earns its place by changing or qualifying the plan.
+
+| What the camera data showed | What it changed |
+|----------------------------|----------------------------|
+| The `day_night` column disagrees with 36 of the photos | Group by infrared or color from the photo itself |
+| Labels describe whole bursts, so later photos can be "animal" with no animal | Resample bursts, and decide how to label bursts before the park labels more |
+| Half the bursts are empty only because the subset was built that way | Report the miss rate for animal photos, and reweight to the park's mix |
+
+A figure that changes nothing does not belong in the outline. Each one gets a sentence saying what it showed and what you will do about it.
+
+::: notes
+About 3 minutes. All three findings are real and come from Weeks 1, 4, and 9. The 36 photos: 27 marked day are infrared, and 9 marked night are in color.
+:::
+
+## Open questions {.smaller}
+
+Milestone 1 ends with what you do not know yet. For the park, a team might write:
+
+**How does the park label a burst when the animal leaves after the first photo?** Ask the client; in this course, the course staff play the client.
+
+**Is 5% the right limit, or a round number?** Also for the client.
+
+**Would scoring whole bursts instead of single photos change the answer?** The team can try both in the notebook.
+
+Open questions are not a weakness. Some your team can answer, some another team on your track may have run into, and some need the course staff or more data. End the outline with a few sentences on how you used AI: what for, what you checked, and one thing it got wrong.
+
+::: notes
+About 2 minutes. Encourage teams to post open questions that other teams on the same track could answer; the client-facing questions (labels, limits) are ones the course staff answer as the client.
+:::
+
+## Lab 9 and the project work session {.smaller}
+
+**Lab 9, together:** look at tissue patches from each hospital, measure how blue each patch is, find accuracy within color groups, reweight to hospital 5's colors, and check that against hospital 5's own labels.
+
+**Then your project:** open your track's starter in Colab. Every member runs it on their own laptop. Work through sections 1 to 5 with the work-session guide; section 5 uses the same two functions as the lab. Leave with your first numbers, a client mix with a reason, and a first draft of the Milestone 1 outline in section 6.
+
+**Before Tuesday:** Milestone 1 and Checkpoint 7 are both due Tue Mar 23. If your team is stuck on a choice that changes the plan, such as the client's mix or a label rule, ask now rather than guessing.
+
+::: notes
+About 1 minute, then the lab. During the work time, circulate: every member should have the starter running within fifteen minutes, and teams should write the case note before discussing it. Midterms go back at the end of class.
+:::

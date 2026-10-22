@@ -1,0 +1,363 @@
+---
+title: "Week 7A: Midterm Review"
+subtitle: "Weeks 1–6, then your questions"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+## Today {.smaller}
+
+The first half reviews what the midterm draws on, one week at a time, with a few short checks along the way.
+
+The second half is yours. Bring a problem from the midterm review packet on Canvas or from a homework Problem 1, and we will work it at the board.
+
+While we review, write down the problems you want to see. I will collect them at the break.
+
+::: notes
+About 1 minute. The plan is roughly 40 minutes of review, a short break, then about 35 minutes of student questions. Collect requests on paper or in the chat during the first half so the second half starts right away. If nobody brings a problem, work the two backup problems in the Week 7 instructor notes at the board.
+:::
+
+## The midterm {.smaller}
+
+**Next class, in class, 75 minutes.** It covers Weeks 1–6.
+
+You may bring one sheet of notes you prepared yourself, front and back, and a scientific calculator. No graphing or programmable calculators, AI, books, phones, or other networked devices. The arithmetic is designed to be done by hand, and any square roots you need are printed on the exam.
+
+The exam asks for the same three kinds of work as the homework: reasoning by hand, as in Problem 1; reading printed code and saying what it does statistically; and checking an AI's answer, as in Problem 3. You will not write code.
+
+Answers are graded on the reasoning, not only the number. Write the setup before the arithmetic, so a slip in arithmetic costs a little and not the whole part.
+
+::: notes
+About 2 minutes. If the exam's structure changes before it is printed, edit the third paragraph. Do not show or describe the exam's numbers today.
+:::
+
+# Part 1: what to know from each week
+
+## Week 1: a model, a cutoff, and a boundary {.smaller}
+
+**Logistic regression** models the log-odds as linear, $\operatorname{logit} p(x) = \beta_0 + \beta_1 x$, and is fit by maximum likelihood, which is the same as minimizing cross-entropy.
+
+**The rule** "predict 1 when $\hat p(x) \ge c$" is the same as $\beta_0 + \beta_1 x \ge \operatorname{logit}(c)$. Moving the cutoff moves the boundary, not the fitted model. In $x$ alone there is at most one boundary.
+
+**A hidden layer** adds units $h_j(x) = g(w_{j0} + x^T w_j)$, and the score combines them, so the boundary can bend. With **squaring units**, as in Week 1A's circle, the score is a polynomial in $x_1$ and $x_2$: expand it, find where it is zero, and shade where it is positive.
+
+::: notes
+About 2 minutes. Practice: HW1 1(c) and Week 1A's "A hidden layer by hand" (the circle). Work only the squaring check on the next slide today; the Week 7 instructor notes say why.
+:::
+
+## Check: a squaring network {.smaller}
+
+A network with inputs $x_1$ and $x_2$ has one squaring unit, $u(x) = (x_1 - x_2)^2$, and score $s(x) = 4 - u(x)$. It predicts 1 when $s(x) > 0$.
+
+1. Find every boundary and sketch the region predicted 1.
+2. Could a logistic regression with only $x_1$ and $x_2$ as inputs draw this region? If not, what feature would it need?
+
+::: {.fragment}
+1. $s(x) > 0$ exactly when $(x_1 - x_2)^2 < 4$, that is, $-2 < x_1 - x_2 < 2$. The boundaries are two parallel lines, $x_2 = x_1 + 2$ and $x_2 = x_1 - 2$, and the region predicted 1 is the stripe between them.
+2. No. Its boundary is one straight line, and this region needs two. Adding the feature $(x_1 - x_2)^2$, or $x_1^2$, $x_1x_2$, and $x_2^2$, lets it draw the stripe.
+:::
+
+::: notes
+About 3 minutes. Sketch it at the board: draw the line x2 = x1, then the two lines 2 above and 2 below it, and shade between. Spot checks: (0, 0) gives s = 4, inside; (0, 2) gives s = 0, on the boundary; (3, 0) gives s = −5, outside.
+
+One squaring unit already gives two boundaries, which logistic regression in x1 and x2 alone cannot draw. If time is short, skip the cutoff check, not this one.
+:::
+
+## Check: move the cutoff {.smaller}
+
+A fitted model is $\hat p(x) = \sigma(-1 + 2x)$, and it predicts 1 when $\hat p(x) \ge c$.
+
+1. Where is the boundary at $c = 0.5$?
+2. Where is it at $c = 0.8$? You may use $\log 4 \approx 1.39$.
+3. What changed, and what did not?
+
+::: {.fragment}
+1. $\operatorname{logit}(0.5) = 0$, so the rule is $-1 + 2x \ge 0$, or $x \ge 0.5$.
+2. $\operatorname{logit}(0.8) = \log(0.8/0.2) = \log 4$, so the rule is $-1 + 2x \ge 1.39$, or $x \ge 1.19$.
+3. The boundary moved right, so fewer cases are predicted 1. The fitted model, $\hat p(x)$, did not change.
+:::
+
+::: notes
+About 2 minutes. Check: (1 + log 4)/2 = 1.193. This is the Week 1 version of a Week 6 idea: the threshold is a decision about how to use the model, chosen separately from fitting it.
+:::
+
+## Week 1: more flexible is not automatically better {.smaller}
+
+At a fixed $x$, for a model fit to a random training set $D$,
+
+$$\mathbb E\bigl[(Y-\hat p_D(x))^2 \mid x\bigr] = \underbrace{p(x)\{1-p(x)\}}_{\text{noise}} + \underbrace{\bigl(\mathbb E[\hat p_D(x)] - p(x)\bigr)^2}_{\text{bias}^2} + \underbrace{\operatorname{Var}\{\hat p_D(x)\}}_{\text{variance}}.$$
+
+A more flexible model usually has lower bias and higher variance. Which one has the smaller error depends on the data, so we compute it rather than assume it.
+
+This is why the course always keeps a simple statistical baseline next to the AI system, and a floor (always predict the most common class) below both. The baseline tells you whether the flexibility bought anything. The floor tells you whether either model learned anything.
+
+::: notes
+About 2 minutes. Practice: HW1 1(d), where the noise term is the same for both models and only bias squared plus variance decides the comparison. The two cultures: the statistician asks which model describes how the data were generated; the algorithmic culture asks which predicts best. Both cultures still need the comparison to be on the same cases.
+:::
+
+## Week 2: a label is a random outcome {.smaller}
+
+A recorded label is one draw from the raters' response distribution for that item. Two labels, or two models' scores, can be dependent for two different reasons. The **law of total covariance** separates them:
+
+$$\operatorname{Cov}(X, Y) = \underbrace{\mathbb E\bigl[\operatorname{Cov}(X, Y \mid Z)\bigr]}_{\text{after fixing the item}} + \underbrace{\operatorname{Cov}\bigl(\mathbb E[X\mid Z],\, \mathbb E[Y \mid Z]\bigr)}_{\text{because items differ}}.$$
+
+If the two are independent once the item $Z$ is fixed, the first term is 0. The second term is not 0 when both responses move with the item: an easy item is easy for everyone. That second term is where Week 4's design effect comes from.
+
+**Brier score.** If the true probability is $q$ and you report $p$, the expected score is $(p - q)^2 + q(1 - q)$. Only the first term depends on what you report, so the honest $p = q$ scores best. Averaging $m$ conditionally independent labels shrinks the label variability by $1/m$.
+
+::: notes
+About 3 minutes. Practice: HW2 Problem 1 (a)–(c). Ask the room: two raters label the same sentence independently given the sentence. Which term is zero? (The first.) Why can the covariance still be positive? (The second: sentences differ in how positive they are, and both raters respond to that.)
+:::
+
+## Week 3: design the evaluation before fitting {.smaller}
+
+1. What exactly is predicted, and how was that label produced?
+2. Which cases should the conclusion describe?
+3. What does the simple model have to beat, and what does the complex model have to beat?
+4. Which data are used to fit, to choose, and to test?
+5. What result would change the decision, and what would it still not prove?
+
+**The split decides what "new" means.** Random rows test more of the same mix, held-out groups test new groups, and later cases test the future.
+
+**Anything fitted** (the vocabulary, the model) uses training data. **Anything chosen** (a threshold, a prompt) uses validation data. The test set is used once.
+
+::: notes
+About 3 minutes. Practice: HW3 Problem 1; the review packet, Problem 1. In printed code, look for `fit` or `fit_transform` before the split, and for anything chosen with `max` or `argmax` over test results. Accuracy versus average recall: with unbalanced classes, accuracy can look good while the rare class is missed, so ask which errors the intended use cares about.
+:::
+
+## Week 4: a benchmark score is an estimate {.smaller}
+
+A test set is a sample of items, so an accuracy $\hat p = k/n$ has a standard error, about $\sqrt{\hat p(1-\hat p)/n}$ for independent items.
+
+**Wald**, $\hat p \pm z\sqrt{\hat p(1-\hat p)/n}$, fails near 0 and 1: at 19 of 20 it runs past 1, and at 20 of 20 it has zero width. **Wilson** keeps every $p$ with $|\hat p - p| \le z\sqrt{p(1-p)/n}$, so its center $\dfrac{\hat p + z^2/(2n)}{1 + z^2/n}$ is pulled toward 1/2, most strongly when $n$ is small.
+
+**Zero errors in $n$ independent cases** do not mean the error rate is 0. The one-sided 95% upper bound is about $3/n$, the **rule of three**.
+
+**What 95% means:** the procedure captures the true accuracy in about 95% of repeated samples. It says nothing about problems the sample cannot see, such as leakage, disputed labels, or a different population.
+
+::: notes
+About 2 minutes. Practice: HW4 1(a)–(b); the review packet, Problem 2, parts 3–4. Wilson for 19/20 is [0.76, 0.99]. On the exam, any interval that needs a square root will either be supplied or come with the square root printed.
+:::
+
+## Week 4: items come in clusters {.smaller}
+
+When items share a source (a passage, a prompt, a camera sequence, a task), they tend to be right or wrong together. Let item $i$ in cluster $g$ be right with probability $P_g$, where $P_g$ varies across clusters with mean $p$ and variance $\tau^2$. With $Z = P_g$, the law of total covariance gives, for two items in the same cluster,
+
+$$\operatorname{Cov}(Y_{gi}, Y_{gk}) = 0 + \operatorname{Var}(P_g) = \tau^2, \qquad \rho = \frac{\tau^2}{p(1-p)}.$$
+
+With $m$ items per cluster and $n$ items in all,
+
+$$\operatorname{Var}(\hat p) = \frac{p(1-p)}{n}\bigl[1 + (m-1)\rho\bigr].$$
+
+The **design effect** is $1 + (m-1)\rho$, and the **effective sample size** is $n$ divided by it. An interval that ignores clustering is too narrow, so **resample whole clusters**. The result still describes only the kind of clusters you sampled.
+
+::: notes
+About 3 minutes. Practice: HW4 1(c); the review packet, Problem 1, item 5. Worked example from Week 4B: 100 passages with 4 questions each and rho = 0.2 gives design effect 1.6 and effective sample size 250.
+:::
+
+## Week 5: two models on the same questions {.smaller}
+
+| | B right | B wrong |
+|---|---:|---:|
+| **A right** | $n_{11}$ | $n_{10}$ |
+| **A wrong** | $n_{01}$ | $n_{00}$ |
+
+The difference in accuracy is $\widehat\Delta = \hat p_B - \hat p_A = (n_{01} - n_{10})/n$. Only the disagreements matter.
+
+**McNemar's test.** If the models are equally accurate, each disagreement is a fair coin, so $n_{01} \sim \operatorname{Binomial}(m, 1/2)$ given $m = n_{10} + n_{01}$. For large $m$, $z = (n_{01} - n_{10})/\sqrt{n_{10} + n_{01}}$.
+
+**Paired standard error:** $\operatorname{SE}(\widehat\Delta) \approx \sqrt{n_{10} + n_{01}}/n$, smaller than the unpaired one because a question that is hard for one model tends to be hard for the other. **If the models answered different questions,** there is no pairing: use Fisher's exact test.
+
+::: notes
+About 3 minutes. Practice: HW5 1(a)–(b); the review packet, Problem 2, parts 1–2. Three ways to break the pairing in code: an unpaired standard error, Fisher's test on shared questions, and two separate bootstrap samples, one for each model.
+:::
+
+## Week 5: is it real, and is it big enough? {.smaller}
+
+```{python}
+#| fig-width: 10.5
+#| fig-height: 3.3
+import matplotlib.pyplot as plt
+
+# name, estimate, standard error; each line runs from estimate - 1.645 SE to estimate + 1.645 SE
+rows = [
+    ("A", 1.2, 0.8 / 1.645),
+    ("B", -0.3, 0.5 / 1.645),
+    ("C", -0.8, 1.0 / 1.645),
+    ("D", 0.5, 2.1 / 1.645),
+    ("E", -0.5, 0.25 / 1.645),
+]
+fig, ax = plt.subplots(figsize=(10.5, 3.3))
+for i, (name, estimate, se) in enumerate(rows):
+    y = len(rows) - i
+    ax.plot([estimate - 1.645 * se, estimate + 1.645 * se], [y, y], color="#155a8a", linewidth=3)
+    ax.plot(estimate, y, "o", color="#252525", markersize=7)
+    ax.text(-2.75, y, name, va="center", fontsize=15, fontweight="bold")
+ax.axvline(0, color="#667085", linestyle="--", linewidth=1.2)
+ax.axvline(-1, color="#c41230", linewidth=1.6)
+ax.text(-1.05, 5.7, "margin, −δ", color="#c41230", ha="right", fontsize=14)
+ax.text(0.05, 5.7, "0", color="#667085", ha="left", fontsize=14)
+ax.set_xlim(-2.9, 3.3)
+ax.set_ylim(0.4, 6.1)
+ax.set_xticks([-2, -1, 0, 1, 2, 3])
+ax.tick_params(labelsize=12)
+ax.set_xlabel("new model minus current model, percentage points", fontsize=13)
+ax.set_yticks([])
+ax.spines[["top", "right", "left"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+The Week 5 picture: each line runs from the one-sided 95% lower bound $\widehat\Delta - 1.645\,\mathrm{SE}$ to the upper bound. **Non-inferior** means the left end is above $-\delta$, with $\delta$ chosen before looking. **Which rows support switching to the new model?**
+
+::: notes
+About 3 minutes. Answer: A, B, and E. C is "not shown to be within the margin," which is not the same as "shown worse." D looks better but is too uncertain. E is shown worse (the whole line is below 0) and shown not much worse (left end above −1); both tests reject, and that is fine. Significant is not the same as important.
+
+Two more Week 5 ideas to mention in one breath each: the winner's curse (the best of several prompts or tasks, picked on the same data, looks better than it is, so check it on fresh questions), and the task bootstrap (when the claim is about tasks, resample tasks). Practice: HW5 1(c)–(d).
+:::
+
+## Week 6: does 0.9 mean 90%? {.smaller}
+
+A model is **calibrated** if, among the answers it gives with confidence $c$, about a fraction $c$ are right. One answer cannot check this. We group answers into bins by confidence, and each bin's accuracy is $k$ right out of $n$, so it gets a Wilson interval. **A gap is real when the bin's average confidence is outside its interval.**
+
+Accuracy and calibration are different. A model that says 0.5 on every yes-or-no question and is right half the time is calibrated and useless.
+
+$$\text{ECE} = \sum_b \frac{n_b}{n}\,\bigl|\text{accuracy}_b - \text{confidence}_b\bigr|.$$
+
+ECE equals average confidence minus accuracy **only when every bin's gap has the same sign**. It depends on the bins, drops the direction, and averages over groups, so report the reliability table with its counts next to it.
+
+::: notes
+About 2 minutes. Practice: Week 6A checks; the review packet, Problem 1, items 7–8, and Problem 2, part 4. Ask: two equal bins, one 10 points overconfident and one 10 points underconfident. What is ECE? (0.10.) What is average confidence minus accuracy? (0.)
+:::
+
+## Week 6: a rule built on confidence {.smaller}
+
+The tool answers on its own when confidence is at least $t$. Two numbers describe the rule:
+
+$$\text{share answered} = \frac{\#\{\text{confidence} \ge t\}}{\#\{\text{all questions}\}}, \qquad \text{error rate} = \frac{\#\{\text{wrong, confidence} \ge t\}}{\#\{\text{confidence} \ge t\}}.$$
+
+The error rate's denominator is the questions the tool answered. Compare its **interval**, not just its estimate, with the client's limit.
+
+**Check.** At $t = 0.9$, a model answers 400 of 1,000 questions on its own. Their average confidence is 0.96, and 32 are wrong. The Wilson interval for the error rate is [5.7%, 11.1%]. The client allows at most 5% wrong.
+
+::: {.fragment}
+The tool answers 40% of questions, and $32/400 = 8\%$ of those answers are wrong, where the model promised about 4%. The whole interval is above 5%, so this rule does not meet the limit.
+:::
+
+::: notes
+About 4 minutes. Wilson for 32/400: [0.057, 0.111]. The most common mistake is dividing 32 by 1,000. Add aloud: all of this describes these 1,000 questions; calibration belongs to a model and a population together. Practice: the review packet, Problem 2, part 5; Week 6A's last check.
+:::
+
+## Which tool fits? {.smaller}
+
+Name the idea or method each situation calls for.
+
+1. Two chatbots answered the same 800 questions. Is the difference real?
+2. Two chatbots were each tested on a different random 40 questions from one pool.
+3. A model got all 50 test cases right. How bad could it be?
+4. The 600 test questions come from 30 documents, 20 per document.
+5. A cheaper model only has to be no more than 2 points worse.
+6. The tool answers on its own above confidence 0.9, and the client allows at most 5% wrong.
+7. You tried 12 prompts and report the best one's accuracy on the same questions.
+8. The vocabulary was built from all the text before the data were split.
+
+::: notes
+About 5 minutes including the next slide. Read them aloud quickly and take answers from the room before advancing.
+:::
+
+## Which tool fits? Answers {.smaller .compact-table}
+
+| | Situation | Idea or method |
+|---|---|---|
+| 1 | Same 800 questions | Paired table, McNemar's test, paired interval |
+| 2 | Different questions | Fisher's exact test (no pairing to use) |
+| 3 | 50 of 50 right | Rule of three: error rate up to about 3/50 = 6% |
+| 4 | 20 questions per document | Design effect; resample documents |
+| 5 | No more than 2 points worse | Non-inferiority: lower bound above −2, margin set in advance |
+| 6 | Answers above 0.9, limit 5% | Error rate among answered cases, with its interval, against 5% |
+| 7 | Best of 12 prompts | Winner's curse; check the chosen prompt on fresh questions |
+| 8 | Vocabulary before the split | Leakage; fit the vocabulary on training data only |
+
+::: notes
+Row 2: with 40 questions each, Fisher's exact test is the course's tool. Row 4: with 20 per document, even rho = 0.1 gives design effect 2.9 (Week 4B).
+:::
+
+## Check every answer for these {.smaller}
+
+These mistakes cost more than arithmetic slips, because they change the conclusion.
+
+1. Dividing by the wrong count, such as the error rate among answered cases divided by all cases.
+2. Treating paired results as independent.
+3. Reading "not significantly different" as "the same" or "good enough."
+4. Comparing an estimate with a limit when its interval crosses the limit.
+5. Splitting or resampling by the wrong unit: rows instead of prompts, customers, sequences, or tasks.
+6. Choosing something (a vocabulary, a threshold, a prompt, a margin) after looking at the test results.
+7. Claiming more than the sampled population supports.
+
+**Your sheet.** Worth the space: the formulas on today's slides and this list. Not worth it: Python syntax or copied paragraphs. Making the sheet is part of studying.
+
+::: notes
+About 2 minutes. These are also the mistakes an AI answer is likely to make, as in every homework's Problem 3.
+:::
+
+# Part 2: your questions
+
+## Where to practice each idea {.smaller .compact-table}
+
+| Idea | Midterm review packet | Homework and lecture |
+|---|---|---|
+| Hidden layers, boundaries, cutoffs | | HW1 1(c); Week 1A's circle; today's squaring check |
+| Bias and variance | | HW1 1(d) |
+| Labels, total covariance, Brier | | HW2 Problem 1 |
+| Design, splits, leakage | Problem 1 | HW3 Problem 1 |
+| Wald, Wilson, rule of three | 2.3–2.4 | HW4 1(a)–(b) |
+| Clusters and the design effect | 1.5 | HW4 1(c) |
+| Paired comparison, McNemar | 2.1–2.2 | HW5 1(a) |
+| Fisher, non-inferiority, winner's curse | | HW5 1(b)–(d) |
+| Calibration and a confidence rule | 1.7–1.8, 2.4–2.5 | Week 6A checks |
+| Checking an AI answer, rewriting a claim | Problem 3 | Problem 3 of any homework |
+
+::: notes
+Show this while collecting requests. The review packet is on Canvas. It has no hidden-layer, printed-code, or prompt-writing item, so those come from the homework.
+:::
+
+## Bring a problem {.smaller}
+
+Tell me the problem and, if you tried it, what you wrote. A wrong first step is the most useful thing we can look at.
+
+For every problem, before any arithmetic, we will answer four questions:
+
+1. What is one unit, and how were the units sampled?
+2. What is being compared, and on which cases?
+3. What is the estimate, and what is its uncertainty?
+4. What would change the decision, and what would the result still not show?
+
+Then someone sets it up, and we finish it together.
+
+::: notes
+About 35 minutes. Work at the board or document camera. Keep each problem to about 8 minutes: setup first, then let the room do the arithmetic. If more than one person asks for the same idea, take that one first. If requests run out, use the two backup problems in the Week 7 instructor notes.
+:::
+
+## Before the midterm {.smaller}
+
+1. Do the midterm review packet once, timed, without AI.
+2. Correct it with the key, and label each mistake: concept, setup, arithmetic, or claim.
+3. Make your sheet.
+4. Rework the problems you missed without looking at the key.
+
+**Next class: the midterm.** Bring your sheet and a pencil.
+
+**Project team form:** due Fri Mar 5 on Canvas. The Project Description, Section 5, says how teams are formed.
+
+::: notes
+About 1 minute. Post the logistics from "The midterm" slide to Canvas tonight.
+:::

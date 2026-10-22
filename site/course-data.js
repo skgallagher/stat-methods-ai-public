@@ -17,7 +17,7 @@ const siteSettings = {
   // "beta": show Weeks 1 through betaThroughWeek with every link open, for testers.
   moduleReleaseMode: "beta",
   previewWeek: 2,
-  betaThroughWeek: 6
+  betaThroughWeek: 9
 };
 
 // Helpers so each week below stays short.
@@ -81,9 +81,21 @@ const weeklyMaterials = [
     lab: notebook("weeks/week06/lab_starter.ipynb", "2027-02-25"),
     data: [dataRelease("BIG-Bench Hard data", "llm_bbh")]
   },
-  { week: 7, dates: "Mar 2 / 4", publishDate: "2027-02-28", topic: "First-half synthesis", note: "In-class midterm Thu Mar 4" },
+  {
+    week: 7, dates: "Mar 2 / 4", publishDate: "2027-02-28",
+    topic: "First-half synthesis",
+    note: "In-class midterm Thu Mar 4",
+    slides: [{ label: "Tue", href: `${courseLinks.pagesBase}/weeks/week07/lecture_a.html` }]
+  },
   { week: 8, dates: "Mar 9 / 11", publishDate: null, topic: "Spring break", isBreak: true },
-  { week: 9, dates: "Mar 16 / 18", publishDate: "2027-03-14", topic: "Distribution shift and project launch" },
+  {
+    week: 9, dates: "Mar 16 / 18", publishDate: "2027-03-14",
+    topic: "Distribution shift and project launch",
+    note: "No homework; project launch Thu Mar 18",
+    slides: slides("week09"),
+    lab: notebook("weeks/week09/lab_starter.ipynb", "2027-03-18"),
+    data: [dataRelease("Camelyon17 data", "camelyon17")]
+  },
   { week: 10, dates: "Mar 23 / 25", publishDate: "2027-03-21", topic: "Sensitivity analysis", note: "Project Milestone 1 due Mar 23" },
   { week: 11, dates: "Mar 30 / Apr 1", publishDate: "2027-03-28", topic: "Designed AI evaluations" },
   { week: 12, dates: "Apr 6 / 8", publishDate: "2027-04-04", topic: "LLM judges as measurement instruments", note: "Project Milestone 2 due Apr 6" },
@@ -110,6 +122,6 @@ const projectDocs = [
     href: courseLinks.projectDataBox,
     actionLabel: "Box folder",
     openDate: "2027-03-14",
-    status: "Data, cached AI outputs, and starter notebooks for all four tracks. Opens with the project launch in Week 9."
+    status: "Data and cached AI outputs for all four tracks, one zip per track. Opens at the end of spring break, when teams and tracks are posted."
   }
 ];

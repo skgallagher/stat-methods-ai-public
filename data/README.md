@@ -36,6 +36,13 @@ so `data/smoke/` cannot be substituted accidentally.
 - `model_outputs.csv`: `image_id`, `vision_prob`, `vision_pred`
 - `splits.csv`: `image_id`, `split`; no camera or sequence may cross protected splits
 
+### `camelyon17` (Week 9 lab)
+
+- `patches.npz`: array `images`, shape (patches, 96, 96, 3), uint8 RGB; row *i* matches row *i* of `patches.csv`
+- `patches.csv`: `patch_id`, `group` (`benchmark`, `hospital 4`, `hospital 5`), `hospital`, `slide_id`, `label` (1 = tumor), `p_tumor`, `predicted_tumor`
+- `release_summary.json`: counts, accuracies, pinned source revision, seed
+- Built by `scripts/freeze_week9_camelyon.py` from Camelyon17-WILDS (CC0). Patches from one slide are related; resample slides for intervals. The model's fitting patches are not released.
+
 ### `cfpb`
 
 - `complaints.csv`: ID, redacted narrative, product/issue, date, channel, consent/publication fields, similarity group, duplicate flag, source/target period

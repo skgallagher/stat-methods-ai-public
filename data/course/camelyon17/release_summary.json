@@ -1,0 +1,31 @@
+{
+  "source": "Camelyon17-WILDS via the Hugging Face mirror wltjr1007/Camelyon17-WILDS",
+  "source_revision": "d784d5344ba6c967f83f9f3d9b2f1e2a4d6eb78f",
+  "license": "CC0 (public domain), as listed by WILDS",
+  "model": "ImageNet ResNet-18 features (torchvision IMAGENET1K_V1) + logistic regression (C=0.1), fitted on other slides from hospitals 1-3",
+  "seed": 2027,
+  "fit_patches_not_released": 2791,
+  "fit_accuracy": 0.9753,
+  "released_patches": 1500,
+  "by_group": {
+    "benchmark": {
+      "patches": 900,
+      "slides": 9,
+      "tumor_share": 0.5511,
+      "accuracy": 0.9067
+    },
+    "hospital 4": {
+      "patches": 300,
+      "slides": 10,
+      "tumor_share": 0.5,
+      "accuracy": 0.8467
+    },
+    "hospital 5": {
+      "patches": 300,
+      "slides": 10,
+      "tumor_share": 0.5,
+      "accuracy": 0.8533
+    }
+  },
+  "patches_npz_sha256": "0d8b3ae777b174df07db5a2ed8ad3a6a755ca2068d4ef6072ceeb76b7510a1b9"
+}

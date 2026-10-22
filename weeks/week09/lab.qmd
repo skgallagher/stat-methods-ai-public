@@ -1,0 +1,272 @@
+---
+title: "Lab 9: A Tumor Model at a New Hospital"
+subtitle: "Week 9 · Camelyon17 tissue slides"
+format: html
+---
+
+## The situation
+
+When a patient has cancer, pathologists check nearby lymph nodes for tumor cells under a microscope, slide by slide. It is slow and tiring work. A research group built a model that looks at small square patches of a scanned slide and gives the probability that the patch contains tumor. Pathologists would use it to flag patches for a closer look, so a tumor patch the model misses may never get that look.
+
+The group built the model on slides from three hospitals. On held-out slides from those same hospitals, its call was right on about 91% of patches. Now hospital 5, which the model has never seen, is considering it. Hospital 5 asks: will it work as well on our slides?
+
+This is Tuesday's question in a new setting. You use the same two functions as in section 5 of your project starter, `accuracy_by_group` and `reweight`.
+
+One thing about the data: the patches were chosen so that about half contain tumor. On a real slide, most tissue is not tumor, so the accuracies here describe this balanced mix.
+
+## 1. Instructor run: load the patches
+
+**Why this step:** each row is one patch, with its hospital, its slide, a pathologist's label, and the model's probability of tumor. Patches from one slide are related, like the photos in one burst in Week 4.
+
+```{python}
+#| eval: false
+# Additional library for this lab
+from statsmodels.stats.proportion import proportion_confint
+
+# Read the patch table and the images. Row i of the table matches image i.
+c17_dir = data_dir / "camelyon17"
+patches = pd.read_csv(c17_dir / "patches.csv")
+images = np.load(c17_dir / "patches.npz")["images"]
+
+# correct = 1 if the model's call matches the pathologist's label, 0 if not.
+patches["correct"] = (patches["predicted_tumor"] == patches["label"]).astype(int)
+
+benchmark = patches[patches["group"] == "benchmark"]
+hospital_5 = patches[patches["group"] == "hospital 5"]
+
+print("Benchmark: ", len(benchmark), "patches from", benchmark["slide_id"].nunique(), "slides at hospitals 1-3")
+print("Hospital 5:", len(hospital_5), "patches from", hospital_5["slide_id"].nunique(), "slides")
+print("Benchmark accuracy:", round(benchmark["correct"].mean(), 3))
+```
+
+## 2. Instructor run: look at patches from each hospital
+
+**Why this step:** before measuring anything, look. Each hospital prepares and stains its slides a little differently. Tumor tissue also looks different from normal tissue, so each row shows four patches without tumor and then four with tumor. That way you compare the stains, not the tissue.
+
+```{python}
+#| eval: false
+fig, axes = plt.subplots(4, 8, figsize=(16, 9))
+for row, hospital in enumerate([1, 2, 3, 5]):
+    here = patches[patches["hospital"] == hospital]
+    no_tumor = here[here["label"] == 0].sample(4, random_state=SEED)
+    tumor = here[here["label"] == 1].sample(4, random_state=SEED)
+    rows_here = pd.concat([no_tumor, tumor])
+    for col in range(8):
+        i = rows_here.index[col]
+        axes[row, col].imshow(images[i])
+        axes[row, col].set_title(f"hospital {hospital}, " + ("tumor" if patches.loc[i, "label"] == 1 else "no tumor"), fontsize=9)
+        axes[row, col].axis("off")
+plt.tight_layout()
+plt.show()
+```
+
+What looks different about hospital 5's patches?
+
+**Your answer:** TODO
+
+## 3. Measure the stain color
+
+**Why this step:** by eye, the hospitals run from light pink to purplish, and hospital 5 looks like a mix. It is hard to say which patches are bluer just by looking, so we measure it, and part 4 needs that number to group patches by color. For each patch, average the blue value minus the red value over its pixels. Bluer patches, more purple than pink, get larger numbers.
+
+```{python}
+#| eval: false
+blue_minus_red = []
+for i in range(len(images)):
+    pixels = images[i].astype(float)
+    blue_minus_red.append(np.mean(pixels[:, :, 2] - pixels[:, :, 0]))
+patches["blue_minus_red"] = blue_minus_red
+benchmark = patches[patches["group"] == "benchmark"]
+hospital_5 = patches[patches["group"] == "hospital 5"]
+
+# Gray and orange, so neither group's color looks like a stain color
+plt.hist(benchmark["blue_minus_red"], bins=30, alpha=0.6, density=True, color="#8a8a85", label="benchmark (hospitals 1-3)")
+plt.hist(hospital_5["blue_minus_red"], bins=30, alpha=0.6, density=True, color="#d95926", label="hospital 5")
+plt.xlabel("blue minus red (larger is bluer)")
+plt.legend()
+plt.show()
+
+bluest_benchmark = benchmark["blue_minus_red"].max()
+share_outside = (hospital_5["blue_minus_red"] > bluest_benchmark).mean()
+print(f"Hospital 5 patches bluer than every benchmark patch: {share_outside:.1%}")
+```
+
+About a quarter of hospital 5's patches are bluer than any patch in the benchmark. What can the benchmark tell you about how the model does on those patches?
+
+**Your answer:** TODO
+
+## 4. Reweight to hospital 5's colors
+
+**Why this step:** this is Tuesday's reweighting, with color groups in place of photo types. We can measure hospital 5's colors without anyone labeling a patch. Suppose the model does as well on hospital 5's patches of each color as on the benchmark's patches of the same color. Then hospital 5's accuracy is the benchmark's accuracy in each color group, averaged using hospital 5's shares instead of the benchmark's.
+
+The code below sorts every patch into one of three color groups, with the cuts set so that each group holds a third of the benchmark's patches. Then it builds Tuesday's table. The benchmark's accuracy in each group needs labels; each hospital's share of patches in each group does not. Multiply hospital 5's share by the accuracy in each row and add down the column to get the reweighted estimate.
+
+```{python}
+#| eval: false
+# Cut the blue-minus-red scale at the benchmark's 1/3 and 2/3 points,
+# so each color group holds a third of the benchmark's patches.
+cut_points = np.quantile(benchmark["blue_minus_red"], [1 / 3, 2 / 3])
+names = np.array(["1 least blue", "2 middle", "3 most blue"])
+
+# Use the same cuts to put every patch, at both places, in a color group.
+benchmark_color = names[np.digitize(benchmark["blue_minus_red"], cut_points)]
+hospital_5_color = names[np.digitize(hospital_5["blue_minus_red"], cut_points)]
+
+# Tuesday's table, one row per color group
+rows = []
+for name in names:
+    in_group = benchmark_color == name
+    rows.append({
+        "color group": name,
+        "benchmark accuracy": benchmark["correct"].to_numpy()[in_group].mean(),
+        "benchmark share": np.mean(benchmark_color == name),
+        "hospital 5 share": np.mean(hospital_5_color == name),
+    })
+table = pd.DataFrame(rows)
+table["hospital 5 share x accuracy"] = table["hospital 5 share"] * table["benchmark accuracy"]
+print(table.round(3).to_string(index=False))
+
+# Averaged with the benchmark's own shares, the accuracies give back the benchmark's accuracy.
+print("Benchmark accuracy:", round((table["benchmark share"] * table["benchmark accuracy"]).sum(), 3))
+# Averaged with hospital 5's shares, they give the reweighted estimate.
+print("Reweighted to hospital 5's colors:", round(table["hospital 5 share x accuracy"].sum(), 3))
+```
+
+Most of hospital 5's patches are in the bluest group, yet the estimate hardly moves from the benchmark's. As Tuesday showed, reweighting moves the estimate only as much as color explains accuracy, and the benchmark's accuracy differs by only a few points between the color groups.
+
+Your project starter does the same calculation with two functions. `accuracy_by_group` makes the benchmark's half of the table and adds a Wilson interval for each group's accuracy. `reweight` takes that table and a set of shares, adds up share times accuracy, and also returns a standard error and Kish's effective sample size from Tuesday. Its estimate should match the total above. Because hospital 5 leans so heavily on one group, the benchmark's 900 patches count for far fewer.
+
+```{python}
+#| eval: false
+def accuracy_by_group(groups, correct):
+    """One row per group: cases, the benchmark's share, and accuracy with a Wilson interval."""
+    table = pd.DataFrame({"group": groups, "correct": correct})
+    total = len(table)
+    rows = []
+    for group_name, cases in table.groupby("group"):
+        n = len(cases)                       # cases in this group
+        right = int(cases["correct"].sum())  # cases the model got right
+        low, high = proportion_confint(right, n, method="wilson")
+        rows.append({"group": group_name, "cases": n, "benchmark_share": n / total,
+                     "accuracy": right / n, "ci_low": low, "ci_high": high})
+    return pd.DataFrame(rows).sort_values("accuracy").reset_index(drop=True)
+
+
+def reweight(by_group, shares):
+    """Accuracy for a mix of groups, its standard error, and Kish's effective sample size."""
+    total_share = sum(shares.values())
+    estimate = 0.0
+    variance = 0.0
+    weight_sum = 0.0
+    for _, row in by_group.iterrows():
+        share = shares.get(row["group"], 0.0) / total_share  # shares are rescaled to add to 1
+        p = row["accuracy"]
+        n = row["cases"]
+        estimate = estimate + share * p                   # share times accuracy, added up as in the table
+        variance = variance + share**2 * p * (1 - p) / n  # each group's variance, times its share squared
+        weight_sum = weight_sum + share**2 / n            # used for Kish's effective sample size
+    return estimate, np.sqrt(variance), 1 / weight_sum
+
+
+# The benchmark's accuracy in each color group, with a Wilson interval for each
+by_color = accuracy_by_group(benchmark_color, benchmark["correct"].to_numpy())
+print(by_color)
+
+# Hospital 5's share of patches in each color group, as a dictionary
+hospital_5_shares = {}
+for name in names:
+    hospital_5_shares[name] = np.mean(hospital_5_color == name)
+
+# The same sum as the table, plus a standard error and Kish's effective sample size
+estimate, se, n_eff = reweight(by_color, hospital_5_shares)
+print(f"Reweighted to hospital 5's colors: {estimate:.3f} "
+      f"(95% interval {estimate - 1.96 * se:.3f} to {estimate + 1.96 * se:.3f}), "
+      f"worth about {n_eff:.0f} equally weighted patches")
+```
+
+The patches that are bluer than every benchmark patch landed in "3 most blue." What did the reweighting assume about them?
+
+**Your answer:** TODO
+
+## 5. Instructor run: what hospital 5's labels showed
+
+**Why this step:** only hospital 5's own labels can check the reweighting. We compare hospital 5 with the benchmark twice: on all patches, and on tumor patches alone, because a tumor patch the model misses may never get a closer look. Patches from one slide share a patient and a stain, so they are not independent, and hospital 5 has only 10 slides. As in Week 4, the interval resamples whole slides, not patches.
+
+The function below does the resampling. Each time through the loop, it draws hospital 5's slides with replacement, and separately the benchmark's slides with replacement. It pools the patches on the drawn slides and records hospital 5's accuracy minus the benchmark's. After 4,000 draws, the middle 95% of those differences is the interval.
+
+```{python}
+#| eval: false
+def slide_bootstrap_difference(new, old, B=4000, seed=SEED):
+    """Percentile interval for accuracy(new) - accuracy(old), resampling whole slides in each."""
+    rng = np.random.default_rng(seed)
+    # Keep each slide's patches together: one array of 0s and 1s per slide
+    new_slides = []
+    for _, cases in new.groupby("slide_id"):
+        new_slides.append(cases["correct"].to_numpy())
+    old_slides = []
+    for _, cases in old.groupby("slide_id"):
+        old_slides.append(cases["correct"].to_numpy())
+    differences = []
+    for b in range(B):
+        # Draw as many slides as each place has, with replacement
+        new_pick = rng.integers(0, len(new_slides), len(new_slides))
+        old_pick = rng.integers(0, len(old_slides), len(old_slides))
+        # Pool the patches on the drawn slides and compute each accuracy
+        new_accuracy = np.concatenate([new_slides[i] for i in new_pick]).mean()
+        old_accuracy = np.concatenate([old_slides[i] for i in old_pick]).mean()
+        differences.append(new_accuracy - old_accuracy)
+    # The middle 95% of the 4,000 differences
+    return np.percentile(differences, [2.5, 97.5])
+
+
+# All patches: hospital 5's accuracy, now checked against its own labels
+print(f"Hospital 5 accuracy: {hospital_5['correct'].mean():.3f}")
+low, high = slide_bootstrap_difference(hospital_5, benchmark)
+print(f"Hospital 5 minus benchmark, all patches: "
+      f"{hospital_5['correct'].mean() - benchmark['correct'].mean():+.3f} (95% interval {low:+.3f} to {high:+.3f})")
+
+# The misses that matter most: tumor patches the model calls clear.
+# Among tumor patches only, correct = 1 means the model caught the tumor.
+tumor_5 = hospital_5[hospital_5["label"] == 1]
+tumor_b = benchmark[benchmark["label"] == 1]
+low, high = slide_bootstrap_difference(tumor_5, tumor_b)
+print(f"Tumor patches caught: hospital 5 {tumor_5['correct'].mean():.3f}, benchmark {tumor_b['correct'].mean():.3f}; "
+      f"difference {tumor_5['correct'].mean() - tumor_b['correct'].mean():+.3f} (95% interval {low:+.3f} to {high:+.3f})")
+```
+
+The last step looks at where hospital 5's misses are. It splits hospital 5's patches into two kinds: those inside the benchmark's range of colors, and those bluer than every benchmark patch. For each kind, it counts how often the model was right on tumor and on no-tumor patches, and how many slides the patches come from.
+
+```{python}
+#| eval: false
+# True for each hospital 5 patch that is bluer than every benchmark patch (bluest_benchmark is from part 3)
+is_outside = (hospital_5["blue_minus_red"] > bluest_benchmark).to_numpy()
+is_tumor = (hospital_5["label"] == 1).to_numpy()
+
+rows = []
+for outside, where in [(False, "inside the benchmark's colors"), (True, "bluer than every benchmark patch")]:
+    for tumor, label_name in [(True, "tumor"), (False, "no tumor")]:
+        cases = hospital_5[(is_outside == outside) & (is_tumor == tumor)]
+        rows.append({"hospital 5 patches": where, "label": label_name,
+                     "patches": len(cases),
+                     "model right": int(cases["correct"].sum()),  # for tumor patches, tumors caught
+                     "accuracy": cases["correct"].mean(),
+                     "slides": cases["slide_id"].nunique()})
+print(pd.DataFrame(rows).round(3).to_string(index=False))
+```
+
+**What this shows:** each interval above is for hospital 5's accuracy minus the benchmark's, so a negative number means hospital 5 does worse. The tumor interval lies entirely below zero. At the 95% level, that rules out the model catching tumors as often at hospital 5 as on the benchmark, but how much less often is uncertain, anywhere from almost no difference to about 40 points. The all-patches interval crosses zero. That does not mean the model works as well at hospital 5. The data fit anything from no drop to a drop of about 13 points, and 10 slides cannot tell those apart.
+
+The table shows where the misses are. On hospital 5's patches inside the benchmark's colors, the model caught about 83% of tumors, a little below the benchmark's 89%. On the patches bluer than every benchmark patch, it caught only 6 of 19. Reweighting put those patches in the "3 most blue" group and gave them the benchmark's accuracy for that group, but no benchmark patch looks like them, so the benchmark could not say how the model does on them. Those 19 tumor patches come from only 4 slides, so this is a strong hint, not proof.
+
+## 6. Stop and discuss
+
+1. Reweighting assumed that within each color group, the model does as well on hospital 5's patches as on the benchmark's. In Lecture 9A's terms, why did that conditional not carry over: did something besides color differ, did hospital 5 have patches outside the benchmark's range, or did the labels mean something different? What might differ between the hospitals that our color number does not measure?
+2. The tumor comparison rests on 5 slides with tumor at each place, and the bluest tumor patches come from 4 slides. What would you ask hospital 5 to collect before relying on the model?
+3. In your project: could some of your client's cases be unlike every case in the benchmark? How would you check?
+
+## 7. Handoff
+
+Open your track's starter notebook and go to section 5. The functions `accuracy_by_group` and `reweight` are the ones you just used. Choose a mix for your client, reweight, and draft the population paragraph, then use the rest of class on the Milestone 1 outline in section 6, following the work-session guide.
+
+## Exit ticket
+
+In one or two sentences, tell hospital 5 what the benchmark's 91% means for them: which way it is probably wrong for their slides, and how sure you are.

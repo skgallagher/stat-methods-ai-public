@@ -1,9 +1,24 @@
 {
   "schema_version": 1,
   "release_status": "student_release",
-  "release_id": "spring27-week06-v1",
+  "release_id": "spring27-week09-v1",
   "delivery": "individual files from the public GitHub repository; no ZIP archive",
   "files": [
+    {
+      "path": "camelyon17/patches.csv",
+      "bytes": 64461,
+      "sha256": "437f755febdcadd41c1ca9d692c3a0c38caefe66ed874efbd801ea73ec5efde9"
+    },
+    {
+      "path": "camelyon17/patches.npz",
+      "bytes": 36571928,
+      "sha256": "0d8b3ae777b174df07db5a2ed8ad3a6a755ca2068d4ef6072ceeb76b7510a1b9"
+    },
+    {
+      "path": "camelyon17/release_summary.json",
+      "bytes": 933,
+      "sha256": "8fb973e81526156385d7d37148905458e79deb30eb7817fac8fbbc9f84cf5a18"
+    },
     {
       "path": "camera_traps/image_features.csv",
       "bytes": 14986,

@@ -1,0 +1,487 @@
+---
+title: "Week 9A: Accurate for Whom?"
+subtitle: "When a client's cases differ from the benchmark's"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{python}
+#| include: false
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from PIL import Image
+from statsmodels.stats.proportion import proportion_confint
+
+data_dir = "../../data/course/camera_traps/"
+photos = pd.read_csv(data_dir + "metadata.csv")
+photos = photos.merge(pd.read_csv(data_dir + "model_outputs.csv"), on="image_id")
+photos = photos.merge(pd.read_csv(data_dir + "splits.csv"), on="image_id")
+photos["right"] = (photos["vision_pred"] == photos["animal_present"]).astype(int)
+
+def is_infrared(image_path):
+    # infrared photos are gray: the three color channels are nearly equal
+    pixels = np.asarray(Image.open("../../data/course/" + image_path).convert("RGB")).astype(float)
+    color_spread = np.mean(np.abs(pixels[..., 0] - pixels[..., 1]) + np.abs(pixels[..., 1] - pixels[..., 2]))
+    return int(color_spread < 3)
+
+photos["infrared"] = photos["image_path"].map(is_infrared)
+photos["team"] = photos["split"].isin(["analysis", "holdout_camera"])
+```
+
+## Recap from Weeks 1 and 4 {.smaller}
+
+- MegaDetector sorts camera-trap photos into "animal" and "empty."
+- On the team's nine cameras, it was right on 151 of 162 photos: **93.2%** (95% interval 88% to 96%).
+- On three other cameras (Homework 4), it was right on 38 of 54: **70.4%**.
+- Same model, same task, a 23-point gap. **Accurate on which photos?**
+
+A partner park wants to use MegaDetector on those three cameras. Could the team have warned them before anyone labeled a photo?
+
+::: notes
+About 3 minutes. Week 4 asked how precise each number is. Today asks a different question: accurate on which photos? The team's 162 photos are the analysis and holdout_camera splits (Lab 1's analysis cameras plus the lab's held-out cameras); the partner's 54 are the homework_holdout cameras from Homeworks 1 and 4. Students who remember Homework 4 know the 70%. Good: today is about whether anything short of labeling the partner's photos could have predicted it. Wilson for 151/162: [0.883, 0.962]; for 38/54: [0.572, 0.809].
+:::
+
+## Today: three questions {.smaller}
+
+1. **Which population does a benchmark score describe?**
+2. **How do we estimate the partner's accuracy from what we can see?**
+3. **What does conditioning miss, and what do we tell the partner?**
+
+Thursday you take the same three steps on your own project.
+
+::: notes
+About 1 minute. Question 1: we write accuracy as an average over a population of photos, so the team and the partner each have their own, and see why more of the team's photos would not close the gap. Question 2: we condition on something we can measure without labels, keep the team's accuracy within each value, average with the partner's mix, put an interval on the result, and count how many photos it really rests on. Question 3: we look at the partner's mistakes, name what the conditioning left out, match it to machine learning's names for these changes, and write a sentence that tells the client which way the error probably goes. Checkpoint 7 follows the same order, and everything it asks is in today's lecture.
+:::
+
+# Question 1: which population does a benchmark score describe?
+
+## Accuracy is an average over a population {.smaller}
+
+For a photo $X$ with label $Y$, and MegaDetector's answer $f(X)$:
+
+$$C = \mathbf 1\{f(X) = Y\}, \qquad \theta = P(C = 1) = E[C].$$
+
+- $\theta$ is defined for a population of photos.
+- The team's photos and the partner's photos come from different populations, each with its own joint distribution of $(X, Y)$.
+- So there are two accuracies, $\theta_{\text{team}}$ and $\theta_{\text{partner}}$. The team's benchmark estimates only the first.
+
+::: notes
+About 2 minutes. $C$ depends on both the photo and its label, so its distribution comes from the joint distribution of $(X, Y)$. Week 6 said the same of calibration: it belongs to a model and a population together. Write $\theta = E[C]$ on the board and leave it up.
+:::
+
+## The partner's photos differ from the team's {.smaller .compact-table}
+
+| | The team's photos | The partner's photos |
+|---------------------------|---:|---:|
+| Cameras | 9 | 3 different ones |
+| Photos (bursts of three) | 162 (54 bursts) | 54 (18 bursts) |
+| Infrared photos, taken in low light | 56% | 28% |
+| Places and backgrounds | the team's sites | new sites |
+
+- All of this is visible before anyone labels a photo.
+- Infrared photos are black and white, and the model sees them differently from color photos.
+
+::: notes
+About 2 minutes. The partner's photos are mostly color. Infrared share: team 90 / 162, partner 15 / 54. Both sets are half animal bursts and half empty ones, because the course subset was built that way; a real park's mix of animal and empty photos would differ, and we come back to that.
+:::
+
+## Metadata are measurements too {.smaller .compact-table}
+
+Compare the `day_night` column with the photos themselves:
+
+| `day_night` says | Color photo | Infrared photo |
+|---|---:|---:|
+| day | 102 | **27** |
+| night | **9** | 78 |
+
+- 21 of the 27 infrared "day" photos are stamped in the 12 o'clock hour: most likely just after midnight, stored as noon.
+- A model sees pixels, so we take the variable to condition on from the photo itself, not from the clock.
+
+::: notes
+About 3 minutes. Six more of the infrared "day" photos are early-morning photos taken in low light. Infrared is detected from the pixels: an infrared photo's three color channels are nearly equal (average channel difference under 3, against at least 4.6 for every color photo, so the split is clean). The 9 "night" photos in color were stamped at 3 am, 6 pm, and 7 pm; some cameras use a color flash, and 6 to 7 pm can still be light. This is a real error in the source timestamps, found Oct 6. Your project's metadata deserve the same check against the cases themselves.
+:::
+
+## Conditioning on what we can see {.smaller}
+
+Let $Z$ be something we can measure on every photo without a label: color or infrared. By the law of total expectation,
+
+$$\theta = E[C] = \sum_k \underbrace{P(Z = k)}_{\text{marginal of } Z}\;\underbrace{P(C = 1 \mid Z = k)}_{\text{conditional accuracy}}.$$
+
+$$\theta_{\text{team}} = \sum_k b_k\, p_k^{\text{team}}, \qquad \theta_{\text{partner}} = \sum_k c_k\, p_k^{\text{partner}}.$$
+
+- The team knows its own $b_k$ and $p_k^{\text{team}}$.
+- It can see the partner's marginal $c_k$ without labeling anything.
+- It cannot see the partner's conditional $p_k^{\text{partner}}$ without labels.
+
+::: notes
+About 3 minutes. The two accuracies can differ because the marginals differ ($c_k \ne b_k$), because the conditionals differ ($p_k^{\text{partner}} \ne p_k^{\text{team}}$), or both. Write both sums on the board and leave them up all lecture. This is Week 2's move of conditioning on $X$, now with $Z$, a coarse summary of the photo that needs no label.
+:::
+
+## More of the team's photos would not close the gap {.smaller}
+
+$$\text{mean squared error} = \text{bias}^2 + \text{variance}$$
+
+- With 1,600 of the team's photos instead of 162, the interval around 93% would be about a third as wide.
+- It would still be an interval around $\theta_{\text{team}}$.
+- More of the team's data lowers the variance, not the bias: a precise estimate of the wrong number.
+- To learn about the partner, we need the partner's marginal of $Z$, and ideally some of its photos labeled.
+
+::: notes
+About 2 minutes. Ten times the photos shrinks the standard error by a factor of about $\sqrt{10} \approx 3.2$. Homework 1, Problem 1(d), split prediction error the same way. The sentence to leave them with: a precise estimate of the wrong thing.
+:::
+
+# Question 2: estimating the partner's accuracy from what we can see
+
+## Reweighting keeps the conditional and swaps the marginal {.smaller .compact-table}
+
+**Assume** the conditional carries over, $p_k^{\text{partner}} = p_k^{\text{team}}$. Then
+
+$$\hat\theta_{\text{partner}} = \sum_k c_k\, \hat p_k^{\text{team}}.$$
+
+| Type of photo, $k$ | Team's accuracy, $\hat p_k$ | Team's share $b_k$ | Partner's share $c_k$ | $c_k\, \hat p_k$ |
+|--------------|--------------------:|---------:|---------:|---------:|
+| Color | 69/72 = 0.958 | 0.444 | 0.722 | 0.692 |
+| Infrared | 82/90 = 0.911 | 0.556 | 0.278 | 0.253 |
+| Total | | | 1.00 | **0.945** |
+
+- Reweighted: **94.5%**, slightly above the team's 93.2%, because the partner has fewer infrared photos, which are harder.
+- Nobody labeled anything new.
+
+::: notes
+About 4 minutes. In words, the assumption is that MegaDetector does as well on the partner's color photos as on the team's, and likewise for infrared. Do the products on the board. Unrounded: 0.7222 × 0.9583 + 0.2778 × 0.9111 = 0.6921 + 0.2531 = 0.9452. Check that the team's own shares give back 93.2%: 0.444 × 0.958 + 0.556 × 0.911 = 0.932. The assumption is the slide's first line. Question 3 comes back to it.
+:::
+
+## How much does infrared explain? {.smaller}
+
+$$\operatorname{Var}(C) = \underbrace{E[\operatorname{Var}(C \mid Z)]}_{\text{within types}} + \underbrace{\operatorname{Var}(E[C \mid Z])}_{\text{between types}}$$
+
+- On the team's photos, the between-types part is 0.00055 out of 0.063, under 1%.
+- Infrared explains almost none of the variation in whether MegaDetector is right, so changing its mix barely moves the accuracy:
+
+$$\theta_{\text{reweighted}} - \theta_{\text{team}} = (c_{\text{color}} - b_{\text{color}})(p_{\text{color}} - p_{\text{infrared}}) = 0.278 \times 0.047 = 0.013.$$
+
+- Reweighting matters when $Z$ explains much of the variation **and** its marginal changes a lot.
+
+::: notes
+About 4 minutes. This is Week 2's law of total covariance with both measurements equal to $C$. $\text{Var}(C) = 0.932 \times 0.068 = 0.0633$. Between: $0.444 \times (0.958 - 0.932)^2 + 0.556 \times (0.911 - 0.932)^2 = 0.00055$, or 0.87%. Within: $0.444 \times 0.958 \times 0.042 + 0.556 \times 0.911 \times 0.089 = 0.0627$. The mix changed by 28 points, but accuracy differs by only 5 points between the types. The two-group identity follows from writing both sums with the same $p_k$ and using $c_{\text{infrared}} = 1 - c_{\text{color}}$. For the project, the Food and Pet tracks have much larger differences in accuracy between classes, so their groups explain more and reweighting will matter more there. Do not say so on the slide; let teams find it.
+:::
+
+## Reweighting is a prediction from a model {.smaller}
+
+Fit $\hat m(z) = \widehat E_{\text{team}}[C \mid Z = z]$ on the team's photos, then average it over the partner's photos:
+
+$$\hat\theta_{\text{partner}} = \frac{1}{n_{\text{partner}}} \sum_{j\,\in\,\text{partner}} \hat m(z_j) = \sum_k c_k\, \hat p_k.$$
+
+- With two types, $\hat m$ is the two cell means, 0.958 and 0.911. With a measured $Z$, it could be a regression of $C$ on $Z$.
+- It fails the way any regression prediction fails:
+    - **An omitted variable:** something else affects $C$ and differs between the populations at the same $Z$.
+    - **Extrapolation:** the partner has values of $Z$ the team never saw.
+
+::: notes
+About 3 minutes. Epidemiologists call this direct standardization: death rates within age groups, averaged over one standard age mix. Survey statisticians call it post-stratification. With a measurement like how blue a tissue patch is (Lab 9), $\hat m$ could be a logistic regression of $C$ on $Z$. The same estimate is a weighted average of the team's photos, each weighted by $c_k / b_k$: 1.625 for a color photo and 0.5 for an infrared one. Machine learning calls these importance weights. The two failure modes are the ones students know from regression, omitted-variable bias and predicting outside the range of $x$. Question 3 finds both.
+:::
+
+## How precise is the reweighted estimate? {.smaller}
+
+$$\text{SE}(\hat\theta_{\text{partner}}) = \sqrt{\sum_k c_k^2\, \frac{\hat p_k(1 - \hat p_k)}{n_k}} = 0.019$$
+
+- Each $\hat p_k$ is a proportion from its own photos (Week 4), so the variances add, each times its squared weight.
+- That treats the photos as independent, but the three photos in a burst share an animal and a moment.
+- Resampling whole bursts within each type: SE 0.024, 95% interval **89% to 98%**.
+
+::: notes
+About 3 minutes. $\text{Var}(\hat p_k) = p_k(1 - p_k)/n_k$. Independent-photo interval: 0.945 ± 0.037, or 90.8% to 98.2%. Burst bootstrap: resample the 24 color bursts and 30 infrared bursts separately (no burst mixes the two types), seed 2027, 4,000 resamples: SE 0.0239, percentile interval [0.893, 0.985]. The interval runs into the ceiling because accuracy is near 1; Week 4's boundary problem again.
+:::
+
+## Only part of the team's photos count {.smaller}
+
+Each of the team's photos gets a weight from the partner's mix: $w = 0.722/72$ for a color photo, $0.278/90$ for an infrared one.
+
+$$n_{\text{eff}} = \frac{\left(\sum_i w_i\right)^2}{\sum_i w_i^2} = \frac{1}{\sum_k c_k^2 / n_k} = 123$$
+
+- Kish's **effective sample size**: uneven weights make the 162 photos worth about 123, and bursts cost more on top of that.
+- Conditioning on more variables explains more, but each cell holds fewer photos and $n_{\text{eff}}$ falls: the bias–variance trade-off again.
+- Week 4's design effect is the same idea, $n / n_{\text{eff}}$: there the loss came from clusters, here from weights.
+
+::: notes
+About 3 minutes. Infrared photos count for less, because the partner has fewer of them. $n_{\text{eff}}$ is the number of equally weighted photos that would give the same precision. 1 / (0.7222²/72 + 0.2778²/90) = 1 / (0.007244 + 0.000857) = 123.4. Check: sqrt(0.945 × 0.055 / 123.4) = 0.0205, close to the exact 0.0189. Kish (1965), Survey Sampling. The project lesson: when the client leans on a group the benchmark has few of, the benchmark is smaller than it looks.
+:::
+
+## Check {.smaller}
+
+A benchmark has 400 easy cases, where a model is right 90% of the time, and 100 hard ones, where it is right 60% of the time. A client's cases are 70% easy and 30% hard.
+
+1. What is the model's accuracy on the benchmark? For the client?
+2. What is the standard error of the client's estimate?
+
+::: {.fragment}
+1. Benchmark: $(360 + 60)/500 = 0.84$. Client: $0.7 \times 0.90 + 0.3 \times 0.60 = 0.81$.
+2. $\sqrt{0.7^2 \times 0.90 \times 0.10 / 400 + 0.3^2 \times 0.60 \times 0.40 / 100} = \sqrt{0.00011 + 0.00022} = 0.018$, about ±3.5 points.
+:::
+
+::: notes
+About 3 minutes. Unrounded: 0.00011025 + 0.000216 = 0.00032625, SE 0.0181. Point out that the 100 hard cases contribute two-thirds of the variance even though they are a fifth of the benchmark: the client weights them more, and there are fewer of them.
+:::
+
+## Conditioning on the right answer {.smaller .compact-table}
+
+$Z$ can also be the right answer, $Y$:
+
+$$\theta = P(Y = \text{empty})\,P(C = 1 \mid \text{empty}) + P(Y = \text{animal})\,P(C = 1 \mid \text{animal})$$
+
+| Population | Share of empty photos | Accuracy |
+|---|---:|---:|
+| The team's photos | 50% | 93.2% |
+| A park whose photos are mostly wind triggers | 80% | $0.8 \times 0.963 + 0.2 \times 0.901 = 95.1\%$ |
+| A feeding station | 20% | $0.2 \times 0.963 + 0.8 \times 0.901 = 91.4\%$ |
+
+- The conditional accuracy within a right answer is that class's recall (Week 3): 96.3% for empty, 90.1% for animal.
+- **Assume** $P_{\text{client}}(C = 1 \mid Y) = P_{\text{team}}(C = 1 \mid Y)$.
+
+::: notes
+About 3 minutes. Our photos are half empty only because the course subset was built that way, as Week 3's balanced samples were. Team counts: empty 78/81, animal 73/81. The client's share of empty photos has to come from somewhere: labels, or an estimate from the model's own predictions corrected with its error rates (Saerens et al. 2002; Lipton et al. 2018), only if asked. The wildlife team cares most about missed animals: the share of animal photos missed (9.9%) does not change with the mix, but the number of missed animals per thousand photos does.
+:::
+
+## Whole cameras or photos within cameras? {.smaller}
+
+- **A question about the team's own nine cameras:** the cameras are fixed groups, so resample bursts within each camera.
+- **A question about new cameras:** the team's nine are a sample of cameras, so resample **whole cameras**, as Week 5 resampled whole tasks. That gives 90% to 97% for a camera like the team's.
+- The population the question is about decides. Your project needs the same choice for its groups.
+
+::: notes
+About 2 minutes. Camera bootstrap of the team's 162 photos (nine cameras, seed 2027, 4,000 resamples): SE 0.019, percentile interval [0.895, 0.969]. Even allowing for how much the team's cameras differ from each other, 70% is far outside. That sets up the next section: the partner's cameras are not like the team's.
+:::
+
+# Question 3: what conditioning misses
+
+## Accuracy at each camera {.smaller}
+
+```{python}
+#| fig-width: 10
+#| fig-height: 3.9
+rows = []
+for camera, group in photos.groupby("camera_id"):
+    right = group["right"].sum()
+    n = len(group)
+    low, high = proportion_confint(right, n, method="wilson")
+    rows.append({"camera": camera, "team": group["team"].iloc[0], "accuracy": right / n, "low": low, "high": high})
+by_camera = pd.DataFrame(rows).sort_values("accuracy").reset_index(drop=True)
+
+fig, ax = plt.subplots(figsize=(10, 3.9))
+for i, row in by_camera.iterrows():
+    color = "#155a8a" if row["team"] else "#b54708"
+    ax.errorbar(i, row["accuracy"], yerr=[[row["accuracy"] - row["low"]], [row["high"] - row["accuracy"]]],
+                fmt="o", color=color, ecolor=color, capsize=3, markersize=7)
+ax.axhline(0.945, linestyle="--", color="#667085", linewidth=1)
+ax.text(-0.4, 0.935, "reweighted estimate: 94.5%", color="#667085", fontsize=12, va="top")
+ax.text(1, 0.36, "partner's cameras", color="#b54708", fontsize=13, ha="center")
+ax.text(7.5, 0.36, "team's cameras", color="#155a8a", fontsize=13, ha="center")
+ax.set_xticks([])
+ax.set_xlim(-0.6, len(by_camera) - 0.4)
+ax.set_ylim(0.3, 1.05)
+ax.set_xlabel("camera (18 photos each), sorted by accuracy", fontsize=13)
+ax.set_ylabel("MegaDetector's accuracy", fontsize=13)
+ax.tick_params(labelsize=11)
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+- On the partner's 54 labeled photos: **70.4%**, not 94.5%. All three partner cameras are below all nine of the team's.
+- Reweighting on infrared did not predict this.
+
+::: notes
+About 3 minutes. Per camera (out of 18): partner 12, 13, 13; team 15, 16, 16, 16, 17, 17, 18, 18, 18. Each interval is a Wilson interval on 18 photos, which treats the photos as independent; with bursts, the honest intervals are wider. Ask: what could make every new camera worse?
+:::
+
+## Look at the partner's mistakes {.smaller}
+
+```{python}
+#| fig-width: 10.5
+#| fig-height: 3.1
+examples = [
+    ("cct0200", "labeled animal (fox):\nsecond photo of the burst"),
+    ("cct0180", "labeled animal (bird):\nthird photo of the burst"),
+    ("cct0193", "labeled empty:\nsomething at the lens"),
+    ("cct0181", "labeled empty:\na streak across the frame"),
+]
+fig, axes = plt.subplots(1, 4, figsize=(10.5, 3.1))
+for ax, (image_id, caption) in zip(axes, examples):
+    path = photos.loc[photos["image_id"] == image_id, "image_path"].iloc[0]
+    ax.imshow(Image.open("../../data/course/" + path))
+    ax.set_title(caption, fontsize=12)
+    ax.axis("off")
+plt.tight_layout(pad=0.3)
+plt.show()
+```
+
+- 16 mistakes on the partner's 54 photos.
+- 7 of the 8 missed animals are the second or third photo of a burst, after the animal left. The label describes the whole burst.
+- Several of the 8 false alarms show something blurred at the lens or moving through, and the labeler called the burst empty.
+
+::: notes
+About 4 minutes. Show each photo and ask the room: is MegaDetector wrong here? The fox burst (cct0199–0201): the tail is visible at the left edge of the first photo, and the next two show bare ground. The bird burst (cct0178–0180): the bird is on the slope in the first photo and gone in the next two. Lab 4 found the same burst-label pattern on the team's cameras, but less often. Whether the blurred close-ups are animals is unclear even to a person; that is the point. The other false alarms include two tree photos at camera 3 (cct0163, cct0164) with nothing visible.
+:::
+
+## What conditioning on infrared missed {.smaller}
+
+As in Week 2, write $C = g(Z, U)$, where $U$ is everything else that matters. Reweighting assumed
+
+$$P_{\text{partner}}(C = 1 \mid Z) = P_{\text{team}}(C = 1 \mid Z),$$
+
+which holds when the distribution of $U$ given $Z$ is the same in both populations. It was not:
+
+1. **An omitted variable.** New backgrounds, vegetation, and camera placement. Infrared or color captures none of it.
+2. **No overlap.** The camera matters most, and none of the partner's cameras is among the team's nine.
+3. **The label means something different.** A photo the animal has left still counts as "animal."
+
+The team's photos could not show any of these.
+
+::: notes
+About 4 minutes. Points 1 and 2 are the two failures from "Reweighting is a prediction from a model": an omitted variable and extrapolation. With no overlap in the camera, there is nothing to condition on. Point 3 is Week 2's lesson that a label is the output of a protocol: the label describes the whole burst, and at the partner's cameras the label and the photo disagree more often. All three live in the partner's photos and labels, which is why only the partner's labels could reveal them. Part of the 23-point gap is MegaDetector, and part is the labeling protocol meeting new cameras; with 54 photos we cannot say how much of each. MegaDetector was partly trained on Caltech Camera Traps (the data README says so), so neither set is a clean outside test, but that is true of both sets and does not explain the gap.
+:::
+
+## The machine-learning names {.smaller .compact-table}
+
+The joint distribution of a photo $X$ and its label $Y$ factors two ways:
+
+$$P(X, Y) = P(X)\,P(Y \mid X) = P(Y)\,P(X \mid Y).$$
+
+| Name | What changes | What stays the same | Camera-trap example |
+|---|---|---|---|
+| Covariate shift | $P(X)$, the photos | $P(Y \mid X)$ | More color photos; new backgrounds |
+| Label shift | $P(Y)$, the right answers | $P(X \mid Y)$ | A park with mostly empty photos |
+| Concept shift | $P(Y \mid X)$, what a label means | — | Bursts the animal has left |
+
+- Reweighting on $Z$ fixes covariate shift only if $Z$ captures the whole change. New backgrounds are covariate shift that infrared misses.
+- Reweighting on $Y$ fixes label shift.
+- Only the client's labels reveal concept shift.
+
+::: notes
+About 3 minutes. Machine-learning papers name a change by which piece of the joint moves. "Captures the whole change" means $P(X \mid Z)$ is the same in both populations, so the only thing that moved is the marginal of $Z$. Real changes mix all three; name the one that most threatens the decision. A test for concept shift: if the client labeled its photos today under the benchmark's rules, would the same photo get the same label? If yes, it is not concept shift, however different the photos look. New backgrounds pass the test, so they are covariate shift that $Z$ did not capture; Lab 9's bluer stains are the same case. A change over time after deployment is often called data drift.
+:::
+
+## Telling the populations apart is not measuring the drop {.smaller}
+
+- A classifier that tells the benchmark's photos from the client's shows that $P(X)$ differs.
+- It says nothing about $P(C = 1 \mid X)$, so it cannot say how much accuracy changes, or why.
+- Here it would succeed almost perfectly: every camera has its own fixed background.
+- Photos that look alike can still differ in accuracy, for example when they were labeled under different rules.
+- **Measuring a drop in accuracy takes labels.**
+
+::: notes
+About 2 minutes. The partner's backgrounds would be just as easy to spot if MegaDetector did as well on them as on the team's. The classifier is still useful: the client photos it is surest are unlike the benchmark's are good ones to label first.
+:::
+
+## Check {.smaller}
+
+A classifier tells benchmark photos from a client's photos with 80% accuracy, where 50% would be chance. Which statement does this support?
+
+A. The model's accuracy on the client's photos is lower.<br>
+B. The two sets of photos differ in a way the classifier can detect.<br>
+C. Reweighting by the classifier's output will give the client's accuracy.<br>
+D. The benchmark's labels are wrong.
+
+::: {.fragment}
+**B.** The classifier shows only that the photos differ, that is, that $P(X)$ differs. A and C need labels from the client or an assumption, and D does not follow.
+:::
+
+::: notes
+About 2 minutes.
+:::
+
+## Checking takes labeled photos from enough cameras {.smaller}
+
+$$n \approx \frac{1.96^2 \times 0.70 \times 0.30}{0.05^2} \approx 320 \text{ independent photos for } \pm 5 \text{ points}$$
+
+- The partner's 54 photos are 18 bursts from 3 cameras: 95% interval 57% to 81% if independent, **56% to 85%** resampling bursts.
+- Bursts raise the 320 further, by Week 4's design effect.
+- Spread the photos over **all** of the partner's cameras, because cameras differ more than photos within a camera.
+- Agree first on how to label bursts and blurred close-ups.
+
+::: notes
+About 3 minutes. Without agreed labeling rules, the new labels will measure something different. Burst bootstrap of the partner's 18 bursts (seed 2027, 4,000 resamples): SE 0.078, percentile interval [0.556, 0.852]. Exact sample size 322.7. With Lab 4's design effect of about 1.8, roughly 580 photos.
+:::
+
+## Give the bias a direction {.smaller}
+
+A weak sentence:
+
+> Your cameras might differ from ours, so the accuracy could change.
+
+A strong one:
+
+> MegaDetector's 93% describes our nine cameras. Reweighted to your mix of color and infrared photos, it predicts 94%, but only if it does as well on your cameras as on ours. On the 54 photos you labeled, it was right on 70% (95% interval 56% to 85%). Many of its mistakes are photos where the label and the photo disagree, so part of the gap is how bursts and close-ups are labeled. Before relying on it, label bursts from all of your cameras under rules we agree on.
+
+- The strong version names both populations, the gap, the assumption, the direction, and what would settle it.
+
+::: notes
+About 3 minutes. Read the strong version aloud and ask what each sentence does. "The direction is unknown" is fine if you say why. This is the paragraph Thursday's lab asks each team to draft for its own track.
+:::
+
+## Check {.smaller}
+
+A speech-to-text system's benchmark is 80% studio recordings and 20% phone calls. It gets 95% of words right in studio recordings and 80% in phone calls. A call center's audio is almost all phone calls.
+
+1. Is the benchmark's accuracy likely too high or too low for the call center?
+2. Give one reason the direction could still be wrong, or the size of the gap could be.
+
+::: {.fragment}
+1. Too high. The benchmark's accuracy is $0.8 \times 0.95 + 0.2 \times 0.80 = 0.92$. If 95% of the call center's audio is phone calls, reweighting gives $0.05 \times 0.95 + 0.95 \times 0.80 \approx 0.81$.
+2. The call center's calls may differ from the benchmark's calls: other phone lines, accents, background noise, or vocabulary. Then the 80% within phone calls does not carry over.
+:::
+
+::: notes
+About 3 minutes. Exact: 0.0475 + 0.76 = 0.8075. Either reason in part 2 earns credit; the best answers name it as a change in the conditional accuracy within phone calls, the partner-camera lesson in a new setting.
+:::
+
+## Your project has groups too {.smaller .compact-table}
+
+| Track | Groups in the data | Reweighting by |
+|---|---|---|
+| Food tagging | dish | the right answer |
+| Pet tagging | breed | the right answer |
+| Human preferences | subreddit (`domain`) | the type of case |
+| Instruction following | type of instruction (`constraint_family`) | the type of case |
+
+- Your groups are your $Z$. Your client probably has a different mix of them than the benchmark does.
+- Thursday you choose a mix for your client and reweight your AI system's accuracy to it.
+- The Project Description, Section 3, says where the two populations and the direction of the difference go in Milestone 1.
+
+::: notes
+About 2 minutes. Do not tell teams what their client's mix is; choosing and defending it is part of their Introduction. The Food and Pet tracks group by the right answer (dish, breed), like the empty-photo slide; the two text tracks group by type of case, like color and infrared.
+:::
+
+## What we did today {.smaller}
+
+1. Accuracy is $E[C]$ over a population: the marginal of $Z$ times the conditional accuracy, summed.
+2. More benchmark data narrows the interval around the benchmark's accuracy, not the client's.
+3. Reweighting keeps the conditional and swaps the marginal. It moves the estimate only as much as $Z$ explains accuracy.
+4. It is a prediction from a model of $E[C \mid Z]$, with Week 4's standard error and Kish's effective sample size.
+5. It fails when something besides $Z$ differs, the client has cases the benchmark lacks, or labels mean something else: 94% predicted, 70% observed.
+6. Telling two populations apart compares marginals, not accuracy.
+7. Tell the client the direction of the error, the assumption, and what would settle it.
+
+::: notes
+About 2 minutes.
+:::
+
+## Thursday, and reading {.smaller}
+
+- **Thursday:** a short introduction to Milestone 1, then Lab 9 together (a tumor model built at three hospitals goes to a new one), then your team reweights its AI system's accuracy to one client mix.
+- **Checkpoint 7** covers this week's two lectures. It opens after Thursday's class and is due Tue Mar 23, the same day as **Milestone 1**.
+- **Reading:** Recht, Roelofs, Schmidt, and Shankar (2019), ["Do ImageNet Classifiers Generalize to ImageNet?"](https://proceedings.mlr.press/v97/recht19a.html), Sections 1 and 2. As you read, ask which part of the joint distribution changed: the images, the right answers, or what the labels mean.
+
+::: notes
+About 2 minutes. The authors built a new test set by following the original ImageNet recipe as closely as they could, and every model they tested did worse on it. Check the paper's numbers before quoting any in class. Its abstract reports the size of the accuracy drop on the new CIFAR-10 and ImageNet test sets; the discussion point is that even a careful copy of the sampling recipe changed the population, the image version of the partner's cameras.
+:::

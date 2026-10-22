@@ -26,7 +26,7 @@ DATA_GROUPS = {
     "04": ["camera_traps"],
     "05": ["llm_bbh"],
     "06": ["llm_bbh"],
-    "09": ["cfpb"],
+    "09": ["camelyon17"],
     "10": ["cfpb"],
     "11": ["designed_eval"],
     "12": ["designed_eval"],

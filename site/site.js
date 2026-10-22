@@ -41,6 +41,7 @@ function link(item) {
 }
 
 function linkList(items) {
+  if (!items) return "";
   return items.map(link).join(" · ");
 }
 
