@@ -1,0 +1,298 @@
+---
+title: "Lab 11: Designing an Evaluation with Repeated Answers"
+subtitle: "Week 11 · Designed AI evaluations, with a language model's answers to GSM8K math problems"
+format: html
+---
+
+## The situation
+
+A tutoring nonprofit is building a homework helper for middle-school math word problems. It would run Llama 3 8B Instruct, an open model, on its own server. Like most chat apps, the helper samples its answers (at temperature 0.6), so asking the same problem twice can give two different answers. Before the nonprofit commits, it wants to know how often an answer is right, and how to spend the roughly 1,200 model calls its server can run for a check before the semester starts.
+
+The problems come from [GSM8K](https://huggingface.co/datasets/openai/gsm8k) ([Cobbe et al. 2021](https://arxiv.org/abs/2110.14168)), a benchmark of 8,792 grade-school math word problems written by people OpenAI hired, 7,473 for training and 1,319 for testing. Each problem takes two to eight steps of ordinary arithmetic, and each comes with a worked solution that ends in a single number. Model developers often report a GSM8K score as a check on whether a model can carry out a short chain of reasoning. [Brown et al. (2024)](https://arxiv.org/abs/2407.21787) drew 127 problems at random from the test set and asked Llama 3 8B Instruct each one 10,000 times. An answer counts as right if its final number matches the answer key. The 127 problems are GSM8K's, not the nonprofit's students' homework, so keep Week 9 in mind when you say who the numbers are about.
+
+Weeks 4 and 5 treated each question as answered once. Lecture 11A asked what changes when a model's answers vary: an evaluation then has two sample sizes, how many problems and how many answers to each, and you choose both. Today you plan the nonprofit's check with real answers. In Lecture 11A's terms the check is an experiment: the unit is a problem, its answers are the replicates, and in part 5 the treatment is the model, with each problem a block.
+
+## 1. Instructor run: look at the answers
+
+**Why this step:** before any standard error, look at what varies. Start with one problem the model gets right about half the time, then look at all 127.
+
+```{python}
+#| eval: false
+gsm_dir = data_dir / "llm_gsm8k"
+problems = pd.read_csv(gsm_dir / "problems.csv", dtype={"answer": str, "most_common_wrong_8b": str})
+texts = pd.read_csv(gsm_dir / "answer_texts.csv", dtype={"final_answer": str})
+correct = np.load(gsm_dir / "correct.npz")
+right_8b = correct["llama3_8b"]   # 127 problems by 10,000 answers, True where the answer is right
+n_problems, n_answers = right_8b.shape
+print(f"{n_problems} problems, {n_answers:,} answers to each")
+
+# One problem: the popcorn problem
+popcorn = problems[problems["question"].str.contains("popcorn")].iloc[0]
+print()
+print(popcorn["question"])
+print("Answer key:", popcorn["answer"])
+print(f"Right: {popcorn['right_8b']:,} of {n_answers:,} answers")
+print(f"Most common wrong answer: {popcorn['most_common_wrong_8b']} ({popcorn['most_common_wrong_count_8b']:,} answers)")
+for _, row in texts[texts["problem_id"] == popcorn["problem_id"]].iterrows():
+    print("\n--- a", "right" if row["correct"] else "wrong", "answer ---")
+    print(row["text"])
+```
+
+For problem $i$, write $p_i$ for the share of its 10,000 answers that are right. It is, to within about a point, the probability that one sampled answer to problem $i$ is right. The model's accuracy $\theta$ is the average of the $p_i$: the probability that one answer to a problem drawn at random from the 127 is right. Machine learning calls this pass@1.
+
+```{python}
+#| eval: false
+# Each problem's accuracy: the share of its 10,000 answers that are right
+p = right_8b.mean(axis=1)
+plt.hist(p, bins=np.linspace(0, 1, 21), color="#5b8db8", edgecolor="white")
+plt.xlabel("share of the problem's 10,000 answers that are right")
+plt.ylabel("problems")
+plt.show()
+
+print(f"Right at least 90% of the time: {np.sum(p >= 0.9)} problems")
+print(f"Right at most 10% of the time:  {np.sum(p <= 0.1)} problems")
+print(f"In between:                     {np.sum((p > 0.1) & (p < 0.9))} problems")
+print(f"Accuracy, the average over the {n_problems} problems: {p.mean():.3f}")
+```
+
+Compare the right and the wrong popcorn answers. At which step does the wrong answer go wrong, and what did it misread? Then use the histogram: what does the sentence "the model is right 77% of the time" hide?
+
+**Your answer:** TODO
+
+## 2. Ten answers to each problem
+
+**Why this step:** before the semester, the nonprofit would check the model the way its app will use it: ask it each test problem several times and grade every answer. We can act out that check without running the model. Brown et al. stored 10,000 answers to each of the 127 problems, so for each problem we pick 10 of its stored answers at random, as if the model had been asked that problem 10 times. That gives $127\times10=1{,}270$ graded answers.
+
+How precise is the accuracy from those 1,270 answers? The quick calculation treats them as 1,270 separate cases, as a report that pools every answer would. But the 10 answers to one problem are alike. On an easy problem the model gets nearly all 10 right, and on a hard one, like the popcorn problem, it misses often. So 10 answers to one problem tell you less than one answer to each of 10 problems.
+
+This is the clustering from Lecture 4B, where questions about one reading passage tended to be right or wrong together. Here each problem is a cluster, and its 10 answers are the items in it. To respect the clusters, make the problem the unit: average each problem's 10 answers, which gives 127 numbers, one per problem, and compute the standard error from those 127 numbers, so the sample size is 127.
+
+```{python}
+#| eval: false
+rng = np.random.default_rng(SEED)
+r = 10   # answers per problem
+
+# For each problem, pick 10 of its 10,000 stored answers at random,
+# as if the model had been asked that problem 10 times.
+draws = np.array([rng.choice(n_answers, size=r, replace=False) for _ in range(n_problems)])
+sample = np.take_along_axis(right_8b, draws, axis=1)   # 127 problems by 10 answers, True where right
+theta_hat = sample.mean()
+print(f"{n_problems} problems x {r} answers = {sample.size:,} answers, {theta_hat:.3f} of them right")
+
+# Standard error 1: as if the 1,270 answers were 1,270 independent cases
+se_answers = np.sqrt(theta_hat * (1 - theta_hat) / sample.size)
+
+# Standard error 2: the problem as the unit. Average each problem's 10 answers (127 numbers),
+# then divide the SD of those 127 averages by the square root of 127.
+problem_means = sample.mean(axis=1)
+se_problems = problem_means.std(ddof=1) / np.sqrt(n_problems)
+
+print(f"SE as if the answers were independent: {se_answers:.4f}")
+print(f"SE with the problem as the unit:       {se_problems:.4f} ({se_problems / se_answers:.1f} times larger)")
+```
+
+The **design effect** from Lecture 4B and Lab 4 measures how much the clusters cost. It is how many times larger the variance is than it would be if the items were independent, here the square of the ratio of the two standard errors. Dividing the number of items by it gives the **effective sample size**: how many independent answers would give the same precision. In Lecture 4B, 400 questions on 100 passages, with a design effect of 1.6, were worth about 250 independent questions.
+
+```{python}
+#| eval: false
+design_effect = (se_problems / se_answers) ** 2
+print(f"Design effect: {design_effect:.1f}")
+print(f"Effective sample size: {sample.size:,} / {design_effect:.1f} = about {sample.size / design_effect:.0f} independent answers")
+```
+
+Why are 10 answers to one problem worth less than one answer to each of 10 problems? Use an easy problem and the popcorn problem in your answer. How many independent answers are the 1,270 worth?
+
+**Your answer:** TODO
+
+## 3. Two sources of variation
+
+**Why this step:** the gap between the two standard errors comes from the law of total variance (Week 9), with the problem as $Z$. Lecture 11A derived the standard error of any check with $n$ problems and $r$ answers to each, in Week 4B's notation: $\tau^2$ between problems and $\sigma^2$ within one. Here are the steps again for the problems, then the numbers. Part 4 uses the formula to compare designs.
+
+**One answer.** Let $C=1$ if an answer is right. Draw a problem at random, then one of its answers. Given the problem, the answer is right with probability $p_i$, so $E[C\mid\text{problem}]=p_i$ and $\operatorname{Var}(C\mid\text{problem})=p_i(1-p_i)$. The law of total variance splits the variance of one answer into two pieces:
+
+$$\operatorname{Var}(C)=\underbrace{\operatorname{Var}\bigl(E[C\mid\text{problem}]\bigr)}_{\tau^2:\ \text{between problems}}+\underbrace{E\bigl[\operatorname{Var}(C\mid\text{problem})\bigr]}_{\sigma^2:\ \text{within a problem}}=\operatorname{Var}(p_i)+E\bigl[p_i(1-p_i)\bigr].$$
+
+The first piece is about which problems the check happens to include. The second is about which answer the model happens to sample.
+
+**The estimate.** A check draws $n$ problems at random and records $r$ answers to each. Write $C_{ij}=1$ if answer $j$ to problem $i$ is right. The estimate $\hat\theta$ is the share of all $nr$ answers that are right. Because every problem has the same $r$ answers, it is also the average of the $n$ problem averages $\bar C_i$:
+
+$$\hat\theta=\frac{1}{nr}\sum_{i=1}^{n}\sum_{j=1}^{r}C_{ij}=\frac{1}{n}\sum_{i=1}^{n}\bar C_i,\qquad\text{where}\quad \bar C_i=\frac{1}{r}\sum_{j=1}^{r}C_{ij}.$$
+
+In part 2, $n=127$, $r=10$, and the $\bar C_i$ are `problem_means`.
+
+**Its variance.** The problems are drawn independently, so the $\bar C_i$ are independent and have the same distribution, and the variance of their average is $\operatorname{Var}(\bar C_i)/n$, as for any average of independent draws (Week 4). Then apply the law of total variance to one problem's average, conditioning on the problem. Given the problem, each of the $r$ answers is right with probability $p_i$, independently of the others, so $E[\bar C_i\mid\text{problem}]=p_i$ and $\operatorname{Var}(\bar C_i\mid\text{problem})=p_i(1-p_i)/r$. Step by step:
+
+$$
+\begin{aligned}
+\operatorname{Var}(\hat\theta)&=\frac{1}{n}\operatorname{Var}(\bar C_i)\qquad\text{(independent problems)}\\
+&=\frac{1}{n}\Bigl(\operatorname{Var}\bigl(E[\bar C_i\mid\text{problem}]\bigr)+E\bigl[\operatorname{Var}(\bar C_i\mid\text{problem})\bigr]\Bigr)\qquad\text{(law of total variance)}\\
+&=\frac{1}{n}\Bigl(\operatorname{Var}(p_i)+E\Bigl[\frac{p_i(1-p_i)}{r}\Bigr]\Bigr)\qquad\text{(the two conditional moments above)}\\
+&=\frac{\tau^2}{n}+\frac{\sigma^2}{n\,r}\qquad\text{(definitions of }\tau^2\text{ and }\sigma^2\text{)}
+\end{aligned}
+$$
+
+As a check, with one answer per problem ($r=1$) this is $(\tau^2+\sigma^2)/n=\operatorname{Var}(C)/n=\theta(1-\theta)/n$, the usual formula for an accuracy.
+
+With 10,000 answers per problem, the $p_i$ are known well enough to compute both pieces. The share of the variance that lies between problems, $\rho=\tau^2/(\tau^2+\sigma^2)$, is Lecture 4B's within-cluster correlation, which Lecture 11A also called an intraclass correlation, so part 2's design effect should come out close to $1+(r-1)\rho$. Lecture 11A also showed that $2\sigma^2$ is the chance that two answers to the same problem disagree, one right and one wrong.
+
+```{python}
+#| eval: false
+between = p.var()                # tau^2: how much the problems differ in accuracy
+within = np.mean(p * (1 - p))    # sigma^2: how much one answer varies within a problem, on average
+print(f"Var(C) = {p.mean() * (1 - p.mean()):.3f} = between {between:.3f} + within {within:.3f}")
+
+
+def se_design(n, r):
+    """Standard error of the accuracy from n problems with r answers to each."""
+    return np.sqrt(between / n + within / (n * r))
+
+
+print(f"Formula SE for {n_problems} problems x {r} answers: {se_design(n_problems, r):.4f} (part 2: {se_problems:.4f})")
+rho = between / (between + within)   # the share of the variance between problems
+print(f"rho, the share of the variance between problems: {rho:.2f}")
+print(f"Design effect from the formula, 1 + (r - 1) x rho = {1 + (r - 1) * rho:.1f} (part 2: {design_effect:.1f})")
+print(f"Chance that two answers to a problem disagree, 2 x sigma^2: {2 * within:.3f}")
+```
+
+The formula and part 2 differ a little because part 2's standard error comes from one random draw of 10 answers per problem, so a different seed would give a slightly different value. Over 2,000 redraws, part 2's standard error averages 0.0272, the formula's value, and 95% of the redraws fall between 0.026 and 0.029. The formula gives that average directly because it uses each problem's 10,000 answers. The same goes for the two design effects.
+
+Say in your own words what each piece measures. How often do two answers to the same problem disagree, and what does that mean for a student who asks the helper the same problem twice? If the app answered at temperature 0, giving the same answer every time, each $p_i$ would be 0 or 1. Which piece would vanish, and what would asking a problem twice tell you?
+
+**Your answer:** TODO
+
+## 4. Instructor run: spend 1,200 calls
+
+**Why this step:** the server can run about 1,200 calls before the semester. The calls can go to many problems with a few answers each, or a few problems with many answers. Rank the four designs below from most to least precise before the simulation runs.
+
+Each simulated check draws $n$ problems at random (with replacement, so the 127 stand in for the population of problems) and $r$ of each problem's 10,000 answers, and computes the accuracy. Repeating that 2,000 times shows how much a real check would vary.
+
+```{python}
+#| eval: false
+designs = [(120, 10), (60, 20), (30, 40), (12, 100)]   # (problems, answers to each): about 1,200 calls each
+rows = []
+for n, r_each in designs:
+    estimates = []
+    for _ in range(2000):
+        chosen = rng.integers(0, n_problems, size=n)              # n problems drawn at random
+        answers = rng.integers(0, n_answers, size=(n, r_each))    # r answers to each, drawn at random
+        estimates.append(right_8b[chosen[:, None], answers].mean())
+    rows.append({"problems": n, "answers to each": r_each, "calls": n * r_each,
+                 "formula SE": se_design(n, r_each), "SD of 2,000 simulated checks": np.std(estimates)})
+# One answer to each of 1,200 problems needs more problems than we have, so only the formula
+rows.append({"problems": 1200, "answers to each": 1, "calls": 1200,
+             "formula SE": se_design(1200, 1), "SD of 2,000 simulated checks": np.nan})
+display(pd.DataFrame(rows).round(4))
+```
+
+In the table, the designs with more problems are more precise. To see why, fix the number of calls at $B=nr$ and substitute $nr=B$ into part 3's formula:
+
+$$\operatorname{Var}(\hat\theta)=\frac{\tau^2}{n}+\frac{\sigma^2}{n\,r}=\frac{\tau^2}{n}+\frac{\sigma^2}{B}.$$
+
+The second term is the same for every design that uses all 1,200 calls, so only the number of problems matters. More problems always win, and the best design asks each problem once.
+
+That assumes the nonprofit has 1,200 checked problems to ask, and it does not. Each problem in the check needs someone to write it and check its answer key. If the volunteers can check only 120 problems before the semester, the best use of the 1,200 calls is all 120 problems with 10 answers each, the top row of the table. Lecture 11A worked out the best design when writing problems and running calls both cost something.
+
+Did the simulation agree with your ranking and with the formula? Why do more problems always win when the number of calls is fixed? The volunteers can check only 120 problems: which design would you recommend, and what is its standard error?
+
+**Your answer:** TODO
+
+## 5. If there is time: is the 70B model worth paying for?
+
+**Why this step:** the nonprofit could pay for Llama 3 70B Instruct instead. Two questions: how much more often is it right, and how should the nonprofit spend a check when one model's calls cost money? Suppose it can pay for 200 calls to the 70B model, while the 8B model on its own server still has its 1,200.
+
+Both models answered the same problems, so compare them problem by problem, as Week 5 compared models question by question. Start with one check that fits the budget: 100 problems, with 2 answers from the 70B model to each (200 calls) and 12 from the 8B model (1,200 calls).
+
+**Paired by problem.** For each problem, subtract the 8B model's share right from the 70B model's share right. That gives 100 differences, one per problem. The estimated difference is their average, and its standard error is their SD divided by $\sqrt{100}$: part 2's recipe, applied to the differences.
+
+**As if unpaired.** For comparison, pretend each model had been tested on its own, separate set of problems. Then the two accuracies would be independent, and the standard error of the difference would be $\sqrt{\text{SE}_{70B}^2+\text{SE}_{8B}^2}$, with each SE from part 2's recipe.
+
+```{python}
+#| eval: false
+right_70b = correct["llama3_70b"]
+
+# One check within the budget: 100 problems, 2 answers from the 70B model and 12 from the 8B model to each
+n5, r70, r8 = 100, 2, 12
+chosen = rng.choice(n_problems, size=n5, replace=False)   # 100 of the 127 problems
+share_70 = np.array([right_70b[i, rng.choice(n_answers, size=r70, replace=False)].mean() for i in chosen])
+share_8 = np.array([right_8b[i, rng.choice(n_answers, size=r8, replace=False)].mean() for i in chosen])
+diff = share_70 - share_8   # 100 differences, one per problem
+estimate = diff.mean()
+
+# Paired: the SD of the 100 differences over the square root of 100
+se_paired = diff.std(ddof=1) / np.sqrt(n5)
+# As if unpaired: each model's SE from part 2's recipe, combined as if independent
+se_unpaired = np.sqrt(share_70.var(ddof=1) / n5 + share_8.var(ddof=1) / n5)
+
+print(f"Accuracy: 70B {share_70.mean():.3f}, 8B {share_8.mean():.3f}")
+print(f"Difference, 70B minus 8B: {estimate:+.3f}")
+print()
+print(f"Paired by problem: SE {se_paired:.4f}, 95% interval {estimate - 1.96 * se_paired:+.3f} to {estimate + 1.96 * se_paired:+.3f}")
+print(f"As if unpaired:    SE {se_unpaired:.4f}, 95% interval {estimate - 1.96 * se_unpaired:+.3f} to {estimate + 1.96 * se_unpaired:+.3f}")
+print()
+print(f"Correlation between the two models' shares right, across problems: {np.corrcoef(share_8, share_70)[0, 1]:.2f}")
+```
+
+The last line measures how much the two models agree about which problems are hard.
+
+**Which standard error is right?** Not the paired one because it is smaller. As in part 2, the standard error has to match how the check was run. Both models answered the same 100 problems, so their accuracies move together: a draw of hard problems pulls both down, and the difference between them stays about the same. The unpaired formula assumes the two accuracies are independent, so it counts that shared up-and-down as if it were noise in the difference. It would be the right standard error for a different design, one in which each model answered its own 100 problems. So the two lines really compare two designs, and giving both models the same problems is the better design: for the same calls, its interval is narrower.
+
+**Other ways to spend the same budget.** Part 3's argument works for the differences too. Write $D_i$ for problem $i$'s difference, $p_i^{70}$ and $p_i^{8}$ for the two models' accuracies on it, and $r_{70}$ and $r_8$ for the answers from each. Given the problem, the two models' answers are independent, so $E[D_i\mid\text{problem}]=p_i^{70}-p_i^{8}$ and $\operatorname{Var}(D_i\mid\text{problem})=p_i^{70}(1-p_i^{70})/r_{70}+p_i^{8}(1-p_i^{8})/r_8$. The law of total variance then gives, for the estimate from $n$ problems,
+
+$$\operatorname{Var}(\hat D)=\frac{1}{n}\Bigl(\underbrace{\operatorname{Var}\bigl(p_i^{70}-p_i^{8}\bigr)}_{\tau_d^2:\ \text{between problems}}+\underbrace{\frac{\sigma_{70}^2}{r_{70}}+\frac{\sigma_{8}^2}{r_8}}_{\text{within a problem}}\Bigr).$$
+
+Lecture 11A's two chatbots at different prices suggest the answer: the cheaper, more variable model should get more answers per problem. The table compares designs that each use all 200 of the 70B model's calls. Predict which is most precise before you run it.
+
+```{python}
+#| eval: false
+p_70 = right_70b.mean(axis=1)                 # each problem's 70B accuracy, from its 10,000 answers
+between_diff = np.var(p_70 - p)               # tau_d^2: how much the gap between the models varies by problem
+within_70 = np.mean(p_70 * (1 - p_70))        # sigma_70^2; part 3's `within` is the 8B model's
+print(f"Between problems {between_diff:.3f}; within a problem: 70B {within_70:.3f}, 8B {within:.3f}")
+
+
+def se_difference(n, r70, r8):
+    """Standard error of the paired difference from n problems, r70 answers from the 70B model and r8 from the 8B."""
+    return np.sqrt((between_diff + within_70 / r70 + within / r8) / n)
+
+
+designs_5 = [(100, 2, 12), (50, 4, 24), (20, 10, 60), (100, 2, 2)]   # (problems, 70B answers each, 8B answers each)
+rows = []
+for n, a, b in designs_5:
+    estimates = []
+    for _ in range(2000):
+        picked = rng.integers(0, n_problems, size=n)
+        s70 = right_70b[picked[:, None], rng.integers(0, n_answers, size=(n, a))].mean(axis=1)
+        s8 = right_8b[picked[:, None], rng.integers(0, n_answers, size=(n, b))].mean(axis=1)
+        estimates.append((s70 - s8).mean())
+    rows.append({"problems": n, "70B answers each": a, "8B answers each": b, "70B calls": n * a, "8B calls": n * b,
+                 "formula SE": se_difference(n, a, b), "SD of 2,000 simulated checks": np.std(estimates)})
+# One 70B answer to each of 200 problems needs more problems than we have, so only the formula
+rows.append({"problems": 200, "70B answers each": 1, "8B answers each": 6, "70B calls": 200, "8B calls": 1200,
+             "formula SE": se_difference(200, 1, 6), "SD of 2,000 simulated checks": np.nan})
+display(pd.DataFrame(rows).round(4))
+```
+
+In one sentence for the nonprofit, what does the paired interval say? Why is the paired standard error smaller than the unpaired one, and which piece of the variance do the two models share? Then use the table: how would you spend the 200 calls to the 70B model, and why does a second 70B answer to the same problem buy so little? Why do the 8B model's extra answers help (compare the first and last rows)?
+
+**Your answer:** TODO
+
+## 6. Stop and discuss
+
+1. A teammate writes: "The model is right 76.1% of the time (plus or minus 2.4 points, from 1,270 answers)." What is wrong with the sentence, and what should it say?
+2. Give two reasons to ask each problem more than once, even though part 4 says more problems win.
+3. The 127 problems are a random sample of GSM8K's test set. Who is $\theta$ about? What would the nonprofit need before it trusts the number for its own students' problems?
+4. Each problem came with its own five worked examples in the prompt. How could that blur the line between "between problems" and "within a problem"? Lecture 11A's fix was crossing: what would you randomize, and how would it tell the two apart?
+
+## 7. Handoff: your project
+
+Your team's comparison is an experiment too. The AI system and the baseline are two treatments, and each case gets both, so each case is a block, as each problem was in part 5. Your track's AI system gives one cached answer per case (CLIP and the judges were run with deterministic decoding), so the variation in your intervals comes from which cases you have, and, as with the ten answers to one problem, it matters which cases are related. In a few sentences:
+
+1. Start the design table your Milestone 2 outline asks for: the unit, the treatments, what is held constant, the block, and what was randomized (for example, the split into analysis and holdout cases).
+2. Which of your cases are related? Your datasheet says, for example Track 2's repeated photos, Track 3's pairs from one Reddit post, and Track 4's two responses to each prompt. Does each interval in your Milestone 2 outline resample those groups rather than single cases?
+3. Is there a choice in how your system was run, such as a prompt, an order, or a decoding setting, that could change its answers? Week 12 takes this up for the judges.
+
+**Your answer:** TODO
+
+## Exit ticket
+
+In one sentence: why are 1,270 answers to 127 problems not 1,270 independent cases, and when is asking each problem more than once still worth it?

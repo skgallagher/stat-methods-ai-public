@@ -1,0 +1,562 @@
+---
+title: "Week 10A: Sensitivity Analysis"
+subtitle: "Would the decision survive another reasonable choice?"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{python}
+#| include: false
+import numpy as np
+import matplotlib.pyplot as plt
+
+# The team's photos from Week 9: accuracy within each type of photo
+p_color, n_color = 69 / 72, 72
+p_infrared, n_infrared = 82 / 90, 90
+
+def theta(c):
+    """Reweighted accuracy when a share c of the client's photos are infrared."""
+    return (1 - c) * p_color + c * p_infrared
+
+def se(c):
+    """Its standard error, treating the photos as independent."""
+    return np.sqrt((1 - c)**2 * p_color * (1 - p_color) / n_color + c**2 * p_infrared * (1 - p_infrared) / n_infrared)
+
+# The team's photos by animal or empty, and color or infrared: (right, photos)
+cells = {("empty", "color"): (32, 33), ("empty", "infrared"): (46, 48),
+         ("animal", "color"): (37, 39), ("animal", "infrared"): (36, 42)}
+
+def lower_bound_two(c, e):
+    """One-sided 95% lower bound when a share c of photos is infrared and a share e is empty."""
+    weights = {("empty", "color"): e * (1 - c), ("empty", "infrared"): e * c,
+               ("animal", "color"): (1 - e) * (1 - c), ("animal", "infrared"): (1 - e) * c}
+    estimate = 0.0
+    variance = 0.0
+    for cell, w in weights.items():
+        right, n = cells[cell]
+        estimate = estimate + w * right / n
+        variance = variance + w**2 * (right / n) * (1 - right / n) / n
+    return estimate - 1.645 * np.sqrt(variance)
+```
+
+## Last time {.smaller}
+
+```{python}
+#| fig-width: 10.5
+#| fig-height: 3.0
+from PIL import Image
+examples = [
+    ("cct0049", "the team's camera:\ncolor"),
+    ("cct0031", "the team's camera:\ninfrared"),
+    ("cct0190", "the partner's camera:\na new background"),
+    ("cct0200", "the partner's camera: labeled\nfox, MegaDetector says empty"),
+]
+fig, axes = plt.subplots(1, 4, figsize=(10.5, 3.0))
+for ax, (image_id, caption) in zip(axes, examples):
+    ax.imshow(Image.open(f"../../data/course/camera_traps/images/{image_id}.jpg"))
+    ax.set_title(caption, fontsize=13)
+    ax.axis("off")
+plt.tight_layout(pad=0.3)
+plt.show()
+```
+
+- MegaDetector was right on 93.2% of photos from the team's nine cameras. Reweighting to the partner park's mix of color and infrared photos predicted 94.5%.
+- The park's own labels showed 70.4%. Infrared missed what was new at the park's cameras: backgrounds, and how bursts were labeled.
+- Lab 9 did the same for tissue slides from a new hospital.
+
+::: notes
+About 3 minutes. Collect Milestone 1 questions first; it was due today. The numbers are 9A's: 151/162, reweighted 0.945, partner 38/54. Photos: cct0049 (deer, team camera 82), cct0031 (fox at night, team camera 68), cct0190 (rabbit, partner camera 51), cct0200 (the second photo of a fox burst at partner camera 72: the label says fox because the burst had one, but the fox has left the frame, and MegaDetector calls it empty; 9A's "Look at the partner's mistakes"). Thursday's lecture is about the part infrared missed.
+:::
+
+## Today's plan {.smaller}
+
+- The park decides from the team's analysis, and the team made choices along the way. Today we **vary those choices** and see whether the decision changes. That is a **sensitivity analysis**.
+- First we ask which variables could change the park's decision, and how sure we are of the park's mix.
+- Then we ask which choices in the analysis could change it, and why reporting only the best one overstates.
+- Then we take the model apart, by dropping a part or transforming its inputs. Machine learning calls these ablations and robustness tests.
+- Last, we write the result up for the park and turn to your project.
+
+::: notes
+About 1 minute.
+:::
+
+## The park's decision {.smaller}
+
+$$\hat\theta_{\text{partner}}=0.722\times0.958+0.278\times0.911=0.945$$
+
+$$\text{use MegaDetector}\iff\text{lower bound on }\theta_{\text{partner}}\ge0.90$$
+
+- $\hat\theta_{\text{partner}}$ estimates the partner park's **overall** accuracy: the team's accuracy on color and on infrared photos, reweighted to the partner's mix of 72% color and 28% infrared.
+- The park set its rule before seeing results: use MegaDetector only if the one-sided 95% lower bound is at least 0.90. Below that, pass on it.
+- With bursts resampled, the lower bound is **0.904**. The rule says use.
+- For today, set the park's labels aside. Would the decision survive other reasonable choices in the analysis?
+
+::: notes
+About 2 minutes. Using MegaDetector means people stop reviewing the photos it calls empty, so its accuracy over all photos is what the park cares about. The 0.90 rule is made up for the lecture and labeled as set in advance, like 9B's 5% miss limit. The lower bound is the 5th percentile of the burst bootstrap from 9A (bursts resampled within each type, seed 2027, 4,000 resamples): 0.904; across other seeds it stays at 0.903 to 0.904. Students know the 70% from "Last time"; today asks what the team could have known before the labels. Thursday returns to the 70%.
+:::
+
+## Two kinds of sensitivity analysis {.smaller}
+
+1. **Choices you could have made differently:** the client's mix, which $Z$, how many groups, the decision rule. Thinking and counting the client's cases pin these down, with no labels. *Today.*
+2. **An assumption you cannot check without new data:** that accuracy within each group carries over to the client. Only labels from the client settle it. *Thursday.*
+
+Both ask the same question: **does the decision change?** Milestone 1, due today, asked for the assumption most likely to threaten your conclusion. This week turns it into a variable you can vary or bound.
+
+::: notes
+About 2 minutes. Epidemiology has done both kinds for a long time. Cornfield et al. (1959) asked how strong a hidden confounder would have to be to explain away the link between smoking and lung cancer, an early sensitivity analysis of the second kind; epidemiologists now call this quantitative bias analysis (Lash, Fox, and Fink 2009). The second kind is the one that failed for the partner park and for hospitals 4 and 5. It needs a different tool, a sensitivity parameter, which is Thursday's lecture and lab. Thursday also asks when you could skip labeling the client's cases (rarely) and how many to label. Neither kind is about perturbing the inputs: rotating or blurring images tests the model, not the conclusion, unless the client's cases really differ that way.
+:::
+
+## A conclusion is a function of choices {.smaller}
+
+$$\hat\theta=\hat\theta(\text{data};\ \text{choices}),\qquad \text{decision}=\mathbf 1\bigl\{\text{lower bound}\ge 0.90\bigr\}$$
+
+- **Primary analysis:** the choices you would defend if you could report only one, fixed in advance.
+- **Alternatives:** other choices you could also defend, each with a reason.
+- **Flip rule:** what result would change the decision, written down before you run anything.
+- A sensitivity analysis reruns the analysis under each alternative and reports **every** result.
+
+::: notes
+About 3 minutes. The flip rule usually comes straight from the client's decision rule: here, a lower bound below 0.90 flips the decision. Writing it first is what keeps the analysis honest; the same idea as setting a non-inferiority margin before seeing the data in Week 5.
+:::
+
+## A power curve is a sensitivity analysis {.smaller}
+
+```{python}
+#| fig-width: 9
+#| fig-height: 2.7
+from scipy.stats import norm
+n_grid = np.linspace(10, 1500, 300)
+fig, ax = plt.subplots(figsize=(9, 2.7))
+for p1, color, n80 in [(0.95, "#155a8a", 183), (0.93, "#5b8db8", 557), (0.92, "#9fbfdc", 1302)]:
+    power = norm.cdf(((p1 - 0.90) * np.sqrt(n_grid) - norm.ppf(0.95) * np.sqrt(0.09)) / np.sqrt(p1 * (1 - p1)))
+    ax.plot(n_grid, power, color=color, linewidth=2, label=f"true accuracy {p1:.2f}: n = {n80:,} for 80%")
+    ax.plot(n80, 0.80, "o", color=color, markersize=8)
+ax.axhline(0.80, color="#c41230", linewidth=1.5)
+ax.text(1530, 0.74, "the usual 80%", color="#c41230", fontsize=12, va="top")
+ax.set_xlim(0, 1800)
+ax.legend(fontsize=11, loc="lower right", frameon=False)
+ax.set_xlabel("labeled photos, n", fontsize=12)
+ax.set_ylabel("power", fontsize=12)
+ax.tick_params(labelsize=11)
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+- Suppose the park labels photos to test whether MegaDetector's accuracy is above 0.90. The $n$ it needs depends on a guess, the true accuracy, and a convention, 80% power.
+- At 80% power: about 180 photos if the truth is 0.95, 560 if 0.93, and 1,300 if 0.92.
+- One $n$ hides that. The curve is a sensitivity analysis over the guess, and epidemiologists and trialists report it this way.
+
+::: notes
+About 3 minutes. One-sided test of $H_0:\theta=0.90$ at level 0.05, normal approximation: $n=\bigl(z_{0.95}\sqrt{0.90\times0.10}+z_{0.80}\sqrt{p_1(1-p_1)}\bigr)^2/(p_1-0.90)^2$, which gives 183, 557, and 1,302; at 90% power, 239, 748, and 1,769. With 300 labeled photos the power is 0.96, 0.54, and 0.29. Photos come in bursts, so the real numbers are larger (Week 4's design effect). Eighty percent is Cohen's (1988) convention, common and fairly arbitrary, like the park's 0.90; a power curve shows what changes if you pick differently. The mix curve a few slides on has the same shape: vary the input you are least sure of, and see where the answer crosses the line. Thursday sizes the park's labeling sample from the tipping point instead, another sensitivity analysis over a guess.
+:::
+
+# Question 1: which variables could change the decision?
+
+## When does a variable move the answer? {.smaller}
+
+$$\theta_{\text{client}}-\theta_{\text{bench}}=\sum_k \underbrace{(c_k-b_k)}_{\text{mix differs}}\,\underbrace{(p_k-\bar p)}_{\text{accuracy differs}}$$
+
+- A variable moves the answer only if its mix differs between the benchmark and the client **and** the model's accuracy differs across its groups.
+- If either factor is near zero, so is its term.
+
+::: notes
+About 3 minutes. $\bar p$ is the benchmark's accuracy. The shift is $\sum_k(c_k-b_k)\,p_k$, and the slide's form follows because the shares in each mix add to 1, so $\sum_k(c_k-b_k)\,\bar p=0$. Each term is a product, which is the sorting rule for the candidates two slides on.
+:::
+
+## Infrared, worked out {.smaller}
+
+$$\underbrace{(0.278)(0.026)}_{\text{color}}+\underbrace{(-0.278)(-0.021)}_{\text{infrared}}=0.007+0.006=+0.013$$
+
+- The mix differs a lot: 56% of the team's photos are infrared, against 28% of the partner's.
+- Accuracy differs little, 0.958 against 0.911, so infrared moves the answer by about a point.
+- This is 9A's law of total variance applied to the shift: infrared explains under 1% of the variation in whether MegaDetector is right.
+
+::: notes
+About 2 minutes. $\bar p=0.932$. Color: $(0.722-0.444)(0.958-0.932)=0.0072$; infrared: $(0.278-0.556)(0.911-0.932)=0.0058$. With two groups this is 9A's identity $(c-b)(p_1-p_2)=0.278\times0.047$.
+:::
+
+## Candidate variables for the partner park {.smaller}
+
+$$\text{for each one:}\quad\text{measured without labels?}\qquad\text{accuracy differs?}\qquad\text{mix differs?}$$
+
+- Infrared, from the pixels
+- Position in the burst: first, second, or third photo
+- Animal or empty
+- The `day_night` column
+- Backgrounds at the partner's new cameras
+
+::: notes
+About 3 minutes. Ask the room for more candidates first, then have them sort each of these with the three questions before the next slide.
+:::
+
+## Sorting the candidates {.smaller .compact-table}
+
+| Variable | Measured without labels? | Accuracy differs? | Mix differs? |
+|---|---|---|---|
+| Infrared, from the pixels | yes | a little: 0.958 and 0.911 | yes: 56% and 28% |
+| Position in the burst | yes, `frame_index` | no: 0.926, 0.944, 0.926 | no: thirds in both |
+| Animal or empty | no: it is the label | yes: 0.963 and 0.901 | unknown |
+| The `day_night` column | yes, but wrong for 36 photos | barely: 0.935 and 0.928 | not worth checking |
+| Backgrounds at new cameras | no | unknown | yes |
+
+Position in the burst cannot move the answer. Animal or empty could, and needs a guess. New backgrounds are Thursday's problem.
+
+::: notes
+About 2 minutes. Ask the room for candidates before showing the table, and sort each one with the three questions. Animal or empty: the course subset is half and half only by construction (9A); in large camera-trap projects most photos are empty (for example Snapshot Serengeti; Norouzzadeh et al. 2018). A client's share of empty photos can be estimated without labels from the model's own predictions corrected for its error rates (Saerens et al. 2002; Lipton et al. 2018), only if asked. The `day_night` bug is 9A's "Metadata are measurements too": 21 infrared photos stamped in the noon hour, 6 more at 8 am, and 9 "night" photos in color. Position in the burst matters for labels (7 of the partner's 8 missed animals are frames 2 and 3), but every burst has three frames, so its mix cannot differ.
+:::
+
+## Animal or empty: estimating a mix without labels {.smaller}
+
+$$q=\text{sens}\cdot\pi+(1-\text{spec})(1-\pi)\quad\Longrightarrow\quad\hat\pi=\frac{\hat q+\text{spec}-1}{\text{sens}+\text{spec}-1}$$
+
+- $q$ is the share of the partner's photos MegaDetector calls animal: 27 of 54. With the team's sensitivity 0.901 and specificity 0.963, $\hat\pi=0.536$. The truth is 0.50.
+- Epidemiologists call this the Rogan–Gladen estimator (1978). Machine learning calls it black-box shift estimation (Lipton et al. 2018).
+- It assumes the error rates carry over to the partner: the same kind of assumption as reweighting.
+
+::: notes
+About 3 minutes. $\pi$ is the partner's share of animal photos. Arithmetic: $(0.5+0.963-1)/(0.901+0.963-1)=0.463/0.864=0.536$. Sensitivity 73/81 and specificity 78/81 on the team's photos. At the partner the error rates did not carry over (its accuracy was 0.70), but its 8 false alarms and 8 missed animals balanced, so the estimate came out close anyway; say that this was luck. Rogan and Gladen (1978), "Estimating prevalence from the results of a screening test," American Journal of Epidemiology. Saerens, Latinne, and Decaestecker (2002) is the version that uses the model's probabilities.
+:::
+
+## Varying a continuous choice: the client's mix {.smaller}
+
+```{python}
+#| fig-width: 9
+#| fig-height: 3.6
+c = np.linspace(0, 1, 201)
+fig, ax = plt.subplots(figsize=(9, 3.6))
+ax.axvspan(0.15, 0.40, color="#e8f4ff", label="the park's guess before any photos: 15% to 40%")
+ax.plot(c, theta(c), color="#155a8a", linewidth=2, label="reweighted accuracy")
+ax.plot(c, theta(c) - 1.645 * se(c), color="#155a8a", linewidth=2, linestyle="--", label="one-sided 95% lower bound")
+ax.axhline(0.90, color="#c41230", linewidth=1.5, label="the park's line, 0.90")
+ax.axvline(0.278, color="#667085", linewidth=1, linestyle=":")
+ax.text(0.285, 0.965, "actual: 28%", color="#667085", fontsize=11)
+ax.set_xlabel("share of the client's photos that are infrared, c", fontsize=12)
+ax.set_ylabel("accuracy", fontsize=12)
+ax.set_ylim(0.84, 0.98)
+ax.legend(fontsize=9, loc="lower left")
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+- The lower bound crosses 0.90 at $c^\dagger\approx0.55$, the **flip point**.
+- Anywhere in the park's guessed range, the rule says use. The decision is **not** sensitive to the mix.
+
+::: notes
+About 4 minutes. Point back to the power curve: the same shape, with the client's mix in place of $n$. $\theta(c)=(1-c)\,0.958+c\,0.911$ and $\mathrm{SE}(c)=\sqrt{(1-c)^2\,0.958\times0.042/72+c^2\,0.911\times0.089/90}$, treating photos as independent, as in HW6 Problem 1. The lower bound is 0.917 at $c=0.15$ and 0.909 at $c=0.40$; it crosses 0.90 at $c=0.552$. Before the park sent any photos, the team knew only that the park's cameras are "mostly color," so the guessed range is the honest input; HW6 Problem 1 is the same exercise for a plant-disease app. A sensitivity analysis can end with "the decision is stable," and that is worth reporting.
+:::
+
+## The client's mix is an estimate too {.smaller}
+
+$$\hat c=\frac{15}{54}=0.28$$
+
+$$\text{Var}(\hat\theta)\approx(1-c)^2\,\text{Var}(\hat p_{\text{color}})+c^2\,\text{Var}(\hat p_{\text{ir}})+(p_{\text{ir}}-p_{\text{color}})^2\,\text{Var}(\hat c)$$
+
+- A client that counts its own unlabeled cases gives a mix with an interval: 0.18 to 0.41 counting photos, 0.12 to 0.51 counting bursts (5 of 18). Count clusters when cases come in clusters (Week 4).
+- The flip point, 0.55, is above even the burst interval, so the decision is still stable.
+- The mix's share of the uncertainty is $0.047\times0.106\approx0.005$, half a point. It is small here because accuracy differs little between the groups.
+
+::: notes
+About 4 minutes. Wilson intervals: 15 of 54 photos, 0.176 to 0.409; 5 of 18 bursts, 0.125 to 0.509 (no burst mixes color and infrared). The variance formula is the delta method for $\hat\theta=(1-\hat c)\,\hat p_{\text{color}}+\hat c\,\hat p_{\text{infrared}}$, with the mix counted on different photos from the accuracies, so the terms add. $\text{SE}(\hat c)$ from bursts is $\sqrt{0.278\times0.722/18}=0.106$. A client mix that comes from a published figure or the client's records has no sampling interval, but it still deserves a range.
+:::
+
+## Two variables at once {.smaller}
+
+```{python}
+#| fig-width: 9
+#| fig-height: 3.3
+c_grid = np.linspace(0, 0.6, 121)
+e_grid = np.linspace(0, 1, 201)
+bound = np.array([[lower_bound_two(c, e) for c in c_grid] for e in e_grid])
+fig, ax = plt.subplots(figsize=(9, 3.3))
+ax.contourf(c_grid, e_grid, bound >= 0.90, levels=[-0.5, 0.5, 1.5], colors=["#f2d7da", "#e8f4ff"])
+ax.contour(c_grid, e_grid, bound, levels=[0.90], colors="#c41230", linewidths=2)
+ax.add_patch(plt.Rectangle((0.15, 0.5), 0.25, 0.4, fill=False, edgecolor="#344054", linestyle="--", linewidth=1.5))
+ax.text(0.155, 0.83, "the park's likely range", color="#344054", fontsize=13)
+ax.plot(0.278, 0.5, "o", color="#b54708", markersize=8)
+ax.text(0.29, 0.42, "the course subset", color="#b54708", fontsize=13)
+ax.text(0.47, 0.75, "use", color="#155a8a", fontsize=16)
+ax.text(0.40, 0.10, "do not use", color="#c41230", fontsize=16)
+ax.set_xlabel("share of the park's photos that are infrared", fontsize=13)
+ax.set_ylabel("share that are empty", fontsize=13)
+ax.tick_params(labelsize=12)
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+- Reweight over four cells: color or infrared, by animal or empty. Infrared animal photos are the weak cell (0.857).
+- The lower bound falls below 0.90 when fewer than about 30% to 40% of the park's photos are empty.
+- Most camera-trap photos are empty, so the decision holds over the park's likely range.
+
+::: notes
+About 4 minutes. Cells on the team's photos: empty color 32/33 = 0.970, empty infrared 46/48 = 0.958, animal color 37/39 = 0.949, animal infrared 36/42 = 0.857. The client's shares are products, $e(1-c)$ and so on, which assumes infrared and empty are unrelated in the park's photos; on the team's photos the infrared share is 59% among empty photos and 52% among animal ones, so the assumption is rough. Independent-photo standard errors, as on the mix-curve slide. The flip line: empty share about 0.20 at $c=0.15$, 0.30 at 0.28, 0.40 at 0.40. With two variables the flip point becomes a flip line; with more, report the corners of the defensible box.
+:::
+
+## Check {.smaller}
+
+A benchmark has easy cases, where a model is right 90% of the time, and hard ones, where it is right 60% of the time. A client's share of hard cases, $h$, is somewhere between 20% and 40%. The client adopts the model only if its accuracy is at least 0.80.
+
+1. Write the reweighted accuracy as a function of $h$, and find the flip point.
+2. Is the decision sensitive to the client's mix?
+
+::: {.fragment}
+1. $\theta(h)=0.90-0.30\,h$, and $0.90-0.30\,h^\ast=0.80$ gives $h^\ast=1/3$.
+2. Yes. The flip point is inside the range: the model is adopted if $h<1/3$ and not if $h>1/3$. The client needs a better estimate of $h$, which needs no labels.
+:::
+
+::: notes
+About 3 minutes. The accuracies are 9A's easy/hard check. This is the case where the flip point falls inside the range, which the park's mix curve does not show. Point out that pinning down $h$ only takes counting the client's cases by type, which is cheap; that is often the best response to a sensitive mix.
+:::
+
+# Question 2: which choices in the analysis could change it?
+
+## Three choices of $Z$ under two decision rules {.smaller .compact-table}
+
+| $Z$ | Estimate | Lower bound | Point rule (estimate $\ge 0.90$) | Bound rule (bound $\ge 0.90$) |
+|---|---:|---:|---|---|
+| 0. Infrared, from the pixels (primary) | 0.945 | 0.904 | use | use |
+| 1. The `day_night` column | 0.933 | 0.892 | use | do not use |
+| 2. No reweighting (the team's accuracy) | 0.932 | 0.889 | use | do not use |
+
+- Under the point rule, all three say use. Under the bound rule, only the primary analysis does.
+- The `day_night` column is wrong for 36 photos (Week 9), so alternative 1 shows what the metadata bug would have cost.
+
+::: notes
+About 3 minutes. Lower bounds are 5th percentiles of the burst bootstrap within each group (seed 2027, 4,000 resamples); across seeds 1 to 4, alternative 1's bound stayed between 0.890 and 0.892, alternative 2's between 0.889 and 0.895, and the primary's at 0.903 to 0.904, so the decisions do not depend on the seed. Within the `day_night` column the team is right on 0.935 of "day" photos and 0.928 of "night" photos, almost no difference, so reweighting by it barely moves the estimate. The resampling unit is not a choice here: 9A settled it by the question, new cameras. A primary analysis that clears the line by 0.4 points is a fragile result, and the table shows it.
+:::
+
+## Reading a sensitivity table {.smaller}
+
+$$\hat\theta^{(1)}-\hat\theta^{(0)}=0.933-0.945=-0.012\quad\text{on the same 162 photos}$$
+
+- Every row uses the **same** team photos, so the rows are paired. Their differences are much less noisy than the rows themselves (Week 5).
+- Each row answers the client's question with a different defensible analysis. It is not a contest to win.
+
+::: notes
+About 2 minutes. Because the rows share photos, a difference between rows is a paired comparison, and its uncertainty is far smaller than either row's interval. That is why two rows can both have wide intervals and still clearly differ. The next slide names the difference between keeping and changing the estimand.
+:::
+
+## Sensitivity versus supplementary analyses {.smaller}
+
+$$\underbrace{\text{same estimand, other assumptions}}_{\text{sensitivity analysis}}\qquad\underbrace{\text{a different estimand}}_{\text{supplementary analysis}}$$
+
+- Clinical trials have kept these apart since the ICH E9(R1) guideline (2019).
+- Same estimand: the partner's accuracy, under another mix, another $Z$, or another decision rule.
+- Different estimand: color photos only, merged classes, or top-3 instead of top-1. Report it, and say it answers a different question.
+- The project's sensitivity analysis is the first kind (Project Description, Section 3).
+
+::: notes
+About 3 minutes. ICH E9(R1), "Addendum on Estimands and Sensitivity Analysis in Clinical Trials" (adopted November 2019). In its terms, a sensitivity analysis asks how robust the main estimate is to departures from its assumptions, for the same estimand; analyses of other estimands are supplementary. The Pet track's cat/dog collapse and the Food track's merged classes are supplementary analyses; both datasheets now call them changes of what is being estimated. Week 5's non-inferiority trials are a natural place for the PredictTB aside, if you want one.
+:::
+
+## The multiverse {.smaller}
+
+$$\underbrace{3}_{\text{defensible choices of }Z}\times\underbrace{2}_{\text{defensible decision rules}}=6\ \text{analyses}$$
+
+- Steegen et al. (2016) call the set of all defensible analyses a **multiverse**, and report all of it.
+- Define the set **before** the results. Show every member. Mark the primary analysis.
+- Do not sort or filter the members by result.
+- The park's table is a small multiverse: six analyses, four say use.
+
+::: notes
+About 2 minutes. Steegen, Tuerlinckx, Gelman, and Vanpaemel (2016), "Increasing Transparency Through a Multiverse Analysis," Perspectives on Psychological Science; it is the HW6 reading. Their point is that a single reported analysis hides how many others were equally defensible. Keep the course version small: one or two choices, each with a reason.
+:::
+
+## Model shopping is the winner's curse again {.smaller}
+
+$$E\bigl[\max(\hat\theta_1,\hat\theta_2)\bigr]=\theta+\sigma\sqrt{\frac{1-\rho}{\pi}}\qquad\text{(Week 5)}$$
+
+- **Model shopping:** trying analyses and reporting the one with the result you wanted.
+- Reporting the best of several estimates of the same quantity overstates it, even when every analysis is honest.
+- With six analyses of the same photos, picking the best overstates by about a point; with six on different data, by about 3 points.
+- A sensitivity analysis reports all of them, with the primary analysis fixed first. That is the whole difference.
+
+::: notes
+About 3 minutes. Week 5's formula is for two estimates with the same mean, standard deviation $\sigma$, and correlation $\rho$. With $\sigma=2.4$ points (this lecture's bootstrap SE) and two analyses of the same photos, say $\rho=0.9$, the overstatement is $2.4\sqrt{0.1/\pi}\approx0.4$ points; with analyses on different photos ($\rho=0$), about 1.4 points. Expected maximum of $k$ exchangeable normals: $E[\max]=\theta+\sigma\sqrt{1-\rho}\,e_k$ with $e_2=0.564$ and $e_6=1.267$; with $\sigma=2.4$, six analyses overstate by 0.96 points at $\rho=0.9$ and 3.0 points at $\rho=0$.
+:::
+
+## What makes an alternative reasonable? {.smaller}
+
+- It is defensible **before** you see its result.
+- It changes something the decision depends on: the population, the measurement, the grouping, or the rule.
+- It is different enough that it could change the decision.
+
+::: notes
+About 2 minutes. One consequential alternative beats five harmless ones. Ask of each alternative: if this came out differently, would we recommend something different?
+:::
+
+## What is not a sensitivity analysis {.smaller}
+
+- Trying ten models and keeping the best.
+- Adding noise, rotations, or blur that the client's cases do not have.
+- Searching subgroups for the biggest gap.
+- Changing the metric after disliking the answer.
+
+::: notes
+About 1 minute. The first is model shopping, the third is the winner's curse in a search, and the fourth changes the estimand after the fact. Question 3 says why rotations and blur do not count on their own.
+:::
+
+# Question 3: what does taking the model apart tell you?
+
+## Dropping a term from a model {.smaller}
+
+$$\Delta_j=\text{Err}\bigl(\hat f_{-j}\bigr)-\text{Err}\bigl(\hat f\bigr)$$
+
+- Statisticians compare nested models: drop a term, refit, and compare, with a likelihood-ratio test or R's `drop1`.
+- For prediction, leave-one-covariate-out (LOCO) measures how much worse the model predicts without variable $j$ (Lei, G'Sell, Rinaldo, Tibshirani, and Wasserman 2018).
+- Both answer: how much does part $j$ contribute to this model?
+
+::: notes
+About 3 minutes. $\hat f_{-j}$ is the model refit without variable $j$. Lei et al. (2018), "Distribution-Free Predictive Inference for Regression," JASA; three of the authors are in CMU's statistics department, and the paper puts intervals on $\Delta_j$ with conformal inference. The question is about the model, not about whether a client's decision holds.
+:::
+
+## Machine learning calls it an ablation {.smaller}
+
+$$\hat\theta_{\text{full}}-\hat\theta_{\text{without part }j}\quad\text{on the same test cases}$$
+
+- An **ablation** removes one part of a system, such as a feature, a layer, a source of training data, or a line of a prompt, and measures the drop.
+- It asks which parts of the model earn its accuracy, a question for the people building it.
+- Removing parts one at a time is a one-factor-at-a-time experiment. Two parts that do the same job each look useless alone; Week 11 designs evaluations like experiments.
+
+::: notes
+About 2 minutes. The word comes from surgery: remove tissue and see what stops working. In Breiman's terms, the algorithmic culture judges a model by its predictive accuracy, so it asks which parts earn that accuracy; the data-modeling culture asks whether the model's assumptions hold. Interactions: with parts A and B, the effect of removing A with B present, $\theta_{11}-\theta_{01}$, can differ from the effect without B, $\theta_{10}-\theta_{00}$; a factorial design estimates both. Track 4's datasheet mentions judge-prompt ablations; Week 12's prompt comparisons are ablations of a prompt.
+:::
+
+## An ablation is an estimate too {.smaller}
+
+$$\widehat\Delta_j=\frac1n\sum_{i=1}^n\bigl(C_i^{\text{full}}-C_i^{(-j)}\bigr)\qquad\text{paired on the same cases (Week 5)}$$
+
+- Use the paired standard error, with the same clusters as the main analysis.
+- If training is random, the drop changes from seed to seed. Rerun over seeds and report the spread.
+- Ten ablations with only the biggest reported is the winner's curse again.
+
+::: notes
+About 2 minutes. Week 5's McNemar test and paired interval apply directly. Bouthillier et al. (2021), "Accounting for Variance in Machine Learning Benchmarks," MLSys, found that seeds and data splits move results as much as many published improvements.
+:::
+
+## A robustness test transforms the inputs {.smaller}
+
+$$\theta_T=E\bigl[C\bigl(T(X)\bigr)\bigr]\qquad T=\text{rotate, blur, add noise, paraphrase}$$
+
+- A **robustness test** applies a transformation $T$ to the test cases and measures accuracy again.
+- It answers: how does the model do on cases that look like $T(X)$?
+- That is a client's question only if the client's cases do look like $T(X)$.
+
+::: notes
+About 2 minutes. ImageNet-C (Hendrycks and Dietterich 2019) is the standard example: 15 corruptions such as noise, blur, weather, and compression, each at 5 severities. The transformation is chosen by the tester, not drawn from any client's population.
+:::
+
+## Synthetic shifts do not predict natural ones {.smaller}
+
+$$\theta_{\text{ImageNetV2}}-\theta_{\text{ImageNet}}\approx-11\text{ to }-14\text{ points}$$
+
+- ImageNetV2 rebuilt ImageNet's test set years later, following the original process as closely as it could. Accuracy still fell (Recht et al. 2019).
+- Models made robust to synthetic corruptions gained little on natural shifts like this one (Taori et al. 2020).
+- Lab 10's Camelyon17 comes from WILDS, a benchmark of natural shifts, such as between hospitals (Koh et al. 2021).
+
+::: notes
+About 3 minutes. Recht, Roelofs, Schmidt, and Shankar (2019), "Do ImageNet Classifiers Generalize to ImageNet?" ICML. Taori et al. (2020), "Measuring Robustness to Natural Distribution Shifts in Image Classification," NeurIPS. Koh et al. (2021), "WILDS: A Benchmark of in-the-Wild Distribution Shifts," ICML. The first bullet also bears on Thursday's question of when you could skip labels: even "the same process" did not guarantee the same accuracy.
+:::
+
+## When a robustness test is a sensitivity analysis {.smaller}
+
+$$\theta_{\text{client}}\approx\theta_{T_s}\quad\text{only if the client's cases look like }T_s(X)$$
+
+- If you can say how the client's cases differ, for example that sellers' phone photos are blurrier, a transformation is a model of that difference.
+- Then vary its severity $s$ and find where the decision flips: a tipping point in $s$.
+- Without that argument, it measures the model, not the client's decision.
+
+::: notes
+About 2 minutes. Thursday's within-group gap $\delta$ is the same idea with no model for the difference: it says how big the difference would have to be, not what causes it. This is why the Project Description says rotating or blurring photos is not the project's sensitivity analysis unless the team can say why the client's photos differ that way.
+:::
+
+## What each kind of analysis answers {.smaller .compact-table}
+
+| | What it varies | What it answers | Who asks |
+|---|---|---|---|
+| Ablation | a part of the model | which parts earn the accuracy | the people building it |
+| Robustness test | the inputs, by a transformation | how the model does on transformed cases | anyone whose cases look transformed |
+| Sensitivity analysis | choices and assumptions in the evaluation | whether the decision changes | the client |
+
+- Your project's sensitivity analysis is the last row (Project Description, Section 3).
+
+::: notes
+About 2 minutes. A supplementary analysis, from Question 2, changes the estimand and fits none of the rows.
+:::
+
+## Check {.smaller}
+
+Is each an ablation, a robustness test, a sensitivity analysis, or none of these?
+
+1. Remove the infrared flag from a model's inputs and measure the drop.
+2. Rotate every test photo 90 degrees and measure accuracy again.
+3. Recompute the park's lower bound with the `day_night` column as $Z$.
+4. Try ten algorithms and report the best.
+
+::: {.fragment}
+1 is an ablation. 2 is a robustness test, and a client question only if the park's cameras are mounted sideways. 3 is a sensitivity analysis. 4 is none of these: it is model shopping.
+:::
+
+::: notes
+About 2 minutes.
+:::
+
+# Question 4: how do you report it?
+
+## Writing it up: the park's version {.smaller}
+
+> **MegaDetector clears the park's line for any infrared share below 55%.**
+
+- **Methods, written before the analysis:** "We vary the park's infrared share from 15% to 40%. The recommendation changes if the lower bound falls below 0.90."
+- **Results:** the mix curve, with the claim above as its title and the flip point marked.
+- **Discussion:** "The park's own count puts its infrared share at 12% to 51%. The mix cannot change the recommendation. What could is how MegaDetector does at the park's new cameras."
+
+::: notes
+About 4 minutes. Titles are claims (Project Description, Section 3): the title states what the figure shows, in a full sentence. The flip rule goes in Methods because it is written first; the result goes in Results; the Discussion says what could still change the recommendation, which leads to Thursday. Ask the room to rewrite a topic title, "Sensitivity analysis," as a claim.
+:::
+
+## Your project {.smaller}
+
+$$\hat\theta_{\text{client}}=\sum_k c_k\,\hat p_k\quad\text{(starter section 5)}$$
+
+- Your sensitivity analysis is **one variable** that could make the AI system more or less accurate for your client than on the benchmark. Say why it could differ for your client, and which way it would push.
+- If you can measure it, vary your client's mix of it (`client_shares`) over the range you can defend, and find the flip point. If you cannot, Thursday's tipping point is the tool.
+- Write the flip rule first. The Project Description, Section 3, has the details.
+
+::: notes
+About 3 minutes. Do not tell teams their variable or their mix. Each track's datasheet lists candidate variables. The Food and Pet tracks have large accuracy differences between classes, so their curves will move more than the park's; let them find it. A discrete alternative like today's table (a grouping or a decision rule) is fine to report, but it is not the project's sensitivity analysis. Rotating or blurring photos does not count unless a team can say why the client's photos differ that way (instructor decision, Oct 27).
+:::
+
+## What we did today {.smaller}
+
+1. A decision depends on choices: a primary analysis, defensible alternatives, and a flip rule written first.
+2. A variable moves the answer only if its mix differs between benchmark and client and accuracy differs across it.
+3. For a measured variable, plot the estimate and its bound against the client's mix and find the flip point. The mix is an estimate too.
+4. A sensitivity analysis keeps the estimand. An analysis of a different estimand is supplementary.
+5. Ablations and robustness tests ask about the model. A sensitivity analysis asks whether the client's decision changes.
+6. Report every row. Picking the best one is model shopping, and Week 5's winner's curse says it overstates.
+
+::: notes
+About 2 minutes.
+:::
+
+## Thursday and HW6 {.smaller}
+
+- **Thursday:** the assumption no choice of $Z$ can check, as a sensitivity parameter with a tipping point, and when to label. Then Lab 10 on hospital 5.
+- **HW6** is out today, due Tue Mar 30. Problem 1 is a flip point in the client's mix, Problem 2 a sensitivity table for hospital 4, and Problem 3 sensitivity analysis versus model shopping.
+- **Checkpoint 8** opens after Thursday's class.
+
+::: notes
+About 1 minute. Milestone 1 was due today; nothing in today's lecture was graded in it.
+:::

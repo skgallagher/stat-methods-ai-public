@@ -1,0 +1,164 @@
+---
+title: "Homework 6: Reweighting and Sensitivity Analysis"
+subtitle: "Statistical Evaluation of AI · Spring 2027"
+format:
+  pdf:
+    geometry:
+      - top=0.8in
+      - bottom=1in
+      - left=1in
+      - right=1in
+---
+
+**Do not use AI for Problem 1.** Work the derivations yourself. AI is allowed in Problem 2 and required in Problem 3.
+
+| | |
+|---|---|
+| **Out / due** | Tue Mar 23 / Tue Mar 30, 11:59pm |
+| **Points** | 100: Problem 1 (45), Problem 2 (40), Problem 3 (15) |
+| **Expected time** | About 5 hours after Labs 9 and 10. Contact course staff if setup or debugging alone takes more than 30 minutes. |
+| **Reading** | Steegen, Tuerlinckx, Gelman, and Vanpaemel (2016), ["Increasing Transparency Through a Multiverse Analysis"](https://doi.org/10.1177/1745691616658637), *Perspectives on Psychological Science*, the introduction and the worked example. Optional, if you did not read it for Week 9: Recht, Roelofs, Schmidt, and Shankar (2019), ["Do ImageNet Classifiers Generalize to ImageNet?"](https://proceedings.mlr.press/v97/recht19a.html), Sections 1 and 2. |
+| **AI policy** | No AI for Problem 1. AI is allowed in Problem 2 and required in Problem 3. Submit the AI-use record at the end. |
+| **Working file** | `hw06_starter.ipynb`. The PDF is a read-only copy of the prompt. |
+| **Submit** | Notebook PDF and completed `.ipynb` in one Gradescope submission. |
+
+## The situation
+
+In Week 9 you reweighted a benchmark's accuracy to a client's mix of cases. In Week 10 you checked whether a decision changes when you make a different reasonable choice in the analysis. In this homework you do both. You reweight under several scenarios and see whether the decision changes. In Problem 1 the scenarios are different mixes of cases, and in Problem 2 they are different ways of grouping the cases. Then you compare the reweighted numbers with the client's own labels.
+
+Problem 1 is a plant-disease app, worked by hand. Problem 2 returns to Lab 9's tumor model and a hospital the lab did not use, hospital 4. The starter reuses Lab 9's code for the patch grid, blue minus red, `accuracy_by_group()`, and `reweight()`. As in the Week 10 lab, you write down the alternatives and what would change the decision before you run them. In Problem 3 you ask an AI assistant how to check the analysis and sort its suggestions.
+
+Problem 2 uses formulas from Problem 1, so do Problem 1 first.
+
+# Problem 1 - Reweighting a plant-disease app (45 points, no AI)
+
+Show your work. A correct number without the steps behind it earns little credit.
+
+An app looks at a photo of a leaf and says whether the plant is diseased. Its benchmark has 1,000 labeled photos: 800 taken in a lab on a plain background, where the app is right on 768, and 200 taken in a field, where it is right on 160. A farmers' cooperative wants to use the app. Its members take most of their photos in the field on their phones, and a survey of members suggests that about 70% of their photos will be field photos, somewhere between 60% and 80%. Before seeing any results, the cooperative decided to adopt the app only if its accuracy on the cooperative's photos is at least 85%.
+
+The notation is Lecture 9A's. For one photo, $C=1$ if the app is right and $C=0$ if not. $Z$ is where the photo was taken, lab or field, which anyone can see without a label. For each value $k$ of $Z$, $b_k$ and $c_k$ are the benchmark's and the cooperative's shares of photos (the two marginals of $Z$), and $p_k=P(C=1\mid Z=k)$ is the conditional accuracy. With only two kinds of photo, the benchmark's shares are $b_{\text{lab}}=0.8$ and $b_{\text{field}}=0.2$, and the cooperative's are $c_{\text{lab}}$ and $c_{\text{field}}=1-c_{\text{lab}}$.
+
+a. **Marginal times conditional (12 points).**
+
+   **(i) (3 points)** Starting from the law of total expectation, $E[C]=E\bigl[E[C\mid Z]\bigr]$, show that the accuracy is
+   $$\theta=\sum_k P(Z=k)\,P(C=1\mid Z=k),$$
+   so that the benchmark's accuracy is $\sum_k b_k\,p_k$ and the cooperative's is $\sum_k c_k\,p_k$, each with its own $p_k$. Which of the two pieces can the cooperative see in its own photos without labeling any, and which can it not?
+
+   **(ii) (4 points)** Compute the app's accuracy on the benchmark, and the reweighted accuracy for the cooperative at $c_{\text{field}}=0.7$, so $c_{\text{lab}}=0.3$. State the assumption the reweighted number rests on, in terms of conditional accuracies.
+
+   **(iii) (5 points)** At $c_{\text{field}}=0.7$, compute the standard error of the reweighted accuracy, treating the photos as independent,
+   $$\mathrm{SE}=\sqrt{\sum_k c_k^2\,\frac{\hat p_k(1-\hat p_k)}{n_k}},$$
+   and Kish's effective sample size, $n_{\text{eff}}=1\big/\sum_k c_k^2/n_k$. How many of the benchmark's 1,000 photos is the reweighted accuracy worth? Which group contributes more of the variance, and why?
+
+b. **How much does $Z$ explain? (9 points).**
+
+   **(i) (5 points)** Draw one photo at random from the benchmark's 1,000 photos. Its kind, $Z$, and whether the app is right on it, $C$, are random. The shares $b_k=P(Z=k)$, the conditional accuracies $p_k=E[C\mid Z=k]$, and the accuracy $\theta$ are fixed numbers. So $E[C\mid Z]$ is random only because $Z$ is. When $Z=\text{lab}$, which happens with probability $b_{\text{lab}}$, it equals $p_{\text{lab}}$. When $Z=\text{field}$, with probability $b_{\text{field}}$, it equals $p_{\text{field}}$. Write $\Delta=p_{\text{lab}}-p_{\text{field}}$ for the gap between the two conditional accuracies. Show that
+   $$\operatorname{Var}\bigl(E[C\mid Z]\bigr)=b_{\text{lab}}\,b_{\text{field}}\,\Delta^2$$
+   in four steps, then compute it.
+
+   1. **The mean.** Write $E\bigl[E[C\mid Z]\bigr]$ as the sum over $k$ of $E[C\mid Z=k]\,P(Z=k)$, and use (a)(i) to explain why it equals $\theta$. (1 point)
+   2. **The variance as an expected value.** Use $\operatorname{Var}(X)=E\bigl[(X-E[X])^2\bigr]$ to write $\operatorname{Var}\bigl(E[C\mid Z]\bigr)$ as the sum over $k$ of $\bigl(E[C\mid Z=k]-\theta\bigr)^2\,P(Z=k)$, and write out its two terms. (1 point)
+   3. **The deviations.** Substitute $\theta$ from step 1 and show that $p_{\text{lab}}-\theta=b_{\text{field}}\,\Delta$ and $p_{\text{field}}-\theta=-b_{\text{lab}}\,\Delta$. Hint: $1-b_{\text{lab}}=b_{\text{field}}$. (1 point)
+   4. **Factor.** Substitute step 3 into step 2, and use $b_{\text{lab}}+b_{\text{field}}=1$. (1 point)
+   5. **The numbers.** Compute $\operatorname{Var}\bigl(E[C\mid Z]\bigr)$, and the share of $\operatorname{Var}(C)=\theta(1-\theta)$ on the benchmark that it makes up. (1 point)
+
+   **(ii) (2 points)** Show that the reweighted accuracy minus the benchmark's accuracy equals $(c_{\text{field}}-b_{\text{field}})(p_{\text{field}}-p_{\text{lab}})$, and compute it at $c_{\text{field}}=0.7$.
+
+   **(iii) (2 points)** In Lecture 9A, infrared explained under 1% of the variation in whether MegaDetector was right, and reweighting moved the estimate by 1.3 points. In 1 or 2 sentences, use (i) and (ii) to say why reweighting moves this estimate so much more.
+
+c. **Is the decision sensitive to the cooperative's mix? (14 points).** The survey gives only a range for the cooperative's share of field photos, so in this part treat it as unknown and write it as $c=c_{\text{field}}$.
+
+   **(i) (4 points)** Write the reweighted accuracy $\theta(c)$ as a function of the field share $c$. Find the flip point $c^\ast$, the share at which $\theta(c^\ast)=0.85$, and compare it with the survey's 70%.
+
+   **(ii) (5 points)** The cooperative's statistician wants a rule that accounts for uncertainty. It adopts the app only when the one-sided 95% lower bound is at least 0.85, that is, when
+   $$\theta(c)-1.645\,\mathrm{SE}(c)\;\ge\;0.85,$$
+   where $\mathrm{SE}(c)$ is the standard error from (a)(iii) with $c_{\text{field}}=c$ and $c_{\text{lab}}=1-c$,
+   $$\mathrm{SE}(c)=\sqrt{(1-c)^2\,\frac{\hat p_{\text{lab}}(1-\hat p_{\text{lab}})}{n_{\text{lab}}}+c^2\,\frac{\hat p_{\text{field}}(1-\hat p_{\text{field}})}{n_{\text{field}}}}.$$
+   Compute $\theta(c)$, $\mathrm{SE}(c)$, and the lower bound at $c=0.5$ and at $c=0.7$. What does this rule decide at each? The flip point for this rule is the share $c^\dagger$ at which $\theta(c^\dagger)-1.645\,\mathrm{SE}(c^\dagger)=0.85$. Without solving for it, explain why $0.5<c^\dagger<0.7$ and why $c^\dagger<c^\ast$.
+
+   **(iii) (3 points)** Over the survey's range, 60% to 80% field photos, does either rule ever say to adopt? In 2 sentences, say whether the cooperative's decision is sensitive to its mix, and what it could do about not knowing $c$.
+
+   **(iv) (2 points)** In 1 sentence each: why must the 85% threshold and the range of $c$ be set before the results are seen, and what would model shopping look like here?
+
+d. **What conditioning misses (10 points).** The cooperative labels 200 of its own field photos. The app is right on 148 of them, or 74% (Wilson 95% interval 67.5% to 79.6%), against 80% on the benchmark's field photos.
+
+   **(i) (2 points)** Which assumption from (a)(ii) does this result challenge?
+
+   **(ii) (6 points)** Lecture 9A gave three ways that conditioning on $Z$ can miss a drop in accuracy.
+
+   - **Something besides $Z$ differs.** Within one value of $Z$, the client's cases differ from the benchmark's in a way that affects whether the model is right.
+   - **No overlap.** The client has cases that the benchmark has none of, so there is no conditional accuracy to borrow.
+   - **The label means something different.** The same case would get one label from the client and another from the benchmark.
+
+   Below are three possible reasons the app did worse on the cooperative's field photos. For each one, answer three questions. Which of the three ways is it? Could reweighting on lab versus field photos fix it? What data would show whether it is happening?
+
+   1. The cooperative's field photos are taken on older phones in early-morning light, while the benchmark's field photos came from one research farm with good cameras at midday.
+   2. Many members grow a crop the benchmark has no photos of.
+   3. The cooperative's agronomists call a leaf diseased at the first small spot, while the benchmark's labelers required a clear lesion.
+
+   **(iii) (2 points)** In (a)(ii), reweighting estimated the app's accuracy on the cooperative's photos at 84.8%. After seeing the 74% on the cooperative's own field photos, do you think the app's actual accuracy on the cooperative's photos is higher or lower than 84.8%, and why? What data would the cooperative need to estimate that accuracy directly, without relying on the benchmark? Answer in 1 or 2 sentences written for the cooperative.
+
+# Problem 2 - Does hospital 4's answer depend on how Z is defined? (40 points)
+
+The patch data from Lab 9 include a hospital the lab did not use. Hospital 4 has 300 patches from 10 slides, and the model never saw any of its slides. Its pathology lead will use the model to flag patches only if the one-sided 95% lower bound for its accuracy on hospital 4's patches is at least 0.85. As in Lab 9, the patches are about half tumor, so every accuracy here describes this balanced mix.
+
+You will reweight the benchmark's accuracy to hospital 4 in several ways, decide in advance what would change the decision, and only then look at hospital 4's labels. AI help with code is allowed. Record any substantial help in the AI-use table.
+
+a. **Look first (5 points).** Run the code in Problem 2(a). It shows four patches without tumor and four with tumor from each of the four hospitals. It also draws histograms of blue minus red and of brightness for the benchmark and hospital 4. Brightness is a patch's average pixel value, so smaller is darker.
+
+   1. Describe how hospital 4's patches differ from the benchmark's, in 2 or 3 sentences. (2 points)
+   2. Report the share of hospital 4's patches outside the benchmark's range on each measure, and the share that falls in the benchmark's darkest third. (3 points)
+
+b. **Decide before running anything (8 points).** The *primary analysis* is the one you would report if you had to pick a single analysis in advance. Here it is Lab 9's: $Z$ is blue minus red, cut into three groups at the benchmark's 1/3 and 2/3 points. A sensitivity analysis asks whether the decision changes under other reasonable choices of $Z$.
+
+   Part (a) suggests two kinds of choice to vary. The first is *which measurement* to group by: hospital 4 differs from the benchmark mostly in brightness, not in color. The second is *how many groups* to cut it into. Nothing in the data says three is the right number. More groups make the patches within a group more alike, so the conditional accuracy is more likely to carry over, but each group holds fewer benchmark patches, so the effective sample size falls (Lecture 9A). Five groups is one finer choice.
+
+   Here are the primary analysis and four possible alternatives:
+
+   0. **Primary:** blue minus red, cut at the benchmark's thirds (3 groups).
+   1. Blue minus red, cut at the benchmark's fifths (5 groups).
+   2. Brightness, cut at the benchmark's thirds (3 groups).
+   3. Brightness, cut at the benchmark's fifths (5 groups).
+   4. Blue minus red in thirds and brightness in thirds at the same time (9 groups). Each patch's group depends on both its color group from 0 and its brightness group from 2.
+
+   Before you run part (c), fill in the notebook's table for alternatives 1 to 4. For each one, say what it changes about $Z$ compared with the primary analysis, and why it is a reasonable choice. Then say whether you expect its reweighted accuracy to be higher or lower than the primary analysis's estimate (or "unknown," with a reason), and whether you expect it to change the decision. Finally, name the one alternative most likely to change the decision, and say why. This part is graded on its reasoning, not on whether your predictions come true.
+
+c. **The sensitivity table (10 points).** Run the code in Problem 2(c). It assigns every patch to a group under each of the five specifications in (b), reweights the benchmark's accuracy to hospital 4 for each one, and prints the results as a table. Part 1 asks you to finish the code first.
+
+   1. **Fill in the groups.** The function `groups_for()` has one case for each of the five specifications, and each case calls `cut_into_groups(column, n_groups, data)`. Replace each `TODO` with the column, `"blue_minus_red"` or `"brightness"`, and the number of groups, 3 or 5, for that specification. Alternative 4 needs two calls, one for color and one for brightness. The cell stops with a message until every argument is filled in. (2 points)
+   2. **Explain the code.** In 3 or 4 sentences, explain what `cut_into_groups()` does, and what the loop over `specifications` computes for each specification. Say which numbers use the benchmark's labels and which use only hospital 4's patches, without their labels. (2 points)
+   3. **Complete the table.** Fill in the `lower_bound` and `decision` columns. The other columns are already computed: the number of groups, the reweighted estimate, its standard error, and the effective sample size. (2 points)
+   4. Look at the figure of the five estimates with their 95% intervals and the 0.85 line. Which specification, if any, changes the decision? (1 point)
+   5. Explain why the effective sample size falls as $Z$ gets finer. Then use the table of alternative 4's nine groups to find the group that holds the most hospital 4 patches, and report how many benchmark patches are in it. (2 points)
+   6. Compare your predictions in (b) with the table. Which came true, and which did not? (1 point)
+
+d. **Now look at hospital 4's labels (9 points).** Run the code in Problem 2(d). It has three blocks, one for each of questions 1 to 3.
+
+   1. The first block reports hospital 4's accuracy on its 300 labeled patches and its difference from the benchmark's accuracy. The 95% interval for the difference comes from `slide_bootstrap_difference()`, the function from Lab 9. It resamples whole slides at both places, keeping each slide's patches together, because patches from the same slide are related. Report hospital 4's accuracy, the difference, and its interval. Did any specification in (c) predict an accuracy this low? (2 points)
+   2. The second block compares the benchmark's and hospital 4's accuracy within each brightness third. Which assumption failed, and how does the table show it? (2 points)
+   3. The standard errors in (c) treat every patch as independent, which Lab 9 showed is not true. The third block, `slide_bootstrap_reweighted()`, redoes the primary analysis 2,000 times. Each time, it draws the benchmark's 9 slides and hospital 4's 10 slides with replacement, keeping each slide's patches together, and reweights again. The 5th percentile of the 2,000 estimates is a one-sided 95% lower bound that accounts for the slides. Report it. Would this lower bound have warned hospital 4 that the model's accuracy could be below 0.85? (2 points)
+   4. A teammate notices that brightness in fifths gave the estimate closest to hospital 4's labels and wants to report that specification. In 2 sentences, explain what is wrong with this, and why it could not be done for a hospital that has no labels yet. (3 points)
+
+e. **A paragraph for the pathology lead (8 points).** Write one paragraph of 3 to 5 sentences for hospital 4's pathology lead. You do not need a sentence for each item below, but the paragraph should contain all of this information.
+
+   - The primary analysis's reweighted accuracy and its lower bound.
+   - What alternatives 1 to 4 changed (the measurement and the number of groups), and why those changes were reasonable.
+   - How far the estimate moved across the five analyses, and whether the decision changed.
+   - The assumption that none of the five analyses could check, and what hospital 4's own labels showed about it.
+   - What labeled data hospital 4 should collect before relying on the model, and why.
+
+# Problem 3 - Sensitivity analysis or model shopping? (15 points)
+
+a. **Ask (5 points).** Paste this prompt into an AI assistant, and preserve your prompt and its complete response.
+
+   > I'm evaluating a model that labels 96-by-96-pixel patches of lymph-node tissue slides as tumor or not tumor. It uses ImageNet ResNet-18 features with a logistic regression on top. On a benchmark of 900 labeled patches from 9 slides at three hospitals, it is right on 90.7% of patches. A new hospital has 300 patches from 10 slides, and I have not used their labels. To estimate the model's accuracy at the new hospital, I cut the patches into three groups by stain color (the average of blue minus red over a patch's pixels), computed the benchmark's accuracy in each group, and averaged those accuracies using the new hospital's share of patches in each group. That gave 90.4%, with a one-sided 95% lower bound of 88.7%. The hospital will use the model only if the lower bound is at least 85%. List three ways to check whether this decision depends on the analytic choices I made.
+
+   Then sort the assistant's three suggestions in the notebook's table. A suggestion is a *sensitivity analysis* if it varies a defensible choice about the data, the groups, the population, or the decision rule, made for a reason before the result is known. It is *model shopping* if it mainly tries to make the number better or closer to a target. Some suggestions can be either, depending on when and why the choice is made, so say which when that happens. Give a statistical reason for each.
+
+b. **Check (5 points).** Pick the suggestion that is most misleading, either because it could only be done after seeing the new hospital's labels or because it cannot test the assumption that failed in Problem 2(d). In 2 or 3 sentences, explain the problem. If you think none of the three is misleading, say so instead, explain why each one is a fair check, and say whether any of them could have caught the failure in Problem 2(d).
+
+c. **Plan for the next hospital (3 points).** Suppose a third hospital asks to use the model, and you have not seen its labels. Using the assistant's suggestions and what you found in Problem 2, write a short plan that you would commit to before running anything. Give the primary analysis you would report, one alternative and why it is reasonable, and the rule that turns the results into a decision, for example "use the model only if both lower bounds are at least 0.85." Then say what you will report if the alternative gives a different decision from the primary analysis.
+
+## Required AI-use record (2 points)
+
+Complete the AI-use table in the notebook for Problems 2 and 3. Record the tool, its purpose, your **initial prompt only**, what you checked, what changed after checking, and one decision you made yourself.

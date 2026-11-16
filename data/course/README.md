@@ -9,6 +9,10 @@ This directory contains frozen, licensed, privacy-reviewed teaching subsets.
   time-spanning complaint extract.
 - `github_issues/`: 120 real scikit-learn issue titles and metadata for the
   Week 3 issue-triage design problem.
+- `llm_gsm8k/`: 127 GSM8K math word problems, each answered 10,000 times by
+  Llama 3 8B Instruct and Llama 3 70B Instruct, marked right or wrong (Week 11).
+- `llm_judges/`: MT-Bench's expert and GPT-4 judgments of six chatbots' answers to
+  80 questions, with the texts (Week 12 lab and HW7).
 
 See each group README for source, license, selection, privacy, and statistical
 limitations.

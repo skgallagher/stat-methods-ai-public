@@ -1,0 +1,1022 @@
+problem_id,model,answer_index,correct,final_answer,text
+g001,llama3_8b,0,True,57500,"As a teacher, Jill earns 20 * 35 * 50 = $<<20*35*50=35,000>>35,000.
+As a coach, Jill earns 30 * 15 * 50 = $<<30*15*50=22,500>>22,500.
+Her total annual salary is 35,000 + 22,500 = $<<35,000+22,500=57,500>>57,500.
+#### 57,500"
+g001,llama3_8b,1,False,85000,"Jill earns $20 per hour as a teacher. She works 35 hours a week, and there are 50 weeks in a year. So her salary as a teacher is 35 * 50 * 20 = <<35*50*20=35000>>$35,000.
+She earns $30 per hour as a coach. She works 15 hours a week, and there are 50 weeks in a year. So her salary as a coach is 15 * 50 * 30 = <<15*50*30=45000>>$45,000.
+The total annual salary is $35,000 + $45,000 = <<35000+45000=85000>>$85,000.
+#### 85000"
+g002,llama3_8b,2,True,48,"The total calories per bag is 5 x 250 = <<5*250=1250>>1250 calories.
+You have 2000 - 1800 = <<2000-1800=200>>200 calories left in your daily target.
+You can eat 200 / 1250 = <<200/1250=0.16>>0.16 of the bag, or 0.16 x 300 = <<0.16*300=48>>48 grams.
+#### 48"
+g002,llama3_8b,0,False,240,"There are 250 * 5 = <<250*5=1250>>1250 calories in the bag.
+You have already consumed 1800 calories, so you have 2000 - 1800 = <<2000-1800=200>>200 calories left.
+You can eat 200/250 * 300 = <<200/250*300=240>>240 grams.
+#### 240"
+g003,llama3_8b,0,True,5,"The distance from 1 to 4 PM is 3 hours * 10 mph = 30 miles.
+It takes him 30 miles / 6 mph = <<30/6=5>>5 hours to get back.
+#### 5"
+g003,llama3_8b,5,False,10,"He sails from 1 to 4 PM, which is 3 hours.  He travels 3*10=<<3*10=30>>30 miles.
+Since he is now 30 miles away from his starting point, he has to travel 60 miles to get back.
+He travels at a rate of 6 mph, so it will take him 60/6=10 hours to get back.
+#### 10"
+g004,llama3_8b,5,True,300,"The distance she traveled since last filling up gas is 100 miles. She filled her tank up again with 4 gallons of gas. This means that 4 gallons of gas are enough to drive 100 miles.
+Since her tank holds 12 gallons of gas, she can drive 4/12 = 1/3 as many miles per gallon as she drove on the 4 gallons of gas. So, the number of miles she can drive on a single tank of gas is 12 * 100 / 4 = <<12*100/4=300>>300.
+#### 300"
+g004,llama3_8b,0,False,200,"Since Sophia has already driven 100 miles, she has 12 - 4 = 8 gallons of gas left.
+The car can travel 4 gallons of gas for 100 miles. So, it can travel 8 gallons of gas for 2 x 100 = <<2*100=200>>200 miles.
+#### 200"
+g005,llama3_8b,0,True,36,"He spends 2 hours watching TV and then 1 hour reading.  So he spends 3 hours per day.  He does this 3 times a week, so he spends 3 x 3 = 9 hours per week.  In 4 weeks, he spends 9 x 4 = 36 hours.
+#### 36"
+g005,llama3_8b,11,False,84,"He spends 2 hours per day watching TV. For 4 weeks, this is 4 x 7 = <<4*7=28>>28 days. 28 days times 2 hours per day is 56 hours.
+He spends 1 hour per day reading. For 4 weeks, this is 4 x 7 = <<4*7=28>>28 days. 28 days times 1 hour per day is 28 hours.
+He watches TV and reads 56 + 28 = <<56+28=84>>84 hours in 4 weeks.
+#### 84"
+g006,llama3_8b,0,True,60,"Bailey receives 5 dollars a week for 8 weeks, so she receives 5*8=<<5*8=40>>40 dollars.
+She ends up with 100 dollars, so she must have started with 100 - 40 = <<100-40=60>>60 dollars.
+#### 60"
+g006,llama3_8b,20,False,100,"Bailey has $100 after 8 weeks and a weekly allowance of $5. So she has 100 - 5*8 = <<100-5*8=100-40=60>>60 dollars after the allowance.
+But before the allowance, she had $5 less for 8 weeks, so she had 60 + 5*8 = <<60+5*8=60+40=100>>100 dollars.
+#### 100"
+g007,llama3_8b,0,True,7425,"5 classes/day * 5 days = 25 classes
+25 classes + 8 classes = 33 classes
+33 classes * 15 students/class = 495 students
+495 students * $15.00/student = $<<495*15=7425>>7,425.00
+#### 7425"
+g007,llama3_8b,1,False,7445,"Judy teaches 5 classes a day for 5 days, so that is 5 x 5 = 25 classes on weekdays. On Saturday, she teaches 8 classes, so 25 + 8 = 33 classes in total.
+Each class has 15 students, so the total number of students is 33 x 15 = 495 students.
+Judy charges $15.00 per student, so the total amount she makes is 495 x $15.00 = $7445.00
+#### 7445"
+g008,llama3_8b,0,True,88,"Artie will make (12 * 3) + (9 * 2) + (17 * 2) = <<12*3+9*2+17*2=36+18+34=88>>88 dollars.
+#### 88"
+g008,llama3_8b,4,False,86,"Marigolds are $2.74 per pot, so 12 pots will be 12*2.74 = <<12*2.74=32.88>>32.88.
+Rounded to the nearest dollar, this is 33 dollars.
+Petunias are $1.87 per pot, so 9 pots will be 9*1.87 = <<9*1.87=16.83>>16.83.
+Rounded to the nearest dollar, this is 17 dollars.
+Begonias are $2.12 per pot, so 17 pots will be 17*2.12 = <<17*2.12=36.04>>36.04.
+Rounded to the nearest dollar, this is 36 dollars.
+The total amount Artie will make is 33 + 17 + 36 = <<33+17+36=86>>86 dollars.
+#### 86"
+g009,llama3_8b,0,True,17,"Charlie started with 10 stickers.
+He bought 21 stickers, so he now has 10 + 21 = <<10+21=31>>31 stickers.
+He got 23 stickers for his birthday, so he now has 31 + 23 = <<31+23=54>>54 stickers.
+He gave 9 stickers to his sister, so he now has 54 - 9 = <<54-9=45>>45 stickers.
+He used 28 stickers, so he now has 45 - 28 = <<45-28=17>>17 stickers.
+#### 17"
+g009,llama3_8b,246,False,7,"Charlie started with 10 stickers.
+He bought 21 stickers and got 23 stickers for his birthday, for a total of 21+23=<<21+23=44>>44 stickers.
+He gave 9 stickers to his sister, leaving him with 44-9=<<44-9=35>>35 stickers.
+He used 28 stickers to decorate the card, leaving him with 35-28=<<35-28=7>>7 stickers.
+#### 7"
+g010,llama3_8b,0,True,22,"The first time it went off, it rang 4 times.
+The second time it went off, it rang 3 * 4 = <<3*4=12>>12 times.
+The third time it went off, it rang 12 / 2 = <<12/2=6>>6 times.
+In total, the alarm rang 4 + 12 + 6 = <<4+12+6=22>>22 times.
+#### 22"
+g010,llama3_8b,152,False,26,"The first time it rang 4 times, so 4 + 4 = 8 total rings.
+The second time it rang for 3 times as long as the first, so 4 * 3 = 12 times it rang. 8 + 12 = 20 total rings.
+The third time it rang for half as long as the second time, so 12 / 2 = 6 times it rang. 20 + 6 = 26 total rings.
+#### 26"
+g011,llama3_8b,0,True,24,"The number of gift bags she needs is 16 * 0.75 = <<16*0.75=12>>12.
+The cost of the gift bags is 12 * 2 = <<12*2=24>>24.
+#### 24"
+g011,llama3_8b,1,False,18,"She invited 16 friends. But 1/4 of them won't show up. So she has 16 - 16/4 = 16 - 4 = 12 guests. She needs 0.75 gift bags per guest. So she needs 12 * 0.75 = 9 gift bags.
+9 gift bags * $2 per bag = 9 * 2 = $18.
+#### 18"
+g012,llama3_8b,0,True,28,"Cindy has 4 pets. Marcia has 4 + 2 = 6 pets. Jan has 6 * 3 = 18 pets.
+The total number of pets is 4 + 6 + 18 = 28.
+#### 28"
+g012,llama3_8b,1862,False,20,"Jan has 3 times the number of pets as Marcia. So if Marcia has 2 more pets than Cindy, then Jan must have 2*3 = 6 more pets than Cindy.
+Cindy has 4 pets, so Marcia has 4+2 = 6 pets, and Jan has 4+6 = 10 pets.
+The total number of pets is 4+6+10 = <<4+6+10=20>>20
+#### 20"
+g013,llama3_8b,0,True,40,"The number of boys is 2/5*200 = <<2/5*200=80>>80
+The number of girls is 200 - 80 = <<200-80=120>>120
+The number of girls in the girl scout is 2/3*120 = <<2/3*120=80>>80
+The number of girls not in the girl scout is 120 - 80 = <<120-80=40>>40
+#### 40"
+g013,llama3_8b,20,False,80,"2/5 of the students are boys, which is 200 * 2/5 = <<200*2/5=80>>80
+The remaining students are girls, which is 200 - 80 = <<200-80=120>>120
+2/3 of the girls are in the girl scout, so the girls not in the girl scout are 120 - 2/3 * 120 = <<120-2/3*120=80>>80
+#### 80"
+g014,llama3_8b,0,True,240,"He uses 2 pads of paper a week so that’s 2*30 = 60 sheets of paper a week.
+There are 4 weeks in a month so he uses 60*4 = 240 sheets of paper a month.
+#### 240"
+g014,llama3_8b,20,False,60,"Each pad has 30 sheets so 2 pads will have 2*30 = <<2*30=60>>60 sheets.
+Since there are 4 weeks in a month, he uses 60/4 = <<60/4=15>>15 sheets of paper per week.
+15 sheets of paper per week * 4 weeks per month = <<15*4=60>>60 sheets of paper per month.
+#### 60"
+g015,llama3_8b,0,True,50,"Rosie runs 10 miles per hour for 3 hours, so she runs 10 * 3 = 30 miles.
+Then she runs 5 miles per hour for 7 - 3 = 4 hours, so she runs 5 * 4 = 20 miles.
+In total, she runs 30 + 20 = 50 miles.
+#### 50"
+g015,llama3_8b,57,False,40,"Rosie can run 10 miles/hour for 3 hours which is 10*3 = <<10*3=30>>30 miles.
+After that, she runs 5 miles/hour which is 5*(7-3) = <<5*(7-3)=10>>10 miles.
+In total, she can run 30+10 = <<30+10=40>>40 miles.
+#### 40"
+g016,llama3_8b,0,True,120,"Amy made 20 more friends than Lily, so Amy made 50 + 20 = 70 friends.
+Lily and Amy have 50 + 70 = 120 friends together.
+#### 120"
+g016,llama3_8b,3506,False,110,"Amy made 20 more friends than Lily, so Amy made Lily + 20 = <<Lily+20>>60 friends.
+Lily and Amy have 50 + 60 = <<50+60=110>>110 friends together.
+#### 110"
+g017,llama3_8b,0,True,2125,"The second box has 500 * 3 = <<500*3=1500>>1500 pieces.
+The third box has 500 / 4 = <<500/4=125>>125 pieces.
+The total number of pieces is 500 + 1500 + 125 = <<500+1500+125=2125>>2125.
+#### 2125"
+g017,llama3_8b,11,False,2375,"The 3rd box had 1/4 the number of pieces as the 2nd box, so it had 1/4 * 3 * 500 = <<1/4*3*500=375>>375 pieces.
+The 2nd box had 3 * 500 = <<3*500=1500>>1500 pieces.
+The 1st box had 500 pieces.
+Adding them all up, Johnny picks up 500 + 1500 + 375 = <<500+1500+375=2375>>2375 blocks in total.
+#### 2375"
+g018,llama3_8b,2,True,5,"5 people came by with 2 tires each. That is 5 * 2 = 10 tires.
+3 people came by with 3 tires each. That is 3 * 3 = 9 tires.
+One person came by with 1 tire. That is 1 tire.
+In total, she inflated 10 + 9 + 1 = 20 tires.
+Each tire costs 25 cents. 20 tires cost 20 * 0.25 = 5 dollars.
+#### 5"
+g018,llama3_8b,0,False,9.00,"She made 5 * 2 * 0.25 + 3 * 3 * 0.25 + 1 * 1 * 0.25 = 5.00 + 3.75 + 0.25 = 9.00
+#### 9.00"
+g019,llama3_8b,0,True,130,"For the first week, Lloyd earned 5 hours * $10/hour = <<5*10=50>>$50
+For the second week, Lloyd earned 8 hours * $10/hour = <<8*10=80>>$80
+For the first two weeks, Lloyd earned $50 + $80 = <<50+80=130>>$130
+#### 130"
+g019,llama3_8b,67,False,100,"First calculate the total hours he tutored: 5 hours/week*2 weeks = <<5*2=10>>10 hours
+Then calculate his earnings for the two weeks: 10 hours*10/hour = <<10*10=100>>100 dollars
+#### 100"
+g020,llama3_8b,0,True,23,"Two years ago, Jan was 30 - 2 = 28.
+Mark was 5 years older than half Jan's age, so Mark was 5 + 28/2 = 5 + 14 = 19.
+Now Mark is 19 + 2 = 21.
+Jean is 2 years older than Mark, so Jean is 21 + 2 = 23.
+#### 23"
+g020,llama3_8b,1,False,32,"Jean is 2 years older than Mark. So Jean's age is Mark's age + 2.
+Two years ago Mark's age was (Mark's age now) - 2 = <<Mark's age now-2>>.
+Mark's age now is (Mark's age now) - 2 + 2 = <<Mark's age now>>.
+Two years ago Jan's age was (Jan's age now) - 2 = <<Jan's age now-2>>.
+Jan's age now is 30.
+So (Jan's age now) - 2 = 30 - 2 = 28.
+Mark's age now is (Mark's age now) - 2 + 2 = 28 + 2 = 30.
+Jean's age now is Mark's age now + 2 = 30 + 2 = 32.
+#### 32"
+g021,llama3_8b,0,True,120,"40 restaurants will receive 40 x 2 = 80 pounds of carrots. 200 - 80 = 120 pounds of carrots will not be used.
+#### 120"
+g021,llama3_8b,97,False,200,"Each restaurant will receive 2 pounds of carrots. There are 40 restaurants. So, 40 x 2 = 80 pounds of carrots will be used. The remaining carrots will be unused.
+#### 200 - 80 = 120 pounds"
+g022,llama3_8b,39,True,98,"Brinley has 5 test scores: 89, 71, 92, 100 and 86. To get the average, add the scores and divide by 5: (89 + 71 + 92 + 100 + 86) / 5 = 438 / 5 = 87.8.
+She can remove the lowest score, which is 71. The new average will be: (89 + 92 + 100 + 86 + x) / 5 = 93.
+Multiply both sides by 5: 89 + 92 + 100 + 86 + x = 93 * 5 = 465.
+Combine like terms: 367 + x = 465.
+Subtract 367 from both sides: x = 98.
+So Brinley needs a score of 98 on the sixth test to get an average of 93.
+#### 98"
+g022,llama3_8b,0,False,120,"Average = (89 + 71 + 92 + 100 + 86 + x) / 6 = 93
+93 * 6 = 558
+558 = 89 + 71 + 92 + 100 + 86 + x
+558 = 438 + x
+x = 120
+#### 120"
+g023,llama3_8b,0,True,20000,"A third of $15000 is $15000/3 = $5000.
+The company spent $15000 + $5000 = $20000 on advertising for the two years.
+#### 20000"
+g023,llama3_8b,127,False,25000,"The company spent $15000 + $15000/3 = <<15000+15000/3=25000>>25000 on advertising.
+#### 25000"
+g024,llama3_8b,0,True,1,"Kalinda can add 4 pieces per minute. Her mom can add 4/2 = 2 pieces per minute. So together they can add 4 + 2 = 6 pieces per minute.
+360 pieces / 6 pieces per minute = 60 minutes
+60 minutes / 60 minutes per hour = 1 hour
+#### 1"
+g024,llama3_8b,13,False,60,"Kalinda can place 4 pieces per minute, so her mom can place 4/2=<<4/2=2>>2 pieces per minute.
+In total, they can place 4 + 2 = 6 pieces per minute.
+The number of pieces left in the puzzle after x minutes will be 360 - 6x.
+When there are no more pieces left, 360 - 6x = 0.  From here, we can solve for x:
+360 - 6x = 0
+-6x = -360
+x = 60
+#### 60"
+g025,llama3_8b,0,True,300,"The total weight of the onions is 4 * 50 = <<4*50=200>>200 pounds.
+The total cost of the onions is 200 * 1.50 = <<200*1.50=300>>300
+#### 300"
+g025,llama3_8b,1286,False,,"If each bag weighs 50 pounds and there are 4 bags, then the total weight of the onions is 4 * 50 = <<4*50=200>>200 pounds.
+At $1.50 per pound, the total cost of the onions is 200 * 1.50 = $<<200*1.50=300>>300.
+#### \$300"
+g026,llama3_8b,0,True,270,"Maddison has 5 boxes with 50 marbles each, so she has 5 * 50 = <<5*50=250>>250 marbles.
+Then she gets 20 more marbles from her friend, so she now has 250 + 20 = <<250+20=270>>270 marbles.
+#### 270"
+g027,llama3_8b,0,True,8,"Ferdinand has 6/2 = <<6/2=3>>3 trees.
+Harry has 2*3 + 5 = <<2*3+5=11>>11 trees.
+Harry has 11 - 3 = <<11-3=8>>8 more trees than Ferdinand.
+#### 8"
+g027,llama3_8b,68,False,5,"Chris has 6 trees.
+Ferdinand has half that, 6/2 = <<6/2=3>>3 trees.
+Harry has twice that, 3 x 2 = <<3*2=6>>6 trees, and 5 more, 6 + 5 = <<6+5=11>>11 trees.
+Harry has 11 - 6 = <<11-6=5>>5 more trees than Ferdinand.
+#### 5"
+g028,llama3_8b,0,True,138,"Sean has to memorize 54 lines from the solo song.
+The first scene has twice the number of lines as the song, so it has 54*2=108 lines. But only a third of them are his lines, so he has to memorize 108/3=36 lines.
+The second scene has six more lines than the song, so it has 54+6=60 lines. Four-fifths of them are his, so he has to memorize 4/5*60=48 lines.
+In total, Sean has to memorize 54+36+48=138 lines.
+#### 138"
+g028,llama3_8b,19,False,87,"The song has 54 lines. The first scene has twice the number of lines, but only a third of them are his lines. So his lines in the first scene are 54/3*2=<<54/3*2=36>>36.
+The second scene has six more lines than the song, and four-fifths of them are his. So his lines in the second scene are (54+6)*4/5=<<(54+6)*4/5=252/5=50.8>>50.
+So he has to memorize 36+50.8=86.8 lines.
+#### 87"
+g029,llama3_8b,0,True,360,"Alani: 20 * 2 = 40
+Braylen: 40 * 2 = 80
+Margot: 60 * 2 = 120
+Total: 20 + 40 + 60 + 40 + 80 + 120 = 360
+#### 360"
+g029,llama3_8b,2,False,240,"Alani doubled her 20 stories to 40.
+Braylen doubled his 40 stories to 80.
+Margot doubled her 60 stories to 120.
+Total stories:40+80+120=<<40+80+120=240>>240
+#### 240"
+g030,llama3_8b,0,True,3,"Each flagstone weighs 75 pounds, and there are 80 flagstones, so the total weight of the flagstones is 80 * 75 = <<80*75=6000>>6000 pounds.
+The delivery trucks can carry a total weight of 2000 pounds, so the number of trucks needed is 6000 / 2000 = <<6000/2000=3>>3 trucks.
+#### 3"
+g030,llama3_8b,31,False,4,"Each flagstone weighs 75 pounds, so 80 flagstones will weigh 80 * 75 = <<80*75=6000>>6000 pounds.
+The trucks can carry a total weight of 2000 pounds, so they can only carry 2000 / 75 = <<2000/75=26.67>>26.67 (round down to 26) flagstones.
+To carry 80 flagstones, the company will need 80 / 26 = <<80/26=3.08>>3.08 (round up to 4) trucks.
+#### 4"
+g031,llama3_8b,0,True,2,"The total number of chocolate bars is 8 * 5 = <<8*5=40>>40.
+The adults get 4 * 6 = <<4*6=24>>24 chocolate bars, leaving 40 - 24 = <<40-24=16>>16 chocolate bars for the children.
+The children will get 16 / 8 = <<16/8=2>>2 chocolate bars each.
+#### 2"
+g031,llama3_8b,2,False,2.5,"4 adults get 4 * 6 = 24 chocolate bars. 8 children will get the remaining 8 * 5 - 24 = 20 chocolate bars.
+8 children will share 20 chocolate bars equally, so each child will get 20 / 8 = 2.5 chocolate bars.
+#### 2.5"
+g032,llama3_8b,1,True,75,"She works for 3 hours. In this 3 hours, she works for 3*60 = <<3*60=180>>180 minutes. In this 180 minutes, she pauses for 30 minutes. So, she works for 180 - 30 = 150 minutes.
+She earns $5 for 10 minutes, so she earns (150/10)*5 = <<(150/10)*5=75>>75 dollars.
+#### 75"
+g032,llama3_8b,0,False,90,"She works from 8 a.m. to 11 a.m. which is 3 hours.
+In 1 hour she earns 5 * 6 = $30
+So in 3 hours she earns 30 * 3 = $90
+#### 90"
+g033,llama3_8b,0,True,3200,"Watson works 5 days a week, for 10 hours a day, so he works 5*10 = <<5*10=50>>50 hours a week.
+At $10 per hour, he earns 50*10 = <<50*10=500>>500 dollars a week.
+He also gets a $300 bonus each week, so his total earnings per week are 500 + 300 = <<500+300=800>>800 dollars.
+Since there are 4 weeks in April, his total earnings in April are 4*800 = <<4*800=3200>>3200 dollars.
+#### 3200"
+g033,llama3_8b,3,False,2000,"Watson makes 10*5*4 = <<10*5*4=200>>200 dollars per week, and the bonus is $300.
+Thus, Watson makes 200 + 300 = <<200+300=500>>500 dollars per week, and for a whole month he makes 4*500 = <<4*500=2000>>2000 dollars.
+#### 2000"
+g034,llama3_8b,0,True,6,"The discount on each tub of ice cream is $13 - $11 = $2.
+So, the discount on 2 tubs of ice cream is 2 x $2 = $4.
+The discount on each packet of milk is $0.5.
+So, the discount on 4 packets of milk is 4 x $0.5 = $2.
+The total discount is $4 + $2 = $6.
+#### 6"
+g034,llama3_8b,1,False,2,"The total cost of 2 tubs of ice cream is 2 x $11 = $22.
+The total cost of 4 packets of milk is 4 x (original price - discount) = 4 x ($1 - $0.5) = 4 x $0.5 = $2.
+The total cost of 2 tubs of ice cream and 4 packets of milk is $22 + $2 = $24.
+The original cost of 2 tubs of ice cream and 4 packets of milk is 2 x $13 + 4 x $1 = 2 x $13 + $4 = $26.
+The total savings is $26 - $24 = $2.
+#### 2"
+g035,llama3_8b,1,True,120000,"Six years ago, Noah's age is 46 - 6 = 40.
+Cera's age 6 years ago is 46 - 6 = 40 as well.
+Noah was half as old as Cera, so Noah's age 6 years ago is half of 40, which is 20.
+The population of Chile 6 years ago was 3000 * 20 = 60000.
+Currently, the population of Chile is now 2 * 60000 = 120000.
+#### 120000"
+g035,llama3_8b,0,False,138000,"Six years ago, Noah was half as old as Cera, so he was 46/2=<<46/2=23>>23 years old.
+The population of Chile six years ago was 3000 times Noah's age, so it was 3000*23=<<3000*23=69000>>69000.
+The population of Chile now is twice the population of Chile six years ago, so it is 69000*2=<<69000*2=138000>>138000.
+#### 138000"
+g036,llama3_8b,0,True,14,"Erin starts with 7 lollipops.
+Then she gets 10 more, so she has 7 + 10 = 17 lollipops.
+Then she gives 3 away, so she has 17 - 3 = 14 lollipops left.
+#### 14"
+g037,llama3_8b,0,True,8400,"Job A pays 15 * 2000 = 30000 dollars a year. After 20% tax, he gets 30000 * 0.8 = 24000 dollars.
+Job B pays 42000 - 6000 = 36000 dollars after property tax. After 10% tax, he gets 36000 * 0.9 = 32400 dollars.
+Job B pays 32400 - 24000 = 8400 dollars more than Job A.
+#### 8400"
+g037,llama3_8b,8,False,160.77,"Job A: 2000 x $15 = $30,000. 20% tax rate on $30,000 = $6,000. $30,000 - $6,000 = $24,000 left. $24,000 / 52 weeks = $461.54 per week.
+Job B: $42,000 - $6,000 = $36,000. 10% tax rate on $36,000 = $3,600. $36,000 - $3,600 = $32,400. $32,400 / 52 weeks = $622.31 per week.
+Job B pays $622.31 - $461.54 = <<622.31-461.54=160.77>>$160.77 more per week.
+#### 160.77"
+g038,llama3_8b,0,True,310,"The 40 tables with 4 legs have 40 x 4 = <<40*4=160>>160 legs.
+The 50 tables with 3 legs have 50 x 3 = <<50*3=150>>150 legs.
+The total number of legs is 160 + 150 = <<160+150=310>>310.
+#### 310"
+g038,llama3_8b,1459,False,40,"The restaurant has 40 tables with 4 legs and 50 tables with 3 legs. So, the total number of legs is 40*4+50*3.
+#### 40*4+50*3
+
+40*4 = 160
+50*3 = 150
+160 + 150 = 310
+
+#### 310"
+g039,llama3_8b,1,True,45,"She already has $80.
+At her first job, she made 20 * 10 = 200.
+At her second job, she made 15 * 5 = 75.
+She earned 200 + 75 = 275.
+So she has 275 + 80 = 355.
+She still needs 400 - 355 = 45.
+#### 45"
+g039,llama3_8b,0,False,125,"Annabelle already has 80 dollars.
+She earns 10 * 20 = 200 dollars at her first job.
+She earns 5 * 15 = 75 dollars at her second job.
+So in total she earns 200 + 75 = 275 dollars.
+She needs 400 - 275 = 125 dollars more.
+#### 125"
+g040,llama3_8b,3,True,20,"First, let's find the distance from the third city to the first city.  This is 75 + 100 = <<75+100=175>>175 miles.  The train travels 50 miles less than that, so it travels 175 - 50 = <<175-50=125>>125 miles.
+Now let's find the total distance the train travels per day: 75 + 100 + 125 = <<75+100+125=300>>300 miles.
+The train travels this distance 3 times a day, so it travels 300 * 3 = <<300*3=900>>900 miles.
+Now let's find how many days the train goes between services: 18000 / 900 = <<18000/900=20>>20 days.
+#### 20"
+g040,llama3_8b,0,False,17,"The train goes a total of 75 + 100 + (100 + 75) = <<75+100+175=350>>350 miles per trip.
+Since it goes 3 trips per day, it goes a total of 350 * 3 = <<350*3=1050>>1050 miles per day.
+Since it needs service every 18,000 miles, it will go between services for 18,000 / 1050 = <<18000/1050=17>>17 days.
+#### 17"
+g041,llama3_8b,0,True,49,"There are 96 - 43 = <<96-43=53>>53 fourth-grade boys
+On Friday, 4 fourth-grade boys were absent, so there are 53 - 4 = <<53-4=49>>49 fourth-grade boys at school
+#### 49"
+g041,llama3_8b,1,False,44,"First, subtract the absent girls and boys from the total number of students to find the number of students who were present on Friday: 96 students - 5 girls - 4 boys = <<96-5-4=87>>87 students
+Then subtract the number of girls who were present from the number of students who were present to find the number of boys present: 87 students - 43 girls = <<87-43=44>>44 boys
+#### 44"
+g042,llama3_8b,0,True,18,"There are 6 girls. If there are twice the number of boys, then there are 6 x 2 = 12 boys.
+In total, there are 6 + 12 = 18 kids in the park.
+#### 18"
+g042,llama3_8b,279,False,12,"6 girls + 2 * 6 = <<6+2*6=12>>12
+#### 12"
+g043,llama3_8b,0,True,32,"Mr. Ruther had 12.8 hectares left after selling 3/5 of his land. So he must have had 12.8 * 5/2 = 32 hectares at first.
+#### 32"
+g043,llama3_8b,1,False,16,"Let x be the amount of land Mr. Ruther had at first.
+He sold 3/5 of it. So, he sold 3/5 * x = <<3/5*x=x/5>>x/5 hectares.
+He had 12.8 hectares left. So, the total amount of land he had is 12.8 + x/5.
+The total amount of land he had is equal to the initial amount of land he had, so:
+12.8 + x/5 = x
+Subtract 12.8 from both sides:
+x/5 = x - 12.8
+Multiply both sides by 5:
+x = 5(x - 12.8)
+Expand and simplify:
+x = 5x - 64
+Subtract 5x from both sides:
+-4x = -64
+Divide both sides by -4:
+x = 16
+#### 16"
+g044,llama3_8b,0,True,80,"The average is the sum of the test scores divided by the number of test scores.
+The sum of the test scores is 65 + 94 + 81 + 86 + 74 = 400.
+The average is 400/5 = 80.
+#### 80"
+g044,llama3_8b,17,False,72.6,"First, we need to find the average of the 5 test scores.
+The average is (65+94+81+86+74)/5 = <<(65+94+81+86+74)/5=(65+94+81+86+74)/5>>363/5 = 72.6
+#### 72.6"
+g045,llama3_8b,2,True,34,"The cost of the streaming services is 10 + (10 + 10) * .8 = 10 + 16 = 26
+The difference between this and the cable package is 60 - 26 = 34
+#### 34"
+g045,llama3_8b,0,False,41.6,"He saves 60 - (10 + 8.4) = 60 - 18.4 = 41.6
+#### 41.6"
+g046,llama3_8b,0,True,14400,"4 weeks/month * 6 days/week = 24 days/month
+24 days/month * 12 months/year = 288 days/year
+288 days/year * $50/day = $14,400/year
+#### 14,400"
+g046,llama3_8b,11,False,,"4 weeks = 28 days (4 weeks = 4 * 7 = 28 days)
+28 days * 6 days = 168 days per month
+168 days * $50 per day = $8400 per month
+There are 12 months in a year. So he earns 12 * $8400 = $100800 per year.
+#### $100800"
+g047,llama3_8b,0,True,3,"First, find the cost of the taffy: 1 pound at $3 + 1/2 pound at $3/2 = $3 + $1.50 = $4.50
+Then find the total cost of all the items: $4.50 + $1.50 + $1.00 (4 magnets at $0.25 each) = $7.00
+Thus, Sally has $10 - $7.00 = <<10-7=3>>$3.00 left.
+#### 3"
+g047,llama3_8b,4,False,3.75,"First, calculate the cost of the taffy: 1 pound for $3 + 1/2 pound for $1.50/2 = $3 + $0.75 = $3.75
+So, the total cost of the taffy is $3.75.  The mixed bag of seashells costs $1.50, and the 4 magnets cost $0.25 x 4 = $1.00.  The total cost of the other items is $1.50 + $1.00 = $2.50.  The cost of the taffy and the other items is $3.75 + $2.50 = $6.25.
+Thus, Sally has $10 - $6.25 = $<<10-6.25=3.75>>3.75 left.
+#### 3.75"
+g048,llama3_8b,0,True,13,"Indras has 6 letters in her name.
+Half of the letters in Indras' name is 6 / 2 = 3.
+Her sister's name has 4 more letters than 3, so it has 3 + 4 = 7 letters.
+In total, Indras and her sister have 6 + 7 = 13 letters.
+#### 13"
+g048,llama3_8b,33,False,11,"Indras has 6 letters.
+The number of letters in her sister's name is the number of letters in Indras' name / 2 + 4.
+This is 6 / 2 + 4 = 1 + 4 = 5.
+So her sister's name has 5 letters.
+Adding the number of letters in both names, Indras and her sister's names have 6 + 5 = 11 letters.
+#### 11"
+g049,llama3_8b,0,True,6,"Finley started in 1st place, but fell back 5 spots to 6th place.
+Then she moved ahead 2 spots to 4th place.
+Then she fell behind 3 spots to 7th place.
+Finally, she jumped ahead 1 spot to 6th place.
+#### 6"
+g049,llama3_8b,3,False,12,"Finley started off in first place. She fell back 5 spots, so she is now in the 6th place.
+She then moves ahead 2 spots, so she is now in the 6th + 2 = 8th place.
+She then falls behind 3 spots, so she is now in the 8th + 3 = 11th place.
+Finally, she jumps ahead 1 spot, so she is now in the 11th + 1 = 12th place.
+#### 12"
+g050,llama3_8b,0,True,4,"6 jars * 8 cupcakes/jar = 48 cupcakes
+48 cupcakes / 12 cupcakes/pan = 4 pans
+#### 4"
+g050,llama3_8b,267,False,24,"Each jar of sprinkles can decorate 8 cupcakes. Mary has 6 jars, so each jar can decorate 6 x 8 = 48 cupcakes. 
+Mary will use up all of her sprinkles decorating 6 x 48 = 288 cupcakes. 
+288 cupcakes will require 288/12 = 24 pans of cupcakes.
+#### 24"
+g051,llama3_8b,0,True,80,"Initially, there were 30 students with 10 pencils each, so there were 30*10 = 300 pencils.
+After 2 months, 1/5 of the pencils were used. 1/5 of 300 is 300/5 = 60.
+So, 300 - 60 = 240 pencils were left.
+At the end of the year, 1/3 of the remaining pencils were left. 1/3 of 240 is 240/3 = 80.
+So, 80 pencils were left.
+#### 80"
+g051,llama3_8b,3,False,160,"Originally, there were 30 students with 10 pencils each, so 30*10 = <<30*10=300>>300 pencils.
+After 1/5 were used, the number of pencils left was 300 - (1/5)*300 = 300 - 60 = 240.
+After 1/3 of the remaining pencils were used, the number of pencils left was 240 - (1/3)*240 = 240 - 80 = 160.
+#### 160"
+g052,llama3_8b,0,True,84,"The 2010 penny weighs 3/4 * 48 = <<3/4*48=36>>36 grains.
+The combined weight of the two pennies is 36 + 48 = <<36+48=84>>84 grains.
+#### 84"
+g052,llama3_8b,267,False,5.46,"The 1959 penny weighs 48 grains. The 2010 penny weighs 3/4 of the 1959 penny, so it weighs 3/4 * 48 = 36 grains.
+The total weight is 36 + 48 = 84 grains.
+1 grain is equal to 0.06479 grams, so 84 grains is equal to 84 * 0.06479 = 5.46 grams.
+#### 5.46 grams"
+g053,llama3_8b,0,True,32,"The family-size pizza costs 3 times as much as the small pizza, so it costs 3 x $8 = $<<3*8=24>>24
+Total cost is $8 + $24 = $<<8+24=32>>32
+#### 32"
+g053,llama3_8b,3843,False,40,"The family-size pizza costs $8 + $8*3 = $<<8+8*3=8+24=32>>32
+Total amount spent is $8 + $32 = $<<8+32=40>>40
+#### 40"
+g054,llama3_8b,0,True,18,"The rug is 5 feet wider than the chair, so it is 3 + 5 = 8 feet wide.
+The couch is 2 feet longer than twice the width of the rug, so it is 2 * 8 + 2 = 18 feet long.
+#### 18"
+g054,llama3_8b,3,False,34,"The rug is 5 feet wider than the chair, so it is 3+5=8 feet wide
+The couch is 2 feet longer than twice the width of the rug, so it is 2*(2*8) + 2 = 34 feet long
+#### 34"
+g055,llama3_8b,1,True,12,"Heather has 27 cups of raisins. 27 cups of raisins are going to be divided into 3 parts: oatmeal cookies, granola, and snack mix. So 27 cups / 3 = <<27/3=9>>9 cups of raisins will be used for each part.
+For oatmeal cookies, 3/4 cup of raisins are needed per batch. So Heather can make 9 cups / (3/4 cup/batch) = 12 batches of oatmeal cookies.
+#### 12"
+g055,llama3_8b,0,False,9,"Heather has 27 cups of raisins. 27 / 3 = <<27/3=9>>9 batches of oatmeal cookies can be made.
+#### 9"
+g056,llama3_8b,0,True,30,"He walks 3+3=<<3+3=6>>6 miles each day
+He has to work 5 times a week so that's 6*5=<<6*5=30>>30 miles
+#### 30"
+g056,llama3_8b,64,False,20,"He walks 2 miles each day to work and back.
+So each day he walks 2*2 = 4 miles
+If he works 5 times a week then he walks 4*5 = 20 miles
+#### 20"
+g057,llama3_8b,0,True,70,"21 buttons - 7 buttons = 14 buttons
+7 buttons * 2 holes = 14 holes
+14 buttons * 4 holes = 56 holes
+Total holes = 14 holes + 56 holes = 70 holes
+#### 70"
+g057,llama3_8b,14,False,28,"First find the number of buttons with four holes, which is 21 - 7 = 14 buttons.
+The 7 buttons with two holes will have 7 * 2 = 14 holes.
+The 14 buttons with four holes will have 14 * 4 = 56 holes.
+In total, there are 14 + 14 = 28 holes.
+#### 28"
+g058,llama3_8b,3,True,240,"In the first week, Judy read for 15 minutes per night for 7 nights, so she read for 7*15 = 105 minutes. If she can read 2 pages per 1.5 minutes, then she read 105 minutes * 2 pages / 1.5 minutes = 140 pages.
+In the second week, she read 100 pages.
+In total, Judy read 140 + 100 = 240 pages.
+#### 240"
+g058,llama3_8b,0,False,170,"In the first week, Judy read for 15 minutes * 7 nights = 105 minutes = 105/1.5 = 70 pages.
+In the second week, she read 100 pages.
+In total, she read 70 + 100 = 170 pages.
+#### 170"
+g059,llama3_8b,5,True,500,"468 is 468/450 - 1 = <<468/450-1=0.04>>4% more than 450. This means that if 450 is x, 468 is x * (1 + 0.04) = <<x*(1+0.04)=1.04x>>1.04x
+To get to 520, she needs to set the oven to a temperature of 520 / 1.04 = <<520/1.04=500>>500
+#### 500"
+g059,llama3_8b,0,False,538,"The oven is off by 18 degrees (468 - 450 = <<468-450=18>>18). To find the temperature she should set it at, add 18 to 520: 520 + 18 = <<520+18=538>>538
+#### 538"
+g060,llama3_8b,0,True,129200,"The value of Juan's house is 76,000 * 0.7 = $<<76,000*0.7=53,200>>53,200.
+The total value of the two houses is 76,000 + 53,200 = $<<76,000+53,200=129,200>>129,200.
+#### 129,200"
+g060,llama3_8b,6,False,128000,"Juan's house is 30% less expensive, so he paid $76,000 * (1 - 0.3) = $<<76,000*(1-0.3)=52,000>>52,000.
+The total value of the two houses is $76,000 + $52,000 = $<<76,000+52,000=128,000>>128,000.
+#### 128,000"
+g061,llama3_8b,0,True,48,"5 dogs * 4 legs per dog = 20 legs
+2 cats * 4 legs per cat = 8 legs
+10 birds * 2 legs per bird = 20 legs
+Total legs = 20 + 8 + 20 = 48
+#### 48"
+g061,llama3_8b,20,False,170,"First figure out the total number of animals: 5 dogs + 2 cats + 10 birds = 17 animals
+Then figure out the average number of legs per animal: 4 legs per dog + 4 legs per cat + 2 legs per bird = 10 legs per animal
+Then multiply the total number of animals by the average number of legs per animal to find the total number of legs: 17 animals * 10 legs per animal = <<17*10=170>>170 legs
+#### 170"
+g062,llama3_8b,0,True,14,"Naomi caught 17 fish.
+Darren caught 17-6 = <<17-6=11>>11 fish.
+Tommy caught 11+3 = <<11+3=14>>14 fish.
+#### 14"
+g062,llama3_8b,267,False,17,"Tommy caught 3 more fish than Darren, so Darren caught 17 - 3 = <<17-3=14>>14 fish.
+Darren caught 6 less than Naomi, so Naomi caught 14 + 6 = <<14+6=20>>20 fish.
+Tommy caught 3 more than Darren, so Tommy caught 14 + 3 = <<14+3=17>>17 fish.
+#### 17"
+g063,llama3_8b,3,True,54,"Howie needs to buy 1 + 1 + 2 = <<1+1+2=4>>4 cupcakes for himself, his teacher, and his 25 classmates.
+For his classmates, he needs 25 * 2 = <<25*2=50>>50 cupcakes.
+So in total, he needs 4 + 50 = <<4+50=54>>54 cupcakes.
+#### 54"
+g063,llama3_8b,0,False,56,"1 + 1 + 25 * 2 = 28 * 2 = 56
+#### 56"
+g064,llama3_8b,0,True,2,"Lori needs 3 deviled egg halves per guest, so she needs 3*16=48 deviled egg halves.
+Since she needs 1 whole egg to make 2 deviled egg halves, she will need 48/2=24 whole eggs.
+Since there are 12 eggs in a dozen, she will need 24/12=2 dozens of eggs.
+#### 2"
+g064,llama3_8b,2,False,8,"Since each guest will eat 3 deviled egg halves, and there are 16 guests, Lori will need 16*3=48 deviled egg halves.
+Since each deviled egg half takes 1/2 egg, and there are 48 deviled egg halves, Lori will need 48*2=96 eggs.
+Since there are 12 eggs in a dozen, Lori will need 96/12=8 dozens of eggs.
+#### 8"
+g065,llama3_8b,0,True,44,"First find the cost of the more expensive coffee: 5 dollars * 1.20 = <<5*1.2=6>>6 dollars
+Then find the total cost of the coffee for a week: 6 dollars * 7 days = <<6*7=42>>42 dollars
+Add the cost of the donut: 42 dollars + 2 dollars = <<42+2=44>>44 dollars
+#### 44"
+g065,llama3_8b,17,False,79,"The normal brand of coffee costs $5 per pound.  The more expensive brand costs 20% more, or $5 + $5*0.2 = <<5+5*0.2=6>>$6 per pound.  He uses 1 pound of coffee per day, and he wants a week's worth of coffee, so he buys 7 pounds of coffee.  The normal brand would have cost 7 * $5 = <<7*5=35>>$35.  The more expensive brand costs 7 * $6 = <<7*6=42>>$42.  He also buys a donut for $2.  In total, everything costs $35 + $42 + $2 = <<35+42+2=79>>$79.
+#### 79"
+g066,llama3_8b,0,True,7,"Gus spent 2*2 + 8 + 1 = 4 + 8 + 1 = 13 dollars on everything except the apple pie.
+He spent 20 - 13 = 7 dollars on the apple pie.
+#### 7"
+g066,llama3_8b,3,False,1.00,"Gus spent 2 x 2.00 + 8.00 + 1.00 = $<<2*2+8+1=12+8+1=21>>21 on the other items.
+He spent $20.00 in total, so the apple pie cost 20.00 - 21.00 = <<20-21=-1>>$1.00.
+#### 1.00"
+g067,llama3_8b,1,True,120,"Kassidy has 3/4 as much as Aurelia, so Kassidy has 3/4 * 120 = <<3*30=90>>90 dollars
+Rayna has 60 more than Kassidy, so Rayna has 90 + 60 = <<90+60=150>>150 dollars
+In total, they have 150 + 90 + 120 = <<150+90+120=360>>360 dollars
+They will share the money equally, so each will receive 360 / 3 = <<360/3=120>>120 dollars
+#### 120"
+g067,llama3_8b,0,False,80,"Kassidy has 3/4 * 120 = <<3/4*120=90>>90 dollars
+Rayna has 90 + 60 = <<90+60=150>>150 dollars
+Together they have 90 + 150 = <<90+150=240>>240 dollars
+If they share this equally, each will have 240/3 = <<240/3=80>>80 dollars
+#### 80"
+g068,llama3_8b,0,True,576,"If 6 potatoes makes 36 hash browns, then 1 potato makes 36/6 = <<36/6=6>>6 hash browns.
+96 potatoes will make 96 x 6 = <<96*6=576>>576 hash browns.
+#### 576"
+g068,llama3_8b,45,False,144,"6 potatoes make 36 hash browns. So 96 potatoes will make 96/6 x 36 = <<96/6*36=144>>144 hash browns.
+#### 144"
+g069,llama3_8b,0,True,120,"The turtle is 5 times slower than the cat. So the turtle runs 15 feet/second / 5 = <<15/5=3>>3 feet/second.
+In 40 seconds, the turtle crawls 3 feet/second * 40 seconds = <<3*40=120>>120 feet.
+#### 120"
+g069,llama3_8b,79,False,200,"The turtle runs at 5/15 the speed of the cat. So 5/15 * 15 feet/second = <<5/15*15=5>>5 feet/second.
+In 40 seconds, the turtle crawls 5 feet/second * 40 seconds = <<5*40=200>>200 feet.
+#### 200"
+g070,llama3_8b,0,True,160,"The restaurant has 170 - 20 = 150 normal chairs left.
+The restaurant has 23 - 13 = 10 baby chairs left.
+In total, the restaurant has 150 + 10 = 160 chairs left.
+#### 160"
+g070,llama3_8b,24,False,287,"After sending 20 normal chairs and 13 baby chairs to the carpenter, the restaurant will have 170 - 20 = 150 normal chairs left.
+150 - 13 = 137 baby chairs left.
+The total number of chairs left is 150 + 137 = 287.
+#### 287"
+g071,llama3_8b,6,True,18,"Bryce and two friends ate 2/3 of their pizzas. 2/3 of 12 slices is 2/3*12 = 8 slices. So they ate 8 slices each for a total of 3*8 = 24 slices.
+The two remaining friends ate ¾ of their pizzas. ¾ of 12 slices is 3/4*12 = 9 slices. So they ate 9 slices each for a total of 2*9 = 18 slices.
+In total, they ate 24 + 18 = <<24+18=42>>42 slices.
+There were originally 12*5 = 60 slices. After eating 42 slices, they have 60 - 42 = <<60-42=18>>18 slices left.
+#### 18"
+g071,llama3_8b,0,False,37,"Bryce and two friends ate 2/3 of their pizzas, which is 2/3 * 4 = <<2/3*4=8/3>>8 slices of pizza.
+The two remaining friends ate ¾ of their pizzas, which is 3/4 * 2 = <<3/4*2=3/2>>3 slices of pizza.
+In total, they ate 8 + 3 = <<8+3=11>>11 slices of pizza.
+There were originally 4 * 12 = 48 slices of pizza. So there are 48 - 11 = <<48-11=37>>37 slices of pizza left.
+#### 37"
+g072,llama3_8b,0,True,25,"The cat eats 9 sausages in 30 minutes, so the dog eats 9 sausages in 30*(2/3) = 20 minutes.
+The average time is (30+20)/2 = 50/2 = 25 minutes.
+#### 25"
+g072,llama3_8b,1,False,20,"The cat takes 30 minutes to eat the sausages. The dog eats the same number of sausages in 30 - 30*2/3 = 30 - 20 = 10 minutes. To find the average, we add the time taken by the cat and the dog and divide by 2. The average time taken by the cat and the dog to eat the sausages is (30 + 10)/2 = 40/2 = 20.
+#### 20"
+g073,llama3_8b,1,True,3,"Boris has 100 apples and gives Beck 10 apples. So Boris has 100 - 10 = <<100-10=90>>90 apples now.
+Beck has 23 fewer apples than Boris initially. So Beck had 100 - 23 = <<100-23=77>>77 apples initially.
+Beck now has 10 apples more than initially. So Beck has 77 + 10 = <<77+10=87>>87 apples now.
+Boris has 90 apples and Beck has 87 apples, so Beck has 90 - 87 = <<90-87=3>>3 fewer apples than Boris now.
+#### 3"
+g073,llama3_8b,0,False,13,"Boris gives Beck 10 apples, so Beck now has 23 - 10 = <<23-10=13>>13 fewer apples than Boris.
+#### 13"
+g074,llama3_8b,1,True,4,"The total number of animals Melissa has to groom is 8 + 5 + 3 + 12 = 28 animals.
+She has to split the grooming jobs over the 7 days of the week.
+Therefore, she will groom 28/7 = <<28/7=4>>4 animals each day.
+#### 4"
+g074,llama3_8b,0,False,28,"Melissa will groom 8 + 5 + 3 + 12 = <<8+5+3+12=28>>28 animals per day.
+#### 28"
+g075,llama3_8b,3,True,240,"Jenna has 4 roommates. So there are 5 people to split the bill. The total electricity bill is 100 * 12 = <<100*12=1200>>1200 dollars per year.
+Each roommate pays 1200/5 = <<1200/5=240>>240 dollars per year.
+#### 240"
+g075,llama3_8b,0,False,300,"The total electricity bill per year is $100 * 12 = $1200.
+There are 4 roommates, so each roommate will pay $1200 / 4 = $<<1200/4=300>>300 per year.
+#### 300"
+g076,llama3_8b,0,True,133,"5% of $140 is $7.
+$140 - $7 = $<<140-7=133>>133
+#### 133"
+g076,llama3_8b,11,False,132,"5% is 1/20, or 0.05.
+You will pay 0.95 * 140 = 132.
+#### 132"
+g077,llama3_8b,0,True,50,"Tatiana has 7 + 5 = <<7+5=12>>12 hours total.
+She reads for 3 hours, leaving 12 - 3 = <<12-3=9>>9 hours.
+She plays video games for 1/3 of the remaining time, which is 1/3 * 9 = <<1/3*9=3>>3 hours.
+The time left for soccer is 9 - 3 = <<9-3=6>>6 hours.
+The percentage of her weekend spent playing soccer is 6/12 = <<6/12=0.5=50>>50%.
+#### 50% or 0.5"
+g077,llama3_8b,5,False,8.33,"Tatiana has 7 hours on Saturday and 5 hours on Sunday, for a total of 7 + 5 = <<7+5=12>>12 hours.
+She reads for 3 hours and plays video games for 1/3 of the remaining time. There are 12 - 3 = <<12-3=9>>9 hours remaining.
+1/3 of 9 is 3 hours, so she plays video games for 3 hours and she has 9 - 3 = <<9-3=6>>6 hours left.
+She spent 6 hours on Saturday and 5 hours on Sunday, for a total of 6 + 5 = <<6+5=11>>11 hours playing video games and reading.
+The amount of time she spends playing soccer is 12 - 11 = <<12-11=1>>1 hour.
+As a percentage of her weekend, she spends (1/12) * 100 = <<1/12*100=8.33>>8.33% playing soccer.
+#### 8.33% (round to 8%)"
+g078,llama3_8b,0,True,800,"1000 * 0.8 = <<1000*0.8=800>>800
+#### 800"
+g078,llama3_8b,686,False,600,"To find 20% of 1000, you can divide by 5 and multiply by 2. So 1000 / 5 = 200 and 200 * 2 = 400.
+You have to pay 1000 - 400 = <<1000-400=600>>600 dollars.
+#### 600"
+g079,llama3_8b,0,True,100,"172 - 47 = <<172-47=125>>125
+125 + 13 = <<125+13=138>>138
+138 - 38 = <<138-38=100>>100
+#### 100"
+g079,llama3_8b,37,False,60,"At the first stop, 47 people get off.
+At the second stop, 13 people get on.
+At the third stop, 38 people get off.
+The number of people on the train at the end is 172 - 47 + 13 - 38 = <<172-47+13-38=60>>60
+#### 60"
+g080,llama3_8b,11,True,2880000,"After the first month, the total number of employees will be 200 + 20 = 220.
+After the second month, the total number of employees will be 220 + 20 = 240.
+After the third month, the total number of employees will be 240 + 20 = 260.
+The total amount of money the company pays to its employees in one month is 240 * 4000 = <<240*4000=960000>>960000.
+The total amount of money the company pays to its employees after three months is three times the amount paid in one month: 3 * 960000 = <<3*960000=2880000>>2880000
+#### 2880000"
+g080,llama3_8b,0,False,1040000,"After one month, the company has 200 + 20 = <<200+20=220>>220 employees.
+After two months, the company has 220 + 20 = <<220+20=240>>240 employees.
+After three months, the company has 240 + 20 = <<240+20=260>>260 employees.
+The total amount of money the company pays to its employees after three months is 260 x 4000 = <<260*4000=1040000>>1040000
+#### 1040000"
+g081,llama3_8b,0,True,1170,"The total cost of the ring is $600 + $300 = $900
+The premium is 30% of $900, which is 0.30 x $900 = $270
+So James paid $900 + $270 = $1170
+#### 1170"
+g081,llama3_8b,155,False,900,"30% premium means that the cost is 130% of the cost of the diamond and gold. 130% of 600 + 300 = 900, so he paid 900.
+#### 900"
+g082,llama3_8b,3,True,79,"Rose starts with 3 flowers with 5 petals each, so she has 3 * 5 = 15 petals.
+Then she picks 4 flowers with 6 petals each, so she has 4 * 6 = 24 petals.
+Then she adds 5 flowers with 4 petals each, so she has 5 * 4 = 20 petals.
+Lastly, she picks 6 flowers with 7 petals each, so she has 6 * 7 = 42 petals.
+In total, Rose has 15 + 24 + 20 + 42 = 101 petals.
+However, she drops 1 of each of the flowers, so she has 1 less of each type of flower.  Thus, she has 3 - 1 = 2 flowers with 5 petals, 4 - 1 = 3 flowers with 6 petals, 5 - 1 = 4 flowers with 4 petals, and 6 - 1 = 5 flowers with 7 petals.
+The total number of petals is 2 * 5 + 3 * 6 + 4 * 4 + 5 * 7 = 10 + 18 + 16 + 35 = 79 petals.
+#### 79"
+g082,llama3_8b,0,False,97,"Rose picks 3 flowers with 5 petals each, so there are 3 * 5 = 15 petals.
+She picks 4 flowers with 6 petals each, so there are 4 * 6 = 24 petals.
+She picks 5 flowers with 4 petals each, so there are 5 * 4 = 20 petals.
+She picks 6 flowers with 7 petals each, so there are 6 * 7 = 42 petals.
+In total, there are 15 + 24 + 20 + 42 = 101 petals.
+She drops 1 of each, so there are 101 - 4 = 97 petals left.
+#### 97"
+g083,llama3_8b,0,True,4500,"The cost of the 3 goats is 3*$500 = $1500
+The cost of the 2 cows is 2*$1500 = $3000
+The total cost is $1500 + $3000 = $4500
+#### 4500"
+g083,llama3_8b,710,False,7500,"He spent 3*$500 = $1500 on the goats. 1500*3 = <<1500*3=4500>>4500
+He spent 2*$1500 = $3000 on the cows. 1500*2 = <<1500*2=3000>>3000
+In total, he spent 4500+3000 = <<4500+3000=7500>>7500
+#### 7500"
+g084,llama3_8b,0,True,16,"Joe has 2 * 20 = 40 cars.
+He sells 20% of them, which is 40 * 0.2 = 8 cars.
+He gives away twice as many as he sold, which is 2 * 8 = 16 cars.
+So he is left with 40 - 8 - 16 = 16 cars.
+#### 16"
+g084,llama3_8b,2,False,32,"Joe has twice as many cars as Robert, so he has 20 * 2 = <<20*2=40>>40 cars.
+He sells 20% of them, which is 0.2 * 40 = <<0.2*40=8>>8.
+He gives away twice as many as the number he sold to his mother, which is 2 * 8 = <<2*8=16>>16.
+So he gives away 8 + 16 = <<8+16=24>>24 cars in total.
+He is left with 40 - 8 = <<40-8=32>>32 cars.
+#### 32"
+g085,llama3_8b,0,True,140,"Kora made 20 dishes
+Rory made 20 more than Kora, so Rory made 20 + 20 = <<20+20=40>>40 dishes
+Jada made twice as many as Rory, so Jada made 40 * 2 = <<40*2=80>>80 dishes
+In total they made 20 + 40 + 80 = <<20+40+80=140>>140 dishes
+#### 140"
+g085,llama3_8b,33,False,120,"Kora made 20 dishes
+Rory made 20 + x = <<20+x>> dishes
+Jada made 2*(20 + x) = <<2*(20+x)=40+x>> dishes
+Total dishes = 20 + 20 + x + 40 + x = <<20+20+x+40+x=100+x>>100 + x
+We know Rory made 20 + x = <<20+x>> dishes. So 20 + x = 20 + 20 = 40
+x = 20
+So Rory made 40 and Jada made 40 + 20 = 60
+Total dishes = 20 + 40 + 60 = 120
+#### 120"
+g086,llama3_8b,0,True,70,"He sold 10 goats from Farm X.
+He sold 2 x 10 = <<2*10=20>>20 goats from Farm Y.
+He has 55 - 10 = <<55-10=45>>45 goats left in Farm X.
+He has 45 - 20 = <<45-20=25>>25 goats left in Farm Y.
+In total, he has 45 + 25 = <<45+25=70>>70 goats.
+#### 70"
+g086,llama3_8b,13,False,45,"He sold 10 goats from Farm X and 45 x 2 = 90 goats from Farm Y.
+So he sold 10 + 90 = 100 goats in total.
+He has 55 - 10 = 45 goats left in Farm X and 45 - 90 = -45 goats left in Farm Y.
+In total, he has 45 - 45 = 0 goats left in Farm Y.
+So he has 45 goats left in Farm X and 0 goats left in Farm Y.
+In total, he has 45 goats left.
+#### 45"
+g087,llama3_8b,0,True,123,"You will have to pay 3 x $25 = $<<3*25=75>>75 for the green food.
+You will have to pay 3 x $18 = $<<3*18=54>>54 for the red food.
+You will get 3 x $2 = $<<3*2=6>>6 off for the red food.
+In total, you will have to pay $75 + $54 - $6 = $<<75+54-6=123>>123.
+#### 123"
+g087,llama3_8b,34,False,117,"Each green basket costs $25.
+Each red basket costs $18, so 3 red baskets cost 3 x $18 = $54.
+You get $2 off each red basket, so you get 3 x $2 = $6 off.
+The total cost is 3 x $25 + $54 - $6 = $75 + $48 - $6 = $117.
+#### 117"
+g088,llama3_8b,0,True,1520,"Rafaela received 40 x $20 = $800.
+Julieta received 90% of $800 = $720.
+So, they received $720 + $800 = $1520 altogether.
+#### 1520"
+g088,llama3_8b,56,False,1440,"Rafaela received 40 x 20 = $<<40*20=800>>800 as tips.
+Julieta received 10% less money in tips than Rafaela, so she received 80% of the tip money.
+80% of $800 is $800 * 0.8 = $<<800*0.8=640>>640.
+Julieta and Rafaela received $800 + $640 = $<<800+640=1440>>1440 as tips altogether.
+#### 1440"
+g089,llama3_8b,0,True,7,"The bag of sweet potatoes weighed 2 times as much as the potatoes, so it weighed 2 * 5 = 10 pounds.
+The bag of carrots weighed 3 pounds fewer than the sweet potatoes, so it weighed 10 - 3 = 7 pounds.
+#### 7"
+g089,llama3_8b,267,False,13,"Let C be the weight of the carrots. The weight of the sweet potatoes is 2 x 5 = 10 pounds. The weight of the sweet potatoes is 3 pounds less than the carrots, so C - 3 = 10. Add 3 to both sides of the equation to get C = 13.
+#### 13"
+g090,llama3_8b,0,True,12.00,"12.48 - 0.03 * 16 = <<12.48-0.03*16=12.48-0.48=12.00>>12.00
+#### 12.00"
+g090,llama3_8b,23,False,11.99,"David has 12.48$.
+He buys 16 bolts, so he spends 16 * 0.03$ = <<16*0.03=0.48>>0.48$.
+He has 12.48$ - 0.48$ = <<12.48-0.48=11.99>>11.99$ left after buying the bolts.
+#### 11.99"
+g091,llama3_8b,1,True,500,"They make 125 on Tuesday.
+They make 125 on Wednesday.
+And they make 2 * 125 = 250 on Friday.
+250 + 125 + 125 = 500 chimichangas.
+#### 500"
+g091,llama3_8b,0,False,375,"They make 125 + 125 + 2*125 = <<125+125+2*125=375>>375 chimichangas.
+#### 375"
+g092,llama3_8b,0,True,480,"Mark used to make $10 per hour.  After the raise, he makes $10 + $2 = $<<10+2=12>>12 per hour.
+He works 8 hours a day for 5 days a week, so he works 8 * 5 = <<8*5=40>>40 hours a week.
+He makes $12 per hour, so he makes 40 * 12 = <<40*12=480>>480 per week.
+#### 480"
+g092,llama3_8b,62,False,600,"Mark used to make $10 an hour for 8 hours a day for 5 days a week.  That is 8 * 5 * $10 = $400 a week.
+Now his pay is $10 + $2 = $12 an hour.  So he makes 8 * 5 * $12 = $600 a week.
+#### 600"
+g093,llama3_8b,0,True,74,"Martin's weight is 55 kg. Carl's weight is 55 + 16 = 71 kg. Christian's weight is 71 + 8 = 79 kg. Harry's weight is 79 - 5 = 74 kg.
+#### 74"
+g093,llama3_8b,152,False,19,"Christian's weight is 8 kg more than Carl's weight, and Carl's weight is 16 kg more than Martin's weight. So Christian's weight is 16 + 8 = 24 kg.
+Harry is 5 kg less than Christian's weight, so Harry's weight is 24 - 5 = <<24-5=19>>19 kg.
+#### 19"
+g094,llama3_8b,2,True,5,"Let A be the number of points Azibo scored.
+Dinar scored 10 less points than Bahati, so Dinar scored Bahati - 10 points.
+Bahati scored 20 more points than Azibo, so Bahati = A + 20.
+The 3 people scored 45 points in total, so A + (A + 20) + (A + 10) = 45.
+Simplifying, we have 3A + 30 = 45.
+Subtracting 30 from both sides, we have 3A = 15.
+Dividing both sides by 3, we have A = 5.
+#### 5"
+g094,llama3_8b,0,False,15,"Bahati scored 10 more points than Dinar, so Dinar scored 45 - 20 = <<45-20=25>>25 points.
+Azibo scored 20 less points than Bahati, so Azibo scored 45 - 30 = <<45-30=15>>15 points.
+#### 15"
+g095,llama3_8b,1,True,300,"100 pages per inch is equal to 100 + 100 = 200 pages per 0.5 inch.
+Since the book is 1.5 inches thick, the total number of pages is 200 x 1.5 = <<200*1.5=300>>300 pages.
+#### 300"
+g095,llama3_8b,0,False,150,"The number of pages in the book is 100 x 1.5 = <<100*1.5=150>>150.
+#### 150"
+g096,llama3_8b,0,True,452,"First find the total amount of time she sleeps: 6 a.m. - 10 p.m. = 8 hours = 8 * 60 = 480 minutes
+Then subtract the time she was sleepwalking: 480 minutes - 23 minutes = <<480-23=457>>457 minutes
+Then subtract the 5 minutes she woke up earlier to go to the bathroom: 457 minutes - 5 minutes = <<457-5=452>>452 minutes
+#### 452"
+g096,llama3_8b,1,False,220,"Kim usually wakes up at 6 a.m., but today she woke up at 6 a.m. - 5 minutes = <<6-5=5:55>>5:55 a.m.
+She usually goes to sleep at 10 p.m., but she was sleepwalking from 2:15 to 2:38 a.m. so she must have gone to sleep at 2:15 a.m.
+Now we need to find the amount of time she spent sleeping: 5:55 a.m. - 2:15 a.m. = <<5:55-2:15=3:40>>3 hours 40 minutes = 3.67 hours
+There are 60 minutes in an hour, so we multiply the number of hours by 60 to get the total number of minutes: 3.67 hours * 60 = <<3.67*60=220.20>>220 minutes
+#### 220"
+g097,llama3_8b,5,True,40,"Let x be the number of people who actually attended the concert. Then 20% of x is 0.20x. Courtney reported that there were 48 people, but if Kelly is right, this is 20% too many. So 48 is 120% of the actual number of people. 0.20x + x = 48. 1.20x = 48. x = 48/1.20 = 40.
+#### 40"
+g097,llama3_8b,0,False,38.4,"48 - 20% * 48 = 48 - 9.6 = 38.4
+#### 38.4"
+g098,llama3_8b,0,True,225,"If Amora and Lainey got 70 corn chips each, then Collins got 70 + 15 = 85 corn chips.
+The total number of corn chips is 70 + 70 + 85 = <<70+70+85=225>>225.
+#### 225"
+g098,llama3_8b,64,False,140,"Let's say the number of corn chips each person got, aside from Collins, is x. Then, Collins got x + 15 corn chips.
+We know Amora and Lainey got 70 corn chips each, so x = 70. Then, Collins got 70 + 15 = 85 corn chips.
+So, the total number of corn chips is x + x + (x + 15) = 2x + 15 = 2*70 + 15 = 140.
+#### 140"
+g099,llama3_8b,0,True,33,"Zeke's team has 7 more players than Carlton's, so Zeke's team has 13+7 = <<13+7=20>>20 players.
+Together, both teams have 13+20 = <<13+20=33>>33 players.
+#### 33"
+g099,llama3_8b,337,False,66,"Carlton's team has 13 players, so Zeke's team has 7 more players. 13 + 7 = <<13+7=20>>20 players.
+So there are 13 + 20 = <<13+20=33>>33 players in Carlton's team and Zeke's team. 33 + 33 = <<33+33=66>>66 players in both teams combined.
+#### 66"
+g100,llama3_8b,1,True,6600,"Walter has collected 500 + 1500 = <<500+1500=2000>>2000 dollars already.
+His friend contributes another $200, so the total is 2000 + 200 = <<2000+200=2200>>2200.
+Walter's lawyer will contribute 3 times as much as everyone else combined. This is 3 * 2200 = <<3*2200=6600>>6600.
+#### 6600"
+g100,llama3_8b,0,False,6000,"Walter's lawyer will contribute 3*(500+1500) = <<3*(500+1500)=3*2000=6000>>6000 dollars.
+#### 6000"
+g101,llama3_8b,0,True,1,"The time spent on rounds is 20 minutes * 9 inpatients = <<20*9=180>>180 minutes = 3 hours.
+The time spent on appointments is 30 minutes * 10 appointments = <<30*10=300>>300 minutes = 5 hours.
+The total time spent is 3 hours + 5 hours = <<3+5=8>>8 hours.
+Doctor Jones will have 9 hours - 8 hours = <<9-8=1>>1 hour left to update his records.
+#### 1"
+g101,llama3_8b,42,False,0,"9 hours at the clinic - 20 minutes x 9 inpatients = <<9-20*9=9-180=9-9=0>>0 hours for rounds
+9 hours at the clinic - 30 minutes x 10 appointments = <<9-30*10=9-300=9-9=0>>0 hours for appointments
+So, Doctor Jones has 0 hours left to update his records.
+#### 0"
+g102,llama3_8b,8,True,45,"Olivia uploaded 72 pictures to Facebook.
+She put the same number of the pics into 8 albums.
+72 / 8 = <<72/8=9>>9 pictures per album.
+She has 3 albums of selfies and 2 albums of portraits.
+3 x 9 = <<3*9=27>>27 selfies and 2 x 9 = <<2*9=18>>18 portraits.
+#### 45"
+g102,llama3_8b,0,False,27,"If Olivia put the same number of pictures into 8 albums, then she put 72/8 = <<72/8=9>>9 pictures into each album.
+She had 3 albums of selfies, so she had 3 x 9 = <<3*9=27>>27 selfies.
+She had 2 albums of portraits, so she had 2 x 9 = <<2*9=18>>18 portraits.
+#### 27, 18"
+g103,llama3_8b,0,True,98,"The hotel started with 100 guests.
+24 guests checked out early, leaving 100 - 24 = <<100-24=76>>76 guests.
+15 guests checked out late, but then 15 * 2 = <<15*2=30>>30 guests checked in.
+So the hotel has 76 + 30 - 15 = <<76+30-15=91>>91 guests.
+Then 7 more guests checked in, so the hotel has 91 + 7 = <<91+7=98>>98 guests.
+#### 98"
+g103,llama3_8b,2,False,113,"The hotel originally had 100 guests.
+24 guests checked out, so the hotel had 100 - 24 = <<100-24=76>>76 guests left.
+15 guests elected for a late checkout, but this doesn't change the number of guests in the hotel.
+Twice as many people checked in as those who opted for a late checkout, so that means 2 * 15 = <<2*15=30>>30 guests checked in.
+The hotel now has 76 + 30 = <<76+30=106>>106 guests.
+7 more guests checked in, so the hotel now has 106 + 7 = <<106+7=113>>113 guests.
+#### 113"
+g104,llama3_8b,0,True,43200,"One dwarf with a steel pickaxe can mine 12 * 2 * 1.5 = <<12*2*1.5=36>>36 pounds of ore per day.
+40 dwarves with steel pickaxes can mine 40 * 36 = <<40*36=1440>>1440 pounds of ore per day.
+In a month with 30 days, they can mine 1440 * 30 = <<1440*30=43200>>43200 pounds of ore.
+#### 43200"
+g104,llama3_8b,2,False,3600,"40 dwarves with steel pickaxes mine 40 * (12 * 1.5 * 30) = 3600 pounds of ore per month.
+#### 3600"
+g105,llama3_8b,0,True,66,"Ted spent 3 x 16 = <<3*16=48>>48 dollars on books and 3 x 6 = <<3*6=18>>18 dollars on pencils.
+In total, he spent 48 + 18 = <<48+18=66>>66 dollars.
+#### 66"
+g105,llama3_8b,11,False,48,"Ted spent $200 - $<<200->> initial money left.
+#### 48"
+g106,llama3_8b,0,True,1,"Xavier was 4 feet tall and grew 3 inches, so he is now 4 feet + 3 inches = 4 feet 3 inches = 51 inches tall.
+Cole was 50 inches tall and grew 2 inches, so he is now 50 inches + 2 inches = 52 inches tall.
+The difference between Cole and Xavier’s height now is 52 inches - 51 inches = 1 inch.
+#### 1"
+g106,llama3_8b,4,False,32,"Xavier grew 3 inches, so now he is 4+3=7 feet tall. He is 12*12=144 inches tall.
+Cole was 50 inches tall and grew 2 inches, so now he is 50+2=52 inches tall. He is 52/12=4.33 feet tall.
+The difference between their height is 7-4.33=2.67 feet or 32 inches.
+#### 32"
+g107,llama3_8b,4,True,10,"Let x be the number of balls he retrieved in the second set. Then he retrieved x + 4 balls in the first set and x/2 balls in the third set.
+The total number of balls is 19. So, x + x + 4 + x/2 = 19. This can be simplified to 3x + 2 = 19.
+3x = 17
+x = 17/3 = 5 2/3
+x = 6
+So, he retrieved 6 balls in the second set. Then he retrieved 6 + 4 = 10 balls in the first set.
+#### 10"
+g107,llama3_8b,0,False,14,"Let's say the number of balls in the second set is x. Then the number of balls in the first set is x + 4 and the number of balls in the third set is x/2.
+The total number of balls is 19, so we can set up the equation: x + (x + 4) + (x/2) = 19
+Combine like terms: 3x/2 + 4 = 19
+Subtract 4 from both sides: 3x/2 = 15
+Multiply both sides by 2: 3x = 30
+Divide both sides by 3: x = 10
+So the number of balls in the second set is 10. The number of balls in the first set is 10 + 4 = 14.
+#### 14"
+g108,llama3_8b,1,True,655,"Bernice has driven 325 kilometers for 4 days, so that means she has driven 325/4 kilometers per day.
+In total, she will need to drive 1955 kilometers, so she needs to drive 1955 - 325*4 = <<1955-325*4=1955-1300=655>>655 kilometers.
+#### 655"
+g108,llama3_8b,0,False,1630,"There are 1955 - 325 = <<1955-325=1630>>1630 kilometers left to drive.
+#### 1630"
+g109,llama3_8b,3,True,2,"James walked 4 miles to the store and then 4 miles back to home.
+Total distance = 4 + 4 = <<4+4=8>>8 miles
+James walks 4 miles per hour so it took him 8/4 = <<8/4=2>>2 hours to walk the total distance.
+#### 2"
+g109,llama3_8b,0,False,1,"James walks 4 miles per hour.  It takes him 4/4 = 1 hour to walk 4 miles.
+#### 1"
+g110,llama3_8b,0,True,72,"The first child is 6 feet = 72 inches tall.
+The second child is 72 + 2 = 74 inches tall.
+The third child is 74 - 5 = 69 inches tall.
+The fourth child is 69 + 3 = 72 inches tall.
+#### 72"
+g110,llama3_8b,21,False,75,"The second child is 6 + 2 = <<6+2=8>>8 feet tall.
+The third child is 8 - 5 = <<8-5=3>>3 feet tall.
+The fourth child is 3 + 3 = <<3+3=6>>6 feet tall.
+The fourth child is 6 * 12 + 3 = <<6*12+3=75>>75 inches tall.
+#### 75"
+g111,llama3_8b,0,True,35,"Sofie will walk 10 miles per day for 7 days so that’s 10*7 = <<10*7=70>>70 miles.
+Brian will walk half as far as Sofie so that’s 70/2 = <<70/2=35>>35 miles.
+#### 35"
+g111,llama3_8b,204,False,7,"Sofie will walk 2 x 7 = <<2*7=14>>14 miles in 7 days. Since she walks 10 miles per day, Brian will walk half as far as Sofie. So he will walk 14/2 = <<14/2=7>>7 miles in 7 days.
+#### 7"
+g112,llama3_8b,0,True,64,"Kris gave 7 stickers to Rob, so Kris had 7+9=<<7+9=16>>16 stickers.
+Luis had twice as many stickers as Kris, so Luis had 2*16=<<2*16=32>>32 stickers.
+Seth gave half of his stickers to Luis, so Seth had 2*32=<<2*32=64>>64 stickers.
+#### 64"
+g112,llama3_8b,1,False,28,"Luis got half of Seth's stickers, so Seth had 2 times the number of stickers Luis got.
+Luis got half of Seth's stickers, so he got (1/2) * x, where x is the number of stickers Seth had.
+Kris got the remaining stickers, which is (1/2) * x - (1/2) * x = 1/2 * x.
+Kris gave 7 stickers to Rob, so Kris had 1/2 * x - 7 = 7, which means 1/2 * x = 14, so x = 2 * 14 = 28.
+#### 28"
+g113,llama3_8b,0,True,750,"The average car goes 120 mph. The 2nd fastest car is 5 times faster, so it goes 5*120=<<5*120=600>>600 mph.
+The fastest car is 1.25 times faster than the 2nd fastest car, so it goes 1.25*600=<<1.25*600=750>>750 mph.
+#### 750"
+g113,llama3_8b,301,False,300,"Let the speed of the 2nd fastest car be 2x. Then the speed of the fastest car is 1.25 x 2x = 2.5 x.
+We know that 2x = 5 x 120 = 600. So x = 600/5 = 120.
+The speed of the fastest car is 2.5 x = 2.5 x 120 = 300.
+#### 300"
+g114,llama3_8b,2,True,45000,"Valerie's brother earns 2 x $5000 = $10,000.
+The total amount of money they earn is $5000 + $10,000 = $15,000.
+Their mother earns 2 x $15,000 = $30,000.
+So, in total, they have $15,000 + $30,000 = $45,000.
+#### 45,000"
+g114,llama3_8b,0,False,40000,"Valerie earns $5000. Her brother earns 2 x $5000 = $10,000. Their combined salary is $5000 + $10,000 = $15,000. Their mother earns 2 x $15,000 = $30,000. The total amount of money they all have together is $5000 + $10,000 + $30,000 = $40,000.
+#### 40,000"
+g115,llama3_8b,0,True,34,"The total number of men is 5/14 * 84 = 30, and the total number of women is 9/14 * 84 = 54.
+After 20 women alight, there are 54 - 20 = 34 women remaining.
+#### 34"
+g115,llama3_8b,11,False,16,"First, we find the number of men and women on the bus by setting up a proportion. We set the ratio of men to women, 5:9, equal to x:y, the number of men and women on the bus, respectively.
+We then cross multiply and solve for y, the number of women on the bus. x / 5 = y / 9
+Cross multiplying gives 9x = 5y
+Substituting x = 84 - y, we get 9(84 - y) = 5y
+Expanding and solving for y, we get y = 36
+So there were 36 women on the bus originally.
+After 20 women alight from the bus, there are 36 - 20 = <<36-20=16>>16 women remaining on the bus.
+#### 16"
+g116,llama3_8b,0,True,12,"The probability of the first ticket winning is 20%.
+The probability of the second ticket winning is 3 * 20% = 60%.
+The probability of both tickets winning is 20% * 60% = 12%.
+#### 12%"
+g116,llama3_8b,1,False,16,"The second lottery ticket has a 3 times greater chance of winning than the first, so it has a 20% + 20% * 3 = 20% + 60% = 80% chance of winning. The probability of both tickets being winners is the product of their individual probabilities: 20% * 80% = 16%. This is 16% out of 100%, so the probability is 16%.
+#### 16"
+g117,llama3_8b,0,True,20,"Carlos collected 27 - 5 = <<27-5=22>>22 seashells.
+Since Carlos collected twice as many as Carrey, Carrey collected 22 / 2 = <<22/2=11>>11 seashells.
+In total, they collected 27 + 22 + 11 = <<27+22+11=60>>60 seashells.
+They divided them equally, so each person got 60 / 3 = <<60/3=20>>20 seashells.
+#### 20"
+g117,llama3_8b,4,False,6.67,"Let Carrey collect C seashells.
+Then Carlos collects 2 * C seashells = 2C seashells.
+Jim collects 5 more than Carlos, so Jim collects 2C + 5 seashells.
+The total number of seashells they collected is C + 2C + 2C + 5 = 5C + 5 seashells.
+They divided the seashells equally among themselves, so each person gets 5C + 5 / 3 = 5(C/3 + 1/3) seashells.
+The problem states that Jim collected 27 seashells, so 2C + 5 = 27.
+Solving for C, we get C = 11.
+Then, each person gets 5(C/3 + 1/3) = 5(11/3 + 1/3) = 5(4/3) = 5 * 4/3 = 20/3 = 6.67 seashells.
+#### 6.67"
+g118,llama3_8b,0,True,30,"Mason eats 4 carrots each on weekdays, which is 4 x 5 = <<4*5=20>>20 carrots.
+He also eats 5 carrots each on Saturday and Sunday, which is 5 x 2 = <<5*2=10>>10 carrots.
+Therefore, Mason eats 20 + 10 = <<20+10=30>>30 carrots a week.
+#### 30"
+g118,llama3_8b,519,False,28,"Mason eats 4 carrots each on 5 weekdays = 4*5 = 20 carrots
+He eats 4 carrots each on 1 Saturday and 1 Sunday = 4*2 = 8 carrots
+In total, Mason eats 20 + 8 = 28 carrots a week
+#### 28"
+g119,llama3_8b,0,True,50,"Archie will pay 18.00 - 3.00 = 15.00 per bag.
+Each bag has 30 sticks, so Archie will pay 15.00 / 30 = 0.50 per stick.
+In cents, that's 50 cents per stick.
+#### 50"
+g119,llama3_8b,30,False,5000,"The bag costs $18.00, but it's $3.00 off, so the actual cost is $18.00 - $3.00 = $15.00.
+The bag contains 30 sticks of beef jerky, so each stick costs $15.00 / 30 = $0.50 per stick.
+To convert the cost to cents, multiply by 100: 50 cents * 100 = 5000 cents.
+#### 5000"
+g120,llama3_8b,0,True,210,"In the first 30 seconds, 20 kernels popped.
+In the next 30 seconds, 3 times the initial rate popped, so 3*20 = 60 kernels popped.
+In the next 30 seconds, 4 times the initial rate popped, so 4*20 = 80 kernels popped.
+In the final 30 seconds, half the rate of the previous 30 seconds popped, so 0.5*80 = 40 kernels popped.
+In the final 30 seconds, a quarter of the kernels that popped in the final 30 seconds also popped, so 0.25*40 = 10 kernels popped.
+In total, 20 + 60 + 80 + 40 + 10 = 210 kernels popped.
+#### 210"
+g120,llama3_8b,2,False,470,"In the first 30 seconds, 20 kernels pop. In the next 30 seconds, 3 times that many pop, so 3*20 = 60 kernels. In the next 30 seconds, 4 times that many pop, so 4*60 = 240 kernels. In the final 30 seconds, half that many pop, so 240/2 = 120 kernels.
+In the final 30 seconds, a quarter of 120 kernels pop from the residual heat, so 120/4 = 30 kernels. 20 + 60 + 240 + 120 + 30 = 470 kernels.
+#### 470"
+g121,llama3_8b,5,True,40,"There are 10 2-legged animals, so there are 10 x 2 = <<10*2=20>>20 legs.
+There are 15 4-legged animals, so there are 15 x 4 = <<15*4=60>>60 legs.
+There are 20 + 60 = <<20+60=80>>80 legs in total.
+Since 2 legs are the same, we divide 80 by 2 to find the number of pairs of legs: 80 / 2 = <<80/2=40>>40.
+#### 40"
+g121,llama3_8b,0,False,80,"There are 10 2-legged animals, so there are 10 x 2 = <<10*2=20>>20 legs.
+There are 15 4-legged animals, so there are 15 x 4 = <<15*4=60>>60 legs.
+The total number of legs is 20 + 60 = <<20+60=80>>80.
+#### 80"
+g122,llama3_8b,1,True,27,"Mazie had 52 marbles. Dallas got x marbles from Mazie. After dropping 4, Dallas has 21 marbles, so he had x - 4 marbles initially. Therefore, x - 4 = 21. Adding 4 to both sides, x = 25. So Dallas got 25 marbles from Mazie. Mazie gave 52 - 25 = 27 marbles to Darla.
+#### 27"
+g122,llama3_8b,0,False,31,"Mazie gave 52 marbles to Dallas and Darla. Dallas has 21 marbles, so Darla has 52 - 21 = 31 marbles.
+#### 31"
+g123,llama3_8b,0,True,665,"214 + 432 + 86 = <<214+432+86=732>>732
+732 - 67 = <<732-67=665>>665
+#### 665"
+g123,llama3_8b,430,False,761,"The number of good seashells is the total number of seashells minus the cracked ones:
+214 + 432 + 86 - 67 = <<214+432+86-67=761>>761
+#### 761"
+g124,llama3_8b,1,True,60,"The total amount Frances earns is 20*2 = <<20*2=40>>40 for cupcakes and 40*1 = <<40*1=40>>40 for cookies.  She earns a total of 40 + 40 = <<40+40=80>>80.
+The total amount Frances spends is 5*4 = <<5*4=20>>20.  So, she has 80 - 20 = <<80-20=60>>60 left.
+#### 60"
+g124,llama3_8b,0,False,80,"Frances makes 20*2 + 40*1 = <<20*2+40*1=60+40=100>>100 dollars.
+Frances spends 5*4 = <<5*4=20>>20 dollars.
+Frances has 100-20 = <<100-20=80>>80 dollars left.
+#### 80"
+g125,llama3_8b,0,True,90,"A small sunflower has 3 * 12 = <<3*12=36>>36 seeds.
+A large sunflower has 50% more seeds than a small sunflower, so it has 36 + 36 * 0.5 = <<36+36*0.5=54>>54 seeds.
+There are 36 + 54 = <<36+54=90>>90 sunflower seeds altogether.
+#### 90"
+g125,llama3_8b,53,False,84,"A small sunflower has 3 dozen seeds, which is 3 x 12 = <<3*12=36>>36 seeds.
+A large sunflower has 50% more seeds, which is 36 + 36/2 = <<36+36/2=48>>48 seeds.
+In total, there are 36 + 48 = <<36+48=84>>84 seeds.
+#### 84"
+g126,llama3_8b,1,True,180,"6 reservations a night * 2 nights a week = 6 * 2 = 12 reservations a week
+Each reservation makes 2 meals ($5 each) + wine ($5) = $15
+So, 12 reservations a week make a total of 12 * $15 = $180
+#### 180"
+g126,llama3_8b,0,False,,"6 reservations a night * 2 nights a week = 12 reservations a week
+12 reservations a week * 2 meals per reservation = 24 meals a week
+24 meals a week * $5 per meal = $120 per week
+#### $120"
+g127,llama3_8b,0,True,5,"Ana peels 1 orange every 3 minutes, so she peels 20 oranges in 60 minutes.
+Jane peels 1 orange every 4 minutes, so she peels 15 oranges in 60 minutes.
+The difference is 20 - 15 = 5 oranges.
+#### 5"
+g127,llama3_8b,24,False,1.67,"In one hour, Ana can peel oranges for 60/3 = <<60/3=20>>20 minutes.
+In one hour, Jane can peel oranges for 60/4 = <<60/4=15>>15 minutes.
+Since Ana can peel for 20-15 = 5 minutes more than Jane, she can peel 5/3 = <<5/3=1.67>>1.67 more oranges than Jane.
+#### 1.67"

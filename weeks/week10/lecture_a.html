@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="lecture_a_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lecture_a_files/libs/quarto-html/tabby.min.js"></script>
+<script src="lecture_a_files/libs/quarto-html/popper.min.js"></script>
+<script src="lecture_a_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="lecture_a_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lecture_a_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="lecture_a_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.38">
+
+  <meta name="author" content="Shannon Gallagher">
+  <title>Week 10A: Sensitivity Analysis</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="lecture_a_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="lecture_a_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="lecture_a_files/libs/revealjs/dist/theme/quarto-0427d8d92a431aa6a6430e53ec02a470.css">
+  <link rel="stylesheet" href="lecture.css">
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+  <link href="lecture_a_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="lecture_a_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="lecture_a_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="lecture_a_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Week 10A: Sensitivity Analysis</h1>
+  <p class="subtitle">Would the decision survive another reasonable choice?</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Shannon Gallagher 
+</div>
+</div>
+</div>
+
+</section>
+<section id="last-time" class="slide level2 smaller">
+<h2>Last time</h2>
+<div id="7e10a2c6" class="cell" data-fig-height="3" data-fig-width="10.5" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_a_files/figure-revealjs/cell-3-output-1.png" width="1030" height="244"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>MegaDetector was right on 93.2% of photos from the team’s nine cameras. Reweighting to the partner park’s mix of color and infrared photos predicted 94.5%.</li>
+<li>The park’s own labels showed 70.4%. Infrared missed what was new at the park’s cameras: backgrounds, and how bursts were labeled.</li>
+<li>Lab 9 did the same for tissue slides from a new hospital.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. Collect Milestone 1 questions first; it was due today. The numbers are 9A’s: 151/162, reweighted 0.945, partner 38/54. Photos: cct0049 (deer, team camera 82), cct0031 (fox at night, team camera 68), cct0190 (rabbit, partner camera 51), cct0200 (the second photo of a fox burst at partner camera 72: the label says fox because the burst had one, but the fox has left the frame, and MegaDetector calls it empty; 9A’s “Look at the partner’s mistakes”). Thursday’s lecture is about the part infrared missed.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="todays-plan" class="slide level2 smaller">
+<h2>Today’s plan</h2>
+<ul>
+<li>The park decides from the team’s analysis, and the team made choices along the way. Today we <strong>vary those choices</strong> and see whether the decision changes. That is a <strong>sensitivity analysis</strong>.</li>
+<li>First we ask which variables could change the park’s decision, and how sure we are of the park’s mix.</li>
+<li>Then we ask which choices in the analysis could change it, and why reporting only the best one overstates.</li>
+<li>Then we take the model apart, by dropping a part or transforming its inputs. Machine learning calls these ablations and robustness tests.</li>
+<li>Last, we write the result up for the park and turn to your project.</li>
+</ul>
+<aside class="notes">
+<p>About 1 minute.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-parks-decision" class="slide level2 smaller">
+<h2>The park’s decision</h2>
+<p><span class="math display">\hat\theta_{\text{partner}}=0.722\times0.958+0.278\times0.911=0.945</span></p>
+<p><span class="math display">\text{use MegaDetector}\iff\text{lower bound on }\theta_{\text{partner}}\ge0.90</span></p>
+<ul>
+<li><span class="math inline">\hat\theta_{\text{partner}}</span> estimates the partner park’s <strong>overall</strong> accuracy: the team’s accuracy on color and on infrared photos, reweighted to the partner’s mix of 72% color and 28% infrared.</li>
+<li>The park set its rule before seeing results: use MegaDetector only if the one-sided 95% lower bound is at least 0.90. Below that, pass on it.</li>
+<li>With bursts resampled, the lower bound is <strong>0.904</strong>. The rule says use.</li>
+<li>For today, set the park’s labels aside. Would the decision survive other reasonable choices in the analysis?</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. Using MegaDetector means people stop reviewing the photos it calls empty, so its accuracy over all photos is what the park cares about. The 0.90 rule is made up for the lecture and labeled as set in advance, like 9B’s 5% miss limit. The lower bound is the 5th percentile of the burst bootstrap from 9A (bursts resampled within each type, seed 2027, 4,000 resamples): 0.904; across other seeds it stays at 0.903 to 0.904. Students know the 70% from “Last time”; today asks what the team could have known before the labels. Thursday returns to the 70%.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="two-kinds-of-sensitivity-analysis" class="slide level2 smaller">
+<h2>Two kinds of sensitivity analysis</h2>
+<ol type="1">
+<li><strong>Choices you could have made differently:</strong> the client’s mix, which <span class="math inline">Z</span>, how many groups, the decision rule. Thinking and counting the client’s cases pin these down, with no labels. <em>Today.</em></li>
+<li><strong>An assumption you cannot check without new data:</strong> that accuracy within each group carries over to the client. Only labels from the client settle it. <em>Thursday.</em></li>
+</ol>
+<p>Both ask the same question: <strong>does the decision change?</strong> Milestone 1, due today, asked for the assumption most likely to threaten your conclusion. This week turns it into a variable you can vary or bound.</p>
+<aside class="notes">
+<p>About 2 minutes. Epidemiology has done both kinds for a long time. Cornfield et al.&nbsp;(1959) asked how strong a hidden confounder would have to be to explain away the link between smoking and lung cancer, an early sensitivity analysis of the second kind; epidemiologists now call this quantitative bias analysis (Lash, Fox, and Fink 2009). The second kind is the one that failed for the partner park and for hospitals 4 and 5. It needs a different tool, a sensitivity parameter, which is Thursday’s lecture and lab. Thursday also asks when you could skip labeling the client’s cases (rarely) and how many to label. Neither kind is about perturbing the inputs: rotating or blurring images tests the model, not the conclusion, unless the client’s cases really differ that way.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-conclusion-is-a-function-of-choices" class="slide level2 smaller">
+<h2>A conclusion is a function of choices</h2>
+<p><span class="math display">\hat\theta=\hat\theta(\text{data};\ \text{choices}),\qquad \text{decision}=\mathbf 1\bigl\{\text{lower bound}\ge 0.90\bigr\}</span></p>
+<ul>
+<li><strong>Primary analysis:</strong> the choices you would defend if you could report only one, fixed in advance.</li>
+<li><strong>Alternatives:</strong> other choices you could also defend, each with a reason.</li>
+<li><strong>Flip rule:</strong> what result would change the decision, written down before you run anything.</li>
+<li>A sensitivity analysis reruns the analysis under each alternative and reports <strong>every</strong> result.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. The flip rule usually comes straight from the client’s decision rule: here, a lower bound below 0.90 flips the decision. Writing it first is what keeps the analysis honest; the same idea as setting a non-inferiority margin before seeing the data in Week 5.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-power-curve-is-a-sensitivity-analysis" class="slide level2 smaller">
+<h2>A power curve is a sensitivity analysis</h2>
+<div id="81779a74" class="cell" data-fig-height="2.7" data-fig-width="9" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_a_files/figure-revealjs/cell-4-output-1.png" width="850" height="250"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>Suppose the park labels photos to test whether MegaDetector’s accuracy is above 0.90. The <span class="math inline">n</span> it needs depends on a guess, the true accuracy, and a convention, 80% power.</li>
+<li>At 80% power: about 180 photos if the truth is 0.95, 560 if 0.93, and 1,300 if 0.92.</li>
+<li>One <span class="math inline">n</span> hides that. The curve is a sensitivity analysis over the guess, and epidemiologists and trialists report it this way.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. One-sided test of <span class="math inline">H_0:\theta=0.90</span> at level 0.05, normal approximation: <span class="math inline">n=\bigl(z_{0.95}\sqrt{0.90\times0.10}+z_{0.80}\sqrt{p_1(1-p_1)}\bigr)^2/(p_1-0.90)^2</span>, which gives 183, 557, and 1,302; at 90% power, 239, 748, and 1,769. With 300 labeled photos the power is 0.96, 0.54, and 0.29. Photos come in bursts, so the real numbers are larger (Week 4’s design effect). Eighty percent is Cohen’s (1988) convention, common and fairly arbitrary, like the park’s 0.90; a power curve shows what changes if you pick differently. The mix curve a few slides on has the same shape: vary the input you are least sure of, and see where the answer crosses the line. Thursday sizes the park’s labeling sample from the tipping point instead, another sensitivity analysis over a guess.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section>
+<section id="question-1-which-variables-could-change-the-decision" class="title-slide slide level1 center">
+<h1>Question 1: which variables could change the decision?</h1>
+
+</section>
+<section id="when-does-a-variable-move-the-answer" class="slide level2 smaller">
+<h2>When does a variable move the answer?</h2>
+<p><span class="math display">\theta_{\text{client}}-\theta_{\text{bench}}=\sum_k \underbrace{(c_k-b_k)}_{\text{mix differs}}\,\underbrace{(p_k-\bar p)}_{\text{accuracy differs}}</span></p>
+<ul>
+<li>A variable moves the answer only if its mix differs between the benchmark and the client <strong>and</strong> the model’s accuracy differs across its groups.</li>
+<li>If either factor is near zero, so is its term.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. <span class="math inline">\bar p</span> is the benchmark’s accuracy. The shift is <span class="math inline">\sum_k(c_k-b_k)\,p_k</span>, and the slide’s form follows because the shares in each mix add to 1, so <span class="math inline">\sum_k(c_k-b_k)\,\bar p=0</span>. Each term is a product, which is the sorting rule for the candidates two slides on.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="infrared-worked-out" class="slide level2 smaller">
+<h2>Infrared, worked out</h2>
+<p><span class="math display">\underbrace{(0.278)(0.026)}_{\text{color}}+\underbrace{(-0.278)(-0.021)}_{\text{infrared}}=0.007+0.006=+0.013</span></p>
+<ul>
+<li>The mix differs a lot: 56% of the team’s photos are infrared, against 28% of the partner’s.</li>
+<li>Accuracy differs little, 0.958 against 0.911, so infrared moves the answer by about a point.</li>
+<li>This is 9A’s law of total variance applied to the shift: infrared explains under 1% of the variation in whether MegaDetector is right.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. <span class="math inline">\bar p=0.932</span>. Color: <span class="math inline">(0.722-0.444)(0.958-0.932)=0.0072</span>; infrared: <span class="math inline">(0.278-0.556)(0.911-0.932)=0.0058</span>. With two groups this is 9A’s identity <span class="math inline">(c-b)(p_1-p_2)=0.278\times0.047</span>.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="candidate-variables-for-the-partner-park" class="slide level2 smaller">
+<h2>Candidate variables for the partner park</h2>
+<p><span class="math display">\text{for each one:}\quad\text{measured without labels?}\qquad\text{accuracy differs?}\qquad\text{mix differs?}</span></p>
+<ul>
+<li>Infrared, from the pixels</li>
+<li>Position in the burst: first, second, or third photo</li>
+<li>Animal or empty</li>
+<li>The <code>day_night</code> column</li>
+<li>Backgrounds at the partner’s new cameras</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. Ask the room for more candidates first, then have them sort each of these with the three questions before the next slide.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="sorting-the-candidates" class="slide level2 smaller compact-table">
+<h2>Sorting the candidates</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Measured without labels?</th>
+<th>Accuracy differs?</th>
+<th>Mix differs?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Infrared, from the pixels</td>
+<td>yes</td>
+<td>a little: 0.958 and 0.911</td>
+<td>yes: 56% and 28%</td>
+</tr>
+<tr class="even">
+<td>Position in the burst</td>
+<td>yes, <code>frame_index</code></td>
+<td>no: 0.926, 0.944, 0.926</td>
+<td>no: thirds in both</td>
+</tr>
+<tr class="odd">
+<td>Animal or empty</td>
+<td>no: it is the label</td>
+<td>yes: 0.963 and 0.901</td>
+<td>unknown</td>
+</tr>
+<tr class="even">
+<td>The <code>day_night</code> column</td>
+<td>yes, but wrong for 36 photos</td>
+<td>barely: 0.935 and 0.928</td>
+<td>not worth checking</td>
+</tr>
+<tr class="odd">
+<td>Backgrounds at new cameras</td>
+<td>no</td>
+<td>unknown</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p>Position in the burst cannot move the answer. Animal or empty could, and needs a guess. New backgrounds are Thursday’s problem.</p>
+<aside class="notes">
+<p>About 2 minutes. Ask the room for candidates before showing the table, and sort each one with the three questions. Animal or empty: the course subset is half and half only by construction (9A); in large camera-trap projects most photos are empty (for example Snapshot Serengeti; Norouzzadeh et al.&nbsp;2018). A client’s share of empty photos can be estimated without labels from the model’s own predictions corrected for its error rates (Saerens et al.&nbsp;2002; Lipton et al.&nbsp;2018), only if asked. The <code>day_night</code> bug is 9A’s “Metadata are measurements too”: 21 infrared photos stamped in the noon hour, 6 more at 8 am, and 9 “night” photos in color. Position in the burst matters for labels (7 of the partner’s 8 missed animals are frames 2 and 3), but every burst has three frames, so its mix cannot differ.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="animal-or-empty-estimating-a-mix-without-labels" class="slide level2 smaller">
+<h2>Animal or empty: estimating a mix without labels</h2>
+<p><span class="math display">q=\text{sens}\cdot\pi+(1-\text{spec})(1-\pi)\quad\Longrightarrow\quad\hat\pi=\frac{\hat q+\text{spec}-1}{\text{sens}+\text{spec}-1}</span></p>
+<ul>
+<li><span class="math inline">q</span> is the share of the partner’s photos MegaDetector calls animal: 27 of 54. With the team’s sensitivity 0.901 and specificity 0.963, <span class="math inline">\hat\pi=0.536</span>. The truth is 0.50.</li>
+<li>Epidemiologists call this the Rogan–Gladen estimator (1978). Machine learning calls it black-box shift estimation (Lipton et al.&nbsp;2018).</li>
+<li>It assumes the error rates carry over to the partner: the same kind of assumption as reweighting.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. <span class="math inline">\pi</span> is the partner’s share of animal photos. Arithmetic: <span class="math inline">(0.5+0.963-1)/(0.901+0.963-1)=0.463/0.864=0.536</span>. Sensitivity 73/81 and specificity 78/81 on the team’s photos. At the partner the error rates did not carry over (its accuracy was 0.70), but its 8 false alarms and 8 missed animals balanced, so the estimate came out close anyway; say that this was luck. Rogan and Gladen (1978), “Estimating prevalence from the results of a screening test,” American Journal of Epidemiology. Saerens, Latinne, and Decaestecker (2002) is the version that uses the model’s probabilities.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="varying-a-continuous-choice-the-clients-mix" class="slide level2 smaller">
+<h2>Varying a continuous choice: the client’s mix</h2>
+<div id="268adaa8" class="cell" data-fig-height="3.6" data-fig-width="9" data-execution_count="4">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_a_files/figure-revealjs/cell-5-output-1.png" width="856" height="336"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>The lower bound crosses 0.90 at <span class="math inline">c^\dagger\approx0.55</span>, the <strong>flip point</strong>.</li>
+<li>Anywhere in the park’s guessed range, the rule says use. The decision is <strong>not</strong> sensitive to the mix.</li>
+</ul>
+<aside class="notes">
+<p>About 4 minutes. Point back to the power curve: the same shape, with the client’s mix in place of <span class="math inline">n</span>. <span class="math inline">\theta(c)=(1-c)\,0.958+c\,0.911</span> and <span class="math inline">\mathrm{SE}(c)=\sqrt{(1-c)^2\,0.958\times0.042/72+c^2\,0.911\times0.089/90}</span>, treating photos as independent, as in HW6 Problem 1. The lower bound is 0.917 at <span class="math inline">c=0.15</span> and 0.909 at <span class="math inline">c=0.40</span>; it crosses 0.90 at <span class="math inline">c=0.552</span>. Before the park sent any photos, the team knew only that the park’s cameras are “mostly color,” so the guessed range is the honest input; HW6 Problem 1 is the same exercise for a plant-disease app. A sensitivity analysis can end with “the decision is stable,” and that is worth reporting.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-clients-mix-is-an-estimate-too" class="slide level2 smaller">
+<h2>The client’s mix is an estimate too</h2>
+<p><span class="math display">\hat c=\frac{15}{54}=0.28</span></p>
+<p><span class="math display">\text{Var}(\hat\theta)\approx(1-c)^2\,\text{Var}(\hat p_{\text{color}})+c^2\,\text{Var}(\hat p_{\text{ir}})+(p_{\text{ir}}-p_{\text{color}})^2\,\text{Var}(\hat c)</span></p>
+<ul>
+<li>A client that counts its own unlabeled cases gives a mix with an interval: 0.18 to 0.41 counting photos, 0.12 to 0.51 counting bursts (5 of 18). Count clusters when cases come in clusters (Week 4).</li>
+<li>The flip point, 0.55, is above even the burst interval, so the decision is still stable.</li>
+<li>The mix’s share of the uncertainty is <span class="math inline">0.047\times0.106\approx0.005</span>, half a point. It is small here because accuracy differs little between the groups.</li>
+</ul>
+<aside class="notes">
+<p>About 4 minutes. Wilson intervals: 15 of 54 photos, 0.176 to 0.409; 5 of 18 bursts, 0.125 to 0.509 (no burst mixes color and infrared). The variance formula is the delta method for <span class="math inline">\hat\theta=(1-\hat c)\,\hat p_{\text{color}}+\hat c\,\hat p_{\text{infrared}}</span>, with the mix counted on different photos from the accuracies, so the terms add. <span class="math inline">\text{SE}(\hat c)</span> from bursts is <span class="math inline">\sqrt{0.278\times0.722/18}=0.106</span>. A client mix that comes from a published figure or the client’s records has no sampling interval, but it still deserves a range.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="two-variables-at-once" class="slide level2 smaller">
+<h2>Two variables at once</h2>
+<div id="f20ea038" class="cell" data-fig-height="3.3" data-fig-width="9" data-execution_count="5">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_a_files/figure-revealjs/cell-6-output-1.png" width="855" height="308"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>Reweight over four cells: color or infrared, by animal or empty. Infrared animal photos are the weak cell (0.857).</li>
+<li>The lower bound falls below 0.90 when fewer than about 30% to 40% of the park’s photos are empty.</li>
+<li>Most camera-trap photos are empty, so the decision holds over the park’s likely range.</li>
+</ul>
+<aside class="notes">
+<p>About 4 minutes. Cells on the team’s photos: empty color 32/33 = 0.970, empty infrared 46/48 = 0.958, animal color 37/39 = 0.949, animal infrared 36/42 = 0.857. The client’s shares are products, <span class="math inline">e(1-c)</span> and so on, which assumes infrared and empty are unrelated in the park’s photos; on the team’s photos the infrared share is 59% among empty photos and 52% among animal ones, so the assumption is rough. Independent-photo standard errors, as on the mix-curve slide. The flip line: empty share about 0.20 at <span class="math inline">c=0.15</span>, 0.30 at 0.28, 0.40 at 0.40. With two variables the flip point becomes a flip line; with more, report the corners of the defensible box.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="check" class="slide level2 smaller">
+<h2>Check</h2>
+<p>A benchmark has easy cases, where a model is right 90% of the time, and hard ones, where it is right 60% of the time. A client’s share of hard cases, <span class="math inline">h</span>, is somewhere between 20% and 40%. The client adopts the model only if its accuracy is at least 0.80.</p>
+<ol type="1">
+<li>Write the reweighted accuracy as a function of <span class="math inline">h</span>, and find the flip point.</li>
+<li>Is the decision sensitive to the client’s mix?</li>
+</ol>
+<div class="fragment">
+<ol type="1">
+<li><span class="math inline">\theta(h)=0.90-0.30\,h</span>, and <span class="math inline">0.90-0.30\,h^\ast=0.80</span> gives <span class="math inline">h^\ast=1/3</span>.</li>
+<li>Yes. The flip point is inside the range: the model is adopted if <span class="math inline">h&lt;1/3</span> and not if <span class="math inline">h&gt;1/3</span>. The client needs a better estimate of <span class="math inline">h</span>, which needs no labels.</li>
+</ol>
+</div>
+<aside class="notes">
+<p>About 3 minutes. The accuracies are 9A’s easy/hard check. This is the case where the flip point falls inside the range, which the park’s mix curve does not show. Point out that pinning down <span class="math inline">h</span> only takes counting the client’s cases by type, which is cheap; that is often the best response to a sensitive mix.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="question-2-which-choices-in-the-analysis-could-change-it" class="title-slide slide level1 center">
+<h1>Question 2: which choices in the analysis could change it?</h1>
+
+</section>
+<section id="three-choices-of-z-under-two-decision-rules" class="slide level2 smaller compact-table">
+<h2>Three choices of <span class="math inline">Z</span> under two decision rules</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 23%">
+<col style="width: 23%">
+<col style="width: 17%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th><span class="math inline">Z</span></th>
+<th style="text-align: right;">Estimate</th>
+<th style="text-align: right;">Lower bound</th>
+<th>Point rule (estimate <span class="math inline">\ge 0.90</span>)</th>
+<th>Bound rule (bound <span class="math inline">\ge 0.90</span>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0. Infrared, from the pixels (primary)</td>
+<td style="text-align: right;">0.945</td>
+<td style="text-align: right;">0.904</td>
+<td>use</td>
+<td>use</td>
+</tr>
+<tr class="even">
+<td>1. The <code>day_night</code> column</td>
+<td style="text-align: right;">0.933</td>
+<td style="text-align: right;">0.892</td>
+<td>use</td>
+<td>do not use</td>
+</tr>
+<tr class="odd">
+<td>2. No reweighting (the team’s accuracy)</td>
+<td style="text-align: right;">0.932</td>
+<td style="text-align: right;">0.889</td>
+<td>use</td>
+<td>do not use</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Under the point rule, all three say use. Under the bound rule, only the primary analysis does.</li>
+<li>The <code>day_night</code> column is wrong for 36 photos (Week 9), so alternative 1 shows what the metadata bug would have cost.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. Lower bounds are 5th percentiles of the burst bootstrap within each group (seed 2027, 4,000 resamples); across seeds 1 to 4, alternative 1’s bound stayed between 0.890 and 0.892, alternative 2’s between 0.889 and 0.895, and the primary’s at 0.903 to 0.904, so the decisions do not depend on the seed. Within the <code>day_night</code> column the team is right on 0.935 of “day” photos and 0.928 of “night” photos, almost no difference, so reweighting by it barely moves the estimate. The resampling unit is not a choice here: 9A settled it by the question, new cameras. A primary analysis that clears the line by 0.4 points is a fragile result, and the table shows it.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="reading-a-sensitivity-table" class="slide level2 smaller">
+<h2>Reading a sensitivity table</h2>
+<p><span class="math display">\hat\theta^{(1)}-\hat\theta^{(0)}=0.933-0.945=-0.012\quad\text{on the same 162 photos}</span></p>
+<ul>
+<li>Every row uses the <strong>same</strong> team photos, so the rows are paired. Their differences are much less noisy than the rows themselves (Week 5).</li>
+<li>Each row answers the client’s question with a different defensible analysis. It is not a contest to win.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. Because the rows share photos, a difference between rows is a paired comparison, and its uncertainty is far smaller than either row’s interval. That is why two rows can both have wide intervals and still clearly differ. The next slide names the difference between keeping and changing the estimand.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="sensitivity-versus-supplementary-analyses" class="slide level2 smaller">
+<h2>Sensitivity versus supplementary analyses</h2>
+<p><span class="math display">\underbrace{\text{same estimand, other assumptions}}_{\text{sensitivity analysis}}\qquad\underbrace{\text{a different estimand}}_{\text{supplementary analysis}}</span></p>
+<ul>
+<li>Clinical trials have kept these apart since the ICH E9(R1) guideline (2019).</li>
+<li>Same estimand: the partner’s accuracy, under another mix, another <span class="math inline">Z</span>, or another decision rule.</li>
+<li>Different estimand: color photos only, merged classes, or top-3 instead of top-1. Report it, and say it answers a different question.</li>
+<li>The project’s sensitivity analysis is the first kind (Project Description, Section 3).</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. ICH E9(R1), “Addendum on Estimands and Sensitivity Analysis in Clinical Trials” (adopted November 2019). In its terms, a sensitivity analysis asks how robust the main estimate is to departures from its assumptions, for the same estimand; analyses of other estimands are supplementary. The Pet track’s cat/dog collapse and the Food track’s merged classes are supplementary analyses; both datasheets now call them changes of what is being estimated. Week 5’s non-inferiority trials are a natural place for the PredictTB aside, if you want one.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-multiverse" class="slide level2 smaller">
+<h2>The multiverse</h2>
+<p><span class="math display">\underbrace{3}_{\text{defensible choices of }Z}\times\underbrace{2}_{\text{defensible decision rules}}=6\ \text{analyses}</span></p>
+<ul>
+<li>Steegen et al.&nbsp;(2016) call the set of all defensible analyses a <strong>multiverse</strong>, and report all of it.</li>
+<li>Define the set <strong>before</strong> the results. Show every member. Mark the primary analysis.</li>
+<li>Do not sort or filter the members by result.</li>
+<li>The park’s table is a small multiverse: six analyses, four say use.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. Steegen, Tuerlinckx, Gelman, and Vanpaemel (2016), “Increasing Transparency Through a Multiverse Analysis,” Perspectives on Psychological Science; it is the HW6 reading. Their point is that a single reported analysis hides how many others were equally defensible. Keep the course version small: one or two choices, each with a reason.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="model-shopping-is-the-winners-curse-again" class="slide level2 smaller">
+<h2>Model shopping is the winner’s curse again</h2>
+<p><span class="math display">E\bigl[\max(\hat\theta_1,\hat\theta_2)\bigr]=\theta+\sigma\sqrt{\frac{1-\rho}{\pi}}\qquad\text{(Week 5)}</span></p>
+<ul>
+<li><strong>Model shopping:</strong> trying analyses and reporting the one with the result you wanted.</li>
+<li>Reporting the best of several estimates of the same quantity overstates it, even when every analysis is honest.</li>
+<li>With six analyses of the same photos, picking the best overstates by about a point; with six on different data, by about 3 points.</li>
+<li>A sensitivity analysis reports all of them, with the primary analysis fixed first. That is the whole difference.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. Week 5’s formula is for two estimates with the same mean, standard deviation <span class="math inline">\sigma</span>, and correlation <span class="math inline">\rho</span>. With <span class="math inline">\sigma=2.4</span> points (this lecture’s bootstrap SE) and two analyses of the same photos, say <span class="math inline">\rho=0.9</span>, the overstatement is <span class="math inline">2.4\sqrt{0.1/\pi}\approx0.4</span> points; with analyses on different photos (<span class="math inline">\rho=0</span>), about 1.4 points. Expected maximum of <span class="math inline">k</span> exchangeable normals: <span class="math inline">E[\max]=\theta+\sigma\sqrt{1-\rho}\,e_k</span> with <span class="math inline">e_2=0.564</span> and <span class="math inline">e_6=1.267</span>; with <span class="math inline">\sigma=2.4</span>, six analyses overstate by 0.96 points at <span class="math inline">\rho=0.9</span> and 3.0 points at <span class="math inline">\rho=0</span>.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-makes-an-alternative-reasonable" class="slide level2 smaller">
+<h2>What makes an alternative reasonable?</h2>
+<ul>
+<li>It is defensible <strong>before</strong> you see its result.</li>
+<li>It changes something the decision depends on: the population, the measurement, the grouping, or the rule.</li>
+<li>It is different enough that it could change the decision.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. One consequential alternative beats five harmless ones. Ask of each alternative: if this came out differently, would we recommend something different?</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-is-not-a-sensitivity-analysis" class="slide level2 smaller">
+<h2>What is not a sensitivity analysis</h2>
+<ul>
+<li>Trying ten models and keeping the best.</li>
+<li>Adding noise, rotations, or blur that the client’s cases do not have.</li>
+<li>Searching subgroups for the biggest gap.</li>
+<li>Changing the metric after disliking the answer.</li>
+</ul>
+<aside class="notes">
+<p>About 1 minute. The first is model shopping, the third is the winner’s curse in a search, and the fourth changes the estimand after the fact. Question 3 says why rotations and blur do not count on their own.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="question-3-what-does-taking-the-model-apart-tell-you" class="title-slide slide level1 center">
+<h1>Question 3: what does taking the model apart tell you?</h1>
+
+</section>
+<section id="dropping-a-term-from-a-model" class="slide level2 smaller">
+<h2>Dropping a term from a model</h2>
+<p><span class="math display">\Delta_j=\text{Err}\bigl(\hat f_{-j}\bigr)-\text{Err}\bigl(\hat f\bigr)</span></p>
+<ul>
+<li>Statisticians compare nested models: drop a term, refit, and compare, with a likelihood-ratio test or R’s <code>drop1</code>.</li>
+<li>For prediction, leave-one-covariate-out (LOCO) measures how much worse the model predicts without variable <span class="math inline">j</span> (Lei, G’Sell, Rinaldo, Tibshirani, and Wasserman 2018).</li>
+<li>Both answer: how much does part <span class="math inline">j</span> contribute to this model?</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. <span class="math inline">\hat f_{-j}</span> is the model refit without variable <span class="math inline">j</span>. Lei et al.&nbsp;(2018), “Distribution-Free Predictive Inference for Regression,” JASA; three of the authors are in CMU’s statistics department, and the paper puts intervals on <span class="math inline">\Delta_j</span> with conformal inference. The question is about the model, not about whether a client’s decision holds.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="machine-learning-calls-it-an-ablation" class="slide level2 smaller">
+<h2>Machine learning calls it an ablation</h2>
+<p><span class="math display">\hat\theta_{\text{full}}-\hat\theta_{\text{without part }j}\quad\text{on the same test cases}</span></p>
+<ul>
+<li>An <strong>ablation</strong> removes one part of a system, such as a feature, a layer, a source of training data, or a line of a prompt, and measures the drop.</li>
+<li>It asks which parts of the model earn its accuracy, a question for the people building it.</li>
+<li>Removing parts one at a time is a one-factor-at-a-time experiment. Two parts that do the same job each look useless alone; Week 11 designs evaluations like experiments.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. The word comes from surgery: remove tissue and see what stops working. In Breiman’s terms, the algorithmic culture judges a model by its predictive accuracy, so it asks which parts earn that accuracy; the data-modeling culture asks whether the model’s assumptions hold. Interactions: with parts A and B, the effect of removing A with B present, <span class="math inline">\theta_{11}-\theta_{01}</span>, can differ from the effect without B, <span class="math inline">\theta_{10}-\theta_{00}</span>; a factorial design estimates both. Track 4’s datasheet mentions judge-prompt ablations; Week 12’s prompt comparisons are ablations of a prompt.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="an-ablation-is-an-estimate-too" class="slide level2 smaller">
+<h2>An ablation is an estimate too</h2>
+<p><span class="math display">\widehat\Delta_j=\frac1n\sum_{i=1}^n\bigl(C_i^{\text{full}}-C_i^{(-j)}\bigr)\qquad\text{paired on the same cases (Week 5)}</span></p>
+<ul>
+<li>Use the paired standard error, with the same clusters as the main analysis.</li>
+<li>If training is random, the drop changes from seed to seed. Rerun over seeds and report the spread.</li>
+<li>Ten ablations with only the biggest reported is the winner’s curse again.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. Week 5’s McNemar test and paired interval apply directly. Bouthillier et al.&nbsp;(2021), “Accounting for Variance in Machine Learning Benchmarks,” MLSys, found that seeds and data splits move results as much as many published improvements.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="a-robustness-test-transforms-the-inputs" class="slide level2 smaller">
+<h2>A robustness test transforms the inputs</h2>
+<p><span class="math display">\theta_T=E\bigl[C\bigl(T(X)\bigr)\bigr]\qquad T=\text{rotate, blur, add noise, paraphrase}</span></p>
+<ul>
+<li>A <strong>robustness test</strong> applies a transformation <span class="math inline">T</span> to the test cases and measures accuracy again.</li>
+<li>It answers: how does the model do on cases that look like <span class="math inline">T(X)</span>?</li>
+<li>That is a client’s question only if the client’s cases do look like <span class="math inline">T(X)</span>.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. ImageNet-C (Hendrycks and Dietterich 2019) is the standard example: 15 corruptions such as noise, blur, weather, and compression, each at 5 severities. The transformation is chosen by the tester, not drawn from any client’s population.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="synthetic-shifts-do-not-predict-natural-ones" class="slide level2 smaller">
+<h2>Synthetic shifts do not predict natural ones</h2>
+<p><span class="math display">\theta_{\text{ImageNetV2}}-\theta_{\text{ImageNet}}\approx-11\text{ to }-14\text{ points}</span></p>
+<ul>
+<li>ImageNetV2 rebuilt ImageNet’s test set years later, following the original process as closely as it could. Accuracy still fell (Recht et al.&nbsp;2019).</li>
+<li>Models made robust to synthetic corruptions gained little on natural shifts like this one (Taori et al.&nbsp;2020).</li>
+<li>Lab 10’s Camelyon17 comes from WILDS, a benchmark of natural shifts, such as between hospitals (Koh et al.&nbsp;2021).</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. Recht, Roelofs, Schmidt, and Shankar (2019), “Do ImageNet Classifiers Generalize to ImageNet?” ICML. Taori et al.&nbsp;(2020), “Measuring Robustness to Natural Distribution Shifts in Image Classification,” NeurIPS. Koh et al.&nbsp;(2021), “WILDS: A Benchmark of in-the-Wild Distribution Shifts,” ICML. The first bullet also bears on Thursday’s question of when you could skip labels: even “the same process” did not guarantee the same accuracy.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="when-a-robustness-test-is-a-sensitivity-analysis" class="slide level2 smaller">
+<h2>When a robustness test is a sensitivity analysis</h2>
+<p><span class="math display">\theta_{\text{client}}\approx\theta_{T_s}\quad\text{only if the client's cases look like }T_s(X)</span></p>
+<ul>
+<li>If you can say how the client’s cases differ, for example that sellers’ phone photos are blurrier, a transformation is a model of that difference.</li>
+<li>Then vary its severity <span class="math inline">s</span> and find where the decision flips: a tipping point in <span class="math inline">s</span>.</li>
+<li>Without that argument, it measures the model, not the client’s decision.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. Thursday’s within-group gap <span class="math inline">\delta</span> is the same idea with no model for the difference: it says how big the difference would have to be, not what causes it. This is why the Project Description says rotating or blurring photos is not the project’s sensitivity analysis unless the team can say why the client’s photos differ that way.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-each-kind-of-analysis-answers" class="slide level2 smaller compact-table">
+<h2>What each kind of analysis answers</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>What it varies</th>
+<th>What it answers</th>
+<th>Who asks</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ablation</td>
+<td>a part of the model</td>
+<td>which parts earn the accuracy</td>
+<td>the people building it</td>
+</tr>
+<tr class="even">
+<td>Robustness test</td>
+<td>the inputs, by a transformation</td>
+<td>how the model does on transformed cases</td>
+<td>anyone whose cases look transformed</td>
+</tr>
+<tr class="odd">
+<td>Sensitivity analysis</td>
+<td>choices and assumptions in the evaluation</td>
+<td>whether the decision changes</td>
+<td>the client</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Your project’s sensitivity analysis is the last row (Project Description, Section 3).</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. A supplementary analysis, from Question 2, changes the estimand and fits none of the rows.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="check-1" class="slide level2 smaller">
+<h2>Check</h2>
+<p>Is each an ablation, a robustness test, a sensitivity analysis, or none of these?</p>
+<ol type="1">
+<li>Remove the infrared flag from a model’s inputs and measure the drop.</li>
+<li>Rotate every test photo 90 degrees and measure accuracy again.</li>
+<li>Recompute the park’s lower bound with the <code>day_night</code> column as <span class="math inline">Z</span>.</li>
+<li>Try ten algorithms and report the best.</li>
+</ol>
+<div class="fragment">
+<p>1 is an ablation. 2 is a robustness test, and a client question only if the park’s cameras are mounted sideways. 3 is a sensitivity analysis. 4 is none of these: it is model shopping.</p>
+</div>
+<aside class="notes">
+<p>About 2 minutes.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="question-4-how-do-you-report-it" class="title-slide slide level1 center">
+<h1>Question 4: how do you report it?</h1>
+
+</section>
+<section id="writing-it-up-the-parks-version" class="slide level2 smaller">
+<h2>Writing it up: the park’s version</h2>
+<blockquote>
+<p><strong>MegaDetector clears the park’s line for any infrared share below 55%.</strong></p>
+</blockquote>
+<ul>
+<li><strong>Methods, written before the analysis:</strong> “We vary the park’s infrared share from 15% to 40%. The recommendation changes if the lower bound falls below 0.90.”</li>
+<li><strong>Results:</strong> the mix curve, with the claim above as its title and the flip point marked.</li>
+<li><strong>Discussion:</strong> “The park’s own count puts its infrared share at 12% to 51%. The mix cannot change the recommendation. What could is how MegaDetector does at the park’s new cameras.”</li>
+</ul>
+<aside class="notes">
+<p>About 4 minutes. Titles are claims (Project Description, Section 3): the title states what the figure shows, in a full sentence. The flip rule goes in Methods because it is written first; the result goes in Results; the Discussion says what could still change the recommendation, which leads to Thursday. Ask the room to rewrite a topic title, “Sensitivity analysis,” as a claim.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="your-project" class="slide level2 smaller">
+<h2>Your project</h2>
+<p><span class="math display">\hat\theta_{\text{client}}=\sum_k c_k\,\hat p_k\quad\text{(starter section 5)}</span></p>
+<ul>
+<li>Your sensitivity analysis is <strong>one variable</strong> that could make the AI system more or less accurate for your client than on the benchmark. Say why it could differ for your client, and which way it would push.</li>
+<li>If you can measure it, vary your client’s mix of it (<code>client_shares</code>) over the range you can defend, and find the flip point. If you cannot, Thursday’s tipping point is the tool.</li>
+<li>Write the flip rule first. The Project Description, Section 3, has the details.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. Do not tell teams their variable or their mix. Each track’s datasheet lists candidate variables. The Food and Pet tracks have large accuracy differences between classes, so their curves will move more than the park’s; let them find it. A discrete alternative like today’s table (a grouping or a decision rule) is fine to report, but it is not the project’s sensitivity analysis. Rotating or blurring photos does not count unless a team can say why the client’s photos differ that way (instructor decision, Oct 27).</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-we-did-today" class="slide level2 smaller">
+<h2>What we did today</h2>
+<ol type="1">
+<li>A decision depends on choices: a primary analysis, defensible alternatives, and a flip rule written first.</li>
+<li>A variable moves the answer only if its mix differs between benchmark and client and accuracy differs across it.</li>
+<li>For a measured variable, plot the estimate and its bound against the client’s mix and find the flip point. The mix is an estimate too.</li>
+<li>A sensitivity analysis keeps the estimand. An analysis of a different estimand is supplementary.</li>
+<li>Ablations and robustness tests ask about the model. A sensitivity analysis asks whether the client’s decision changes.</li>
+<li>Report every row. Picking the best one is model shopping, and Week 5’s winner’s curse says it overstates.</li>
+</ol>
+<aside class="notes">
+<p>About 2 minutes.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="thursday-and-hw6" class="slide level2 smaller">
+<h2>Thursday and HW6</h2>
+<ul>
+<li><strong>Thursday:</strong> the assumption no choice of <span class="math inline">Z</span> can check, as a sensitivity parameter with a tipping point, and when to label. Then Lab 10 on hospital 5.</li>
+<li><strong>HW6</strong> is out today, due Tue Mar 30. Problem 1 is a flip point in the client’s mix, Problem 2 a sensitivity table for hospital 4, and Problem 3 sensitivity analysis versus model shopping.</li>
+<li><strong>Checkpoint 8</strong> opens after Thursday’s class.</li>
+</ul>
+<aside class="notes">
+<p>About 1 minute. Milestone 1 was due today; nothing in today’s lecture was graded in it.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="lecture_a_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="lecture_a_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="lecture_a_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

@@ -1,0 +1,655 @@
+---
+title: "Week 11A: Designing an AI Evaluation"
+subtitle: "How many questions, how many answers to each, and what to randomize"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{python}
+#| include: false
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Thursday's data: Llama 3 8B Instruct, 10,000 answers to each of 127 GSM8K problems
+right_8b = np.load("../../data/course/llm_gsm8k/correct.npz")["llama3_8b"]
+runs = right_8b.mean(axis=0)   # column j = the j-th answer to every problem = one run
+
+# The city's chatbot (made-up numbers): accuracy 0.80, between-question and within-question variance
+tau2, sigma2 = 0.06, 0.10
+
+def se_design(n, r):
+    """Standard error of the accuracy from n questions with r answers to each."""
+    return np.sqrt(tau2 / n + sigma2 / (n * r))
+```
+
+## Plan the evaluation before you spend {.smaller}
+
+```{python}
+#| fig-width: 9
+#| fig-height: 3.4
+low, high = np.percentile(runs, [5, 95])
+fig, ax = plt.subplots(figsize=(9, 3.4))
+counts, _, _ = ax.hist(runs, bins=(np.arange(61, 113) - 0.5) / 127, color="#5b8db8", edgecolor="white")   # one bar per possible score k/127
+ax.set_ylim(0, counts.max() * 1.1)
+for x in (low, high):
+    ax.axvline(x, color="#333333", linestyle=":", linewidth=1.5)
+ax.text(low - 0.006, counts.max() * 0.9, f"middle 90% of runs, between\nthe dotted lines: {low:.2f} to {high:.2f}", ha="right", va="top", fontsize=12)
+ax.set_xlabel("accuracy of one run: one answer to each of the 127 problems", fontsize=12)
+ax.set_ylabel("runs", fontsize=12)
+ax.tick_params(labelsize=11)
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+- Same model, same 127 problems, 10,000 runs: scores from **0.70 to 0.82**.
+- A score is random twice: which questions, and which answers.
+- A design mistake cannot be fixed afterward.
+
+::: notes
+About 3 minutes. The figure: Llama 3 8B Instruct answered the same 127 GSM8K math problems 10,000 times at temperature 0.6, and nothing changed between runs but the model's random draws; 0.70 to 0.82 is the middle 90% of runs. Say the point in full: a chat model's score is random twice over, in which questions you ask and which answers it happens to give; every call costs something, so plan the evaluation (how many questions, how many answers to each, what to randomize) before the first call. Data: Brown et al. (2024), "Large Language Monkeys," the GSM8K part of their release, which is Thursday's lab data. A "run" here is column $j$ of the 127 × 10,000 matrix: the $j$-th answer to every problem. Run accuracies: mean 0.768, SD 0.039, 5th and 95th percentiles 0.701 and 0.819, lowest 0.488. Leaderboards usually report one run. Do not preview the lab's other numbers.
+:::
+
+## This week we choose the design {.smaller .compact-table}
+
+| Weeks | The question | The design |
+|---|---|---|
+| 4 and 5 | How precise is a score? Which model is better? | given; we analyzed it |
+| 9 and 10 | Does the score carry over to the client? | given; the client's cases |
+| **11** | **How should the evaluation be run?** | **ours: questions, answers, randomization** |
+| 12 | Can we trust the judge that grades answers? | ours: the judge and its prompt |
+
+Fisher (1938): "He can perhaps say what the experiment died of."
+
+::: notes
+About 2 minutes. Weeks 4 and 5 analyzed a benchmark someone else built; Weeks 9 and 10 asked whether a score carries over to a client whose cases were given. This week we choose how many questions, how many answers to each, and what to randomize. Week 12 asks whether the judge that grades answers can be trusted. Fisher's line is about consulting a statistician after the experiment is finished: Fisher, R. A. (1938), Presidential Address to the First Indian Statistical Congress, *Sankhyā* 4, 14–17. A design mistake (a confounded comparison, too few questions) cannot be fixed by analysis afterward.
+:::
+
+## Recap: Week 4B's clusters {.smaller}
+
+$$\operatorname{Var}(Y)=\underbrace{\tau^2}_{\text{between passages}}+\underbrace{\sigma^2}_{\text{within a passage}}$$
+
+$$\rho=\frac{\tau^2}{\tau^2+\sigma^2},\qquad \text{design effect}=1+(m-1)\rho$$
+
+- Week 4B: each passage came with its $m$ questions.
+- Today: a question is the cluster, and its answers are the items.
+- **We choose** the number of answers, $r$.
+
+::: notes
+About 2 minutes. In Week 4B we could only analyze the clusters the benchmark gave us. Same notation as Week 4B: $\tau^2$ between clusters, $\sigma^2$ within. Thursday's lab uses it too. Week 5's pairing comes back in Question 4 as blocking.
+:::
+
+## Today's plan {.smaller}
+
+1. Why does one question get different answers?
+2. What do repeated answers measure?
+3. How should you spend a budget?
+4. What should you block, cross, and randomize?
+
+Thursday's lab: Questions 1 to 3 on real data.
+
+::: notes
+About 1 minute. The lab uses the GSM8K data from the first slide.
+:::
+
+## Running example: Pittsburgh's chatbot {.smaller}
+
+- Residents ask about potholes, trash pickup, and sinkholes.
+- It samples at temperature 0.7, so two asks can get two answers.
+- Calls are cheap. A checked question costs staff time.
+- The city asks: how often is an answer right?
+
+::: notes
+About 1 minute. The City of Pittsburgh's chatbot answers the questions residents would otherwise phone in to the city's service line. For the sinkhole question, remind the room of October 28, 2019, when a sinkhole at 10th Street and Penn Avenue downtown swallowed the back end of a Port Authority bus waiting at a red light; 10th Street took nearly a year to reopen. The chatbot is made up. Staff have written and checked answers for a bank of questions. The chatbot runs on the city's own server, so a call costs little. Before launch, the city wants to know how often an answer is right and how to run the check. The numbers for the city are made up for the lecture; say so. The lab has real data, so the lecture uses a parallel example with different numbers.
+:::
+
+# Question 1: why does the same question get different answers?
+
+## A model draws each token at random\* {.smaller .compact-table}
+
+$$P(\text{next token}=j)=\frac{e^{z_j/T}}{\sum_k e^{z_k/T}}$$
+
+| Temperature | Token A | Token B | Token C |
+|---|---:|---:|---:|
+| $T=0.25$ | 0.98 | 0.02 | 0.00 |
+| $T=0.6$ | 0.82 | 0.15 | 0.03 |
+| $T=1$ | 0.67 | 0.25 | 0.09 |
+| $T=2$ | 0.51 | 0.31 | 0.19 |
+
+- Temperature $T$ divides the scores $z_j$ before the softmax.
+- Low $T$: almost always the top token. High $T$: spread out.
+- One early draw can change the whole answer.
+
+<p class="compact-note">\* The simplest version. Real systems first trim the candidates, for example to the top $k$ tokens (Hugging Face's default is $k=50$) or to the most likely tokens that make up probability $p$ ("top-p").</p>
+
+::: notes
+About 3 minutes. The asterisk: there are many ways to sample tokens. In Hugging Face `transformers` (checked Nov 4, 2026, version 5.13), `generate()` uses greedy decoding unless sampling is turned on by the user or by the model's own `generation_config.json`; when it samples, the defaults are temperature 1.0, top-$k$ 50, and top-$p$ 1.0. Top-$p$, or nucleus sampling (Holtzman et al. 2020, "The Curious Case of Neural Text Degeneration"), keeps the smallest set of tokens whose probabilities add to $p$. Other rules (min-$p$, repetition penalties) also change the draw. All of them are settings of the system being evaluated, like temperature. Brown et al.'s GSM8K answers used temperature 0.6 and no top-$p$. The model scores every possible next token and turns the scores into probabilities; here $z=(2, 1, 0)$. At $T\to0$ it always takes the top token ("greedy decoding"). An answer is a long chain of these draws. Week 6B's temperature scaling uses the same $T$ for a different job: it is fitted to recalibrate a classifier's probabilities, while sampling temperature is a setting chosen by whoever deploys the model. Thursday's popcorn problem is the one-early-draw case: reading "four times the initial popping rate" as four times the previous amount sends the answer to 470.
+:::
+
+## Temperature is part of the system {.smaller}
+
+- Test at the temperature the system will use: 0.7.
+- At $T=0$, the variation within a question disappears.
+- Report temperature, prompt, and model version with every score.
+
+::: notes
+About 2 minutes. Say aloud that a check at $T=0$ evaluates a different system from the one residents will use. Miller (2024), Section 3.3, makes the same point: lowering the temperature to shrink the error bars changes the system being evaluated. Section 3 of "Adding Error Bars to Evals" is this week's reading. Temperature, prompt, and version are part of what the number means, like Week 2's labeling protocol. Even at $T=0$, some hosted models are not exactly repeatable (batching on GPUs), so record repeat behavior rather than assume it.
+:::
+
+## Each question has its own accuracy {.smaller}
+
+$$C_{ij}=1\ \text{if answer } j \text{ to question } i \text{ is right}$$
+
+$$P(C_{ij}=1\mid\text{question } i)=p_i,\qquad \theta=E[p_i]$$
+
+- Given the question, each answer is a coin flip with probability $p_i$.
+- Accuracy $\theta$ averages $p_i$ over residents' questions.
+- Week 4B's model: $\tau^2=\operatorname{Var}(p_i)$ and $\sigma^2=E[p_i(1-p_i)]$.
+
+::: notes
+About 3 minutes. An easy question has $p_i$ near 1, a hard one near 0. This is Week 4B's two-level model with a question in place of a passage. The law of total variance for one answer: $\operatorname{Var}(C)=\operatorname{Var}(E[C\mid i])+E[\operatorname{Var}(C\mid i)]=\operatorname{Var}(p_i)+E[p_i(1-p_i)]=\tau^2+\sigma^2$, which equals $\theta(1-\theta)$ because $C$ is 0 or 1. For the city's chatbot, $0.06+0.10=0.16=0.8\times0.2$.
+:::
+
+## Check {.smaller}
+
+One question has $p_i=0.6$.
+
+1. What is $\operatorname{Var}(C_{ij}\mid\text{question } i)$?
+2. At $T=0$, what values can $p_i$ take, and what is $\sigma^2$?
+
+::: {.fragment}
+1. $0.6\times0.4=0.24$.
+2. $p_i$ is 0 or 1, so $\sigma^2=0$ and $\tau^2=\theta(1-\theta)$.
+:::
+
+::: notes
+About 3 minutes. At $T=0$ the chatbot always gives its single most likely answer, which is either right or not. Then $p_i(1-p_i)=0$ for every question, and all the variance is between questions.
+:::
+
+# Question 2: what do repeated answers measure?
+
+## Condition on the question, then average {.smaller}
+
+::: {style="font-size: 0.9em;"}
+$$
+\begin{aligned}
+P(\text{2 answers disagree}\mid i)&=p_i(1-p_i)+(1-p_i)\,p_i=2p_i(1-p_i)\\
+P(\ge1\text{ of }k\text{ right}\mid i)&=1-P(k\text{ wrong in a row}\mid i)=1-(1-p_i)^k\\
+P(\ge2\text{ of }3\text{ right}\mid i)&=\tbinom{3}{2}\,p_i^2(1-p_i)+p_i^3
+\end{aligned}
+$$
+:::
+
+$$P(\text{event})=E\bigl[P(\text{event}\mid i)\bigr]\qquad\text{(law of total expectation)}$$
+
+- Given the question, answers are independent coin flips with probability $p_i$.
+- Average each line over the questions to get the estimand.
+
+::: notes
+About 4 minutes. Line 1: one right and one wrong happens two ways, right then wrong or wrong then right. Line 2: the complement of $k$ wrong in a row; given the question the $k$ answers are independent, so $P(k\text{ wrong})=(1-p_i)^k$. Machine learning calls the average pass@k. Line 3: Binomial$(3, p_i)$, exactly two right or all three. The last line is the law of total expectation from Weeks 4B and 9. Estimating from $r$ answers per question, if question $i$ has $c$ right: the share of its $\binom{r}{2}$ pairs that disagree, $c(r-c)/\binom{r}{2}$, is unbiased for $2p_i(1-p_i)$; $1-\binom{r-c}{k}/\binom{r}{k}$, the chance that a random $k$ of the $r$ answers includes a right one, is unbiased for $1-(1-p_i)^k$ (Chen et al. 2021). Plugging $\hat p_i$ into $1-(1-\hat p_i)^k$ is biased, because the function is concave (Jensen). Both unbiased versions are U-statistics.
+:::
+
+## Each column is a different estimand {.smaller .compact-table}
+
+| Question | $p_i$ | Two answers disagree | At least 1 of 3 right | Majority of 3 right |
+|------------------------------|------:|------------:|------------:|------------:|
+| How do I report a pothole? | 1.0 | 0.00 | 1.000 | 1.000 |
+| When is my trash pickup? | 0.9 | 0.18 | 0.999 | 0.972 |
+| Where do I park in a snow emergency? | 0.6 | 0.48 | 0.936 | 0.648 |
+| Who fixes a sinkhole? | 0.3 | 0.42 | 0.657 | 0.216 |
+| **Average** | **0.70** | **0.27** | **0.898** | **0.709** |
+
+::: notes
+About 2 minutes. Each column is a different quantity computed from the same answers, and they answer different questions. Each is the previous slide's line for that question, and the bottom row averages over the four. For these four, $\tau^2=0.075$ and $\sigma^2=0.135$.
+:::
+
+## Two answers disagree 27% of the time {.smaller}
+
+$$\text{disagreement}=2\sigma^2=2\,(1-\rho)\,\theta(1-\theta)=0.27$$
+
+$$\rho=\operatorname{corr}(C_{i1},C_{i2})=\frac{\tau^2}{\tau^2+\sigma^2}=0.36$$
+
+- Asked once, an answer is right 70% of the time.
+- Asked twice, one answer is right and one wrong 27% of the time.
+- $\rho$ measures how alike two answers to the same question are.
+- $\rho$ near 1: the question decides the answer. Near 0: the draw does.
+
+::: notes
+About 4 minutes. Same four questions as the table: $\theta=0.70$, $\tau^2=0.075$, $\sigma^2=0.135$. Where $\rho$ comes from: by the law of total covariance (Week 4B), two answers to the same question have $\operatorname{Cov}(C_{i1},C_{i2})=\operatorname{Var}(p_i)=\tau^2$, and each has variance $\tau^2+\sigma^2=\theta(1-\theta)$, so their correlation is $\tau^2/(\tau^2+\sigma^2)$. It is Week 4B's within-cluster correlation, and it is also the share of the variance in right-or-wrong that lies between questions: here 36% comes from which question was asked and 64% from which answer the model drew. In measurement this is the intraclass correlation, the standard test–retest reliability coefficient (the same blood pressure measured twice). At $\rho=1$, $\sigma^2=0$: every question's answers are all right or all wrong, as at $T=0$, and a second answer tells you nothing new. At $\rho=0$, every question is equally hard, and whether an answer is right is a coin flip with the same $\theta$. The first line ties the two together: for a fixed accuracy, a higher $\rho$ means less disagreement. Check: $2(1-0.357)(0.21)=0.27$. Disagreement needs at least two answers per question; its complement, 0.73, is how often two answers agree (both right or both wrong). Week 2's DynaSent raters were people agreeing with each other; this is a model agreeing with itself, and Week 12 asks whether different judges agree. For Thursday's GSM8K data, $\rho=0.47$ and the disagreement rate is $2\times0.094=0.19$.
+:::
+
+## Pick the estimand that fits the use {.smaller}
+
+| How the answers are used | The estimand | Chatbot |
+|----------------------------------------------|----------------------------------|------:|
+| A resident asks once and reads the answer | accuracy, $\theta=E[p_i]$ | 0.70 |
+| A resident asks the same question twice | chance the two answers disagree | 0.27 |
+| Staff read 3 drafts and send one that is right | chance at least 1 of 3 is right | 0.90 |
+| The app shows the most common of 3 answers | chance the majority of 3 is right | 0.71 |
+
+- The chatbot shows each resident one answer, so the city needs accuracy, $\theta$.
+- Majority voting helps easy questions and hurts hard ones: sinkhole, 0.30 to 0.22.
+
+::: notes
+About 3 minutes. Each row is a different question about the same answers, so each needs its own estimand; none is a better estimate of $\theta$. Row 3 fits whenever a person or a test can pick out the right answer, as with code that must pass unit tests; this is the "at least one of $k$ right" line from the derivation slide with $k=3$. Row 4: for a question with $p_i>0.5$ the majority of three is more likely to be right than one answer (0.9 rises to 0.972), and for $p_i<0.5$ it is less likely (the sinkhole question, 0.3, falls to 0.216). Majority voting over sampled reasoning: Wang et al. (2023), "Self-Consistency Improves Chain of Thought Reasoning in Language Models." Real majority votes count final answers, which can split across several wrong ones; the binary version here is the simplest case. Brown et al. (2024) study the at-least-one-right rate at very large $k$ and call it coverage. Values are the bottom row of the table two slides back.
+:::
+
+## The machine-learning names {.smaller .compact-table}
+
+| Statistics | Machine learning |
+|---|---|
+| $\theta$, the accuracy of one sampled answer | pass@1 |
+| the chance that at least one of $k$ answers is right | pass@k |
+| the most common of $k$ answers | majority voting, self-consistency |
+| a question's own accuracy, $p_i$ | per-item accuracy |
+| variation between runs of a benchmark | seed variance, "eval noise" |
+
+::: notes
+About 1 minute. The ideas come first; the names are how students will find them in papers. pass@k comes from program synthesis: Kulal et al. (2019, "SPoC: Search-based Pseudocode to Code") counted a problem solved if any of $k$ generated programs passed its tests, and Chen et al. (2021, "Evaluating Large Language Models Trained on Code," the HumanEval paper) made it standard and gave the unbiased estimator on the previous slides' notes. Careful: machine learning's "self-consistency" means majority voting, not how often two answers agree. Statistics has the same quantity as the chance of at least one success in $k$ trials; in reliability engineering it is a parallel system with $k$ components, and in epidemiology the combined sensitivity of $k$ tests read in parallel.
+:::
+
+## Check {.smaller}
+
+A question has $p_i=0.4$.
+
+1. Find: two answers disagree, at least 1 of 3 right, majority of 3 right.
+2. A vendor reports pass@5: at least 1 of 5 right. Why is that wrong here?
+
+::: {.fragment}
+1. $2(0.4)(0.6)=0.48$; $1-0.6^3=0.784$; $3(0.16)(0.6)+0.064=0.352$.
+2. A resident sees one answer, so the city needs $\theta$, which is pass@1.
+:::
+
+::: notes
+About 3 minutes. pass@5 is higher than pass@1, and it answers a question no resident asks.
+:::
+
+# Question 3: how should you spend a budget?
+
+## A check has two sample sizes {.smaller}
+
+$$\hat\theta=\frac{1}{nr}\sum_{i=1}^{n}\sum_{j=1}^{r}C_{ij}=\frac{1}{n}\sum_{i=1}^{n}\bar C_i,\qquad \bar C_i=\frac{1}{r}\sum_{j=1}^{r}C_{ij}$$
+
+- $n$ questions drawn at random, $r$ answers to each.
+- $\hat\theta$, the share right, is the average of the question averages.
+- Week 4B's benchmark fixed $m$. Here we choose $r$.
+
+::: notes
+About 2 minutes. Because every question gets the same $r$, the share of all $nr$ answers that are right equals the average of the $n$ question averages $\bar C_i$. In Week 4B only $n$ was ours.
+:::
+
+## Its variance, step by step {.smaller}
+
+$$
+\begin{aligned}
+\operatorname{Var}(\hat\theta)&=\frac{1}{n}\operatorname{Var}(\bar C_i)\qquad\text{(independent questions)}\\
+&=\frac{1}{n}\Bigl(\operatorname{Var}\bigl(E[\bar C_i\mid i]\bigr)+E\bigl[\operatorname{Var}(\bar C_i\mid i)\bigr]\Bigr)\qquad\text{(total variance)}\\
+&=\frac{1}{n}\Bigl(\operatorname{Var}(p_i)+E\Bigl[\frac{p_i(1-p_i)}{r}\Bigr]\Bigr)\qquad\text{(conditional moments)}\\
+&=\frac{\tau^2}{n}+\frac{\sigma^2}{n\,r}
+\end{aligned}
+$$
+
+- Given $i$: $E[\bar C_i\mid i]=p_i$ and $\operatorname{Var}(\bar C_i\mid i)=p_i(1-p_i)/r$.
+- With $r=1$: $\theta(1-\theta)/n$, the usual formula.
+
+::: notes
+About 4 minutes. Go line by line. The first line uses that the $\bar C_i$ are independent with the same distribution because the questions are drawn independently, and the variance of an average of $n$ of them is $1/n$ times one variance (Week 4). With $r=1$, $(\tau^2+\sigma^2)/n=\theta(1-\theta)/n$.
+:::
+
+## It is Week 4B's design effect {.smaller}
+
+$$\frac{\tau^2}{n}+\frac{\sigma^2}{n\,r}=\frac{\theta(1-\theta)}{n\,r}\,\bigl[1+(r-1)\rho\bigr]$$
+
+- The bracket is Week 4B's design effect, with $r$ for $m$.
+- The city's chatbot: $\tau^2=0.06$, $\sigma^2=0.10$, $\rho=0.375$.
+- 60 questions × 10 answers: design effect 4.4. The next slide says what that buys.
+
+::: notes
+About 2 minutes. The first factor is the variance if all $nr$ answers were independent. Algebra, using $\theta(1-\theta)=\tau^2+\sigma^2$ and $\rho(\tau^2+\sigma^2)=\tau^2$: $\frac{\tau^2+\sigma^2}{nr}\bigl[1+(r-1)\rho\bigr]=\frac{\tau^2+\sigma^2}{nr}+\frac{(r-1)\tau^2}{nr}=\frac{\tau^2}{n}+\frac{\sigma^2}{nr}$. For the chatbot, $\theta=0.80$. Design effect $1+9(0.375)=4.375$, and the 600 answers are worth $600/4.375=137$ independent ones.
+:::
+
+## The 600 answers are worth 137 {.smaller}
+
+$$n_{\text{eff}}=\frac{nr}{1+(r-1)\rho}=\frac{600}{4.375}=137$$
+
+| Design | Answers | SE |
+|---------------------------------|------:|------:|
+| 60 questions × 1 answer | 60 | 0.052 |
+| 60 questions × 10 answers | 600 | 0.034 |
+| 137 questions × 1 answer | 137 | 0.034 |
+| 600 questions × 1 answer | 600 | 0.016 |
+
+- 600 clustered answers give the SE of 137 answers to 137 questions.
+- The extra 540 answers bought what 77 new questions would.
+- Endless answers to 60 questions are worth at most $n/\rho=160$.
+
+::: notes
+About 4 minutes. The effective sample size is the number of independent answers that would give the same standard error: divide the number of answers by the design effect (Week 4B; Kish 1965). Here $\sqrt{0.16/137}=0.034$, the same as 60 questions with 10 answers each. Ten answers to each of 60 questions beat one answer each (0.052), but they are far from 600 answers to 600 questions (0.016), because answers to the same question repeat much of the same information. The cap: as $r$ grows, the design effect grows like $r\rho$, so $n_{\text{eff}}=nr/(1+(r-1)\rho)$ approaches $n/\rho=60/0.375=160$. Its SE, $\sqrt{0.16/160}=0.032$, is the floor on the next-but-one slide: no number of answers to 60 questions does better than 160 independent ones. In Week 4B, 400 questions on 100 passages were worth 250. In Thursday's lab, 1,270 answers to 127 problems are worth about 237.
+:::
+
+## With the calls fixed, more questions win {.smaller .compact-table}
+
+$$nr=B\quad\Longrightarrow\quad\operatorname{Var}(\hat\theta)=\frac{\tau^2}{n}+\frac{\sigma^2}{B}$$
+
+| Questions, $n$ | Answers to each, $r$ | SE |
+|---:|---:|---:|
+| 600 | 1 | 0.016 |
+| 200 | 3 | 0.022 |
+| 60 | 10 | 0.034 |
+| 20 | 30 | 0.056 |
+
+- 600 calls: only $n$ moves the SE.
+- Best: 600 questions, one answer each, if you have them.
+
+::: notes
+About 3 minutes. With $B$ fixed, the second term is the same for every design. One answer to each of 600 questions is best, if the city has 600 checked questions. Thursday's lab checks a table like this by simulation on real data.
+:::
+
+## More answers help, down to a floor {.smaller}
+
+```{python}
+#| fig-width: 9
+#| fig-height: 2.9
+r_grid = np.arange(1, 41)
+fig, ax = plt.subplots(figsize=(9, 2.9))
+ax.plot(r_grid, se_design(60, r_grid), color="#155a8a", linewidth=2)
+ax.axhline(np.sqrt(tau2 / 60), color="#c41230", linewidth=1.5)
+ax.text(40, np.sqrt(tau2 / 60) - 0.0012, "floor: the between-question part, 0.032", color="#c41230", fontsize=12, ha="right", va="top")
+ax.set_ylim(0.028, 0.055)
+ax.set_xlabel("answers to each question, r", fontsize=12)
+ax.set_ylabel("SE, 60 questions", fontsize=12)
+ax.tick_params(labelsize=11)
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+- 60 checked questions: SE 0.052 with 1 answer, 0.034 with 10.
+- The between part, $\sqrt{\tau^2/n}=0.032$, never shrinks.
+
+::: notes
+About 2 minutes. Suppose staff have checked only 60 questions. More answers shrink only the within-question part; the between-question part is a floor however many answers you collect. SE at $r=1, 2, 5, 10, 20$: 0.052, 0.043, 0.037, 0.034, 0.033. Past about 10 answers, the next dollar belongs on a new question.
+:::
+
+## When questions cost money too {.smaller}
+
+$$\text{cost}=n\,(c_q+r\,c_a),\qquad \operatorname{Var}(\hat\theta)=\frac{1}{n}\Bigl(\tau^2+\frac{\sigma^2}{r}\Bigr)$$
+
+- $c_q$, one checked question: about 10 minutes of staff time, \$5.
+- $c_a$, one answer: about 10 cents of server time.
+- So $c_q/c_a=50$: a checked question costs as much as 50 calls.
+- Fixed budget $C$: choose $r$, and $n=C/(c_q+r\,c_a)$.
+
+::: notes
+About 2 minutes. The prices are made up but plausible: staff time at about \$30 an hour, and a call's cost depends on the model's size and the prompt's length (a long prompt to a large hosted model can cost several cents). In practice the ratio is often far larger than 50 for small models, which pushes $r^\ast$ up: at $c_q/c_a=1{,}000$, the city's $r^\ast$ would be about 41. This is a different budget from the last two slides, where only one of the two was limited. Thursday's lab keeps a fixed number of calls; this budget counts both kinds of cost. For the city, $c_q/c_a=50$.
+:::
+
+## Finding the best r, step by step {.smaller}
+
+$$
+\begin{aligned}
+\operatorname{Var}(\hat\theta)&=\frac{(\tau^2+\sigma^2/r)\,(c_q+r\,c_a)}{C}\qquad\text{(substitute } n=C/(c_q+r\,c_a))\\
+&=\frac{\tau^2c_q+\tau^2c_a\,r+\sigma^2c_q/r+\sigma^2c_a}{C}\qquad\text{(multiply out)}\\
+0&=\tau^2c_a-\frac{\sigma^2c_q}{r^2}\qquad\text{(set the derivative in } r \text{ to zero)}\\
+r^\ast&=\sqrt{\frac{\sigma^2}{\tau^2}\cdot\frac{c_q}{c_a}}\qquad\text{(Cochran 1977, two-stage sampling)}
+\end{aligned}
+$$
+
+- $C$ drops out: the budget sets $n$, not $r$.
+- More answers when questions are costly or answers vary a lot.
+
+::: notes
+About 4 minutes. The second derivative, $2\sigma^2c_q/(r^3C)$, is positive, so this is a minimum. Cochran, *Sampling Techniques* (3rd ed.), Chapter 10, "Subsampling with units of equal sizes."
+:::
+
+## Every design the \$500 budget allows {.smaller}
+
+```{python}
+#| fig-width: 9
+#| fig-height: 3.8
+# The $500 budget: a checked question costs $5 and an answer 10 cents.
+budget, c_q, c_a = 500, 5.0, 0.10
+n_grid = np.arange(10, 99)                                            # questions
+r_max = np.floor((budget / n_grid - c_q) / c_a + 1e-9).astype(int)    # the most answers each that the budget allows
+se_formula = se_design(n_grid, r_max)
+
+# Simulate 2,000 checks for each design. Each question's p_i is drawn from a Beta
+# distribution with mean 0.80 and variance tau^2 = 0.06, so sigma^2 = 0.10.
+beta_a, beta_b = 0.8 * (0.16 / tau2 - 1), 0.2 * (0.16 / tau2 - 1)
+sim_rng = np.random.default_rng(2027)
+se_simulated = []
+for n, r in zip(n_grid, r_max):
+    p = sim_rng.beta(beta_a, beta_b, size=(2000, n))
+    right = sim_rng.binomial(r, p)
+    se_simulated.append((right.sum(axis=1) / (n * r)).std())
+
+best = se_formula.argmin()
+fig, ax = plt.subplots(figsize=(9, 3.8))
+ax.plot(n_grid, se_formula, color="#155a8a", linewidth=2, label="formula")
+ax.plot(n_grid, se_simulated, "o", color="#5b8db8", markersize=3.5, label="2,000 simulated checks per design")
+ax.plot(n_grid[best], se_formula[best], "o", color="#c41230", markersize=9)
+ax.annotate(f"best: {n_grid[best]} questions × {r_max[best]} answers, SE {se_formula[best]:.3f}",
+            (n_grid[best], se_formula[best]), xytext=(n_grid[best] - 4, 0.052), ha="right", fontsize=12,
+            arrowprops=dict(arrowstyle="-", color="#c41230"))
+for n_label, dx, dy, ha in [(20, 3, 0.007, "left"), (50, 0, 0.007, "center"), (98, -1, 0.006, "right")]:
+    j = list(n_grid).index(n_label)
+    ax.plot(n_label, se_formula[j], "o", color="#155a8a", markersize=6)
+    ax.text(n_label + dx, se_formula[j] + dy, f"{n_label} × {r_max[j]}", ha=ha, fontsize=11)
+ax.set_ylim(0.025, 0.08)
+ax.set_xlabel("questions, n (each gets the most answers the budget allows)", fontsize=12)
+ax.set_ylabel("SE of the accuracy", fontsize=12)
+ax.tick_params(labelsize=11)
+ax.legend(fontsize=11, frameon=False, loc="upper right")
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+- The lowest SE is near $r^\ast=\sqrt{(0.10/0.06)\times50}=9.1$.
+- Smallest SE means the narrowest interval, so the surest launch call.
+- The bottom is flat: 73 to 90 questions are within 0.001 of the best.
+
+::: notes
+About 4 minutes. Each point spends the whole \$500: $n$ questions at \$5 each, and as many 10-cent answers to each as the rest allows, $r=\lfloor(500/n-5)/0.10\rfloor$. The best is 86 questions with 8 answers each (SE 0.029, \$498.80 spent); 84 × 9 gives 0.0291. At the ends: 10 questions × 450 answers gives 0.078, and 98 questions × 1 answer gives 0.040. The simulation draws each question's $p_i$ from a Beta(4/3, 1/3), which has mean 0.80 and variance 0.06, then each answer as a coin flip with that $p_i$; it agrees with the formula to within 0.003 at every $n$.
+
+Why the smallest SE: every design here estimates the same thing, $\theta$, without bias (the share right is unbiased in each), so the only difference between them is precision. With the budget fixed, the smallest SE gives the narrowest 95% interval, and the city is least likely to launch a chatbot below its line or hold back one above it. Turned around, it is the cheapest design for a given precision. It is not the only goal: because the bottom is flat, choose among the nearly best designs for other reasons, such as at least 2 answers per question to estimate disagreement, more questions to cover more kinds of residents' questions, or allowance for $\tau^2$ and $\sigma^2$ being guesses from a pilot. If the estimates could be biased, compare mean squared error instead of SE.
+:::
+
+## The cheaper model gets more answers {.smaller}
+
+$$\frac{r_A}{r_B}=\frac{\sigma_A}{\sigma_B}\sqrt{\frac{c_B}{c_A}}$$
+
+- In-house: costs 1 per call, $\sigma_A^2=0.10$.
+- Paid: costs 20 per call, $\sigma_B^2=0.04$.
+- $r_A/r_B=\sqrt{0.10/0.04}\times\sqrt{20}=7.1$ in-house answers per paid one.
+- Thursday: a 200-call limit on a paid model.
+
+::: notes
+About 3 minutes. To compare two chatbots on the same questions, each gets its own number of answers per question. The in-house model varies a lot within a question; the paid one varies less. Derivation as on the last slide: $\operatorname{Var}(\hat D)=\bigl(\tau_d^2+\sigma_A^2/r_A+\sigma_B^2/r_B\bigr)/n$ with cost $n(c_q+r_Ac_A+r_Bc_B)$ gives $r_m^\ast=\sqrt{\sigma_m^2c_q/(\tau_d^2c_m)}$ for each model, and the ratio drops $\tau_d^2$ and $c_q$. $\tau_d^2$ is the between-question variance of the difference in accuracy.
+:::
+
+## Check {.smaller}
+
+A chatbot has $\tau^2=0.04$ and $\sigma^2=0.16$.
+
+1. With 500 calls: 100 questions × 5 answers, or 500 × 1?
+2. A checked question costs 25 calls. What is $r^\ast$?
+3. It launches if the lower bound clears 0.75. Why want the smallest SE?
+
+::: {.fragment}
+1. $\sqrt{0.04/100+0.16/500}=0.027$ against $\sqrt{0.20/500}=0.020$: 500 × 1.
+2. $r^\ast=\sqrt{(0.16/0.04)\times25}=10$.
+3. Same target, no bias: the smallest SE makes the surest launch call.
+:::
+
+::: notes
+About 4 minutes. In question 2, the budget counts both costs. Question 3: every design estimates the same $\theta$ without bias, so they differ only in precision, and the smallest SE gives the narrowest interval for the money. Make it concrete with an estimate of 0.80 and a one-sided 95% lower bound, $0.80-1.645\,\text{SE}$: with SE 0.020 (500 × 1) the bound is 0.767 and the chatbot launches; with 0.027 (100 × 5) it is 0.756, still a launch; with 0.040 it is 0.734, and the city would hold back a chatbot whose estimate is well above its line. A bigger SE makes both kinds of wrong call more likely. This is why the last few slides minimized the SE.
+:::
+
+# Question 4: what should you block, cross, and randomize?
+
+## An evaluation is an experiment {.smaller .compact-table}
+
+Does adding the city's web page to the prompt help?
+
+| Design term | In the city's check |
+|---|---|
+| Unit | a question |
+| Treatment | the prompt with the web page, or without it |
+| Response | whether each answer is right |
+| Block | the question: each one gets both prompts |
+| Replication | several answers per question per prompt |
+| Randomization | the order of the calls |
+
+<p class="compact-note">Fisher (1935), *The Design of Experiments*: replication, randomization, and local control (blocking).</p>
+
+::: notes
+About 3 minutes. The city asks whether adding the relevant city web page to the prompt raises accuracy. Fisher's three principles in *The Design of Experiments* (1935): replication, randomization, and local control (blocking). Adding retrieved pages to a prompt is what machine learning calls retrieval-augmented generation (RAG); name it only if asked.
+:::
+
+## Pairing is blocking {.smaller .compact-table}
+
+$$\operatorname{Var}(\hat D)=\frac{1}{n}\Bigl(\tau_d^2+\frac{\sigma_{\text{page}}^2}{r}+\frac{\sigma_{\text{none}}^2}{r}\Bigr)$$
+
+| Question | No page | With page | Gain |
+|--------------------------------------|------:|------:|------:|
+| How do I report a pothole? | 1.00 | 1.00 | 0.00 |
+| When is my trash pickup? | 0.90 | 0.95 | 0.05 |
+| Where do I park in a snow emergency? | 0.60 | 0.80 | 0.20 |
+| Who fixes a sinkhole? | 0.30 | 0.50 | 0.20 |
+| **Average** | **0.70** | **0.81** | **0.11** |
+
+- Each question is a block: both prompts run on it.
+- Accuracy varies a lot by question (0.075); the gain varies little (0.008).
+- Pairing leaves only the gain's variance, $\tau_d^2$, between questions.
+
+::: notes
+About 3 minutes. The estimate is $\hat D=\frac{1}{n}\sum_i\bigl(\bar C_i^{\,\text{page}}-\bar C_i^{\,\text{none}}\bigr)$, the average gain over questions. The with-page accuracies are made up. Between-question variances: 0.075 without the page, 0.038 with it, and 0.008 for the gain. Unpaired, with each prompt on its own questions, the between-question part would be $0.075+0.038=0.113$, about 14 times the paired 0.008, because the easy pothole question and the hard sinkhole question stay easy and hard with either prompt. Week 5 compared two models on the same questions; in design terms each question is a block. The within-question parts stay, divided by $r$: given the question, the two prompts' answers are independent. This is part 5 of Thursday's lab.
+:::
+
+## Cross prompt choices with questions {.smaller .compact-table}
+
+| Question | $p_i$ | Confounded design | Crossed design |
+|--------------------------------------|-----:|--------------|--------------|
+| How do I report a pothole? | 1.0 | wording A | A and B |
+| When is my trash pickup? | 0.9 | wording A | A and B |
+| Where do I park in a snow emergency? | 0.6 | wording B | A and B |
+| Who fixes a sinkhole? | 0.3 | wording B | A and B |
+
+- Confounded: B looks 50 points worse only because its questions are harder.
+- Crossed: every question gets both wordings, so difficulty cancels.
+- Lab data: each problem's worked examples changed only with the problem.
+
+::: notes
+About 3 minutes. The example: suppose wording B does nothing at all. In the confounded design, A's questions average $(1.0+0.9)/2=0.95$ and B's average $(0.6+0.3)/2=0.45$, so B looks 50 points worse; the wording is confounded with the questions. In the crossed design, each question gets both wordings, in random order, and the difference within each question is 0. In Thursday's GSM8K data, the five worked examples in the prompt changed only when the problem changed, so the between-problem variance mixes how hard a problem is with how helpful its examples were. No analysis can separate them afterward. With crossing, the examples' effect can be estimated on its own and stops hiding in $\tau^2$. This is the lab's discussion question 4. A factor that changes only with the unit is confounded with the unit, like a treatment given to only one hospital.
+:::
+
+## Runs are a third level of variation {.smaller}
+
+- Lab data: answer $j$ to every problem rises and falls together.
+- Run 1 scores 0.732 and run 2 scores 0.756, with nothing changed.
+- Test prompt A in run 1, B in run 2: B gains 2.4 points for free.
+- Randomize: interleave calls, one seed per answer, repeat whole runs.
+
+::: notes
+About 3 minutes. The example: run 1 is the first stored answer to each of the 127 problems, and run 2 the second; Llama 3 8B scores 0.732 and 0.756. Had prompt A been tested in run 1 and prompt B in run 2, B would look 2.4 points better with nothing changed. Even with independent answers two runs differ by chance, but the shared seed makes runs differ more: a run's SD is 0.039 against 0.027. If prompt A runs on Monday and B on Tuesday, the day and any model update are confounded too. In Brown et al.'s data, the first answers to all 127 problems rise and fall together, and so do the second answers, and so on, for both models. Something is shared within a run, most likely its random seed. A run's score varies with SD 0.039, against the 0.027 that independent answers would give; that is the spread on the first slide. Evidence: across the 10,000 runs, the two models' run accuracies correlate 0.16 at the same index and 0.00 when one model's runs are shifted by one; within a problem, accuracy is flat across the 10,000 answers. The average correlation between two problems' answers in the same run is only 0.013, but over 127 problems it adds up. If prompt A runs Monday and B Tuesday, the run, the day, and any model update are confounded with the prompt. Thursday's lab draws a separate random answer for each problem, which removes the link.
+:::
+
+## Check {.smaller}
+
+Prompt A runs Monday on 200 questions. After a model update, prompt B runs Thursday on the same questions and scores 4 points higher.
+
+1. What is confounded with the prompt?
+2. Redesign the check.
+
+::: {.fragment}
+1. The day and the model version.
+2. Same session, A and B in random order per question, version pinned.
+:::
+
+::: notes
+About 3 minutes. The 4 points could be the update. The redesign blocks on the question and randomizes the order: for each question, run A and B in random order in the same session, with several answers to each, and record the pinned model version.
+:::
+
+## Write the design plan first {.smaller .compact-table}
+
+| Design term | The city's check of the web page |
+|---------------------|------------------------------------------------------|
+| Unit | questions drawn at random from the bank |
+| Treatment | the prompt with the web page, or without it |
+| Held constant | temperature 0.7, the model version, the rest of the prompt |
+| Block | the question: both prompts on every question |
+| Replication | several answers per question per prompt |
+| Randomization | call order and seeds, both prompts in one session |
+| Response | right or wrong, against the staff's answer |
+| Analysis | the paired difference, resampling questions |
+| Decision rule | add the page if the lower bound on the gain is above 0 |
+
+::: notes
+About 3 minutes. This is the experiment from "An evaluation is an experiment," written out as a plan before any call is made, with the budget from Question 3 setting how many questions and answers. Writing the analysis and the decision rule first is the same move as Week 5's non-inferiority margin and Week 10's flip rule; in trials it is a pre-registered analysis plan. Thursday's lab treats the nonprofit's check the same way, and the lab's handoff asks each team to write its own comparison in these terms.
+:::
+
+## Next week: judges as measurements {.smaller}
+
+- Answers without a key are graded by another model, an LLM judge.
+- Its prompt and the order of the responses are treatments.
+- Do different judges agree? That is **inter-rater reliability**.
+
+::: notes
+About 1 minute. So far each answer was checked against a key. Today's design rules apply to judges too. Today's disagreement rate compared a model with itself; Week 12 asks whether different judges agree with each other.
+:::
+
+## Writing it up {.smaller}
+
+> On 85 questions from the city's bank, with 9 answers to each at temperature 0.7, the chatbot was right on 80% of its answers (95% interval 74% to 86%, resampling questions). Asked twice, it gave one right and one wrong answer about 20% of the time.
+
+- Give $n$, $r$, and the temperature.
+- Resample questions, not answers.
+- Add the disagreement rate if repeat answers matter.
+
+::: notes
+About 2 minutes. The interval resamples questions, the unit. Report the disagreement rate when the client cares whether residents get the same answer twice. Interval: $0.80\pm1.96\times0.029$ with the $r^\ast$ design from "The city's best design." Disagreement rate $2\sigma^2=0.20$.
+:::
+
+## Your project {.smaller}
+
+- Your comparison is an experiment: AI and baseline, blocked by case.
+- One cached answer per case, so the variation comes from cases.
+- Which cases are related? Each interval should resample those groups.
+- Could your system answer differently if asked again? Say so.
+
+::: notes
+About 2 minutes. The AI system and the baseline are two treatments, and each case gets both, so each case is a block, as in Week 5. Each interval should resample the related groups, as today's interval resampled questions, not answers. A system that could answer differently when asked again has a source of variation the team did not measure. Related cases: Track 2's repeated photos, Track 3's pairs from one Reddit post, Track 4's two responses to each prompt. Track 1 has none listed. The Project Description has the requirements; do not restate them.
+:::
+
+## What we did today {.smaller}
+
+1. A score is random twice: questions and answers. Temperature is part of the system.
+2. Repeated answers give new estimands: disagreement, at least one right, majority.
+3. $\operatorname{Var}(\hat\theta)=\tau^2/n+\sigma^2/(nr)$. With calls fixed, more questions win.
+4. When questions cost too, $r^\ast=\sqrt{(\sigma^2/\tau^2)(c_q/c_a)}$.
+5. An evaluation is an experiment: write the design plan first.
+
+::: notes
+About 1 minute.
+:::
+
+## Thursday {.smaller}
+
+- Lecture 11B, then Lab 11: the nonprofit's check as an experiment.
+- Then work time on the Milestone 2 outline, due Tue Apr 6.
+- Reading: Miller (2024), "Adding Error Bars to Evals," Section 3.
+- HW6 was due today. Checkpoint 9 opens after Thursday's class.
+
+::: notes
+About 1 minute. The lab uses Llama 3 8B and 70B Instruct answering GSM8K problems.
+:::

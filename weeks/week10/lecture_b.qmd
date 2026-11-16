@@ -1,0 +1,238 @@
+---
+title: "Week 10B: The Assumption Reweighting Cannot Check"
+subtitle: "A sensitivity parameter, its tipping point, and when to label"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{python}
+#| include: false
+import numpy as np
+import matplotlib.pyplot as plt
+
+theta_team = 151 / 162         # the team's accuracy
+theta_reweighted = 0.9452      # reweighted to the partner's mix (9A)
+theta_partner = 38 / 54        # the partner's own labels
+camera_gaps = np.array([-6.1, 8.4, 1.1, -8.1, 7.3, 1.1, -3.7, 9.6, -10.9])   # each team camera left out, in points
+```
+
+## Today's plan {.smaller}
+
+- **About 40 minutes:** Tuesday's sensitivity analysis varied choices the team made. Today is the assumption no choice can check: how wrong it would have to be to flip the decision, and how many labels would settle it.
+- **About 40 minutes, together:** Lab 10 does the same for hospital 5.
+- Lab 10 ends with each team's first sensitivity plan for Milestone 2.
+
+::: notes
+About 1 minute. Today follows the order a practitioner works in: before any of the partner's photos are labeled, then after.
+:::
+
+## The assumption reweighting makes {.smaller}
+
+```{mermaid}
+flowchart LR
+  S["S: which population<br>(team or partner)"] --> Z["Z: infrared<br>or color"]
+  Z --> C["C: MegaDetector<br>is right"]
+  S -.-> U["U: backgrounds, placement,<br>labeling at new cameras"]
+  U -.-> C
+  linkStyle 0,1 stroke:#155a8a,stroke-width:3px
+  linkStyle 2,3 stroke:#c41230,stroke-width:3px,stroke-dasharray:8 5
+  style U stroke:#c41230,stroke-dasharray:5 4
+```
+
+$$P_{\text{partner}}(C=1\mid Z)=P_{\text{team}}(C=1\mid Z)\quad\Longleftrightarrow\quad C\perp S\mid Z$$
+
+- Reweighting is right when $Z$ blocks **every** path from $S$ to $C$.
+- The dashed path goes around $Z$. No choice of $Z$ the team can measure closes it, and the team's photos cannot show it.
+- No overlap is the other failure: values of $Z$ the team never saw.
+
+::: notes
+About 4 minutes. $S$ is a variable that says which population a case comes from; the diagram is called a selection diagram, and the question "can the team's results be carried to the partner?" is called transportability (Pearl and Bareinboim 2011). Clinical trialists ask the same question when they generalize a trial to a target population (Cole and Stuart 2010). Conditional independence of $C$ and $S$ given $Z$ is exactly the Week 9 assumption, written the Week 2 way. 9A's "What conditioning on infrared missed" found the things in $U$: new backgrounds, cameras the team never saw, and the burst-labeling protocol meeting new cameras.
+:::
+
+## Make the unknown part a parameter {.smaller}
+
+$$\begin{aligned}\delta_k&=p_k^{\text{partner}}-p_k^{\text{team}}\\ \theta_{\text{partner}}&=\sum_k c_k\,p_k^{\text{partner}}=\underbrace{\sum_k c_k\,p_k^{\text{team}}}_{\theta_{\text{rw}},\ \text{estimated by }\hat\theta_{\text{rw}}}+\sum_k c_k\,\delta_k\end{aligned}$$
+
+$$\text{one }\delta\text{ for every type:}\qquad \theta_{\text{partner}}=\theta_{\text{rw}}+\delta$$
+
+- $\theta_{\text{partner}}$ and $\theta_{\text{rw}}$ are true accuracies; reweighting estimates $\theta_{\text{rw}}$ by $\hat\theta_{\text{rw}}=0.945$.
+- $\delta$ is how much worse (or better) the model does within each type at the new cameras.
+- The team's photos say nothing about $\delta$. So do not estimate it: **vary it**, as a **sensitivity parameter**, and see what it would take to change the decision.
+
+::: notes
+About 3 minutes. One $\delta$ for every type is the simplest version; a team can let $\delta$ differ by type if it has a reason. Tuesday's sensitivity analysis varied choices the team made; this one varies an assumption the team cannot check. For now, pretend nobody has labeled the partner's photos. The labels come at the end of the lecture.
+:::
+
+## The tipping point {.smaller}
+
+```{python}
+#| fig-width: 9
+#| fig-height: 3.0
+delta = np.linspace(-0.15, 0.04, 301)
+fig, ax = plt.subplots(figsize=(9, 3.0))
+ax.plot(100 * delta, theta_reweighted + delta, color="#155a8a", linewidth=2, label="estimated accuracy at the partner, if the gap is δ")
+ax.axhline(0.90, color="#c41230", linewidth=1.5, label="the park's line, 0.90")
+ax.axvline(100 * (0.90 - theta_reweighted), color="#667085", linestyle="--", linewidth=1)
+ax.text(100 * (0.90 - theta_reweighted) + 0.3, 0.81, "tipping point:\n−4.5 points", color="#667085", fontsize=11)
+ax.set_xlabel("δ, the within-type gap (points)", fontsize=12)
+ax.set_ylabel("accuracy", fontsize=12)
+ax.legend(fontsize=9, loc="upper left")
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+$$\delta^\ast=\min\bigl\{\delta:\ \hat\theta_{\text{rw}}+\delta\ge\tau\bigr\}=\tau-\hat\theta_{\text{rw}}=0.90-0.945=-0.045$$
+
+- $\tau=0.90$ is the park's line. The decision holds unless MegaDetector is at least **4.5 points** worse within each type.
+
+::: notes
+About 3 minutes. The tipping point is the most negative within-type gap the decision survives. This uses the point estimate. With the park's lower-bound rule, the tipping point is $0.90-0.904=-0.004$: almost any loss within types flips it. Either way, the question becomes concrete: is a 4.5-point within-type gap plausible at three new cameras?
+:::
+
+## How big is δ usually? {.smaller}
+
+$$\hat\delta_j=\hat\theta_j-\hat\theta_{\text{rw}}^{(-j)}$$
+
+- Leave out each of the team's nine cameras in turn: reweight the other eight to its mix, and compare with its own accuracy. The gaps run from **−11 to +10 points** (SD 7.5).
+- With 18 photos a camera, noise alone would give an SD of about 6 points. What is left, $\sqrt{7.5^2-6^2}\approx4.5$ points, is the size of the tipping point.
+- This treats the partner's cameras as three more cameras like the team's. If they are not, these gaps are a **floor** on the risk, not a measure of it.
+
+::: notes
+About 4 minutes. Per camera, $\hat\delta$: −6.1, +8.4, +1.1, −8.1, +7.3, +1.1, −3.7, +9.6, −10.9 points. Noise SD for 18 photos at 93%: $\sqrt{0.93\times0.07/18}=0.060$. Subtracting the noise variance from the observed variance is rough with nine cameras; the point is the order of magnitude. This is cross-validation with cameras as the folds, and it is the same exchangeability assumption as reweighting, moved up a level: from photos within a type to whole cameras. Even the floor says the decision is fragile. Lab 10 does the same with Camelyon's three benchmark hospitals (300 patches each, so the gaps of about ±10 points there are real), and asks whether hospital 5 is like them.
+:::
+
+## When could the team skip labeling the partner's photos? {.smaller}
+
+$$\text{skip the labels only if }\ C\perp S\mid Z\ \text{ is believable}$$
+
+- In practice, you would rarely trust a reweighted number without labeling some of the client's own cases.
+- Skipping them needs an argument that nothing on the dashed path differs. **Ask the room:** what would have to be the same at the partner's cameras?
+- Which of those could the team check from the partner's photos alone, with no labels?
+
+::: {.fragment}
+Overlap can be checked: the partner has both color and infrared photos. New backgrounds, new placements, and how bursts get labeled cannot. **Label.**
+:::
+
+::: notes
+About 3 minutes. Get two or three conditions from the room; do not give the whole list, because Lab 10 part 4 asks students to write it for hospitals. The full list, for you: the same process (cameras, placement, backgrounds; for hospitals, stain and scanner), the same population, the same label definition (here, how a burst is labeled), overlap on $Z$, a track record of small gaps at earlier held-out sites like this one, and a margin plus a way back (a tipping point far beyond those gaps, and a cheap, reversible mistake). The first three are what sits in $U$. The partner passes overlap and fails the others, which is a useful contrast with hospital 5, which fails overlap too. Settings where labels truly do not exist when the decision is made: label delay (loan defaults, five-year recurrence), selective labels (outcomes seen only for approved loans), many sites at once, and data that does not exist yet (a new scanner).
+:::
+
+## How many of the partner's photos to label {.smaller}
+
+$$1.96\sqrt{\frac{\tau(1-\tau)}{n}}<|\delta^\ast|\quad\Longrightarrow\quad n>\Bigl(\frac{1.96}{0.045}\Bigr)^2\times0.90\times0.10\approx171$$
+
+- The tipping point sets the size: enough labeled photos that a gap as big as the tipping point would show up.
+- Photos in a burst are related, so label more: about 310 with Lab 4's design effect of 1.8, spread over all three cameras.
+- Label first where the weights $c_k/b_k$ are largest, or where the team has no cases. For the partner, that is color photos (weight 1.6).
+
+::: notes
+About 3 minutes. Accuracy near the line is the worst case for the variance, so use $\tau$ for $p$. 9A's 320 (580 with bursts) was a different target: ±5 points at 70%, after the partner's 70% was known. Lab 10 does this for hospital 5: about 131 independent patches.
+
+Survey statisticians combine a few labels with the reweighted estimate in small area estimation. The reweighted estimate is what they call a synthetic estimator, and Fay and Herriot (1979) average it with the area's own direct estimate, giving the direct estimate the weight $\sigma_\delta^2/(\sigma_\delta^2+\text{SE}^2)$, where $\sigma_\delta$ is the spread of $\delta$ between areas (what leaving one site out estimates). It borrows the same exchangeability assumption. With the team's $\sigma_\delta\approx4.5$ points and the partner's burst SE of 7.8 points, the weight on the partner's labels is about 0.25, which would pull its 0.704 up to about 0.885. The partner is not like the team's cameras, so that shrinkage would hide most of the problem. For Camelyon, where the hospitals differ by about 10 points, 130 labeled patches get about 90% of the weight.
+:::
+
+## What the partner's labels show {.smaller}
+
+```{python}
+#| fig-width: 9
+#| fig-height: 2.2
+fig, ax = plt.subplots(figsize=(9, 2.2))
+ax.plot(camera_gaps, np.ones_like(camera_gaps), "o", color="#8a8a85", markersize=8, alpha=0.8)
+ax.plot([-40.7, -9.4], [0, 0], color="#b54708", linewidth=3)
+ax.plot([100 * (theta_partner - theta_reweighted)], [0], "o", color="#b54708", markersize=9)
+ax.axvline(0, color="black", linewidth=1)
+ax.axvline(-4.5, color="#c41230", linestyle="--", linewidth=1.5)
+ax.text(-3.6, 0.42, "tipping point", color="#c41230", fontsize=13)
+ax.set_yticks([0, 1])
+ax.set_yticklabels(["partner", "team's cameras"], fontsize=13)
+ax.set_ylim(-0.6, 1.6)
+ax.set_xlabel("within-type gap δ (points)", fontsize=13)
+ax.tick_params(axis="x", labelsize=12)
+ax.spines[["top", "right", "left"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+$$\hat\delta=\hat\theta_{\text{partner}}-\hat\theta_{\text{rw}}=0.704-0.945=-0.241$$
+
+- **The decision:** 0.704 (56% to 85%, bursts resampled) is below 0.90 even at the top. Do not use. 54 photos settle a gap this big.
+- **The assumption fails:** the 95% interval for $\delta$, −41 to −9 points, excludes 0. It is worse in both types (color 0.958 to 0.744, infrared 0.911 to 0.600).
+- **The floor was not the risk:** the partner's gap is more than twice the worst of the team's cameras.
+
+::: notes
+About 4 minutes. The labels do two jobs: they give the decision directly, and they show how far off reweighting was and where. $\hat\delta=\sum_k\hat c_k(\hat p_k^{\text{partner}}-\hat p_k^{\text{team}})$ exactly, with the partner's shares. Partner by type: color 29 / 39 = 0.744 (team 69 / 72), infrared 9 / 15 = 0.600 (team 82 / 90). Interval for $\delta$: bursts resampled within type for the team and the partner separately, seed 2027, 4,000 resamples, SE 0.080, percentile interval $-0.407$ to $-0.094$; treating photos as independent, SE 0.065 and $-0.369$ to $-0.114$. Contrast with hospital 5 in Lab 10: there 300 patches cannot settle a decision 0.3 points from the line. How many labels it takes depends on how close the answer is to the line, which nobody knows in advance; the tipping point is the best guess.
+:::
+
+## How much of the drop did infrared explain? {.smaller}
+
+$$\theta_{\text{partner}}-\theta_{\text{team}}=\underbrace{\sum_k (c_k-b_k)\,p_k^{\text{team}}}_{\text{mix: known before labels}}+\underbrace{\sum_k c_k\,\bigl(p_k^{\text{partner}}-p_k^{\text{team}}\bigr)}_{\text{within types: }\delta}$$
+
+$$-22.8\text{ points}=(+1.3)+(-24.2)$$
+
+- The mix part is Week 9's reweighting, $0.945-0.932$. The labels add the within part, which is $\hat\delta$.
+- To a client: "Infrared explains +1.3 of the 22.8-point drop. The rest happened within each type of photo."
+- Demographers call this a Kitagawa decomposition (1955): a difference in rates split into a mix part and a within-group part.
+
+::: notes
+About 2 minutes. Numbers: team 151/162 = 0.932, reweighted 0.945, partner 38/54 = 0.704. Mix: 0.945 − 0.932 = +0.013. Within: 0.704 − 0.945 = −0.242 (−0.241 unrounded). Hospital 5 in Lab 10: mix +0.5 points, within −5.8. In both, the mix part is small and the within part is the story. The split adds no new number after the labels; it is a way to describe the drift to a client, in the spirit of Week 9's "How much does infrared explain?" Kitagawa, E. M. (1955), "Components of a Difference Between Two Rates," JASA.
+:::
+
+## Tipping-point analyses elsewhere in statistics {.smaller}
+
+- **Clinical trials:** when outcomes are missing, a *tipping-point analysis* asks how different the missing patients would have to be to overturn the result.
+- **Causal inference:** for an unmeasured confounder, Rosenbaum's sensitivity analysis and the *E-value* ask how strong it would have to be to explain away an effect (VanderWeele and Ding 2017).
+- Report it the same way: **"The decision holds unless the within-type gap is at least 4.5 points. Gaps that large are common between our own cameras, so we recommend labeling about 300 of the partner's photos first."**
+
+::: notes
+About 2 minutes. The statistician's habit is to name the untestable assumption, turn it into a parameter, and report how far it would have to move. Machine-learning evaluations rarely do this.
+:::
+
+## The classifier and the evaluation model {.smaller}
+
+$$\underbrace{f(X)}_{\text{the classifier: predicts the label}}\qquad\qquad\underbrace{E[C\mid Z]}_{\text{the evaluation: where } f \text{ is right}}$$
+
+- MegaDetector already sees the pixels that "infrared" summarizes. That does not make it equally accurate on both types of photo.
+- $Z$ is chosen to explain variation in **whether the model is right**, not to predict the label.
+- So "why isn't $Z$ in the model?" has an answer: it is in the model's input, but not in its accuracy.
+
+::: notes
+About 2 minutes. A classifier can use a feature and still be worse in some regions of it, for example where it saw few training examples. The evaluation model is the statistician's model; the classifier is the engineer's. Week 9's "Reweighting is a prediction from a model" was about the second.
+:::
+
+## Check {.smaller}
+
+A reweighted accuracy is 0.88, and the client's line is 0.85. Leaving out each benchmark site in turn gives within-group gaps between −5 and +4 points.
+
+1. What is the tipping point $\delta^\ast$?
+2. Is the decision safe?
+3. About how many independent labeled cases from the client would show a gap as big as $\delta^\ast$?
+
+::: {.fragment}
+1. $\delta^\ast=0.85-0.88=-0.03$, a 3-point within-group loss.
+2. No. Gaps of 3 points or more are common between the benchmark's own sites, and the client may differ more.
+3. $(1.96/0.03)^2\times0.85\times0.15\approx540$, and more if the cases come in clusters.
+:::
+
+::: notes
+About 3 minutes.
+:::
+
+## Today's lab and HW6 {.smaller}
+
+- **Lab 10:** hospital 5's tipping point; leave one benchmark hospital out to see how big $\delta$ usually is; decide when you would skip labels and how many you would ask for; then look at hospital 5's labels.
+- **Handoff:** your team's first sensitivity plan for Milestone 2: one variable that could make the AI system worse or better for your client, with a mix curve if you can measure it or a tipping point if you cannot.
+- **HW6** is due Tue Mar 30. Checkpoint 8 opens after class.
+
+::: notes
+About 1 minute, then the lab.
+:::

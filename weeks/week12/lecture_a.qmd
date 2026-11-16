@@ -1,0 +1,645 @@
+---
+title: "Week 12A: Can We Trust the Judge?"
+subtitle: "Agreement beyond chance, the reliability of several judges, and the order of the answers"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{python}
+#| include: false
+import numpy as np
+import matplotlib.pyplot as plt
+
+# The city's graders (made-up numbers): between-answer and within-answer variance of a rating
+tau2, sigma2 = 0.3, 0.7
+rho = tau2 / (tau2 + sigma2)
+
+
+def reliability(r, rho=rho):
+    """Spearman-Brown: the reliability of the average of r raters."""
+    return r * rho / (1 + (r - 1) * rho)
+```
+
+## The grader is part of the score {.smaller}
+
+Two city staff members read the same 100 chatbot answers.
+
+Each marked every answer **helpful** or **not helpful**.
+
+- Staff member A marked 60 helpful. Staff member B marked 70.
+- So is the chatbot helpful 60% of the time, or 70%?
+- With no answer key, someone has to judge: a person or a model.
+- Today: how far can we trust a judge?
+
+::: notes
+About 2 minutes. The running example is Pittsburgh's city chatbot from 11A (potholes, trash pickup, snow-emergency parking, sinkholes). Many of its answers have no answer key: "Is this answer helpful to a resident?" needs someone to judge it. Two staff members read the same 100 answers and marked each helpful or not. A says 60, B says 70. The chatbot did not change; the grader did. All numbers for the city are made up for the lecture; say so. Thursday's lab has real data: experts and GPT-4 judging chatbot answers on MT-Bench.
+:::
+
+## This week we check the judge {.smaller .compact-table}
+
+| Weeks | The question | What we choose |
+|---|---|---|
+| 4 and 5 | How precise is a score? Which model is better? | nothing; the key was given |
+| 9 and 10 | Does the score carry over to the client? | nothing; the cases were given |
+| 11 | How should the evaluation be run? | questions, answers, randomization |
+| **12** | **Can we trust the judge that grades the answers?** | **which judges, how many, which order** |
+
+::: notes
+About 2 minutes. Weeks 4 and 5 scored answers against a key someone else wrote. Week 11 designed the evaluation. This week the key itself is a measurement: a person or a model decides what counts as right, and we ask how much to trust it. The project's Tracks 3 and 4 are about exactly this: an LLM judge against human preferences, and an LLM judge against a rule checker.
+:::
+
+## Recap: raters and repeated answers {.smaller}
+
+- Week 2: five raters labeled each sentence; their votes split.
+- Week 11: $\rho$ measured how alike two answers to one question are.
+- Today: how alike are two judges of one answer?
+
+::: notes
+About 1 minute. Week 2's DynaSent raters looked at vote patterns, not at agreement corrected for chance; that is new today. Week 11's $\rho=\tau^2/(\tau^2+\sigma^2)$ comes back in Question 2 with raters in place of answers.
+:::
+
+## Today's plan {.smaller}
+
+1. How often do two judges agree beyond chance?
+2. How reliable is the average of several judges?
+3. Does the order of the answers change the verdict?
+4. Does agreement mean the judge is right?
+
+Thursday's lab: Questions 1 and 3 on MT-Bench, with experts and GPT-4.
+
+::: notes
+About 1 minute. HW7 Problem 1 follows the same four questions with new numbers; Problem 2 uses MT-Bench's other half.
+:::
+
+# Question 1: how often do two judges agree beyond chance?
+
+## Two staff graded the same 100 answers {.smaller}
+
+| | B: helpful | B: not helpful | Total |
+|---|---:|---:|---:|
+| **A: helpful** | 54 | 6 | 60 |
+| **A: not helpful** | 16 | 24 | 40 |
+| **Total** | 70 | 30 | 100 |
+
+- They agree on $54+24=78$ answers: 78%.
+- Is 78% good? It depends on how often they would agree by chance.
+
+::: notes
+About 2 minutes. Read the table with the room: the diagonal is agreement, the off-diagonal cells are disagreements. The margins are each grader's own rate, 60% and 70% from the first slide.
+:::
+
+## Two ways to agree {.smaller}
+
+$$P(\text{agree})=P(\text{both helpful})+P(\text{both not helpful})$$
+
+- The two ways cannot both happen, so their probabilities add.
+- Each is a **joint** probability: a cell on the table's diagonal.
+- Observed: $0.54+0.24=0.78$.
+- The **margins** are each grader's own rate: A 0.60, B 0.70 helpful.
+
+::: notes
+About 2 minutes. Start from the definition of agreement: the event "they agree" is the union of "both helpful" and "both not helpful," which are disjoint, so the probabilities add. The joint probabilities are the diagonal cells divided by 100. The margins are the row and column totals divided by 100. Chance agreement, next, keeps the margins and changes only how the joint is built from them.
+:::
+
+## Chance assumes independence {.smaller}
+
+$$
+\begin{aligned}
+P(\text{agree by chance})&=P(\text{both helpful})+P(\text{both not helpful})\\
+&=\textcolor{#8f1025}{P(\text{A helpful})\,P(\text{B helpful})}+\textcolor{#8f1025}{P(\text{A not})\,P(\text{B not})}\\
+&=0.60\times0.70+0.40\times0.30\\
+&=0.42+0.12\\
+&=0.54
+\end{aligned}
+$$
+
+- The red step is the assumption: A's and B's grades are **independent**.
+- Then each joint probability is the product of the margins.
+- Independent graders, at their own rates, would agree on 54% of answers.
+
+::: notes
+About 3 minutes. Go line by line. Line 1 is the last slide's split into two disjoint ways. Line 2 is the only assumption: if the two grades are independent, then $P(\text{A helpful and B helpful})=P(\text{A helpful})\,P(\text{B helpful})$, and the same for "not helpful." Independent means knowing A's grade tells you nothing about B's: graders who never read the answer and each flipped a weighted coin, A's coin landing helpful 60% of the time and B's 70%. Lines 3 and 4 put in the margins. The real graders are not independent, which is the point: they agree on 78%, not 54%. HW7 Problem 1(a)(ii) asks for these steps with its own table.
+:::
+
+## Chance as a table of expected counts {.smaller}
+
+| | B: helpful | B: not helpful | Total |
+|---|---:|---:|---:|
+| **A: helpful** | 54 (42) | 6 (18) | 60 |
+| **A: not helpful** | 16 (28) | 24 (12) | 40 |
+| **Total** | 70 | 30 | 100 |
+
+- In parentheses: the counts if the grades were independent.
+- Each is row total × column total ÷ 100, as in a chi-square test.
+- On the diagonal: 78 observed, 54 expected by chance.
+
+::: notes
+About 2 minutes. For example, $60\times70/100=42$: 60 answers A calls helpful, and an independent B would call 70% of them helpful. These are the expected counts of the chi-square test of independence from intro statistics. The graders agree on 24 more answers than chance; kappa, next, compares that 24 with the 46 they could have added at most ($100-54$).
+:::
+
+## Kappa: agreement beyond chance {.smaller}
+
+$$\kappa=\frac{\text{agreement}-\text{chance agreement}}{1-\text{chance agreement}}=\frac{0.78-0.54}{1-0.54}=\frac{0.24}{0.46}=0.52$$
+
+- $\kappa=1$: they agree on every answer.
+- $\kappa=0$: no better than two independent graders.
+- $\kappa<0$: worse than chance.
+
+<p class="compact-note">Cohen (1960), "A coefficient of agreement for nominal scales."</p>
+
+::: notes
+About 3 minutes. The denominator is the most they could gain over chance, 0.46; they gained 0.24 of it, about half. Avoid labels such as "moderate" or "substantial" for ranges of kappa: they are conventions, and kappa depends on how common each category is, as the next slide shows. Cohen, J. (1960), *Educational and Psychological Measurement* 20(1), 37–46.
+:::
+
+## Agreement alone can mislead {.smaller .compact-table}
+
+Staff flag 10 of 200 answers as unsafe. A judge calls every answer safe.
+
+| | Judge: safe | Judge: unsafe | Total |
+|---|---:|---:|---:|
+| **Staff: safe** | 190 | 0 | 190 |
+| **Staff: unsafe** | 10 | 0 | 10 |
+| **Total** | 200 | 0 | 200 |
+
+$$
+\begin{aligned}
+\text{agreement}&=190/200=0.95\\
+\text{chance}&=P(\text{staff safe})\,P(\text{judge safe})\\
+&\quad+P(\text{staff unsafe})\,P(\text{judge unsafe})\\
+&=0.95\times1+0.05\times0=0.95\\
+\kappa&=(0.95-0.95)/(1-0.95)=0
+\end{aligned}
+$$
+
+- The judge never reads an answer, and it still agrees 95% of the time.
+
+<p class="compact-note">Feinstein and Cicchetti (1990), "High agreement but low kappa."</p>
+
+::: notes
+About 3 minutes. Build it from the table. Agreement is the diagonal: 190 safe-safe and 0 unsafe-unsafe. For chance, use the margins as on the "Chance assumes independence" slide: the staff say safe 95% of the time and unsafe 5%; the judge says safe 100% of the time and unsafe 0%. So chance agreement is $0.95\times1+0.05\times0=0.95$, the same as the observed agreement, and kappa's numerator is 0. A judge that always gives the same answer agrees exactly as often as chance predicts, so its kappa is always 0. The judge never reads an answer, and its agreement looks excellent. Kappa subtracts what the shares alone give. The flip side: kappa can be low when agreement is high, if one category is rare, so report agreement, the shares, and kappa together. Feinstein, A. R., and Cicchetti, D. V. (1990), *Journal of Clinical Epidemiology* 43(6), 543–549. HW7 1(b) is the same idea with a judge that always says yes.
+:::
+
+## Check {.smaller}
+
+Two graders read 50 answers: both yes on 35, only A on 5, only B on 2, both no on 8.
+
+1. Find agreement, chance agreement, and $\kappa$.
+2. A third grader gives every answer the same grade A gives. Find its $\kappa$ with A.
+
+::: {.fragment}
+1. Agreement 0.86, chance 0.644, $\kappa=0.61$.
+2. Agreement 1, chance $0.80^2+0.20^2=0.68$, so $\kappa=0.32/0.32=1$.
+:::
+
+::: notes
+About 4 minutes. Agreement $43/50=0.86$. A says yes on $35+5=40$ of 50 (0.80) and B on $35+2=37$ (0.74), so chance is $0.80\times0.74+0.20\times0.26=0.592+0.052=0.644$, and $\kappa=(0.86-0.644)/(1-0.644)=0.216/0.356=0.61$. Question 2: the third grader copies A, so it says yes on 0.80 of answers too, and chance agreement is $0.80\times0.80+0.20\times0.20=0.64+0.04=0.68$. They agree on every answer, so the numerator and denominator are both $1-0.68$, and $\kappa=1$. Perfect agreement gives $\kappa=1$ whatever the shares; the previous slide showed the other end, $\kappa=0$.
+:::
+
+## Compare a judge with a second rater {.smaller .compact-table}
+
+| Chatbot answers to 120 residents' questions | $\kappa$ |
+|---|---:|
+| Staff member with staff member | 0.52 |
+| LLM judge with a staff member | 0.48 |
+| Difference, judge minus staff (95% interval) | $-0.04$ ($-0.13$ to $0.05$) |
+
+- Staff disagree with each other too, so $\kappa=1$ is the wrong target.
+- Compare the judge's $\kappa$ with staff to staff's $\kappa$ with each other.
+- This judge could be up to 0.13 worse than a second staff member, or 0.05 better.
+- The interval resamples residents' questions (Weeks 4B and 11).
+
+::: notes
+About 3 minutes. Made-up numbers. Staff members disagree with each other ($\kappa=0.52$), so no judge can be expected to agree with one staff member perfectly. The fair comparison is with a second staff member: if the judge's $\kappa$ with a staff member is about the same as two staff members' $\kappa$ with each other, the judge can stand in for one more staff member. It can also come out higher: a judge that tracks what most staff would say can agree with one staff member more than a second staff member does, so the interval runs both ways. Several answers come from the same resident's question and share its difficulty, so the interval resamples residents' questions, as Week 4B resampled passages and Week 11 resampled questions. Thursday's lab and HW7 Problem 2 make this comparison for GPT-4 on MT-Bench.
+:::
+
+## What kappa says about two raters {.smaller .compact-table}
+
+| $\kappa$ | The two raters' grades |
+|---|---|
+| 1 | always the same |
+| between 0 and 1 | the same more often than chance |
+| 0 | independent: one grade says nothing about the other |
+| below 0 | the same less often than chance |
+
+- Independent grades are bad: both raters read the same answer.
+- Good raters' grades depend on each other through the answer.
+- But their mistakes should not depend on each other. That is Question 2.
+- High $\kappa$ means they agree, not that they are right. That is Question 4.
+
+::: notes
+About 3 minutes. The summary of Question 1, and the bridge to Question 2. Independence shows up twice today, and students should hear the difference. In the chance model, the grades themselves are independent; that is what two raters who ignored the answer would look like, so it is the baseline a good pair of raters should beat, and $\kappa$ measures by how much. A rater who gives every answer the same grade (the always-safe judge) is independent of anyone, which is why its $\kappa$ was 0. Good raters' grades are dependent, because both depend on the same answer: in Question 2's model, both ratings depend on the answer's quality $\mu_i$. What we want independent is their mistakes, given the answer. That is what makes averaging several raters work, and it fails when raters share a bias (all prefer longer answers, Question 4) or are copies of each other (a judge asked twice at temperature 0). Last bullet: $\kappa=1$ says two raters always agree; it does not say they are right, which Question 4 takes up.
+:::
+
+# Question 2: how reliable is the average of several judges?
+
+## A rating is a noisy measurement {.smaller}
+
+The chatbot writes the answers. Now staff score each answer on a scale, such as 1 to 5.
+
+- Each answer $i$ has a true quality $\mu_i$. Answers differ, with variance $\tau^2$.
+- Each rater's score misses the true quality a little, with variance $\sigma^2$.
+- Given the answer, different raters' misses are independent.
+
+$$\operatorname{Var}(\mu_i)=\tau^2,\qquad y_{i1},\dots,y_{ir}\mid\mu_i\ \text{independent, mean}\ \mu_i,\ \text{variance}\ \sigma^2$$
+
+- This is Week 4B's model, with an answer in place of a passage.
+
+::: notes
+About 2 minutes. Ratings here are scores, such as 1 to 5, or votes coded as numbers. $\tau^2$ is how much the answers really differ; $\sigma^2$ is how much raters differ on the same answer. The model assumes raters are unbiased: given the answer, each rating has mean $\mu_i$. Question 4 comes back to what happens when that fails.
+:::
+
+## Two raters' correlation is $\rho$ {.smaller}
+
+$$\operatorname{Cov}(y_{i1},y_{i2})=\operatorname{Var}(\mu_i)=\tau^2,\qquad \rho=\frac{\tau^2}{\tau^2+\sigma^2}$$
+
+- Raters of the same answer share its quality, so their scores move together.
+- Their covariance is $\tau^2$, by the law of total covariance, as in Week 4B.
+- For the city, $\tau^2=0.3$ and $\sigma^2=0.7$, so $\rho=0.3$.
+- $\rho$ is the reliability of a single rating.
+
+::: notes
+About 3 minutes. The steps, as in Week 4B: given $\mu_i$ the two ratings are independent, so the within-answer covariance is 0, and the covariance of the conditional means is $\operatorname{Cov}(\mu_i,\mu_i)=\tau^2$. Each rating has variance $\tau^2+\sigma^2$ by the law of total variance. HW7 1(c)(i) asks for these steps with its own numbers; do not write them out here. In measurement, $\rho$ is the intraclass correlation (Shrout and Fleiss 1979).
+:::
+
+## Average more raters, and reliability rises {.smaller}
+
+```{python}
+#| fig-width: 9
+#| fig-height: 2.8
+r_grid = np.arange(1, 16)
+fig, ax = plt.subplots(figsize=(9, 2.8))
+ax.plot(r_grid, reliability(r_grid), "o-", color="#155a8a", linewidth=2, markersize=5)
+ax.axhline(0.8, color="#c41230", linestyle=":", linewidth=1.5)
+ax.text(15, 0.78, "0.8", color="#c41230", fontsize=12, ha="right", va="top")
+ax.annotate(f"10 raters: {reliability(10):.2f}", (10, reliability(10)), xytext=(10.5, 0.55), fontsize=12,
+            arrowprops=dict(arrowstyle="-", color="#155a8a"))
+ax.set_ylim(0.2, 1.0)
+ax.set_xlabel("raters per answer, r", fontsize=12)
+ax.set_ylabel("reliability", fontsize=12)
+ax.tick_params(labelsize=11)
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+$$\text{reliability}=\frac{\tau^2}{\operatorname{Var}(\bar y_i)}=\frac{\tau^2}{\tau^2+\sigma^2/r}=\frac{r\rho}{1+(r-1)\rho}$$
+
+- A score averages $r$ raters. The last form is Spearman–Brown.
+- For the city, one rater gives 0.30, two give 0.46, five give 0.68, and 0.8 takes 10.
+
+::: notes
+About 4 minutes. Reliability is the share of the average's variance that comes from real differences between answers. $\operatorname{Var}(\bar y_i)=\tau^2+\sigma^2/r$ comes from the law of total variance, exactly as 11A's $\operatorname{Var}(\hat\theta)$ did with one question. The last step is algebra; HW7 1(c)(ii) asks for it. Values: 0.30, 0.46, 0.56, 0.63, 0.68 for 1 to 5 raters, 0.81 for 10. Solving $r\rho/(1+(r-1)\rho)\ge0.8$ gives $r\ge0.8(0.7)/(0.3\times0.2)=9.3$, so 10. Spearman, C. (1910), and Brown, W. (1910), both *British Journal of Psychology* 3(3).
+:::
+
+## What a reliability of 0.8 means {.smaller}
+
+```{python}
+#| fig-width: 9
+#| fig-height: 2.4
+# 200 answers with true quality mu; two separate panels of 10 raters each score every answer
+sim = np.random.default_rng(2027)
+n_answers, r_panel = 200, 10
+mu = 3 + sim.normal(0, np.sqrt(tau2), n_answers)
+panel_1 = mu + sim.normal(0, np.sqrt(sigma2), (r_panel, n_answers)).mean(axis=0)
+panel_2 = mu + sim.normal(0, np.sqrt(sigma2), (r_panel, n_answers)).mean(axis=0)
+fig, axes = plt.subplots(1, 2, figsize=(9, 2.4))
+for ax, x, y, xlabel, ylabel in [(axes[0], panel_1, panel_2, "panel 1's average score", "panel 2's average score"),
+                                 (axes[1], panel_1, mu, "panel 1's average score", "true quality")]:
+    ax.plot(x, y, "o", color="#155a8a", markersize=3, alpha=0.6)
+    ax.set_title(f"correlation {np.corrcoef(x, y)[0, 1]:.2f}", fontsize=12)
+    ax.set_xlabel(xlabel, fontsize=11)
+    ax.set_ylabel(ylabel, fontsize=11)
+    ax.tick_params(labelsize=10)
+    ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+- Each dot is an answer. Two different panels of 10 raters scored all 200.
+- A panel's score for an answer is the average of its 10 ratings.
+- On the left, the two panels' scores correlate 0.80. That is the reliability.
+- On the right, one panel's scores and the true quality correlate 0.90.
+- The truth has no rater noise, so the right plot lines up better, at about $\sqrt{0.8}$.
+- 0.8 is a convention, not a law. Ask for more when one score decides something.
+
+<p class="compact-note">Usual source for 0.7, 0.8, and 0.9: Nunnally (1978). See also Lance, Butts, and Michels (2006).</p>
+
+::: notes
+About 3 minutes. The plots are simulated from the city's model, with $\tau^2=0.3$, $\sigma^2=0.7$, and 10 raters per panel, so a panel's reliability is $10(0.3)/(1+9(0.3))=0.81$. With seed 2027 the sample correlations are 0.80 and 0.90.
+
+What is being averaged: each of a panel's 10 raters gives the answer a rating, and the panel's score is the average of those 10 ratings. The two panels are different people rating the same answers.
+
+Left plot. Two panels agree only because they rate the same answers; the rest is which raters each panel happened to get. The correlation between two panels' scores is the reliability. In the model the two scores share only $\mu_i$, so their covariance is $\tau^2$ and their correlation is $\tau^2/(\tau^2+\sigma^2/r)$. This is test–retest reliability.
+
+Right plot. The true quality has no rater noise, so a panel's score lines up with it better than with another noisy score. In the model $\operatorname{Cov}(\bar y_i,\mu_i)=\tau^2$, so the correlation is $\tau^2/\sqrt{\tau^2(\tau^2+\sigma^2/r)}=\sqrt{\text{reliability}}$. Put the other way, reliability is the $R^2$ of the score on the true quality, the share of the scores' variance that comes from real differences between answers. Signal over signal plus noise, not signal over noise ($\tau^2/(\sigma^2/r)$ would be 4 here).
+
+Why 0.8. It is a convention from psychological testing. The usual citation is Nunnally (1978), *Psychometric Theory*, 2nd ed., and Nunnally and Bernstein (1994), 3rd ed.: about 0.7 for early research, 0.8 for basic research comparing groups, and 0.9 or more when a score decides something about one person. I have not checked the exact pages. Lance, C. E., Butts, M. M., and Michels, L. C. (2006), "The sources of four commonly reported cutoff criteria: What did they really say?", *Organizational Research Methods* 9(2), 202–220, show that the 0.7 cutoff is often cited for more than Nunnally said. For the city, flagging one answer for review calls for about 0.9. Comparing two chatbots' average quality over many answers needs less, because averaging over answers also averages out rater noise (the "Two goals" slide).
+:::
+
+## Averaging needs different raters {.smaller}
+
+Could the city get 10 ratings cheaply by asking one LLM judge 10 times?
+
+- At temperature 0, it gives the same rating every time, so 10 calls are one rating.
+- At a higher temperature, its ratings vary, like a person rating the same answer twice.
+- Averaging those calls smooths that variation but keeps the judge's own leanings.
+- Different people, models, or prompts average out each other's leanings.
+
+::: notes
+About 3 minutes. Yes, the point is that averaging needs different raters. A rater's miss has two parts: a leaning that rater brings to every answer (harsher than most, or fond of long answers), and variation from one occasion to the next. A person who rates the same answer twice, or an LLM judge called twice at a temperature above 0, varies only in the second part; the leaning is the same on every call. Averaging repeated ratings from one rater shrinks the occasion part but not the leaning, so their mistakes are correlated, and Spearman–Brown's $r$ would overstate the reliability. At temperature 0 there is no occasion part at all, and ten calls give one rating. In the model, $\sigma^2$ is the variance across different raters, so $r$ counts different raters. This is Week 11's temperature point from the other side: there, repeated answers varied because the model sampled. Even different models can share leanings (all prefer longer answers, Question 4), so a panel of models is worth less than its size suggests. HW7's stretch problem tests whether a panel of experts beats one expert.
+:::
+
+## More answers, or more ratings? {.smaller .compact-table}
+
+The city wants its chatbot's average helpfulness, with \$500 for grading.
+
+- Collecting and preparing one chatbot answer to grade costs \$6.
+- Each answer is rated by one or more different raters, at \$1 per rating.
+- More ratings per answer leaves money for fewer answers.
+- Every choice is unbiased for the same average, so pick the smallest SE.
+
+| Week 11 | Today |
+|---|---|
+| a question | a chatbot answer |
+| a sampled answer to that question | a rating of that answer |
+
+$$\operatorname{Var}(\text{average helpfulness})=\frac{1}{n}\Bigl(\tau^2+\frac{\sigma^2}{r}\Bigr),\qquad \text{cost}=n\,(\$6+r\times\$1)$$
+
+::: notes
+About 3 minutes. Set the scene before any formula. The city wants one number, the chatbot's average helpfulness over residents' questions. Why the smallest SE: whatever the split between answers and ratings, the average of the scores has the same expected value, the chatbot's true average helpfulness, so every design is unbiased for the same target. They differ only in how much the estimate varies, so the design with the smallest SE gives the narrowest interval for the same \$500, as in Week 11's budget problem. To get it, staff collect chatbot answers (draw a resident's question, record the answer, remove names), about \$6 each, and pay raters \$1 per rating. Every answer must be rated at least once; the choice is whether to rate each answer several times or to rate more answers once. This is Week 11's budget problem with new names: an answer here plays the role of a question in Week 11, and a rating plays the role of a sampled answer. $n$ is the number of answers and $r$ the ratings per answer. The variance formula is Week 11's, with $\tau^2$ the real differences between answers and $\sigma^2$ the rater noise.
+:::
+
+## About four ratings per answer is best {.smaller .compact-table}
+
+$$r^\ast=\sqrt{\frac{\sigma^2}{\tau^2}\times\frac{\text{cost of an answer}}{\text{cost of a rating}}}=\sqrt{\frac{0.7}{0.3}\times\frac{\$6}{\$1}}=3.7$$
+
+| Ratings per answer, $r$ | Answers \$500 buys | SE of the average helpfulness |
+|---:|---:|---:|
+| 1 | 71 | 0.119 |
+| 2 | 62 | 0.102 |
+| 4 | 50 | 0.098 |
+| 10 | 31 | 0.109 |
+
+- Each row spends the \$500 on as many answers as it can.
+- One rating each buys the most answers, but every score is noisy.
+- Ten ratings each leaves too few answers.
+
+::: notes
+About 2 minutes. $r^\ast$ is Week 11's rule, written in words because the names changed. Week 11's cost of a question is now the cost of an answer, and Week 11's cost of an answer is now the cost of a rating. Each row buys $n=\lfloor500/(6+r)\rfloor$ answers, and the SE is $\sqrt{(0.3+0.7/r)/n}$. The best is $r=4$, near $r^\ast=3.7$; 3 ratings gives 0.0985.
+:::
+
+## Two goals need two designs {.smaller .compact-table}
+
+The chatbot writes the answers, and raters score them.
+
+The city could use those scores for two different jobs.
+
+| What the city wants | For example | Raters per answer |
+|---|---|---|
+| a trustworthy score for each single chatbot answer | flag one bad chatbot answer for staff to fix | 10, for a reliability of 0.81 |
+| the chatbot's average helpfulness over many residents' questions | decide whether the chatbot is helpful enough to launch | about 4, with the rest of the \$500 spent on more answers |
+
+- The first job uses each answer's score on its own, so that score must be reliable.
+- The second job averages over many answers, which also averages out rater noise.
+- So the second job needs fewer raters per answer and more answers.
+
+::: notes
+About 3 minutes. The numbers are the city's from the last few slides. For the first job, Spearman–Brown says 10 raters give each answer's average score a reliability of 0.81. For the second job, the budget table says about 4 ratings per answer gives the smallest SE for the chatbot's average helpfulness. The difference comes from what is averaged. One answer's score averages only its own raters, so its rater noise shrinks only with more raters. The chatbot's average helpfulness averages over all $n$ answers, so rater noise shrinks with $n$ as well, and the real differences between answers, $\tau^2/n$, become the larger part of the variance. HW7 1(d)(iii) asks for this contrast with its own numbers.
+:::
+
+## Check {.smaller}
+
+Two raters' scores of the same answer correlate 0.5, so $\rho=0.5$.
+
+1. What is the reliability of the average of 2 raters?
+2. How many raters does a reliability of 0.9 take?
+3. If $\sigma^2=\tau^2$ and an answer costs 4 ratings, how many ratings per answer?
+
+::: {.fragment}
+1. $2(0.5)/(1+0.5)=0.67$.
+2. $r\ge0.9(0.5)/(0.5\times0.1)=9$.
+3. $\sqrt{1\times4}=2$.
+:::
+
+::: notes
+About 3 minutes. For question 2, solve $r\rho/(1+(r-1)\rho)\ge R$ for $r$, which gives $r\ge R(1-\rho)/\bigl(\rho(1-R)\bigr)$.
+:::
+
+# Question 3: does the order of the answers change the verdict?
+
+## A judge reads one answer first {.smaller}
+
+The city is choosing between two versions of its chatbot, A and B.
+
+- For each question, an LLM judge reads both versions' answers and picks one.
+- The judge has to read one answer first.
+- Swap the two answers and ask again. If the verdict changes, that is a **flip**.
+- At temperature 0 nothing else changed, so the order caused the flip.
+
+::: notes
+About 2 minutes. Many LLM judges compare two answers rather than grading one. At temperature 0 the same input gives the same output, so if the verdict changes when only the order changes, the order caused it. A flip cannot be blamed on sampling.
+:::
+
+## So show every pair in both orders {.smaller .compact-table}
+
+| Design term | The city's check |
+|---|---|
+| Unit | a resident's question, with version A's and version B's answers |
+| Treatment | the order, A first or B first |
+| Block | the pair of answers, which gets both orders |
+| Held constant | the prompt, the model version, temperature 0 |
+| Response | which version the judge picks |
+| Randomization | the order of the calls |
+
+- Each pair is compared with itself, so how hard its question is cancels.
+
+::: notes
+About 2 minutes. This is 11A's design table. The order is crossed with the pair, as 11A crossed prompt wording with questions.
+:::
+
+## Verdicts by order form a paired table {.smaller .compact-table}
+
+| 200 pairs | B shown first, judge picks A | B shown first, judge picks B |
+|---|---:|---:|
+| **A shown first, judge picks A** | 70 | 24 |
+| **A shown first, judge picks B** | 10 | 96 |
+
+- On 166 pairs the judge picked the same version both times.
+- On 34 pairs, 17%, the verdict flipped with the order.
+- On 24 of them it picked whichever version it read first, and on 10 the second.
+- This is Week 5's paired table, with the order in place of the model.
+
+::: notes
+About 3 minutes. Made-up numbers. Top right: A when A is first and B when B is first, so the judge picked whichever it read first (24). Bottom left: the one it read second (10). Week 5A's leaderboard table had two models where this has two orders. The flip rate is $34/200=0.17$, with SE $\sqrt{0.17\times0.83/200}=0.027$ if the pairs were independent.
+:::
+
+## Does the judge favor the first answer? {.smaller}
+
+$$
+\begin{aligned}
+P(\text{picks A}\mid\text{A first})&=(70+24)/200=0.47\\
+P(\text{picks A}\mid\text{B first})&=(70+10)/200=0.40\\
+\text{order effect}&=0.47-0.40=(24-10)/200=0.07
+\end{aligned}
+$$
+
+- Only the 34 flips carry evidence about the order, as in Week 5.
+- If the order did not matter, each flip would go either way with probability 1/2.
+- McNemar's test gives $z=(24-10)/\sqrt{34}=2.40$ and $p\approx0.02$.
+- So yes. This judge favors the answer it reads first.
+
+::: notes
+About 3 minutes. The order effect is the paired difference in proportions from Week 5A, $(n_{01}-n_{10})/n$, with the order in place of the model; its paired SE is 0.029. The 166 pairs with the same verdict both times appear in both probabilities and cancel. Normal approximation $p=0.016$; exact binomial $p=0.024$. McNemar, Q. (1947), *Psychometrika* 12(2), 153–157.
+:::
+
+## Why not pick one order at random? {.smaller}
+
+- Always showing A first makes a first-answer preference look like a better A.
+- One random order per pair is fair on average, but noisier.
+- With one call per pair, you never see a flip.
+- Showing both orders compares each pair with itself.
+
+<p class="compact-note">Zheng et al. (2023, Section 3.4) describe both designs.</p>
+
+::: notes
+About 3 minutes. If version A is always shown first, a 7-point first-position preference looks like a better version A. Randomizing one order per pair removes that bias on average, because the push from position lands on both versions equally often, but it stays in each verdict as noise, and no single pair shows whether its verdict depends on the order. Showing both orders blocks on the pair (11A, "Pairing is blocking"), and every flip is visible. Zheng et al. describe swapping the order and calling a disagreement a tie, or assigning positions at random. Box, Hunter, and Hunter's boys' shoes (Statistics for Experimenters, Section 3.2) is the same idea: each boy wears both materials, one per foot; here each pair gets both orders.
+:::
+
+## Medical trials call this a crossover {.smaller .compact-table}
+
+In a crossover trial, each patient gets two treatments, one after the other.
+
+| Crossover trial | LLM judge |
+|---|---|
+| two treatments | two answers |
+| first period, second period | shown first, shown second |
+| half get AB, half get BA | A first, B first |
+| period effect | position bias |
+
+<p class="compact-note">Hills and Armitage (1979). Jones and Kenward (2015), Chapter 2. Sports models call it home-field advantage (Davidson and Beaver 1977).</p>
+
+::: notes
+About 3 minutes. In a two-period crossover trial each patient gets both treatments, one per period, and half get AB and half BA, so a period effect cancels. A judge sees both answers, one per position, and showing both orders balances the position. A caution: in crossover trials, McNemar's test on discordant pairs is a test of the treatment, assuming no period effect. Here the two orders are what we compare within each pair, so the same test checks the period (position) effect. Hills, M., and Armitage, P. (1979), *British Journal of Clinical Pharmacology* 8(1), 7–20; Jones, B., and Kenward, M. G. (2015), *Design and Analysis of Cross-Over Trials*, 3rd ed., Chapter 2, "Binary Data." Bradley–Terry models for paired comparisons add an order term for the home team: Davidson, R. R., and Beaver, R. J. (1977), *Biometrics* 33(4), 693–702. More in `instructor_only/week12/references.md`.
+:::
+
+## Pairs from one question flip together {.smaller}
+
+- In Thursday's data, each question gives 30 pairs of answers to judge.
+- Pairs from the same question tend to flip together.
+- So an interval for the flip rate should resample questions, as for kappa.
+- Which pairs would you expect to flip most often?
+
+::: notes
+About 3 minutes. On MT-Bench, each question appears in 30 items, 2 turns times 15 pairs of chatbots. Take answers to the last question before saying anything. The one to reach is pairs whose two answers are close in quality, where small things, including the order, decide the verdict. Pairs with one clearly better answer rarely flip. So a flip rate depends on the mix of comparisons, like any average over a mix (Week 9). Thursday's lab measures the flip rate on MT-Bench and its design effect; HW7 2(d) looks at how it depends on how close the two chatbots are.
+:::
+
+## Check {.smaller}
+
+Another judge compares two versions on 150 questions, in both orders. It picks A both times on 60, B both times on 63, the version it read first on 9, and the one it read second on 18.
+
+1. Find the flip rate and its SE, as if the pairs were independent.
+2. Find $z$. Which position does the judge favor, and how sure are you?
+
+::: {.fragment}
+1. 27 flips out of 150 is 0.18, with SE $\sqrt{0.18\times0.82/150}=0.031$.
+2. $z=(9-18)/\sqrt{27}=-1.73$. It leans toward the second answer, but $p\approx0.08$.
+:::
+
+::: notes
+About 4 minutes. The exact binomial p-value is 0.12. Not significant at 5%, but not evidence that the order does not matter either; 27 flips is little to go on.
+:::
+
+# Question 4: does agreement mean the judge is right?
+
+## Two judges can agree and be wrong {.smaller}
+
+- Suppose the staff and the LLM judge both tend to prefer longer answers.
+- Then they agree with each other, even when the longer answer is worse.
+- Agreement measures reliability. Being right is validity.
+- Thursday's lab starts with a question where both chatbots' answers are wrong.
+
+::: notes
+About 3 minutes. Kappa and Spearman–Brown measure how consistently judges agree, not whether they are right. In Question 2's model, raters were unbiased given the answer; a shared preference for length is a bias they all share, and averaging more raters does not remove it. In Thursday's first item both chatbots' answers are wrong and the experts split their votes; a judge that picks either one agrees with an expert half the time.
+:::
+
+## Check against the truth {.smaller}
+
+- If answers can be checked, compare the judge with the key.
+- If not, change something the judge should ignore, and see if verdicts move.
+- For example, lengthen an answer without adding anything.
+- If the judge's own model wrote one of the answers, check whether it favors that one.
+
+<p class="compact-note">Zheng et al. (2023, Section 3.3) name position, verbosity, and self-enhancement biases.</p>
+
+::: notes
+About 3 minutes. Where an answer can be checked, compare the judge with the key, not just with people. Where it cannot, design an experiment that changes one thing the judge should ignore, such as length or order, and see whether the verdict moves. That is the same treatment-and-block design as Question 3. HW7 2(e) checks whether experts and GPT-4 both prefer the longer answer. In Thursday's second item, GPT-4 judges an answer GPT-4 wrote.
+:::
+
+## The machine-learning names {.smaller .compact-table}
+
+| Statistics | Machine learning |
+|---|---|
+| a rater | LLM-as-a-judge |
+| agreement beyond chance with people | human agreement, alignment with humans |
+| a period (order) effect | position bias |
+| a shared preference for length | verbosity bias |
+| a rater favoring its own model | self-enhancement bias |
+| the average of several raters | a jury or panel of judges |
+
+::: notes
+About 1 minute. The ideas come first; the names are how students will find them in papers. Zheng et al. (2023) named the three biases. Many machine-learning papers report raw agreement with humans, not kappa, and with ties or a common category that overstates it (Question 1).
+:::
+
+## Writing it up {.smaller}
+
+> On chatbot answers to 120 residents' questions, the LLM judge agreed with a staff member about as well as two staff members agreed with each other ($\kappa$ 0.48 against 0.52; difference $-0.04$, 95% interval $-0.13$ to $0.05$, resampling questions). Shown each pair in both orders, it changed its verdict on 17% of pairs, and it favored the answer it read first.
+
+- Compare the judge with a second rater, and give an interval.
+- Resample questions. Give the flip rate and which position wins.
+
+::: notes
+About 2 minutes. Made-up numbers from today's slides. A report that gives only raw agreement, or only one order, leaves out what a reader needs.
+:::
+
+## Your project {.smaller}
+
+- If your track is human preferences, your judge saw both orders. Make the 2×2 table.
+- If it is instruction following, find the judge's $\kappa$ with the rule checker.
+- If it is food or pet tagging, the dataset's labels are a rater too.
+- In your Milestone 2 design table, say what your reference is and how reliable it is.
+
+::: notes
+About 2 minutes. Track 3's judge is stored in both orders (`v1` and `v2`), so the verdicts-by-order table and McNemar's test apply directly; the judge's kappa with the human preference should resample posts. Track 4's judge is compared with a rule checker; which one is the reference, and is it right? Tracks 1 and 2 come back to Week 2's point that labels are measurements. Thursday's lab handoff asks each team for this.
+:::
+
+## What we did today {.smaller}
+
+1. Kappa measures agreement beyond chance.
+2. A judge should be compared with a second rater, resampling questions.
+3. Averaging more raters raises reliability, as Spearman–Brown says.
+4. Showing both orders reveals flips and which position the judge favors.
+5. Agreement is not validity, so check the judge against the truth where you can.
+
+::: notes
+About 1 minute.
+:::
+
+## Thursday {.smaller}
+
+- Lecture 12B, then Lab 12 on experts and GPT-4 judging MT-Bench.
+- Then work time on your project.
+- HW7 is out today and due Tue Apr 13. Milestone 2 was due today.
+- Read Zheng et al. (2023), Sections 3.3 and 4.2.
+
+::: notes
+About 1 minute. Checkpoint 10 opens after Thursday's class.
+:::

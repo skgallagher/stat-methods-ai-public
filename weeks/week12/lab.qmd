@@ -1,0 +1,383 @@
+---
+title: "Lab 12: How Often Do Expert and AI Judges Agree?"
+subtitle: "Week 12 · Agreement corrected for chance, with expert and GPT-4 judgments of chatbot answers"
+format: html
+---
+
+## The situation
+
+A team that runs a chatbot benchmark pays experts to compare chatbots' answers, and it wants to know whether GPT-4 could replace one of the experts. Today the team looks at four kinds of questions: writing, roleplay, reasoning, and STEM. HW7 Problem 2 gives you the other four kinds and asks for the team's recommendation.
+
+The data come from MT-Bench ([Zheng et al. 2023](https://arxiv.org/abs/2306.05685); [the judgments on Hugging Face](https://huggingface.co/datasets/lmsys/mt_bench_human_judgments)). The authors wrote 80 questions, ten in each of eight categories, and six chatbots answered each one. For a question, a turn of the conversation, and a pair of chatbots (an **item**), experts, mostly graduate students in the question's field, read the two answers and voted for the better one or called a tie. Many items have one expert vote, and some have two to six. GPT-4 gave a verdict on every item. It was run twice at temperature 0, with the two answers in swapped positions, and when the two runs disagreed, the verdict was recorded as a tie.
+
+The experts are not an answer key. They are raters, and raters disagree. So the question today is not whether GPT-4 is right, but whether it agrees with an expert about as well as a second expert would. Lecture 12A's tool for that is agreement corrected for chance, Cohen's $\kappa$.
+
+## 1. Instructor run: look at two items where the experts split
+
+**Why this step:** before any $\kappa$, read what the judges read. Both items below are reasoning questions, so each has a right answer.
+
+```{python}
+#| eval: false
+judge_dir = data_dir / "llm_judges"
+items = pd.read_csv(judge_dir / "items.csv")
+votes = pd.read_csv(judge_dir / "human_votes.csv")
+questions = pd.read_csv(judge_dir / "questions.csv", keep_default_na=False)
+answers = pd.read_csv(judge_dir / "answers.csv", keep_default_na=False)   # keep any empty answer as ""
+
+items = items[items["half"] == "lab"].reset_index(drop=True)   # writing, roleplay, reasoning, STEM; HW7 has the rest
+votes = votes.merge(items, on="item_id")                        # one row per expert vote, with its item's details
+print(f"{len(items):,} items from {items['question_id'].nunique()} questions in {items['category'].nunique()} categories")
+print(f"{len(votes):,} expert votes from {votes['judge'].nunique()} experts; {(items['n_human_votes'] >= 2).sum()} items have 2 or more")
+
+
+def answer_of(question_id, model, turn):
+    """One chatbot's reply to one turn of one question."""
+    row = answers[(answers["question_id"] == question_id) & (answers["model"] == model) & (answers["turn"] == turn)]
+    return row["answer"].iloc[0]
+
+
+def show_item(item_id, characters=1000):
+    """Print an item's question, both answers (cut at `characters`), the expert votes, and GPT-4's verdict."""
+    item = items[items["item_id"] == item_id].iloc[0]
+    question = questions[questions["question_id"] == item["question_id"]].iloc[0]
+    print(f"Item {item_id}: question {item['question_id']} ({item['category']}), turn {item['turn']}")
+    print("The question:", question[f"turn_{item['turn']}"][:characters])
+    for label in ["model_1", "model_2"]:
+        print(f"\n--- {label}: {item[label]} ---")
+        print(answer_of(item["question_id"], item[label], item["turn"])[:characters])
+    print("\nExpert votes:", votes[votes["item_id"] == item_id]["vote"].tolist())
+    agreed = "the two orders agreed" if item["gpt4_orders_agree"] else "the two orders disagreed"
+    print(f"GPT-4: {item['gpt4_verdict']} ({agreed})")
+    print("=" * 80)
+
+
+show_item("j0701")   # David's sisters
+show_item("j0843")   # Suresh's shadow
+```
+
+For each item, work out the right answer yourself. Is either chatbot's answer right, and is its reasoning right? Then look at the votes. What does a vote for one of these answers say about the answer, and what does it not say? Why might GPT-4's verdict on the second item have depended on which answer it read first?
+
+**Your answer:** TODO
+
+Now pick an item yourself. Change `category` to the kind of question you want to read, and run the cell. Change the seed in the last line to read another item.
+
+```{python}
+#| eval: false
+# Items where at least one expert voted for each chatbot
+vote_sets = votes.groupby("item_id")["vote"].agg(set)
+split_items = items[items["item_id"].isin([i for i, s in vote_sets.items() if {"model_1", "model_2"} <= s])]
+print(split_items["category"].value_counts().to_string())
+
+category = "writing"   # change to "roleplay", "reasoning", or "stem"
+choices = split_items.loc[split_items["category"] == category, "item_id"].to_numpy()
+show_item(np.random.default_rng(1).choice(choices))   # change the 1 to read another item
+```
+
+What were the experts disagreeing about on your item? Would a second reading change your mind?
+
+**Your answer:** TODO
+
+## 2. Agreement and agreement by chance
+
+**Why this step:** two judges agree some of the time just by chance. Lecture 12A's $\kappa$ asks how much of the gap between chance and perfect agreement they close:
+$$\kappa=\frac{\text{observed agreement}-\text{chance agreement}}{1-\text{chance agreement}}.$$
+Chance agreement is how often two judges would agree if each voted independently, at its own rates. HW7 Problem 1(a) works this out for two categories. Here there are three: model 1, model 2, and tie.
+
+The table puts GPT-4's verdict on an item next to each expert vote on that item, so an item with three expert votes contributes three rows.
+
+```{python}
+#| eval: false
+gpt4_table = pd.crosstab(votes["gpt4_verdict"], votes["vote"], margins=True, margins_name="total")
+gpt4_table.index.name, gpt4_table.columns.name = "GPT-4's verdict", "expert's vote"
+display(gpt4_table)
+```
+
+Compute $\kappa$ for GPT-4 with an expert from this table, one step per line. `counts` is the table without the totals, as an array: rows are GPT-4's verdict and columns the expert's vote, each in the order model 1, model 2, tie. Fill in the four TODO lines and run the cell.
+
+```{python}
+#| eval: false
+CATEGORIES = ["model_1", "model_2", "tie"]
+
+
+def table_of(first, second):
+    """Counts of each (first, second) pair of votes, with all three categories in the same order on both sides."""
+    counts = pd.crosstab(np.asarray(first), np.asarray(second))
+    return counts.reindex(index=CATEGORIES, columns=CATEGORIES, fill_value=0)
+
+
+counts = table_of(votes["gpt4_verdict"], votes["vote"]).to_numpy()
+n = counts.sum()
+
+# 1. Observed agreement: the share of the n rows on the diagonal. np.trace(counts) adds up the diagonal.
+observed = None   # TODO
+
+# 2. Each judge's share of each category: GPT-4's from the row totals, the experts' from the column totals.
+gpt4_share = counts.sum(axis=1) / n
+expert_share = None   # TODO: like the line above, for the columns (axis=0)
+
+# 3. Chance agreement: GPT-4's share times the experts' share, added up over the three categories.
+chance = None   # TODO
+
+# 4. Kappa, from Lecture 12A's formula.
+k = None   # TODO
+
+if any(value is None for value in [observed, expert_share, chance, k]):
+    print("Fill in the four TODO lines, then run this cell again.")
+else:
+    print("GPT-4's shares: ", gpt4_share.round(3), "\nExperts' shares:", np.round(expert_share, 3))
+    print(f"GPT-4 with an expert: agreement {observed:.3f}, chance {chance:.3f}, kappa {k:.3f}")
+```
+
+Your four lines work for any square table, so they can become a function. `kappa_from_table` does the same steps. Check that it gives your numbers.
+
+```{python}
+#| eval: false
+def kappa_from_table(counts):
+    """Observed agreement, chance agreement, and kappa from a square table of counts (no margins)."""
+    counts = np.asarray(counts, dtype=float)
+    shares = counts / counts.sum()
+    observed = np.trace(shares)
+    chance = np.sum(shares.sum(axis=1) * shares.sum(axis=0))   # row share times column share, added over categories
+    return observed, chance, (observed - chance) / (1 - chance)
+
+
+print("kappa_from_table gives: agreement {:.3f}, chance {:.3f}, kappa {:.3f}".format(*kappa_from_table(counts)))
+```
+
+Now two experts on the same item. An item with three experts gives three pairs of experts, and an item with one expert gives none. A pair of experts has no "first" and "second" expert, so the table counts each pair both ways, once as (A, B) and once as (B, A). That makes the table symmetric, and the chance agreement uses the experts' shares of all their votes together.
+
+```{python}
+#| eval: false
+# Every pair of experts who judged the same item
+rows = []
+for item_id, group in votes.groupby("item_id"):
+    item_votes = group["vote"].tolist()
+    for i in range(len(item_votes)):
+        for j in range(i + 1, len(item_votes)):
+            rows.append({"item_id": item_id, "question_id": group["question_id"].iloc[0],
+                         "category": group["category"].iloc[0], "first": item_votes[i], "second": item_votes[j]})
+expert_pairs = pd.DataFrame(rows)
+print(f"{len(expert_pairs):,} pairs of experts on {expert_pairs['item_id'].nunique()} items")
+
+
+def expert_table(pairs):
+    """The symmetric table of expert pairs: each pair counted once each way."""
+    first = np.concatenate([pairs["first"], pairs["second"]])
+    second = np.concatenate([pairs["second"], pairs["first"]])
+    return table_of(first, second)
+
+
+def kappa_experts(pairs):
+    return kappa_from_table(expert_table(pairs))
+
+
+def kappa_gpt4(expert_votes):
+    return kappa_from_table(table_of(expert_votes["gpt4_verdict"], expert_votes["vote"]))
+
+
+display(expert_table(expert_pairs).rename_axis(index="one expert's vote", columns="the other expert's vote"))
+```
+
+Run `kappa_from_table` on the experts' table, and compare with GPT-4.
+
+```{python}
+#| eval: false
+expert_result = None   # TODO: kappa_from_table applied to expert_table(expert_pairs)
+
+if expert_result is None:
+    print("Fill in the TODO line, then run this cell again.")
+else:
+    for name, (observed, chance, k) in [("Expert with expert", expert_result), ("GPT-4 with expert", kappa_gpt4(votes))]:
+        print(f"{name}: agreement {observed:.3f}, chance {chance:.3f}, kappa {k:.3f}")
+```
+
+Compare the two $\kappa$'s. On these questions, does GPT-4 agree with an expert more or less than a second expert does? Why is it fair to compare GPT-4 with a second expert rather than with a perfect score?
+
+**Your answer:** TODO
+
+## 3. The question is the unit
+
+**Why this step:** each question appears in 30 items (2 turns × 15 pairs of chatbots), and items from one question share its text and its answers. So the votes are clustered, as Week 4's camera bursts and Week 11's repeated answers were. An interval should resample whole questions. To see what that changes, you will resample two ways: whole questions, and single items as if they were independent.
+
+`resample_kappas` draws the units with replacement, recomputes both $\kappa$'s and their difference, and repeats that `B` times. Run the cell as it is, which resamples questions. Then change `unit` to `"item_id"` and run it again. Each run is saved in `results`.
+
+```{python}
+#| eval: false
+results = {}   # one entry per unit you resample
+
+
+def resample_kappas(pairs, expert_votes, unit="question_id", B=2000, seed=SEED):
+    """Kappa for experts, kappa for GPT-4, and their difference, resampling whole units B times."""
+    rng = np.random.default_rng(seed)
+    pair_parts = {u: part for u, part in pairs.groupby(unit)}
+    vote_parts = {u: part for u, part in expert_votes.groupby(unit)}
+    ids = np.array(sorted(vote_parts))
+    draws = []
+    for _ in range(B):
+        drawn = rng.choice(ids, size=len(ids), replace=True)
+        k_experts = kappa_experts(pd.concat([pair_parts[u] for u in drawn if u in pair_parts], ignore_index=True))[2]
+        k_gpt4 = kappa_gpt4(pd.concat([vote_parts[u] for u in drawn], ignore_index=True))[2]
+        draws.append((k_experts, k_gpt4, k_gpt4 - k_experts))
+    return np.array(draws)
+
+
+estimates = [kappa_experts(expert_pairs)[2], kappa_gpt4(votes)[2]]
+estimates.append(estimates[1] - estimates[0])
+NAMES = ["expert with expert", "GPT-4 with expert", "difference, GPT-4 minus experts"]
+```
+
+```{python}
+#| eval: false
+unit = "question_id"   # after the first run, change to "item_id" and run again
+
+results[unit] = resample_kappas(expert_pairs, votes, unit=unit)
+low, high = np.percentile(results[unit], [2.5, 97.5], axis=0)
+display(pd.DataFrame({"estimate": estimates, "SD": results[unit].std(axis=0), "2.5%": low, "97.5%": high},
+                     index=NAMES).round(3))
+```
+
+Once you have both runs, compute the design effect for each $\kappa$: how many times larger the variance is when you resample questions than when you resample items, as in Lab 11.
+
+```{python}
+#| eval: false
+if len(results) < 2:
+    print("Run the cell above with both units first.")
+else:
+    design_effect = None   # TODO: square the ratio of the SDs, questions over items (results[...].std(axis=0) gives the SDs)
+    if design_effect is None:
+        print("Fill in the TODO line, then run this cell again.")
+    else:
+        print(pd.Series(design_effect, index=NAMES).round(2).to_string())
+```
+
+Which way of resampling gives wider intervals, and by how much for GPT-4's $\kappa$? Why is the question the right unit? Then answer the team: can GPT-4 stand in for one expert on these questions? Use the interval for the difference.
+
+**Your answer:** TODO
+
+## 4. Where do the judges disagree?
+
+**Why this step:** an overall $\kappa$ averages over very different questions. A reasoning question usually has a right answer; a writing prompt usually does not.
+
+Start with one category. Keep the rows of `expert_pairs` in that category, and call `kappa_experts` and `kappa_gpt4` on them. Then change `category` and run it again.
+
+```{python}
+#| eval: false
+category = "writing"   # then try "reasoning", "roleplay", and "stem"
+
+category_votes = votes[votes["category"] == category]
+category_pairs = None   # TODO: the rows of expert_pairs in this category, as in the line above
+
+if category_pairs is None:
+    print("Fill in the TODO line, then run this cell again.")
+else:
+    print(f"{category}: {len(category_pairs)} expert pairs, {len(category_votes)} expert votes")
+    print(f"experts' kappa {kappa_experts(category_pairs)[2]:.3f}, GPT-4's kappa {kappa_gpt4(category_votes)[2]:.3f}")
+```
+
+The next cell repeats this for all four categories, with an interval for each difference (10 questions each).
+
+```{python}
+#| eval: false
+rows = []
+for category in sorted(items["category"].unique()):
+    category_pairs = expert_pairs[expert_pairs["category"] == category]
+    category_votes = votes[votes["category"] == category]
+    k_experts = kappa_experts(category_pairs)[2]
+    k_gpt4 = kappa_gpt4(category_votes)[2]
+    low, high = np.percentile(resample_kappas(category_pairs, category_votes, B=1000)[:, 2], [2.5, 97.5])
+    rows.append({"category": category, "questions": category_votes["question_id"].nunique(),
+                 "expert pairs": len(category_pairs), "expert votes": len(category_votes),
+                 "experts' kappa": k_experts, "GPT-4's kappa": k_gpt4,
+                 "difference": k_gpt4 - k_experts, "2.5%": low, "97.5%": high})
+by_category = pd.DataFrame(rows).sort_values("experts' kappa", ascending=False).reset_index(drop=True)
+display(by_category.round(3))
+
+# The difference in kappa for each category, with its interval and a line at 0
+fig, ax = plt.subplots(figsize=(7, 3))
+y = np.arange(len(by_category))
+ax.hlines(y, by_category["2.5%"], by_category["97.5%"], color="#5b8db8", linewidth=3)
+ax.plot(by_category["difference"], y, "o", color="#155a8a")
+ax.axvline(0, color="#333333", linewidth=1)
+ax.set_yticks(y)
+ax.set_yticklabels(by_category["category"])
+ax.invert_yaxis()
+ax.set_xlabel("GPT-4's kappa minus the experts' kappa, with 95% interval")
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+```
+
+Where do experts agree with each other most, and least? Where does GPT-4 agree with experts less than they agree with each other, and where more? Give the denominators.
+
+You found this pattern after looking at four categories, and with 10 questions each the intervals are wide, so part of it may be luck (Week 5's winner's curse). The honest test is new questions. HW7's half has math and coding, which have checkable answers, and humanities, which mostly does not. Write down what you predict HW7's categories will show, before you see them.
+
+**Your answer:** TODO
+
+## 5. Does the order of the answers change GPT-4's verdict?
+
+**Why this step:** GPT-4 judged every item twice, once with each answer first, at temperature 0. With the temperature at 0, the only thing that changed between the two runs was the order. When the two verdicts differ, the order changed the verdict: a **flip**.
+
+Fill in the flip rate and its standard error as if the 1,200 items were independent.
+
+```{python}
+#| eval: false
+flipped = ~items["gpt4_orders_agree"]   # True where the two orders gave different verdicts
+flip_rate = None   # TODO: the share of items that flipped
+naive_se = None    # TODO: sqrt(p(1 - p) / n), as if the 1,200 items were independent
+print("flip rate:", flip_rate, " SE as if independent:", naive_se)
+```
+
+The next cell resamples questions, as in part 3, and compares the two standard errors.
+
+```{python}
+#| eval: false
+rng = np.random.default_rng(SEED)
+question_ids = np.array(sorted(items["question_id"].unique()))
+flip_parts = {q: part["gpt4_orders_agree"].to_numpy() for q, part in items.groupby("question_id")}
+resampled_flips = []
+for _ in range(2000):
+    drawn = rng.choice(question_ids, size=len(question_ids), replace=True)
+    resampled_flips.append(1 - np.concatenate([flip_parts[q] for q in drawn]).mean())
+low, high = np.percentile(resampled_flips, [2.5, 97.5])
+print(f"GPT-4's two orders disagree on {flipped.sum()} of {len(items)} items (95% interval {low:.3f} to {high:.3f})")
+print(f"SE resampling questions: {np.std(resampled_flips):.4f}")
+if flip_rate is None or naive_se is None:
+    print("Fill in the two TODO lines above to compare with the SE as if items were independent.")
+else:
+    print(f"Flip rate {flip_rate:.3f}; SE as if items were independent {naive_se:.4f}; "
+          f"design effect {(np.std(resampled_flips) / naive_se) ** 2:.2f}")
+
+by_question = 1 - items.groupby("question_id")["gpt4_orders_agree"].mean()
+print(f"Flip rate for one question: from {by_question.min():.2f} to {by_question.max():.2f}")
+print("Flip rate by category:")
+print((1 - items.groupby("category")["gpt4_orders_agree"].mean()).round(3).to_string())
+```
+
+Why is the design effect so far above 1? Compare the flip rates by category with part 4's $\kappa$'s: which category flips least, and do experts agree well on it? What does that say about the difference between a judge that is consistent and a judge that agrees with people?
+
+MT-Bench recorded a flip as a tie, so these data show how often the order changed the verdict, but not which answer GPT-4 favored, the first or the second. What would you need to keep from each pair of runs to test for a preference for the first answer? (HW7 Problem 1(e) has that design.)
+
+**Your answer:** TODO
+
+## 6. Stop and discuss
+
+1. A teammate writes: "GPT-4 agrees with our experts 65.5% of the time, so it is 65.5% accurate." What is wrong with the sentence? Use David's sisters.
+2. GPT-4's $\kappa$ with an expert is about the same as an expert's with another expert. Is GPT-4 then a good judge? What else would you want to check before replacing an expert?
+3. In part 3, resampling questions widened the interval for each $\kappa$ more than for their difference. Why might the difference be less affected? (Think of Week 5's pairing: both $\kappa$'s are computed on the same questions.)
+4. The experts are graduate students voting on questions the MT-Bench authors wrote. Who is this $\kappa$ about, and what would the team need before it trusts the number for its own benchmark (Week 9)?
+
+## 7. Handoff: your project
+
+Every track has a judge or a label that someone, or something, produced. In a few sentences, for your team's track:
+
+1. **Human preferences (Track 3).** Your judge saw every pair in both orders. Make the 2×2 table of its verdicts by order, as in HW7 Problem 1(e): how often does it flip, and does it favor the first response? Then what is the judge's $\kappa$ with the human preference, resampling posts?
+2. **Instruction following (Track 4).** What is the judge's $\kappa$ with the rule checker, resampling prompts? Which of the two is your reference, and how would you know whether it is right?
+3. **Food or pet tagging (Tracks 1 and 2).** The dataset's labels are a rater too (Week 2). On which cases would a second labeler most likely disagree, and how would that change your accuracy?
+
+Add one row to the design table your Milestone 2 outline started in Lab 11: what your track's reference is, and how reliable it is.
+
+**Your answer:** TODO
+
+## Exit ticket
+
+In one sentence: why does $\kappa$ subtract the agreement expected by chance, and why does its interval resample questions rather than votes?

@@ -1,0 +1,102 @@
+---
+title: "Week 12B: Experts and GPT-4 as Judges"
+subtitle: "A short introduction to Lab 12, then work on your project"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+## Today {.smaller}
+
+- About 12 minutes on the tables you will build in Lab 12.
+- About 35 minutes on Lab 12, with me.
+- The rest of class on your project.
+
+::: notes
+About 1 minute.
+:::
+
+## Who answers and who judges in the lab {.smaller}
+
+A benchmark team pays experts to compare chatbots' answers.
+
+Could GPT-4 replace one expert?
+
+- Six chatbots from 2023, GPT-4 among them, answered 80 questions.
+- An item is one question, one turn of the conversation, and one pair of chatbots.
+- For each item, 1 to 6 experts voted for the better answer, or a tie.
+- GPT-4 also judged every item, twice, once with each answer first.
+
+::: notes
+About 2 minutes. The data are MT-Bench (Zheng et al. 2023, "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena," the reading). Say the roles out loud, because GPT-4 plays two of them. GPT-4 is one of the six chatbots that wrote answers, and GPT-4 is also the judge whose verdicts we compare with the experts'. The experts were mostly graduate students in each question's field. GPT-4 judged at temperature 0, and when its two orders disagreed, the data record a tie. The lab uses writing, roleplay, reasoning, and STEM questions; HW7 Problem 2 uses math, coding, extraction, and humanities, so the lab's numbers do not answer the homework.
+:::
+
+## Agreement with three choices {.smaller .compact-table}
+
+An LLM judge and an expert each judged the same 100 items.
+
+Each picked chatbot 1, chatbot 2, or a tie.
+
+| | Expert: chatbot 1 | Expert: chatbot 2 | Expert: tie | Total |
+|---|---:|---:|---:|---:|
+| **Judge: chatbot 1** | 35 | 6 | 4 | 45 |
+| **Judge: chatbot 2** | 3 | 30 | 7 | 40 |
+| **Judge: tie** | 2 | 4 | 9 | 15 |
+| **Total** | 40 | 40 | 20 | 100 |
+
+With a neighbor, find the agreement, the chance agreement, and $\kappa$.
+
+::: {.fragment}
+$$
+\begin{aligned}
+\text{agreement}&=(35+30+9)/100=0.74\\
+\text{chance}&=\textcolor{#8f1025}{0.45\times0.40+0.40\times0.40+0.15\times0.20}\\
+&=0.18+0.16+0.03=0.37\\
+\kappa&=(0.74-0.37)/(1-0.37)=0.59
+\end{aligned}
+$$
+:::
+
+::: notes
+About 4 minutes. Made-up numbers. Give pairs two minutes, then reveal. The steps are Tuesday's, with three ways to agree instead of two: both pick chatbot 1, both pick chatbot 2, or both call a tie. The red line is the independence step, as on Tuesday: each term is the judge's share times the expert's share for that choice, the row total over 100 times the column total over 100. In the lab, students write these steps as code from GPT-4's table of 1,692 expert votes. For two experts, the lab counts each pair both ways, so both experts share one set of rates, the experts' pooled shares (Fleiss, J. L. (1971), "Measuring nominal scale agreement among many raters," *Psychological Bulletin* 76(5), 378–382); the lab's text explains this before `expert_table`. If asked about other scales or missing ratings, Krippendorff's alpha handles any number of raters, missing ratings, and ordered or numeric scales (Hayes, A. F., and Krippendorff, K. (2007), *Communication Methods and Measures* 1(1), 77–89).
+:::
+
+## Fill in the lab's design with a neighbor {.smaller .compact-table}
+
+Tuesday's design table for the city's judge is the model.
+
+| Design term | In Lab 12 |
+|---------------------|------------------------------------------------------|
+| Unit | [a question, which appears in 30 items]{.fragment} |
+| Raters | [the experts, 1 to 6 per item, and GPT-4]{.fragment} |
+| Response | [a vote for chatbot 1, chatbot 2, or a tie]{.fragment} |
+| Held constant | [GPT-4's prompt and temperature 0]{.fragment} |
+| Order | [GPT-4 saw both orders, and a disagreement was recorded as a tie]{.fragment} |
+| Comparison | [GPT-4's $\kappa$ with an expert minus two experts' $\kappa$]{.fragment} |
+| Interval | [resample questions]{.fragment} |
+
+::: notes
+About 3 minutes. One minute for pairs, then reveal one row at a time. Common slips are calling a vote or an item the unit (items from one question share its text and answers, so the question is the unit) and expecting the order to be recorded (it was not; a flip was stored as a tie, so the lab can count flips but not say which position GPT-4 favored).
+:::
+
+## How the lab runs {.smaller}
+
+1. Read two items where the experts split, then one you pick.
+2. Write kappa in four lines from GPT-4's table, then check it with a function.
+3. Resample questions, then items, and compare the intervals.
+4. Find kappa for one category, then all four, and predict what HW7 will show.
+5. Write the flip rate, and compare its two standard errors.
+
+Then a short discussion and a handoff to your project.
+
+::: notes
+About 2 minutes. The lab ends with a handoff for each project track, so there is no separate project slide; circulate during work time and ask each team who or what decides what is right in its track, and how reliable it is. Part 1 starts as an instructor run. In every part students write or change code, and blank TODO lines print a message rather than fail, so the notebook runs top to bottom. Part 4's prediction is tested in HW7 2(c). At least one Checkpoint 10 question comes from parts 2 and 3.
+:::

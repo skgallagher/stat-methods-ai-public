@@ -1,0 +1,138 @@
+---
+title: "Homework 7: Evaluation Design and Inter-Rater Reliability"
+subtitle: "Statistical Evaluation of AI · Spring 2027"
+format:
+  pdf:
+    geometry:
+      - top=0.8in
+      - bottom=1in
+      - left=1in
+      - right=1in
+---
+
+**Do not use AI for Problem 1.** Work the derivations yourself. AI is allowed in Problem 2. In Problem 3 you use an AI assistant as a judge.
+
+| | |
+|---|---|
+| **Out / due** | Tue Apr 6 / Tue Apr 13, 11:59pm |
+| **Points** | 100: Problem 1 (45), Problem 2 (40, including a 5-point stretch), Problem 3 (15) |
+| **Expected time** | About 5 hours after Labs 11 and 12. Contact course staff if setup or debugging alone takes more than 30 minutes. |
+| **Reading** | Zheng et al. (2023), ["Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena"](https://arxiv.org/abs/2306.05685), Section 3.3 (position and verbosity bias) and Section 4.2 (agreement between GPT-4 and humans). |
+| **AI policy** | No AI for Problem 1. AI is allowed in Problem 2. In Problem 3 you use an AI assistant as a judge. Submit the AI-use record at the end. |
+| **Working file** | `hw07_starter.ipynb`. The PDF is a read-only copy of the prompt. |
+| **Submit** | Notebook PDF and completed `.ipynb` in one Gradescope submission. |
+
+## The situation
+
+Weeks 11 and 12 asked how to design an evaluation and whether to trust the judge that grades it. When answers have no answer key, someone has to judge them, a person or another model, and judges disagree. This homework measures how much, with two tools: agreement corrected for chance, and the reliability of an average of several raters, which is Lecture 11A's $\rho$ with raters in place of answers.
+
+Problem 1 works a small grading example by hand. Problem 2 uses MT-Bench (Zheng et al. 2023): experts and GPT-4 judged the same pairs of chatbot answers, and the question is whether GPT-4 can stand in for an expert. In Problem 3 you run an AI assistant as a judge yourself and measure it.
+
+# Problem 1 - Two raters, many raters, and a budget (45 points, no AI)
+
+Show your work. A correct number without the steps behind it earns little credit.
+
+A tutoring company's chatbot answers students' math questions. Two staff members, A and B, each read the same 200 answers and mark each one acceptable or not:
+
+| | B: acceptable | B: not acceptable |
+|---|---:|---:|
+| **A: acceptable** | 130 | 20 |
+| **A: not acceptable** | 10 | 40 |
+
+a. **Agreement and agreement by chance (10 points).**
+
+   **(i) (2 points)** On what share of the 200 answers do A and B agree?
+
+   **(ii) (4 points)** Suppose A and B rated independently, each marking answers acceptable at the rate in the table. Starting from $P(\text{agree})=P(\text{both acceptable})+P(\text{both not acceptable})$, compute the chance that they agree.
+
+   **(iii) (4 points)** Cohen's kappa is $\kappa=(\text{observed agreement}-\text{chance agreement})/(1-\text{chance agreement})$. Compute it. In one sentence each, say what $\kappa=0$ and $\kappa=1$ would mean.
+
+b. **A judge that always says yes (3 points).** A third rater, C, marks every answer acceptable. Compute C's agreement with A, the chance agreement, and $\kappa$. In 1 or 2 sentences, say why agreement alone is a poor summary when one category is common.
+
+c. **The reliability of an average of $r$ raters (14 points).** Answer $i$ has a true quality $\mu_i$, and across answers $\operatorname{Var}(\mu_i)=\tau^2$. Given $\mu_i$, the raters' scores $y_{i1},\dots,y_{ir}$ are independent, each with mean $\mu_i$ and variance $\sigma^2$. This is Lecture 4B's two-level model with an answer in place of a passage.
+
+   **(i) (3 points)** Use the law of total covariance to show that two raters' scores on the same answer have covariance $\tau^2$, and correlation $\rho=\tau^2/(\tau^2+\sigma^2)$. This is Week 2's two raters and Lecture 11A's $\rho$, with raters in place of answers.
+
+   **(ii) (6 points)** Let $\bar y_i$ be the average of $r$ raters' scores on answer $i$. Its reliability is the share of its variance that comes from the answers, $\tau^2/\operatorname{Var}(\bar y_i)$. Use the law of total variance to show that $\operatorname{Var}(\bar y_i)=\tau^2+\sigma^2/r$, and then show that the reliability equals $r\rho/\bigl(1+(r-1)\rho\bigr)$. This is the Spearman–Brown formula.
+
+   **(iii) (3 points)** With $\tau^2=0.4$ and $\sigma^2=0.6$, compute the reliability for $r=1$, 2, and 3, and find the smallest $r$ whose reliability is at least 0.8.
+
+   **(iv) (2 points)** In 1 sentence: what does the Spearman–Brown formula say about judging with one rater, human or AI, compared with a panel?
+
+d. **Spending a labeling budget (10 points).** The company wants the average quality of its chatbot's answers. Preparing a new answer for rating (drawing a question, recording the answer, removing names) costs \$8, and each rating costs \$2. It has \$600. With $n$ answers rated $r$ times each, the average quality has variance $\tau^2/n+\sigma^2/(nr)$ (Lecture 11A), with $\tau^2=0.4$ and $\sigma^2=0.6$ as in part (c).
+
+   **(i) (4 points)** Use Lecture 11A's rule, $r^\ast=\sqrt{(\sigma^2/\tau^2)(c_q/c_a)}$, to find the best number of ratings per answer.
+
+   **(ii) (4 points)** For $r=1$, 2, 3, and 6, find how many answers the budget allows and the standard error of the average quality.
+
+   **(iii) (2 points)** Part (c) needs 6 raters per answer for a reliability of 0.8, but part (ii) favors 2 or 3. In 1 or 2 sentences, explain why the two answers differ: what is each design for?
+
+e. **Does the order of the answers matter? (8 points)** The company also tries an LLM judge. The judge is shown a student's question and two answers to it, A and B, from two versions of the chatbot, and asked which answer is better. A good judge should give the same verdict whichever answer it reads first. To check, the company shows the judge each of 100 pairs twice, once with A first and once with B first:
+
+   | | B shown first: picks A | B shown first: picks B |
+   |---|---:|---:|
+   | **A shown first: picks A** | 45 | 15 |
+   | **A shown first: picks B** | 5 | 35 |
+
+   On the 80 pairs on the diagonal, the judge picks the same answer in both orders. On the other 20 the verdict **flips** with the order: on 15 the judge picks whichever answer it was shown first, and on 5 whichever it was shown second.
+
+   **(i) (2 points)** Estimate the flip rate, the share of pairs whose verdict depends on the order, with its standard error.
+
+   **(ii) (3 points)** Using only the 20 pairs that flip, test whether the judge favors the answer shown first, with Week 5's test for discordant pairs. Report $z$ and your conclusion.
+
+   **(iii) (3 points)** Using Lecture 11A's design terms, explain why showing every pair in both orders is a better design than choosing one order per pair at random. The judge ran at temperature 0; why can a flip not be blamed on sampling?
+
+# Problem 2 - Can GPT-4 stand in for an expert? (40 points)
+
+A team that runs a chatbot benchmark pays experts to compare models' answers, and it asks whether GPT-4 could replace one of them. MT-Bench gives you the evidence. Six chat models answered two-turn questions. For each question, turn, and pair of models (an **item**), experts, mostly graduate students in the question's field, voted for the better answer or called a tie. GPT-4 gave a verdict on every item. It was run twice at temperature 0, with the answers in swapped positions; when the two orders disagreed, the verdict is recorded as a tie and `gpt4_orders_agree` is False.
+
+This homework uses the 40 questions in math, coding, extraction, and humanities; Lab 12 used the other 40. Each question appears in 30 items (2 turns × 15 pairs of models), so items from one question are related, and **every interval in this problem resamples questions**. AI help with code is allowed. Record substantial help in the AI-use table.
+
+a. **Look first (4 points).** Run the code in Problem 2(a). It prints two items where the experts split, with the question, both answers, and the votes. In 2 or 3 sentences, say what the experts might be disagreeing about.
+
+b. **Reliability (9 points).** Run the code in Problem 2(b). It pairs every two experts who judged the same item, and it compares GPT-4's verdict with each expert's vote.
+
+   1. Finish the chance-agreement line in `kappa()`, following Problem 1(a) with three categories (`model_1`, `model_2`, `tie`). The cell stops with a message until you do. (2 points)
+   2. Report the table: agreement, chance agreement, $\kappa$, and the 95% interval for $\kappa$, for expert with expert and for GPT-4 with expert, and the difference in $\kappa$ with its interval. (3 points)
+   3. Why does the interval resample questions, not votes or items? (2 points)
+   4. Can GPT-4 stand in for one expert? Answer in 2 sentences, citing the interval for the difference. (2 points)
+
+c. **The average hides a pattern (6 points).** Run the code in Problem 2(c). It repeats part (b) within each category.
+
+   1. Describe the pattern across categories, with the denominators. Where does GPT-4 agree with experts less than experts agree with each other, and where more? (3 points)
+   2. With 10 questions per category, how firmly can you claim this pattern? Look at the intervals, and connect your answer to Week 5's winner's curse. (3 points)
+
+d. **Order and the mix of comparisons (7 points).** Run the code in Problem 2(d). It reports how often GPT-4's two orders disagree, then breaks the results down by how far apart the two models are in strength, ranked by the experts' votes.
+
+   1. Report the flip rate with its interval and the design effect. Why is the design effect above 1? (2 points)
+   2. How do the flip rate and GPT-4's agreement with experts change as the two models get closer in strength? Why might close comparisons be harder for every judge? (3 points)
+   3. A client compares only models one rank apart. What agreement should it expect, and what does that say about the overall figure (Week 9)? (2 points)
+
+e. **Agreement is not validity (4 points).** Run the code in Problem 2(e). It reports how often a verdict that picks a winner picks the longer answer.
+
+   1. Report the share for experts and for GPT-4. (2 points)
+   2. Explain in 2 sentences how two judges can agree with each other without either being right, and what evidence would check whether a verdict is right. (2 points)
+
+f. **For the client (5 points).** Run the code in Problem 2(f). It estimates the experts' $\tau^2$, $\sigma^2$, and $\rho$ (votes coded $+1$, $-1$, and 0) and the Spearman–Brown reliability for 1 to 5 experts per item. Write one paragraph of 3 to 5 sentences for the benchmark team: whether GPT-4 can replace an expert, under what conditions, and the main limitation. Then fill in the design table in the notebook for a follow-up study in which experts label new items, and give the number of items and experts per item you would choose, with a reason.
+
+g. **Stretch: an expert panel (5 points).** With AI's help on the code, test whether GPT-4 agrees more with a panel of experts than with one. On items with at least 3 expert votes, hold out one vote at random (seed 2027), take the majority of the remaining votes as the panel's verdict (state your rule for ties before you run anything), and compare GPT-4's agreement with the held-out expert and with the panel. Explain what you find with Problem 1(c). Full credit goes to a reproducible attempt with a correct diagnosis, whether or not the panel helps.
+
+# Problem 3 - An AI assistant as the judge (15 points)
+
+In this problem you use an AI assistant as a judge, the way GPT-4 was used in Problem 2, and check whether its verdicts depend on the order of the answers.
+
+a. **Predict (3 points).** Run the code in Problem 3(a). It prints five assigned items, the same for everyone, drawn from pairs of models close in strength on which the experts did not all agree, and a judging prompt for each item in each order. Before you run any AI, record which item you think is most likely to get a different verdict when the answers swap places, and why.
+
+b. **Run the judge (4 points).** Use an AI assistant (record which one, and its version if it shows one). For each item, start a new conversation, paste the prompt for the first order the code assigns, record the verdict, then start another new conversation for the other order. The code randomizes which order goes first for each item. Record each raw verdict in the table. If no assistant is available, record your prediction first, then use the cached GPT-4 verdicts that the code in Problem 3(c) shows.
+
+c. **From 10 calls to a study (6 points).** Run the code in Problem 3(c), which shows the experts' votes and GPT-4's verdicts for the five items. In 2 sentences, say how many of your items flipped, how your verdicts compare with the experts' and GPT-4's, and whether your prediction held. Then write one paragraph (5 to 7 sentences) for the benchmark team on what a study would need before it trusts your assistant as a judge, using one idea from each of these weeks:
+
+   - Week 4: the unit and the sample size. How many items would estimate the flip rate with a standard error of about 0.03 if the rate is near 0.17, and what would clustering by question do to that number?
+   - Weeks 5 and 12: the comparison with a second rater.
+   - Week 9: whether the result carries over to the team's own questions.
+   - Week 11: the design, including what is held constant and what is randomized.
+   - Week 12: the order of the answers.
+
+## Required AI-use record (2 points)
+
+Complete the AI-use table in the notebook for Problems 2 and 3. Record the tool, its purpose, your **initial prompt only**, what you checked, what changed after checking, and one decision you made yourself.

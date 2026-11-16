@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "release_status": "student_release",
-  "release_id": "spring27-week09-v1",
+  "release_id": "spring27-week12-v1",
   "delivery": "individual files from the public GitHub repository; no ZIP archive",
   "files": [
     {
@@ -1188,6 +1188,56 @@
       "path": "llm_bbh/release_summary.json",
       "bytes": 1319,
       "sha256": "1a6e11ecf3a7af019c1de9544fd9d9d9f5be2cebbbe0b4fa1b6e76a7c3cd678c"
+    },
+    {
+      "path": "llm_gsm8k/answer_texts.csv",
+      "bytes": 67026,
+      "sha256": "afa4ca9d1fcdf3fee726b25f25d24f460f58a27a7e228a3903480e0ceaafb0cd"
+    },
+    {
+      "path": "llm_gsm8k/correct.npz",
+      "bytes": 160453,
+      "sha256": "7a6435655a12f14c3cdafbf4d67aa23f01279bdc4ad630aaa0930f48b309ae90"
+    },
+    {
+      "path": "llm_gsm8k/problems.csv",
+      "bytes": 68947,
+      "sha256": "554b91fe0e645b1f81a8dcfeb0ea759357c37bdfc8033fdcbf2ae274e5c377dc"
+    },
+    {
+      "path": "llm_gsm8k/prompts.csv",
+      "bytes": 368248,
+      "sha256": "ed57ddc744d092659063483c56cb3f95c073a1b222eee08bc2a584b32bc0b6d6"
+    },
+    {
+      "path": "llm_gsm8k/release_summary.json",
+      "bytes": 1091,
+      "sha256": "ef705992f6d63fe4e463f96ef977d301f56f65974cee8f24a160d8ab597973e6"
+    },
+    {
+      "path": "llm_judges/answers.csv",
+      "bytes": 849317,
+      "sha256": "1f188659eacf6f494054c1660adb263fa08adabdb7210ed11364fed282f6304f"
+    },
+    {
+      "path": "llm_judges/human_votes.csv",
+      "bytes": 76122,
+      "sha256": "c2595a6933364004562d80fdf26b2c6eb3f7794943afd335e0495b2631ce0809"
+    },
+    {
+      "path": "llm_judges/items.csv",
+      "bytes": 151310,
+      "sha256": "b46a2293dc116c212222ee182ca37f689c22beea45ace2efda04d0405dcdd6f8"
+    },
+    {
+      "path": "llm_judges/questions.csv",
+      "bytes": 33747,
+      "sha256": "0ff768a5383133298a3c9764a000b594a3352037e3db62879c56908e3cb0c2ff"
+    },
+    {
+      "path": "llm_judges/release_summary.json",
+      "bytes": 803,
+      "sha256": "e747a664dcd6782e78fc224a7edde30fce1693062bca90045fe265c0f931bb85"
     }
   ]
 }

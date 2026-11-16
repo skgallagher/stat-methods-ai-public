@@ -1,0 +1,26 @@
+{
+  "source": "Hugging Face dataset ScalingIntelligence/monkey_business (Brown et al. 2024, Large Language Monkeys)",
+  "source_main_revision": "a9f8f73bcd6948a57ed922cba4e48062ef95f553",
+  "source_parquet_revision": "5acc07474317fe5280a2618d2b6652cdb740d101",
+  "license": "MIT (dataset); GSM8K is MIT (Cobbe et al. 2021); answers are Llama 3 outputs under the Meta Llama 3 Community License",
+  "models": {
+    "llama3_8b": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "llama3_70b": "meta-llama/Meta-Llama-3-70B-Instruct"
+  },
+  "sampling": {
+    "temperature": 0.6,
+    "few_shot_examples": "5, different for each problem",
+    "max_new_tokens": 512,
+    "answers_per_problem": 10000
+  },
+  "correctness": "the number after '####' in the answer equals the one in the answer key (string match)",
+  "problems": 127,
+  "gsm8k_test_problems": 1319,
+  "accuracy": {
+    "llama3_8b": 0.7685,
+    "llama3_70b": 0.9304
+  },
+  "between_problem_variance_8b": 0.0843,
+  "within_problem_variance_8b": 0.0936,
+  "correct_npz_sha256": "7a6435655a12f14c3cdafbf4d67aa23f01279bdc4ad630aaa0930f48b309ae90"
+}

@@ -1,0 +1,29 @@
+{
+  "source": "Hugging Face dataset lmsys/mt_bench_human_judgments (Zheng et al. 2023)",
+  "source_main_revision": "f7d2896d2cc5d80f8b55c2bbc722613555233c25",
+  "source_parquet_revision": "63d601feea39fd4139ad2d03050ee5219ada5f7e",
+  "license": "CC-BY-4.0",
+  "items": 2400,
+  "questions": 80,
+  "answers": 960,
+  "human_votes": 3354,
+  "human_votes_dropped_as_duplicates": 1,
+  "human_judges": 65,
+  "items_with_two_or_more_human_votes": 960,
+  "gpt4_orders_disagree": 380,
+  "gpt4_judging": "GPT-4, temperature 0, run in both answer orders (FastChat llm_judge); disagreeing orders recorded as a tie",
+  "halves": {
+    "lab": [
+      "reasoning",
+      "roleplay",
+      "stem",
+      "writing"
+    ],
+    "homework": [
+      "coding",
+      "extraction",
+      "humanities",
+      "math"
+    ]
+  }
+}

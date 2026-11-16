@@ -1,0 +1,145 @@
+---
+title: "Week 11B: Spending an Evaluation Budget"
+subtitle: "A short introduction to Lab 11, then work on the Milestone 2 outline"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+## Today {.smaller}
+
+- About 15 minutes: Lab 11's design, and how to design any evaluation.
+- About 30 minutes on Lab 11, with me.
+- The rest of class: your team's Milestone 2 outline, due Tue Apr 6.
+
+::: notes
+About 1 minute.
+:::
+
+## The nonprofit's check {.smaller}
+
+- A tutoring nonprofit wants a math homework helper: Llama 3 8B.
+- Its own server can run about **1,200 calls** before the semester.
+- It could pay for Llama 3 70B, but only about **200 calls**.
+- Data: 127 GSM8K problems, 10,000 answers each from both models.
+
+::: notes
+About 2 minutes. The helper would run Llama 3 8B Instruct on the nonprofit's server, sampling at temperature 0.6. The nonprofit's questions: how often is an answer right, how should it spend the calls, and is the 70B model worth paying for? Because Brown et al. (2024) stored 10,000 answers per problem, we can act out any check without running a model. GSM8K: 8,792 grade-school word problems written for OpenAI (Cobbe et al. 2021), two to eight steps of arithmetic each; the 127 were drawn at random from its 1,319 test problems.
+:::
+
+## Your turn: fill in Lab 11's design {.smaller}
+
+With a neighbor, fill in the right column. Tuesday's city table is the model.
+
+| Design term | In Lab 11 |
+|---------------------|------------------------------------------------------|
+| Unit | [a GSM8K problem, drawn at random from the test set]{.fragment} |
+| Treatment | [the model, 8B or 70B (part 5)]{.fragment} |
+| Held constant | [temperature 0.6 and the five-example prompt]{.fragment} |
+| Block | [the problem: both models answer it]{.fragment} |
+| Replication | [$r$ answers per problem]{.fragment} |
+| Randomization | [which stored answers are drawn, separately for each problem]{.fragment} |
+| Response | [right or wrong, against the answer key]{.fragment} |
+| Budget | [1,200 calls on the 8B; 200 paid calls on the 70B]{.fragment} |
+
+::: notes
+About 4 minutes: 2 minutes for pairs to fill in the column, then reveal one row at a time (each answer is a fragment). Tuesday's "Write the design plan first" table is the model. Common slips: calling an answer the unit (the answers are replicates; the problem is the unit); calling temperature the treatment (it is held fixed at 0.6, part of the system); and saying nothing is randomized because the answers already exist (the lab's randomization is which stored answers it draws, separately for each problem, which also breaks the link between same-numbered answers from Tuesday's "Runs are a third level" slide).
+:::
+
+## What you will use from Tuesday {.smaller}
+
+$$\operatorname{Var}(\hat\theta)=\frac{\tau^2}{n}+\frac{\sigma^2}{n\,r},\qquad \text{design effect}=1+(r-1)\rho,\qquad \rho=\frac{\tau^2}{\tau^2+\sigma^2}$$
+
+$$\operatorname{Var}(\hat D)=\frac{1}{n}\Bigl(\tau_d^2+\frac{\sigma_{70}^2}{r_{70}}+\frac{\sigma_{8}^2}{r_{8}}\Bigr)\qquad\text{(two models on the same problems)}$$
+
+- $n$ problems, $r$ answers to each; $\tau^2$ between, $\sigma^2$ within.
+- Calls fixed: more problems win.
+- Two prices: the cheaper, more variable model gets more answers.
+
+::: notes
+About 3 minutes. $\tau_d^2$ is the between-problem variance of the difference in accuracy. Remind students that the cost rule $r^\ast$ from Tuesday needs a budget that counts problems too; the lab's budget counts only calls.
+:::
+
+## How the lab runs {.smaller}
+
+1. One problem the model gets right half the time, then all 127.
+2. Ten answers each: the problem as the unit, and the design effect.
+3. Between and within variance, and how often two answers disagree.
+4. Spend 1,200 calls: rank four designs, then simulate them.
+5. If there is time: 200 paid calls on the 70B model.
+
+Then discussion and a handoff to your project.
+
+::: notes
+About 2 minutes. Parts 1 and 4 are instructor runs; students predict before part 4's simulation. At least one Checkpoint 9 question comes from parts 2 to 4.
+:::
+
+## A planning sheet for any evaluation {.smaller .compact-table}
+
+| Plan item | Ask |
+|---------------------------|------------------------------------------------------------|
+| Objective | What decision, and what result would change it? |
+| Response | What counts as right, and who decides? |
+| Treatments | What are you comparing? |
+| Held constant | What stays fixed: temperature, prompt, model version? |
+| Nuisance factors | What else varies? Block it, randomize it, or measure it. |
+| Experimental unit | What is one case? A new client case is one more of these. |
+| Restrictions and budget | What costs money: cases, answers, or labels? |
+| Analysis | Which comparison and interval, written before the first call? |
+
+<p class="compact-note">Adapted from Coleman and Montgomery's (1993) pre-design guide sheet for planned experiments. Replication, randomization, and blocking are Fisher's (1935) three principles.</p>
+
+::: notes
+About 3 minutes. Coleman, D. E., and Montgomery, D. C. (1993), "A Systematic Approach to Planning for a Designed Industrial Experiment," *Technometrics* 35(1), 1–12. Their Master Guide Sheet lists objectives, background, response variables, control variables (what we call treatments), factors to be held constant, nuisance factors, interactions, restrictions, design preferences including blocking and randomization, analysis, and trial runs. Their rule for nuisance factors: if its level can be set for each unit, block on it or randomize it; if not (it varies unpredictably), measure it and use it as a covariate. For LLM evaluations: block on the question; randomize call order, seeds, and which response is shown first; measure things like response length. Fisher, R. A. (1935), *The Design of Experiments*. Examples for each row: in Lab 11 the unit is a problem and the treatments are the two models; in the project, a new client photo, Reddit pair, or prompt is one more case, and related cases (repeated photos, pairs from one post, two responses to one prompt) are resampled together (Week 4B). The response is Week 2's measurement question; the budget is Tuesday's Question 3; the analysis written first is Week 5's margin and Week 10's flip rule.
+:::
+
+## The steps of an experiment {.smaller}
+
+1. State the problem: the client's decision, and the result that would change it.
+2. Choose the factors: the treatments, what is held constant, the nuisance factors.
+3. Choose the response: what counts as right.
+4. Choose the design: the unit, the blocks, the randomization, $n$ and $r$.
+5. Run it, as planned.
+6. Analyze it as it was designed, resampling the unit.
+7. Conclude and recommend.
+
+<p class="compact-note">The steps of experimentation in Coleman and Montgomery (1993), Table 1. For step 4: "Block what you can; randomize what you cannot," attributed to George Box.</p>
+
+::: notes
+About 3 minutes. Coleman and Montgomery's Table 1 lists the steps as recognition and statement of the problem, choice of factors and levels, selection of the response variables, choice of experimental design, conduction of the experiment, data analysis, and conclusions and recommendations; the first three are the planning phase. For step 4, a small pilot (say 20 questions with 5 answers each) gives a rough $\tau^2$ and $\sigma^2$, enough to pick $r$ because the SE curve is flat near its minimum (Tuesday). Box's mantra is quoted widely; Pashley and Miratrix (2020) discuss when blocking pays. Ask the room to run the steps for one track in a minute: for Track 3, the decision is whether the judge can stand in for human preferences; the unit is a pair, grouped by Reddit post; the judge saw both orders, so order is crossed with the pair; the answers are deterministic, so replication is across pairs and posts; and the comparison and its interval are written before the holdout is opened.
+:::
+
+## Your project is an experiment too {.smaller .compact-table}
+
+| Track | Unit | Treatments, on the same cases | Related groups | Randomized |
+|------------------------|----------------|----------------------------------|--------------------------|----------------------------|
+| Food tagging | a photo | CLIP and the fitted baseline | none listed | the 20% holdout |
+| Pet tagging | a photo | CLIP and the fitted baseline | repeated photos | holdout, by photo group |
+| Human preferences | a pair | the judge and the baselines | pairs from one post | holdout by post; order |
+| Instruction following | a response | the judge and the baseline | 2 responses per prompt | holdout, by prompt |
+
+- Every track has one cached answer per case: the replicates are cases.
+- Each case gets every system, so each case is a block.
+- Every interval should resample the related groups.
+
+::: notes
+About 3 minutes. From each track's datasheet and system card. Food: 1,440 photos, a seeded random 20% holdout (seed 2027); no repeated photos are listed, but confusable dishes are a different issue. Pets: 11 pairs of repeated photos, so the holdout was drawn by `photo_group` and intervals should resample groups. Preferences: 900 pairs from 791 Reddit posts, holdout by post; the judge was run in both response orders, so order is crossed with the pair, which is Week 12's starting point. Instructions: two responses to each of 150 prompts, holdout by prompt (5 per family); the rule checker is the reference the judge is checked against. In every track the systems used deterministic decoding (or, for CLIP, no sampling), so there is no within-case replication to measure; that is a fixed setting of each system, worth saying. Do not restate Milestone 2's requirements; the Project Description has them.
+:::
+
+## After the lab: your Milestone 2 outline {.smaller}
+
+- Work on your outline. The Project Description says what it needs.
+- Milestone 2 now asks for a design table for your comparison.
+- **Which cases are related? Does each interval resample them?**
+
+::: notes
+About 1 minute. Circulate during work time; ask each team the question in bold. The AI system and the baseline are the treatments and each case is a block. Each system gives one cached answer per case; if it could answer differently when asked again, teams should say so as a limit.
+:::

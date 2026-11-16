@@ -43,9 +43,29 @@ so `data/smoke/` cannot be substituted accidentally.
 - `release_summary.json`: counts, accuracies, pinned source revision, seed
 - Built by `scripts/freeze_week9_camelyon.py` from Camelyon17-WILDS (CC0). Patches from one slide are related; resample slides for intervals. The model's fitting patches are not released.
 
+### `llm_gsm8k` (Week 11 lab)
+
+- `problems.csv`: `problem_id`, `gsm8k_test_index`, `question`, `answer`, `solution`, `right_8b`, `right_70b`, `most_common_wrong_8b`, `most_common_wrong_count_8b`, `no_final_answer_8b`
+- `correct.npz`: arrays `llama3_8b` and `llama3_70b`, bool, shape (127, 10000); row *i* matches row *i* of `problems.csv`
+- `answer_texts.csv`: `problem_id`, `model`, `answer_index`, `correct`, `final_answer`, `text` (the first right and first wrong 8B answer per problem)
+- `prompts.csv`: `problem_id`, `prompt` (five worked examples, different for each problem, then the question)
+- `release_summary.json`: pinned source revisions, sampling settings, accuracies
+- Built by `scripts/freeze_week11_gsm8k.py` from `ScalingIntelligence/monkey_business` (Brown et al. 2024, MIT). The unit is the problem; answers to one problem are repeated measurements, so intervals resample problems.
+
+### `llm_judges` (Week 12 lab and HW7)
+
+- `items.csv`: `item_id`, `question_id`, `category`, `half` (`lab` or `homework`), `turn`, `model_1`, `model_2`, `gpt4_verdict`, `gpt4_orders_agree`, `n_human_votes`
+- `human_votes.csv`: `item_id`, `judge`, `vote` (`model_1`, `model_2`, or `tie`)
+- `questions.csv`: `question_id`, `category`, `turn_1`, `turn_2`
+- `answers.csv`: `question_id`, `model`, `turn`, `answer`
+- `release_summary.json`: pinned source revisions and counts
+- Built by `scripts/freeze_week12_mtbench.py` from `lmsys/mt_bench_human_judgments` (Zheng et al. 2023, CC-BY-4.0). Lab 12 uses the `lab` half of the questions and HW7 the `homework` half. Items from one question are related; intervals resample questions.
+
 ### `cfpb`
 
-- `complaints.csv`: ID, redacted narrative, product/issue, date, channel, consent/publication fields, similarity group, duplicate flag, source/target period
+- `complaints.csv`: ID, redacted narrative, product/issue, date, channel,
+  similarity group, duplicate flag, received year, source/target period,
+  product-by-year sample cell, and source URL
 - `model_outputs.csv`: true category, fitted statistical-baseline output, cached AI output, correctness, confidence, and locked alternative-label correctness
 - `future_holdout_outputs.csv`: the untouched later-period comparison rows
 - `weak_analysis_plan.txt`: frozen AI-generated object for the Week 3 audit
@@ -53,7 +73,8 @@ so `data/smoke/` cannot be substituted accidentally.
 ### `dynasent`
 
 - `items.csv` and `homework_items.csv`: disjoint lab/homework items with item ID, sentence, collection round, five-vote counts, model class probabilities and label
-- `prompt_items.csv`: six homework items used for the prompt-as-measurement experiment
+- `forecaster_items.csv`: ten synthetic smoke items used to test the student-plus-two-model Problem 3 workflow
+- `prompt_items.csv`: legacy six-item smoke table retained only for compatibility with older notebook builds
 
 ### `nhanes`
 

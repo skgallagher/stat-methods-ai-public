@@ -27,9 +27,9 @@ DATA_GROUPS = {
     "05": ["llm_bbh"],
     "06": ["llm_bbh"],
     "09": ["camelyon17"],
-    "10": ["cfpb"],
-    "11": ["designed_eval"],
-    "12": ["designed_eval"],
+    "10": ["camelyon17"],
+    "11": ["llm_gsm8k"],
+    "12": ["llm_judges"],
 }
 
 WORKFLOW = """## How this lab works

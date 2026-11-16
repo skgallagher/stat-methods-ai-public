@@ -26,8 +26,8 @@ DATA_GROUPS = {
     "hw03": ["cfpb", "github_issues"],
     "hw04": ["camera_traps"],
     "hw05": ["llm_bbh"],
-    "hw06": ["cfpb"],
-    "hw07": ["designed_eval"],
+    "hw06": ["camelyon17"],
+    "hw07": ["llm_judges"],
 }
 
 STARTER_LINES = {
@@ -179,35 +179,33 @@ STARTER_LINES = {
         "    print(\"Right answer:\", question[\"target\"].iloc[0])",
     ],
     "hw06": [
-        "# HW6: save the pre-specification before revealing held-back output",
-        "prespecification = pd.DataFrame(columns=[",
-        "    'alternative', 'assumption_varied', 'why_both_reasonable',",
-        "    'expected_direction_or_unknown', 'decision_flip_rule',",
-        "    'chosen_before_reveal'])",
-        "prespecification",
-        "# After saving Problem 1, reuse run_cfpb_specification() and paired_interval().",
-        "ai_alternatives = pd.DataFrame(columns=[",
-        "    'ai_suggestion', 'real_assumption_or_model_shopping',",
-        "    'accept_or_reject', 'statistical_reason'])",
-    ],
-    "hw07": [
-        "# HW7: paired agreement and pair-ID resampling",
-        "both_agree, minimal_only, rubric_only, neither = 60, 10, 20, 10",
-        "n_pairs = both_agree + minimal_only + rubric_only + neither",
-        "minimal_agreement = (both_agree + minimal_only) / n_pairs",
-        "rubric_agreement = (both_agree + rubric_only) / n_pairs",
-        "observed_difference = rubric_agreement - minimal_agreement",
-        "def bootstrap_pairs(data, statistic, B=2000, seed=2027):",
-        "    rng = np.random.default_rng(seed)",
-        "    pair_ids = data['pair_id'].drop_duplicates().to_numpy()",
-        "    estimates = []",
-        "    for _ in range(B):",
-        "        sampled_ids = rng.choice(pair_ids, len(pair_ids), replace=True)",
-        "        sampled = pd.concat([data.query('pair_id == @pid') for pid in sampled_ids])",
-        "        estimates.append(statistic(sampled))",
-        "    return np.quantile(estimates, [0.025, 0.975])",
-        "judge_root = data_dir / 'designed_eval'",
-        "run_order = np.random.default_rng(SEED).permutation(['minimal', 'rubric']).tolist()",
+        "# Additional library for this homework",
+        "from statsmodels.stats.proportion import proportion_confint",
+        "",
+        "# Read the patch table and the images, as in Lab 9. Row i of the table matches image i.",
+        "c17_dir = data_dir / \"camelyon17\"",
+        "patches = pd.read_csv(c17_dir / \"patches.csv\")",
+        "images = np.load(c17_dir / \"patches.npz\")[\"images\"]",
+        "",
+        "# correct = 1 if the model's call matches the pathologist's label, 0 if not.",
+        "patches[\"correct\"] = (patches[\"predicted_tumor\"] == patches[\"label\"]).astype(int)",
+        "",
+        "# Two measurements that need no label, each averaged over a patch's pixels:",
+        "# blue minus red (larger is bluer, as in Lab 9) and brightness (smaller is darker).",
+        "blue_minus_red = []",
+        "brightness = []",
+        "for i in range(len(images)):",
+        "    pixels = images[i].astype(float)",
+        "    blue_minus_red.append(np.mean(pixels[:, :, 2] - pixels[:, :, 0]))",
+        "    brightness.append(np.mean(pixels))",
+        "patches[\"blue_minus_red\"] = blue_minus_red",
+        "patches[\"brightness\"] = brightness",
+        "",
+        "benchmark = patches[patches[\"group\"] == \"benchmark\"]",
+        "hospital_4 = patches[patches[\"group\"] == \"hospital 4\"]",
+        "print(\"Benchmark: \", len(benchmark), \"patches from\", benchmark[\"slide_id\"].nunique(), \"slides at hospitals 1-3\")",
+        "print(\"Hospital 4:\", len(hospital_4), \"patches from\", hospital_4[\"slide_id\"].nunique(), \"slides\")",
+        "# Do not look at hospital 4's accuracy until Problem 2(d).",
     ],
 }
 
@@ -1219,6 +1217,775 @@ HW5_P3C_RESPONSE = "\n".join([
 
 HW5_AI_RECORD = HW4_AI_RECORD
 
+
+HW6_P1_RESPONSES = {
+    "a": _hw4_p1_response("a", ["(i)", "(ii)", "(iii)"]),
+    "b": _hw4_p1_response("b", ["(i) 1.", "(i) 2.", "(i) 3.", "(i) 4.", "(i) 5.", "(ii)", "(iii)"]),
+    "c": _hw4_p1_response("c", ["(i)", "(ii)", "(iii)", "(iv)"]),
+    "d": _hw4_p1_response("d", ["(i)", "(ii) 1.", "(ii) 2.", "(ii) 3.", "(iii)"]),
+}
+
+HW6_P2A_CODE = "\n".join([
+    "# Problem 2(a), step 1: four patches without tumor, then four with tumor, from each hospital (as in Lab 9)",
+    "fig, axes = plt.subplots(4, 8, figsize=(16, 9))",
+    "for row, hospital in enumerate([1, 2, 3, 4]):",
+    "    here = patches[patches[\"hospital\"] == hospital]",
+    "    no_tumor = here[here[\"label\"] == 0].sample(4, random_state=SEED)",
+    "    tumor = here[here[\"label\"] == 1].sample(4, random_state=SEED)",
+    "    rows_here = pd.concat([no_tumor, tumor])",
+    "    for col in range(8):",
+    "        i = rows_here.index[col]",
+    "        axes[row, col].imshow(images[i])",
+    "        axes[row, col].set_title(f\"hospital {hospital}, \" + (\"tumor\" if patches.loc[i, \"label\"] == 1 else \"no tumor\"), fontsize=9)",
+    "        axes[row, col].axis(\"off\")",
+    "plt.tight_layout()",
+    "plt.show()",
+    "",
+    "# Problem 2(a), step 2: the two measurements, benchmark against hospital 4",
+    "# Gray and orange, so neither group's color looks like a stain color",
+    "fig, axes = plt.subplots(1, 2, figsize=(12, 4))",
+    "for ax, column, axis_label in [(axes[0], \"blue_minus_red\", \"blue minus red (larger is bluer)\"),",
+    "                               (axes[1], \"brightness\", \"brightness (smaller is darker)\")]:",
+    "    bins = np.linspace(patches[column].min(), patches[column].max(), 40)   # the same bins for both groups",
+    "    ax.hist(benchmark[column], bins=bins, alpha=0.6, density=True, color=\"#8a8a85\", label=\"benchmark (hospitals 1-3)\")",
+    "    ax.hist(hospital_4[column], bins=bins, alpha=0.6, density=True, color=\"#d95926\", label=\"hospital 4\")",
+    "    ax.set_xlabel(axis_label)",
+    "    ax.legend()",
+    "plt.tight_layout()",
+    "plt.show()",
+    "",
+    "# Problem 2(a), step 3: how much of hospital 4 lies outside the benchmark's range",
+    "for column in [\"blue_minus_red\", \"brightness\"]:",
+    "    below = (hospital_4[column] < benchmark[column].min()).mean()",
+    "    above = (hospital_4[column] > benchmark[column].max()).mean()",
+    "    print(f\"{column}: benchmark mean {benchmark[column].mean():.1f}, hospital 4 mean {hospital_4[column].mean():.1f}\")",
+    "    print(f\"    hospital 4 patches below the benchmark's range: {below:.1%}, above it: {above:.1%}\")",
+    "",
+    "# The benchmark's darkest third is every patch below the benchmark's 1/3 point of brightness",
+    "darkest_third_cut = np.quantile(benchmark[\"brightness\"], 1 / 3)",
+    "print(f\"Hospital 4 patches in the benchmark's darkest third: {(hospital_4['brightness'] < darkest_third_cut).mean():.1%}\")",
+])
+
+HW6_P2C_CODE = "\n".join([
+    "# Problem 2(c): reweight the benchmark's accuracy to hospital 4 in five ways",
+    "",
+    "# Lab 9's two functions, unchanged",
+    "def accuracy_by_group(groups, correct):",
+    "    \"\"\"One row per group: cases, the benchmark's share, and accuracy with a Wilson interval.\"\"\"",
+    "    table = pd.DataFrame({\"group\": groups, \"correct\": correct})",
+    "    total = len(table)",
+    "    rows = []",
+    "    for group_name, cases in table.groupby(\"group\"):",
+    "        n = len(cases)                       # cases in this group",
+    "        right = int(cases[\"correct\"].sum())  # cases the model got right",
+    "        low, high = proportion_confint(right, n, method=\"wilson\")",
+    "        rows.append({\"group\": group_name, \"cases\": n, \"benchmark_share\": n / total,",
+    "                     \"accuracy\": right / n, \"ci_low\": low, \"ci_high\": high})",
+    "    return pd.DataFrame(rows).sort_values(\"accuracy\").reset_index(drop=True)",
+    "",
+    "",
+    "def reweight(by_group, shares):",
+    "    \"\"\"Accuracy for a mix of groups, its standard error, and Kish's effective sample size.\"\"\"",
+    "    total_share = sum(shares.values())",
+    "    estimate = 0.0",
+    "    variance = 0.0",
+    "    weight_sum = 0.0",
+    "    for _, row in by_group.iterrows():",
+    "        share = shares.get(row[\"group\"], 0.0) / total_share  # shares are rescaled to add to 1",
+    "        p = row[\"accuracy\"]",
+    "        n = row[\"cases\"]",
+    "        estimate = estimate + share * p                   # share times accuracy, added up as in the table",
+    "        variance = variance + share**2 * p * (1 - p) / n  # each group's variance, times its share squared",
+    "        weight_sum = weight_sum + share**2 / n            # used for Kish's effective sample size",
+    "    return estimate, np.sqrt(variance), 1 / weight_sum",
+    "",
+    "",
+    "# Part 1: you fill in the arguments marked TODO in groups_for() below.",
+    "TODO = None",
+    "",
+    "",
+    "def cut_into_groups(column, n_groups, data):",
+    "    \"\"\"Cut a measurement at the benchmark's quantiles and name each patch's group.\"\"\"",
+    "    if column is None or n_groups is None:",
+    "        raise ValueError(\"Fill in the column and the number of groups in every call in groups_for(), then run this cell again.\")",
+    "    cut_points = np.quantile(benchmark[column], np.linspace(0, 1, n_groups + 1)[1:-1])",
+    "    numbers = np.digitize(data[column], cut_points) + 1   # 1 is the lowest group",
+    "    names = []",
+    "    for number in numbers:",
+    "        names.append(f\"{column} {number} of {n_groups}\")",
+    "    return np.array(names)",
+    "",
+    "",
+    "def groups_for(specification, data):",
+    "    \"\"\"The group of every patch in data under one specification of Z.",
+    "",
+    "    Part 1: replace each TODO with the column (\"blue_minus_red\" or \"brightness\")",
+    "    and the number of groups (3 or 5) for that specification.",
+    "    \"\"\"",
+    "    if specification == \"0. primary: color thirds\":",
+    "        return cut_into_groups(TODO, TODO, data)",
+    "    if specification == \"1. color fifths\":",
+    "        return cut_into_groups(TODO, TODO, data)",
+    "    if specification == \"2. brightness thirds\":",
+    "        return cut_into_groups(TODO, TODO, data)",
+    "    if specification == \"3. brightness fifths\":",
+    "        return cut_into_groups(TODO, TODO, data)",
+    "    if specification == \"4. color thirds and brightness thirds\":",
+    "        color = cut_into_groups(TODO, TODO, data)   # the color group, as in 0",
+    "        dark = cut_into_groups(TODO, TODO, data)    # the brightness group, as in 2",
+    "        names = []",
+    "        for i in range(len(color)):",
+    "            names.append(color[i] + \" / \" + dark[i])",
+    "        return np.array(names)",
+    "",
+    "",
+    "def hospital_4_shares(groups):",
+    "    \"\"\"Hospital 4's share of patches in each group. These need no labels.\"\"\"",
+    "    shares = {}",
+    "    for name in np.unique(groups):",
+    "        shares[name] = np.mean(groups == name)",
+    "    return shares",
+    "",
+    "",
+    "specifications = [\"0. primary: color thirds\", \"1. color fifths\", \"2. brightness thirds\",",
+    "                  \"3. brightness fifths\", \"4. color thirds and brightness thirds\"]",
+    "",
+    "rows = []",
+    "for specification in specifications:",
+    "    benchmark_groups = groups_for(specification, benchmark)",
+    "    by_group = accuracy_by_group(benchmark_groups, benchmark[\"correct\"].to_numpy())",
+    "    shares = hospital_4_shares(groups_for(specification, hospital_4))",
+    "",
+    "    # Overlap check: a hospital 4 group with no benchmark patches cannot be reweighted.",
+    "    for name in shares:",
+    "        if name not in list(by_group[\"group\"]):",
+    "            print(\"No benchmark patches in\", name, \"- hospital 4 share\", round(shares[name], 3))",
+    "",
+    "    estimate, se, n_eff = reweight(by_group, shares)",
+    "    rows.append({\"specification\": specification, \"groups\": len(by_group),",
+    "                 \"estimate\": estimate, \"se\": se, \"n_eff\": n_eff})",
+    "",
+    "table = pd.DataFrame(rows)",
+    "",
+    "# Part 3 (TODO): the one-sided 95% lower bound, estimate - 1.645 * se",
+    "table[\"lower_bound\"] = np.nan",
+    "# Part 3 (TODO): the decision, \"use\" or \"do not use\", under the rule: use the model if the lower bound is at least 0.85",
+    "table[\"decision\"] = \"TODO\"",
+    "display(table.round(3))",
+    "",
+    "# Part 4: the five estimates with 95% intervals, in the order listed",
+    "fig, ax = plt.subplots(figsize=(8, 3.5))",
+    "y = np.arange(len(table))[::-1]   # the primary analysis at the top",
+    "ax.errorbar(table[\"estimate\"], y, xerr=1.96 * table[\"se\"], fmt=\"o\", color=\"#155a8a\", capsize=0)",
+    "ax.axvline(0.85, color=\"#c41230\", linestyle=\"--\", label=\"0.85, the pathology lead's line\")",
+    "ax.set_yticks(y)",
+    "ax.set_yticklabels(table[\"specification\"])",
+    "ax.set_xlabel(\"reweighted accuracy for hospital 4 (95% interval)\")",
+    "ax.legend(loc=\"upper right\")",
+    "plt.tight_layout()",
+    "plt.show()",
+    "",
+    "# Part 5: alternative 4's nine groups, one row per group",
+    "nine_groups = \"4. color thirds and brightness thirds\"",
+    "cells = pd.DataFrame({\"benchmark patches\": pd.Series(groups_for(nine_groups, benchmark)).value_counts(),",
+    "                      \"hospital 4 patches\": pd.Series(groups_for(nine_groups, hospital_4)).value_counts()})",
+    "display(cells.fillna(0).astype(int).sort_values(\"hospital 4 patches\", ascending=False))",
+])
+
+HW6_P2D_CODE = "\n".join([
+    "# Problem 2(d), part 1: hospital 4's own labels",
+    "print(f\"Hospital 4 accuracy: {hospital_4['correct'].mean():.3f} ({hospital_4['correct'].sum()} of {len(hospital_4)} patches)\")",
+    "print(f\"Benchmark accuracy:  {benchmark['correct'].mean():.3f}\")",
+    "",
+    "",
+    "# Lab 9's slide bootstrap for a difference in accuracy, unchanged",
+    "def slide_bootstrap_difference(new, old, B=4000, seed=SEED):",
+    "    \"\"\"Percentile interval for accuracy(new) - accuracy(old), resampling whole slides in each.\"\"\"",
+    "    rng = np.random.default_rng(seed)",
+    "    # Keep each slide's patches together: one array of 0s and 1s per slide",
+    "    new_slides = []",
+    "    for _, cases in new.groupby(\"slide_id\"):",
+    "        new_slides.append(cases[\"correct\"].to_numpy())",
+    "    old_slides = []",
+    "    for _, cases in old.groupby(\"slide_id\"):",
+    "        old_slides.append(cases[\"correct\"].to_numpy())",
+    "    differences = []",
+    "    for b in range(B):",
+    "        # Draw as many slides as each place has, with replacement",
+    "        new_pick = rng.integers(0, len(new_slides), len(new_slides))",
+    "        old_pick = rng.integers(0, len(old_slides), len(old_slides))",
+    "        # Pool the patches on the drawn slides and compute each accuracy",
+    "        new_accuracy = np.concatenate([new_slides[i] for i in new_pick]).mean()",
+    "        old_accuracy = np.concatenate([old_slides[i] for i in old_pick]).mean()",
+    "        differences.append(new_accuracy - old_accuracy)",
+    "    # The middle 95% of the 4,000 differences",
+    "    return np.percentile(differences, [2.5, 97.5])",
+    "",
+    "",
+    "low, high = slide_bootstrap_difference(hospital_4, benchmark)",
+    "print(f\"Hospital 4 minus benchmark: {hospital_4['correct'].mean() - benchmark['correct'].mean():+.3f} \"",
+    "      f\"(95% interval {low:+.3f} to {high:+.3f}, resampling slides)\")",
+    "",
+    "# Problem 2(d), part 2: accuracy within each brightness third",
+    "benchmark_dark = cut_into_groups(\"brightness\", 3, benchmark)",
+    "hospital_4_dark = cut_into_groups(\"brightness\", 3, hospital_4)",
+    "rows = []",
+    "for name in np.unique(benchmark_dark):",
+    "    in_benchmark = benchmark_dark == name",
+    "    in_hospital_4 = hospital_4_dark == name",
+    "    rows.append({\"brightness group\": name,",
+    "                 \"benchmark patches\": in_benchmark.sum(),",
+    "                 \"benchmark accuracy\": benchmark[\"correct\"].to_numpy()[in_benchmark].mean(),",
+    "                 \"hospital 4 patches\": in_hospital_4.sum(),",
+    "                 \"hospital 4 accuracy\": hospital_4[\"correct\"].to_numpy()[in_hospital_4].mean()})",
+    "display(pd.DataFrame(rows).round(3))",
+    "",
+    "",
+    "# Problem 2(d), part 3: resample whole slides for the primary analysis",
+    "def slide_bootstrap_reweighted(specification, B=2000, seed=SEED):",
+    "    \"\"\"B reweighted estimates, each from benchmark slides and hospital 4 slides drawn with replacement.\"\"\"",
+    "    rng = np.random.default_rng(seed)",
+    "    benchmark_slides = []",
+    "    for _, cases in benchmark.groupby(\"slide_id\"):",
+    "        benchmark_slides.append(cases)",
+    "    hospital_4_slides = []",
+    "    for _, cases in hospital_4.groupby(\"slide_id\"):",
+    "        hospital_4_slides.append(cases)",
+    "",
+    "    estimates = []",
+    "    for b in range(B):",
+    "        # Draw as many slides as each place has, with replacement",
+    "        benchmark_pick = rng.integers(0, len(benchmark_slides), len(benchmark_slides))",
+    "        hospital_4_pick = rng.integers(0, len(hospital_4_slides), len(hospital_4_slides))",
+    "        benchmark_sample = pd.concat([benchmark_slides[i] for i in benchmark_pick])",
+    "        hospital_4_sample = pd.concat([hospital_4_slides[i] for i in hospital_4_pick])",
+    "",
+    "        # Redo the reweighting on the resampled patches, with the same cut points",
+    "        by_group = accuracy_by_group(groups_for(specification, benchmark_sample),",
+    "                                     benchmark_sample[\"correct\"].to_numpy())",
+    "        shares = hospital_4_shares(groups_for(specification, hospital_4_sample))",
+    "        estimate, se, n_eff = reweight(by_group, shares)",
+    "        estimates.append(estimate)",
+    "    return np.array(estimates)",
+    "",
+    "",
+    "reweighted_estimates = slide_bootstrap_reweighted(\"0. primary: color thirds\")   # takes a few seconds",
+    "print(\"Primary analysis, resampling slides\")",
+    "print(\"  95% interval:\", np.round(np.quantile(reweighted_estimates, [0.025, 0.975]), 3))",
+    "print(\"  one-sided 95% lower bound (the 5th percentile):\", round(np.quantile(reweighted_estimates, 0.05), 3))",
+])
+
+HW6_P2A_RESPONSE = "\n".join([
+    "### Your response - Problem 2(a)",
+    "",
+    "**1. How hospital 4's patches differ from the benchmark's (2-3 sentences):**  ",
+    "TODO",
+    "",
+    "**2. Share outside the benchmark's range on each measure, and share in the benchmark's darkest third:**  ",
+    "TODO",
+])
+
+HW6_P2B_RESPONSE = "\n".join([
+    "### Your response - Problem 2(b)",
+    "",
+    "Fill in this table and save the notebook **before** you run part (c).",
+    "",
+    "| Alternative | What it changes about Z, compared with the primary | Why it is a reasonable choice | Higher or lower than the primary's estimate? | Will the decision change? |",
+    "|---|---|---|---|---|",
+    "| 1. color fifths | TODO | TODO | TODO | TODO |",
+    "| 2. brightness thirds | TODO | TODO | TODO | TODO |",
+    "| 3. brightness fifths | TODO | TODO | TODO | TODO |",
+    "| 4. color thirds and brightness thirds (9 groups) | TODO | TODO | TODO | TODO |",
+    "",
+    "**The alternative most likely to change the decision, and why:**  ",
+    "TODO",
+])
+
+HW6_P2C_RESPONSE = "\n".join([
+    "### Your response - Problem 2(c)",
+    "",
+    "**1.** Fill in the arguments marked `TODO` in `groups_for()` in the code cell above.",
+    "",
+    "**2. What `cut_into_groups()` does, what the loop computes for each specification, and which numbers use labels (3-4 sentences):**  ",
+    "TODO",
+    "",
+    "**3.** Fill in the `lower_bound` and `decision` columns in the code cell above.",
+    "",
+    "**4. Which specification, if any, changes the decision:**  ",
+    "TODO",
+    "",
+    "**5. Why the effective sample size falls as Z gets finer, and the group with the most hospital 4 patches:**  ",
+    "TODO",
+    "",
+    "**6. Which of your predictions in (b) came true, and which did not:**  ",
+    "TODO",
+])
+
+HW6_P2D_RESPONSE = "\n".join([
+    "### Your response - Problem 2(d)",
+    "",
+    "**1. Hospital 4's accuracy, its difference from the benchmark with the slide interval, and whether any specification predicted it:**  ",
+    "TODO",
+    "",
+    "**2. Which assumption failed, and how the brightness table shows it:**  ",
+    "TODO",
+    "",
+    "**3. The slide-resampled lower bound, and whether it would have warned hospital 4:**  ",
+    "TODO",
+    "",
+    "**4. What is wrong with reporting the specification closest to the labels (2 sentences):**  ",
+    "TODO",
+])
+
+HW6_P2E_RESPONSE = "\n".join([
+    "### Your response - Problem 2(e)",
+    "",
+    "**A paragraph for hospital 4's pathology lead (3-5 sentences, with every item in the list):**  ",
+    "TODO",
+])
+
+HW6_P3A_RESPONSE = "\n".join([
+    "### Your response - Problem 3(a)",
+    "",
+    "**My prompt:**  ",
+    "TODO",
+    "",
+    "**The assistant's complete response:**  ",
+    "TODO",
+    "",
+    "| Suggestion | Sensitivity analysis, model shopping, or either | Statistical reason |",
+    "|---|---|---|",
+    "| 1. TODO | TODO | TODO |",
+    "| 2. TODO | TODO | TODO |",
+    "| 3. TODO | TODO | TODO |",
+])
+
+HW6_P3B_RESPONSE = "\n".join([
+    "### Your response - Problem 3(b)",
+    "",
+    "**The most misleading suggestion and the problem with it, or why none is misleading (2-3 sentences):**  ",
+    "TODO",
+])
+
+HW6_P3C_RESPONSE = "\n".join([
+    "### Your response - Problem 3(c)",
+    "",
+    "**Primary analysis:**  ",
+    "TODO",
+    "",
+    "**One alternative, and why it is reasonable:**  ",
+    "TODO",
+    "",
+    "**The rule that turns the results into a decision:**  ",
+    "TODO",
+    "",
+    "**What I will report if the alternative gives a different decision:**  ",
+    "TODO",
+])
+
+HW6_AI_RECORD = HW4_AI_RECORD
+
+HW7_STARTER = '''# Read MT-Bench's judgments and keep this homework's half of the questions
+judge_dir = data_dir / "llm_judges"
+items = pd.read_csv(judge_dir / "items.csv")
+votes = pd.read_csv(judge_dir / "human_votes.csv")
+questions = pd.read_csv(judge_dir / "questions.csv", keep_default_na=False)
+answers = pd.read_csv(judge_dir / "answers.csv", keep_default_na=False)   # one answer is empty; keep it as ""
+
+items = items[items["half"] == "homework"].reset_index(drop=True)   # math, coding, extraction, humanities
+votes = votes.merge(items, on="item_id")                             # one row per expert vote, with its item's details
+print(f"{len(items):,} items from {items['question_id'].nunique()} questions in {items['category'].nunique()} categories")
+print(f"{len(votes):,} expert votes from {votes['judge'].nunique()} experts; {(items['n_human_votes'] >= 2).sum()} items have 2 or more")
+
+
+def answer_of(question_id, model, turn):
+    """One model's reply to one turn of one question."""
+    row = answers[(answers["question_id"] == question_id) & (answers["model"] == model) & (answers["turn"] == turn)]
+    return row["answer"].iloc[0]
+
+
+# Items from one question are related, so every interval resamples questions.
+question_ids = np.array(sorted(items["question_id"].unique()))
+'''
+
+HW7_P1_RESPONSES = {
+    "a": _hw4_p1_response("a", ["(i)", "(ii)", "(iii)"]),
+    "b": _hw4_p1_response("b", ["Agreement, chance agreement, and kappa", "Why agreement alone is a poor summary"]),
+    "c": _hw4_p1_response("c", ["(i)", "(ii)", "(iii)", "(iv)"]),
+    "d": _hw4_p1_response("d", ["(i)", "(ii)", "(iii)"]),
+    "e": _hw4_p1_response("e", ["(i)", "(ii)", "(iii)"]),
+}
+
+HW7_P2A_CODE = '''# Problem 2(a): two items where the experts split between the two models
+def show_item(item_id, characters=1000):
+    """Print an item's question, both answers (cut at `characters`), the expert votes, and GPT-4's verdict."""
+    item = items[items["item_id"] == item_id].iloc[0]
+    question = questions[questions["question_id"] == item["question_id"]].iloc[0]
+    print(f"Item {item_id}: question {item['question_id']} ({item['category']}), turn {item['turn']}")
+    if item["turn"] == 2:
+        print("The user's first message:", question["turn_1"][:characters])
+    print("The message being answered:", question[f"turn_{item['turn']}"][:characters])
+    for label in ["model_1", "model_2"]:
+        print(f"\\n--- {label}: {item[label]} ---")
+        print(answer_of(item["question_id"], item[label], item["turn"])[:characters])
+    print("\\nExpert votes:", votes[votes["item_id"] == item_id]["vote"].tolist())
+    agreed = "the two orders agreed" if item["gpt4_orders_agree"] else "the two orders disagreed"
+    print(f"GPT-4: {item['gpt4_verdict']} ({agreed})")
+    print("=" * 80)
+
+
+vote_sets = votes.groupby("item_id")["vote"].agg(set)
+split_items = sorted(i for i, s in vote_sets.items() if {"model_1", "model_2"} <= s)
+print(len(split_items), "items have votes for both models")
+looked_at = np.random.default_rng(SEED).choice(split_items, size=2, replace=False)
+for item_id in looked_at:
+    show_item(item_id)
+'''
+
+HW7_P2B_CODE = '''# Problem 2(b): agreement corrected for chance, expert with expert and GPT-4 with expert
+CATEGORIES = ["model_1", "model_2", "tie"]
+
+
+def kappa(first, second, pooled=False):
+    """Observed agreement, chance agreement, and kappa for two equally long lists of votes."""
+    first, second = np.asarray(first), np.asarray(second)
+    observed = np.mean(first == second)
+    if pooled:
+        # Two experts on the same item are interchangeable, so both use the shares of all their votes together.
+        shares = pd.Series(np.concatenate([first, second])).value_counts(normalize=True)
+        share_first, share_second = shares, shares
+    else:
+        # GPT-4 and the experts each have their own shares.
+        share_first = pd.Series(first).value_counts(normalize=True)
+        share_second = pd.Series(second).value_counts(normalize=True)
+    # TODO (Problem 2(b)1): the chance agreement, as in Problem 1(a) but with three categories.
+    # For a category c, share_first.get(c, 0) is the first rater's share of votes for c.
+    chance = None
+    if chance is None:
+        raise NotImplementedError("Finish the chance-agreement line in kappa() (Problem 2(b)1), then run this cell again.")
+    return observed, chance, (observed - chance) / (1 - chance)
+
+
+# Every pair of experts who judged the same item
+rows = []
+for item_id, group in votes.groupby("item_id"):
+    item_votes = group["vote"].tolist()
+    for i in range(len(item_votes)):
+        for j in range(i + 1, len(item_votes)):
+            rows.append({"item_id": item_id, "question_id": group["question_id"].iloc[0],
+                         "first": item_votes[i], "second": item_votes[j]})
+expert_pairs = pd.DataFrame(rows)
+
+
+def kappa_experts(pairs):
+    return kappa(pairs["first"], pairs["second"], pooled=True)
+
+
+def kappa_gpt4(expert_votes):
+    return kappa(expert_votes["gpt4_verdict"], expert_votes["vote"])
+
+
+def resample_kappas(pairs, expert_votes, B=2000, seed=SEED):
+    """Kappa for experts, kappa for GPT-4, and their difference, resampling whole questions B times."""
+    rng = np.random.default_rng(seed)
+    pair_parts = {q: part for q, part in pairs.groupby("question_id")}
+    vote_parts = {q: part for q, part in expert_votes.groupby("question_id")}
+    ids = np.array(sorted(vote_parts))
+    results = []
+    for _ in range(B):
+        drawn = rng.choice(ids, size=len(ids), replace=True)
+        k_experts = kappa_experts(pd.concat([pair_parts[q] for q in drawn if q in pair_parts]))[2]
+        k_gpt4 = kappa_gpt4(pd.concat([vote_parts[q] for q in drawn]))[2]
+        results.append((k_experts, k_gpt4, k_gpt4 - k_experts))
+    return np.array(results)
+
+
+resampled = resample_kappas(expert_pairs, votes)
+table = []
+for column, (name, data, statistic) in enumerate([("expert with expert", expert_pairs, kappa_experts),
+                                                   ("GPT-4 with expert", votes, kappa_gpt4)]):
+    observed, chance, k = statistic(data)
+    low, high = np.percentile(resampled[:, column], [2.5, 97.5])
+    table.append({"comparison": name, "n": len(data), "agreement": observed, "chance": chance,
+                  "kappa": k, "2.5%": low, "97.5%": high})
+display(pd.DataFrame(table).round(3))
+low, high = np.percentile(resampled[:, 2], [2.5, 97.5])
+print(f"Difference in kappa, GPT-4 minus experts: {table[1]['kappa'] - table[0]['kappa']:+.3f} (95% interval {low:+.3f} to {high:+.3f})")
+print(f"{expert_pairs['item_id'].nunique()} items have a pair of experts, from {expert_pairs['question_id'].nunique()} questions")
+'''
+
+HW7_P2C_CODE = '''# Problem 2(c): the same comparison within each category (10 questions each)
+rows = []
+for category in sorted(items["category"].unique()):
+    category_pairs = expert_pairs[expert_pairs["item_id"].isin(items.loc[items["category"] == category, "item_id"])]
+    category_votes = votes[votes["category"] == category]
+    k_experts = kappa_experts(category_pairs)[2]
+    k_gpt4 = kappa_gpt4(category_votes)[2]
+    low, high = np.percentile(resample_kappas(category_pairs, category_votes, B=1000)[:, 2], [2.5, 97.5])
+    rows.append({"category": category, "questions": category_votes["question_id"].nunique(),
+                 "expert pairs": len(category_pairs), "expert votes": len(category_votes),
+                 "expert kappa": k_experts, "GPT-4 kappa": k_gpt4,
+                 "difference": k_gpt4 - k_experts, "2.5%": low, "97.5%": high})
+by_category = pd.DataFrame(rows)
+display(by_category.round(3))
+
+# The difference in kappa for each category, with its interval and a line at 0
+fig, ax = plt.subplots(figsize=(7, 3))
+y = np.arange(len(by_category))
+ax.hlines(y, by_category["2.5%"], by_category["97.5%"], color="#5b8db8", linewidth=3)
+ax.plot(by_category["difference"], y, "o", color="#155a8a")
+ax.axvline(0, color="#333333", linewidth=1)
+ax.set_yticks(y)
+ax.set_yticklabels(by_category["category"])
+ax.set_xlabel("GPT-4's kappa minus the experts' kappa, with 95% interval")
+ax.spines[["top", "right"]].set_visible(False)
+plt.tight_layout()
+plt.show()
+'''
+
+HW7_P2D_CODE = '''# Problem 2(d): how often GPT-4's two orders disagree, and how that depends on the pair of models
+flipped = ~items["gpt4_orders_agree"]
+flip_rate = flipped.mean()
+naive_se = np.sqrt(flip_rate * (1 - flip_rate) / len(items))    # as if the 1,200 items were independent
+
+rng = np.random.default_rng(SEED)
+flip_parts = {q: part["gpt4_orders_agree"].to_numpy() for q, part in items.groupby("question_id")}
+resampled_flips = []
+for _ in range(2000):
+    drawn = rng.choice(question_ids, size=len(question_ids), replace=True)
+    resampled_flips.append(1 - np.concatenate([flip_parts[q] for q in drawn]).mean())
+low, high = np.percentile(resampled_flips, [2.5, 97.5])
+print(f"GPT-4's orders disagree on {flipped.sum()} of {len(items)} items: {flip_rate:.3f} (95% interval {low:.3f} to {high:.3f})")
+print(f"SE resampling questions {np.std(resampled_flips):.4f}; as if items were independent {naive_se:.4f}; design effect {(np.std(resampled_flips) / naive_se) ** 2:.2f}")
+
+# Each model's strength: its share of the expert votes it took part in, counting a tie as half a win
+wins = pd.concat([
+    votes.assign(model=votes["model_1"], won=(votes["vote"] == "model_1") + 0.5 * (votes["vote"] == "tie")),
+    votes.assign(model=votes["model_2"], won=(votes["vote"] == "model_2") + 0.5 * (votes["vote"] == "tie")),
+])
+strength = wins.groupby("model")["won"].mean().sort_values()
+print("\\nEach model's share of expert votes won (a tie counts as half):")
+print(strength.round(3).to_string())
+rank = {model: position for position, model in enumerate(strength.index, start=1)}
+items["rank gap"] = (items["model_1"].map(rank) - items["model_2"].map(rank)).abs()
+votes["rank gap"] = votes["item_id"].map(items.set_index("item_id")["rank gap"])
+
+by_gap = pd.DataFrame({
+    "items": items.groupby("rank gap").size(),
+    "flip rate": 1 - items.groupby("rank gap")["gpt4_orders_agree"].mean(),
+    "expert votes": votes.groupby("rank gap").size(),
+    "GPT-4 agrees with expert": (votes["gpt4_verdict"] == votes["vote"]).groupby(votes["rank gap"]).mean(),
+})
+display(by_gap.round(3))
+'''
+
+HW7_P2E_CODE = '''# Problem 2(e): how often a verdict for one answer goes to the longer answer
+length = answers.assign(chars=answers["answer"].str.len()).set_index(["question_id", "model", "turn"])["chars"]
+
+
+def longer_share(table, verdict_column):
+    """Among verdicts that pick a winner (answers of different lengths), the share that pick the longer answer."""
+    length_1 = np.array([length[(q, m, t)] for q, m, t in zip(table["question_id"], table["model_1"], table["turn"])])
+    length_2 = np.array([length[(q, m, t)] for q, m, t in zip(table["question_id"], table["model_2"], table["turn"])])
+    verdict = table[verdict_column].to_numpy()
+    keep = np.isin(verdict, ["model_1", "model_2"]) & (length_1 != length_2)
+    picked_longer = np.where(verdict == "model_1", length_1 > length_2, length_2 > length_1)
+    return picked_longer[keep].mean(), keep.sum()
+
+
+for name, table, column in [("experts", votes, "vote"), ("GPT-4", items, "gpt4_verdict")]:
+    share, n = longer_share(table, column)
+    print(f"{name}: {share:.3f} of {n} verdicts that pick a winner pick the longer answer")
+'''
+
+HW7_P2F_CODE = '''# Problem 2(f): how much of the experts' disagreement is between items, and the reliability of a panel
+# Code each vote +1 (model_1), -1 (model_2), or 0 (tie), and use items with 2 or more votes.
+scored = votes.assign(score=votes["vote"].map({"model_1": 1.0, "model_2": -1.0, "tie": 0.0}))
+scored = scored[scored.groupby("item_id")["score"].transform("size") >= 2]
+by_item = scored.groupby("item_id")["score"]
+n_i = by_item.size()
+N, k = n_i.sum(), len(n_i)
+
+# One-way random-effects ANOVA: the within-item mean square estimates sigma^2,
+# and the between-item mean square estimates sigma^2 + n0 * tau^2.
+sigma2 = ((scored["score"] - by_item.transform("mean")) ** 2).sum() / (N - k)
+between = (n_i * (by_item.mean() - scored["score"].mean()) ** 2).sum() / (k - 1)
+n0 = (N - (n_i ** 2).sum() / N) / (k - 1)          # the average number of votes per item, adjusted for unequal counts
+tau2 = (between - sigma2) / n0
+rho = tau2 / (tau2 + sigma2)
+print(f"{k} items, {N} votes: tau^2 = {tau2:.3f}, sigma^2 = {sigma2:.3f}, rho = {rho:.3f}")
+for r in range(1, 6):
+    print(f"  {r} expert(s) per item: reliability {r * rho / (1 + (r - 1) * rho):.3f}")
+'''
+
+HW7_P3A_CODE = '''# Problem 3(a): five assigned items (the same for everyone) and a judging prompt for each order
+PROMPT = """You are judging two answers to the same question. Decide which answer is more helpful, correct, and relevant to the question. Do not let the order of the answers, their length, or their style decide for you. Reply with one line: A, B, or tie.
+
+[Question]
+{question}
+
+[Answer A]
+{answer_a}
+
+[Answer B]
+{answer_b}"""
+
+# Turn-1 items from pairs of models close in strength (where Problem 2(d) found most flips), on which
+# the experts did not all agree, short enough to paste, and not the two items from Problem 2(a).
+experts_split = votes.groupby("item_id")["vote"].nunique() > 1
+pool = items[(items["turn"] == 1) & (items["rank gap"] <= 2) & items["item_id"].map(experts_split).fillna(False)
+             & ~items["item_id"].isin(looked_at)].copy()
+pool["characters"] = [len(answer_of(q, a, 1)) + len(answer_of(q, b, 1))
+                      for q, a, b in zip(pool["question_id"], pool["model_1"], pool["model_2"])]
+assigned = pool[pool["characters"] <= 2500].sample(5, random_state=SEED).sort_values("item_id")
+order_rng = np.random.default_rng(SEED + 3)
+assigned["run first"] = order_rng.choice(["model_1 as A", "model_2 as A"], size=len(assigned))
+display(assigned[["item_id", "category", "model_1", "model_2", "run first"]])
+
+for _, item in assigned.iterrows():
+    question = questions.loc[questions["question_id"] == item["question_id"], "turn_1"].iloc[0]
+    answer_1 = answer_of(item["question_id"], item["model_1"], 1)
+    answer_2 = answer_of(item["question_id"], item["model_2"], 1)
+    print("#" * 80)
+    print(f"Item {item['item_id']}. Run first: {item['run first']}")
+    print("\\n--- Prompt with model_1 as A ---\\n")
+    print(PROMPT.format(question=question, answer_a=answer_1, answer_b=answer_2))
+    print("\\n--- Prompt with model_2 as A ---\\n")
+    print(PROMPT.format(question=question, answer_a=answer_2, answer_b=answer_1))
+'''
+
+HW7_P3C_CODE = '''# Problem 3(c): the experts' votes and GPT-4's cached verdicts for the five assigned items
+reveal = assigned[["item_id", "category", "model_1", "model_2", "gpt4_verdict", "gpt4_orders_agree"]].copy()
+reveal["expert votes"] = [votes.loc[votes["item_id"] == i, "vote"].tolist() for i in reveal["item_id"]]
+display(reveal)
+'''
+
+HW7_P2A_RESPONSE = """### Your response - Problem 2(a)
+
+**What the experts might be disagreeing about (2-3 sentences):**
+TODO
+"""
+
+HW7_P2B_RESPONSE = """### Your response - Problem 2(b)
+
+**1.** Finish the chance-agreement line in `kappa()` in the code cell above.
+
+**2. The table** (agreement, chance agreement, kappa and its 95% interval for each comparison, and the difference with its interval):
+TODO
+
+**3. Why the interval resamples questions:**
+TODO
+
+**4. Can GPT-4 stand in for one expert? (2 sentences, citing the interval for the difference):**
+TODO
+"""
+
+HW7_P2C_RESPONSE = """### Your response - Problem 2(c)
+
+**1. The pattern across categories, with denominators:**
+TODO
+
+**2. How firmly you can claim it, and the connection to the winner's curse:**
+TODO
+"""
+
+HW7_P2D_RESPONSE = """### Your response - Problem 2(d)
+
+**1. Flip rate, interval, design effect, and why the design effect is above 1:**
+TODO
+
+**2. How flips and agreement change with the rank gap, and why close comparisons may be harder:**
+TODO
+
+**3. What a client comparing models one rank apart should expect, and what it says about the overall figure:**
+TODO
+"""
+
+HW7_P2E_RESPONSE = """### Your response - Problem 2(e)
+
+**1. The share for experts and for GPT-4:**
+TODO
+
+**2. How two judges can agree without either being right, and what would check a verdict (2 sentences):**
+TODO
+"""
+
+HW7_P2F_RESPONSE = """### Your response - Problem 2(f)
+
+**A paragraph for the benchmark team (3-5 sentences):**
+TODO
+
+**Design table for a follow-up study in which experts label new items:**
+
+| Design term | Your study |
+|---|---|
+| Unit | TODO |
+| Treatments | TODO |
+| Held constant | TODO |
+| Block | TODO |
+| Related groups | TODO |
+| Randomization | TODO |
+| Response | TODO |
+| Number of items and experts per item, with a reason | TODO |
+"""
+
+HW7_P2G_RESPONSE = """### Your response - Problem 2(g), stretch
+
+**Your rule for the panel's verdict (including ties), stated before running anything:**
+TODO
+
+**Your code (in a code cell below this one) and what it found:**
+TODO
+
+**What you find, explained with Problem 1(c):**
+TODO
+"""
+
+HW7_P3A_RESPONSE = """### Your response - Problem 3(a)
+
+**My prediction, recorded before running any AI: the item most likely to flip, and why:**
+TODO
+"""
+
+HW7_P3B_RESPONSE = """### Your response - Problem 3(b)
+
+**Assistant and version:** TODO
+
+| Item | Run first | Verdict with model_1 as A | Verdict with model_2 as A | Same model both times? |
+|---|---|---|---|---|
+| TODO | TODO | TODO | TODO | TODO |
+| TODO | TODO | TODO | TODO | TODO |
+| TODO | TODO | TODO | TODO | TODO |
+| TODO | TODO | TODO | TODO | TODO |
+| TODO | TODO | TODO | TODO | TODO |
+
+Translate each verdict to the model it picked: with model_1 as A, "A" means model_1; with model_2 as A, "A" means model_2.
+"""
+
+HW7_P3C_RESPONSE = """### Your response - Problem 3(c)
+
+**What your 10 calls showed (2 sentences):**
+TODO
+
+**For the benchmark team: what a study would need before it trusts your assistant as a judge (one paragraph, 5-7 sentences, one idea from each week):**
+TODO
+
+Check that your paragraph covers each week:
+
+| Week | The idea you used |
+|---|---|
+| 4: the unit and the sample size (how many items for an SE of about 0.03, and what clustering does) | TODO |
+| 5 and 12: the comparison with a second rater | TODO |
+| 9: whether the result carries over | TODO |
+| 11: the design (held constant, randomized) | TODO |
+| 12: the order of the answers | TODO |
+"""
+
+HW7_AI_RECORD = HW4_AI_RECORD
+
+STARTER_LINES["hw07"] = HW7_STARTER.rstrip("\n").splitlines()
+
+
 SPECIAL_RESPONSES = {
     ("hw01", "3", "a"): HW1_P3A_RESPONSE,
     ("hw01", "3", "b"): HW1_P3B_RESPONSE,
@@ -1254,6 +2021,33 @@ SPECIAL_RESPONSES = {
     ("hw05", "3", "a"): HW5_P3A_RESPONSE,
     ("hw05", "3", "b"): HW5_P3B_RESPONSE,
     ("hw05", "3", "c"): HW5_P3C_RESPONSE,
+    ("hw06", "1", "a"): HW6_P1_RESPONSES["a"],
+    ("hw06", "1", "b"): HW6_P1_RESPONSES["b"],
+    ("hw06", "1", "c"): HW6_P1_RESPONSES["c"],
+    ("hw06", "1", "d"): HW6_P1_RESPONSES["d"],
+    ("hw06", "2", "a"): HW6_P2A_RESPONSE,
+    ("hw06", "2", "b"): HW6_P2B_RESPONSE,
+    ("hw06", "2", "c"): HW6_P2C_RESPONSE,
+    ("hw06", "2", "d"): HW6_P2D_RESPONSE,
+    ("hw06", "2", "e"): HW6_P2E_RESPONSE,
+    ("hw06", "3", "a"): HW6_P3A_RESPONSE,
+    ("hw06", "3", "b"): HW6_P3B_RESPONSE,
+    ("hw06", "3", "c"): HW6_P3C_RESPONSE,
+    ("hw07", "1", "a"): HW7_P1_RESPONSES["a"],
+    ("hw07", "1", "b"): HW7_P1_RESPONSES["b"],
+    ("hw07", "1", "c"): HW7_P1_RESPONSES["c"],
+    ("hw07", "1", "d"): HW7_P1_RESPONSES["d"],
+    ("hw07", "1", "e"): HW7_P1_RESPONSES["e"],
+    ("hw07", "2", "a"): HW7_P2A_RESPONSE,
+    ("hw07", "2", "b"): HW7_P2B_RESPONSE,
+    ("hw07", "2", "c"): HW7_P2C_RESPONSE,
+    ("hw07", "2", "d"): HW7_P2D_RESPONSE,
+    ("hw07", "2", "e"): HW7_P2E_RESPONSE,
+    ("hw07", "2", "f"): HW7_P2F_RESPONSE,
+    ("hw07", "2", "g"): HW7_P2G_RESPONSE,
+    ("hw07", "3", "a"): HW7_P3A_RESPONSE,
+    ("hw07", "3", "b"): HW7_P3B_RESPONSE,
+    ("hw07", "3", "c"): HW7_P3C_RESPONSE,
 }
 
 SPECIAL_CODE_BEFORE_RESPONSE = {
@@ -1273,6 +2067,17 @@ SPECIAL_CODE_BEFORE_RESPONSE = {
     ("hw05", "2", "c"): HW5_P2C_CODE,
     ("hw05", "2", "d"): HW5_P2D_CODE,
     ("hw05", "2", "e"): HW5_P2E_CODE,
+    ("hw06", "2", "a"): HW6_P2A_CODE,
+    ("hw06", "2", "c"): HW6_P2C_CODE,
+    ("hw06", "2", "d"): HW6_P2D_CODE,
+    ("hw07", "2", "a"): HW7_P2A_CODE,
+    ("hw07", "2", "b"): HW7_P2B_CODE,
+    ("hw07", "2", "c"): HW7_P2C_CODE,
+    ("hw07", "2", "d"): HW7_P2D_CODE,
+    ("hw07", "2", "e"): HW7_P2E_CODE,
+    ("hw07", "2", "f"): HW7_P2F_CODE,
+    ("hw07", "3", "a"): HW7_P3A_CODE,
+    ("hw07", "3", "c"): HW7_P3C_CODE,
 }
 
 FINAL = "\n".join([
@@ -1320,7 +2125,7 @@ def problem_cells(problem: str, hw_id: str) -> list[dict]:
     if not heading_match:
         return [markdown_cell(problem), markdown_cell(RESPONSE.format(label="problem"))]
     heading, body = heading_match.groups()
-    subpart_pattern = r"(?=^[a-f]\.\s)" if hw_id == "hw03" else r"(?=^[a-e]\.\s)"
+    subpart_pattern = {"hw03": r"(?=^[a-f]\.\s)", "hw07": r"(?=^[a-g]\.\s)"}.get(hw_id, r"(?=^[a-e]\.\s)")
     pieces = re.split(subpart_pattern, body, flags=re.M)
     introduction = pieces[0].strip()
     cells = [markdown_cell(heading + ("\n\n" + introduction if introduction else ""))]
@@ -1330,7 +2135,7 @@ def problem_cells(problem: str, hw_id: str) -> list[dict]:
     problem_number = re.search(r"Problem (\d+)", heading).group(1)
     for piece in pieces[1:]:
         piece = piece.strip()
-        letter = re.match(r"([a-f])\.", piece).group(1)
+        letter = re.match(r"([a-g])\.", piece).group(1)
         cells.append(markdown_cell(piece))
         special_code = SPECIAL_CODE_BEFORE_RESPONSE.get(
             (hw_id, problem_number, letter)
@@ -1371,13 +2176,14 @@ def build_notebook(qmd_path: Path, hw_id: str, label: str) -> dict:
                 cell["source"] = ("".join(cell["source"]) + HW3_AI_TABLE).splitlines(True)
                 break
         cells.append(markdown_cell(HW3_AI_APPENDIX))
-    if hw_id in ("hw04", "hw05"):
+    if hw_id in ("hw04", "hw05", "hw06", "hw07"):
         for cell in cells:
             text = "".join(cell["source"])
             if cell["cell_type"] == "markdown" and "## Required AI-use record" in text:
                 cell["source"] = text.split("## Required AI-use record")[0].rstrip().splitlines(True)
                 break
-        cells.append(markdown_cell(HW4_AI_RECORD if hw_id == "hw04" else HW5_AI_RECORD))
+        records = {"hw04": HW4_AI_RECORD, "hw05": HW5_AI_RECORD, "hw06": HW6_AI_RECORD, "hw07": HW7_AI_RECORD}
+        cells.append(markdown_cell(records[hw_id]))
     cells.append(markdown_cell(FINAL))
     for index, cell in enumerate(cells):
         cell["id"] = f"{hw_id}-{index:03d}"

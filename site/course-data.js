@@ -17,7 +17,7 @@ const siteSettings = {
   // "beta": show Weeks 1 through betaThroughWeek with every link open, for testers.
   moduleReleaseMode: "beta",
   previewWeek: 2,
-  betaThroughWeek: 9
+  betaThroughWeek: 12
 };
 
 // Helpers so each week below stays short.
@@ -96,9 +96,32 @@ const weeklyMaterials = [
     lab: notebook("weeks/week09/lab_starter.ipynb", "2027-03-18"),
     data: [dataRelease("Camelyon17 data", "camelyon17")]
   },
-  { week: 10, dates: "Mar 23 / 25", publishDate: "2027-03-21", topic: "Sensitivity analysis", note: "Project Milestone 1 due Mar 23" },
-  { week: 11, dates: "Mar 30 / Apr 1", publishDate: "2027-03-28", topic: "Designed AI evaluations" },
-  { week: 12, dates: "Apr 6 / 8", publishDate: "2027-04-04", topic: "LLM judges as measurement instruments", note: "Project Milestone 2 due Apr 6" },
+  {
+    week: 10, dates: "Mar 23 / 25", publishDate: "2027-03-21",
+    topic: "Sensitivity analysis",
+    note: "Project Milestone 1 due Mar 23",
+    slides: slides("week10"),
+    lab: notebook("weeks/week10/lab_starter.ipynb", "2027-03-25"),
+    homework: { label: "HW6", due: "Mar 30", pdf: `${courseLinks.publicBlob}/weeks/week10/hw06.pdf`, links: notebook("weeks/week10/hw06_starter.ipynb", "2027-03-25"), openDate: "2027-03-25" },
+    data: [dataRelease("Camelyon17 data", "camelyon17")]
+  },
+  {
+    week: 11, dates: "Mar 30 / Apr 1", publishDate: "2027-03-28",
+    topic: "Designed AI evaluations",
+    note: "No homework; project work session Thu Apr 1",
+    slides: slides("week11"),
+    lab: notebook("weeks/week11/lab_starter.ipynb", "2027-04-01"),
+    data: [dataRelease("GSM8K answers data", "llm_gsm8k")]
+  },
+  {
+    week: 12, dates: "Apr 6 / 8", publishDate: "2027-04-04",
+    topic: "LLM judges as measurement instruments",
+    note: "Project Milestone 2 due Apr 6",
+    slides: slides("week12"),
+    lab: notebook("weeks/week12/lab_starter.ipynb", "2027-04-08"),
+    homework: { label: "HW7", due: "Apr 13", pdf: `${courseLinks.publicBlob}/weeks/week12/hw07.pdf`, links: notebook("weeks/week12/hw07_starter.ipynb", "2027-04-08"), openDate: "2027-04-08" },
+    data: [dataRelease("MT-Bench judgments data", "llm_judges")]
+  },
   { week: 13, dates: "Apr 13", publishDate: "2027-04-11", topic: "Human-centered and responsible AI", note: "Guest lecture Tue · no class Thu (Spring Carnival)" },
   { week: 14, dates: "Apr 20 / 22", publishDate: "2027-04-18", topic: "Statistical argument and recommendation", note: "Project Milestone 3 due Apr 20" },
   { week: 15, dates: "Apr 27 / 29", publishDate: "2027-04-25", topic: "Oral defenses and course synthesis", note: "Slides and video due Sun Apr 25" }

@@ -1,0 +1,285 @@
+---
+title: "Lab 10: How Wrong Could the Reweighting Be?"
+subtitle: "Week 10 · Camelyon17 tissue slides, continued"
+format: html
+---
+
+## The situation
+
+In Lab 9, reweighting by stain color predicted that the tumor model would be right on about 91% of hospital 5's patches. Suppose hospital 5 decided, before seeing any results, to use the model only if its accuracy on hospital 5's patches is at least 85%. Reweighting says yes.
+
+Reweighting assumes that, within each color group, the model does as well on hospital 5's patches as on the benchmark's. Today you ask how wrong that assumption would have to be to change the decision, whether a gap that large is plausible, and whether hospital 5 should label some of its own patches before deciding. You answer these before you look at hospital 5's labels, and then you check.
+
+As in Lab 9, the patches are about half tumor, so the accuracies here describe this balanced mix.
+
+## 1. Instructor run: reweight to hospital 5
+
+**Why this step:** this is Lab 9's reweighting, packed into one function, `reweight_to()`, so that you can reuse it in part 3 with any benchmark and any client.
+
+```{python}
+#| eval: false
+# Additional library for this lab
+from statsmodels.stats.proportion import proportion_confint
+
+# Read the patch table and the images, as in Lab 9.
+c17_dir = data_dir / "camelyon17"
+patches = pd.read_csv(c17_dir / "patches.csv")
+images = np.load(c17_dir / "patches.npz")["images"]
+patches["correct"] = (patches["predicted_tumor"] == patches["label"]).astype(int)
+
+# Blue minus red for each patch, averaged over its pixels (Lab 9, part 3)
+blue_minus_red = []
+for i in range(len(images)):
+    pixels = images[i].astype(float)
+    blue_minus_red.append(np.mean(pixels[:, :, 2] - pixels[:, :, 0]))
+patches["blue_minus_red"] = blue_minus_red
+
+benchmark = patches[patches["group"] == "benchmark"]
+hospital_5 = patches[patches["group"] == "hospital 5"]
+
+
+# Lab 9's two functions, unchanged
+def accuracy_by_group(groups, correct):
+    """One row per group: cases, the benchmark's share, and accuracy with a Wilson interval."""
+    table = pd.DataFrame({"group": groups, "correct": correct})
+    total = len(table)
+    rows = []
+    for group_name, cases in table.groupby("group"):
+        n = len(cases)                       # cases in this group
+        right = int(cases["correct"].sum())  # cases the model got right
+        low, high = proportion_confint(right, n, method="wilson")
+        rows.append({"group": group_name, "cases": n, "benchmark_share": n / total,
+                     "accuracy": right / n, "ci_low": low, "ci_high": high})
+    return pd.DataFrame(rows).sort_values("accuracy").reset_index(drop=True)
+
+
+def reweight(by_group, shares):
+    """Accuracy for a mix of groups, its standard error, and Kish's effective sample size."""
+    total_share = sum(shares.values())
+    estimate = 0.0
+    variance = 0.0
+    weight_sum = 0.0
+    for _, row in by_group.iterrows():
+        share = shares.get(row["group"], 0.0) / total_share  # shares are rescaled to add to 1
+        p = row["accuracy"]
+        n = row["cases"]
+        estimate = estimate + share * p                   # share times accuracy, added up as in the table
+        variance = variance + share**2 * p * (1 - p) / n  # each group's variance, times its share squared
+        weight_sum = weight_sum + share**2 / n            # used for Kish's effective sample size
+    return estimate, np.sqrt(variance), 1 / weight_sum
+
+
+def reweight_to(reference, client):
+    """Reweight the reference's accuracy to the client's mix of color thirds.
+
+    The thirds are cut at the reference's 1/3 and 2/3 points. Only the reference's
+    labels are used; the client's patches are only sorted into groups.
+    """
+    cut_points = np.quantile(reference["blue_minus_red"], [1 / 3, 2 / 3])
+    reference_groups = np.digitize(reference["blue_minus_red"], cut_points)
+    client_groups = np.digitize(client["blue_minus_red"], cut_points)
+    by_group = accuracy_by_group(reference_groups, reference["correct"].to_numpy())
+    shares = {}
+    for group in np.unique(client_groups):
+        shares[group] = np.mean(client_groups == group)
+    estimate, se, n_eff = reweight(by_group, shares)
+    return estimate
+
+
+reweighted_5 = reweight_to(benchmark, hospital_5)
+print(f"Benchmark accuracy:               {benchmark['correct'].mean():.3f}")
+print(f"Reweighted to hospital 5's colors: {reweighted_5:.3f}")
+```
+
+The two numbers are almost the same. That could mean several things. Hospital 5's colors might look like the benchmark's. Or they might differ a lot while the model is about equally accurate in every color group. Look at the colors and the groups before deciding which.
+
+```{python}
+#| eval: false
+# Blue minus red, benchmark against hospital 5, with the benchmark's thirds marked
+cut_points = np.quantile(benchmark["blue_minus_red"], [1 / 3, 2 / 3])
+bins = np.linspace(patches["blue_minus_red"].min(), patches["blue_minus_red"].max(), 40)   # the same bins for both
+plt.hist(benchmark["blue_minus_red"], bins=bins, alpha=0.6, density=True, color="#8a8a85", label="benchmark (hospitals 1-3)")
+plt.hist(hospital_5["blue_minus_red"], bins=bins, alpha=0.6, density=True, color="#d95926", label="hospital 5")
+for cut in cut_points:
+    plt.axvline(cut, color="black", linestyle=":", linewidth=1)   # the benchmark's 1/3 and 2/3 points
+plt.xlabel("blue minus red (larger is bluer)")
+plt.legend()
+plt.show()
+
+# Each color third: the benchmark's accuracy, and each hospital's share of patches
+benchmark_groups = np.digitize(benchmark["blue_minus_red"], cut_points)
+hospital_5_groups = np.digitize(hospital_5["blue_minus_red"], cut_points)
+names = ["1 least blue", "2 middle", "3 most blue"]
+rows = []
+for group in [0, 1, 2]:
+    rows.append({"color group": names[group],
+                 "benchmark accuracy": benchmark["correct"].to_numpy()[benchmark_groups == group].mean(),
+                 "benchmark share": np.mean(benchmark_groups == group),
+                 "hospital 5 share": np.mean(hospital_5_groups == group)})
+display(pd.DataFrame(rows).round(3))
+```
+
+Use the histogram and the table to say which explanation fits here. Why did reweighting barely move the estimate, and what does the histogram show that the table hides?
+
+**Your answer:** TODO
+
+## 2. The tipping point
+
+**Why this step:** reweighting assumed that, within each color group, the model is as accurate on hospital 5's patches as on the benchmark's. Suppose instead it does worse by $\delta$ in every group ($\delta$ is negative when the model is worse). Keep the true accuracies and their estimates apart:
+
+- $\theta_5$ is hospital 5's **true** accuracy, the share of all its patches the model would get right.
+- $p_k$ is the benchmark's true accuracy in color group $k$, and $c_k$ is hospital 5's share of patches in group $k$.
+- $\theta_{\text{rw}}=\sum_k c_k\,p_k$ is what reweighting estimates. Its estimate from part 1 is $\hat\theta_{\text{rw}}=0.911$, and $E[\hat\theta_{\text{rw}}]=\theta_{\text{rw}}$.
+
+If hospital 5's accuracy in each group is $p_k+\delta$, then
+
+$$\theta_5=\sum_k c_k\,(p_k+\delta)=\theta_{\text{rw}}+\delta,$$
+
+because the shares $c_k$ add to 1. The benchmark says nothing about $\delta$, so treat it as a sensitivity parameter: try values of $\delta$ and see what happens to the decision. Using the estimate $\hat\theta_{\text{rw}}$ in place of $\theta_{\text{rw}}$, hospital 5's estimated accuracy is $\hat\theta_{\text{rw}}+\delta$, and the decision holds when that is at least hospital 5's line, $\tau=0.85$. The **tipping point** $\delta^\ast$ is the most negative gap the decision survives:
+
+$$\delta^\ast=\min\bigl\{\delta:\ \hat\theta_{\text{rw}}+\delta\ge\tau\bigr\}=\tau-\hat\theta_{\text{rw}}.$$
+
+It is a minimum because a negative $\delta$ means the model does worse. Any gap below $\delta^\ast$ puts the estimated accuracy under the line. This ignores the sampling error in $\hat\theta_{\text{rw}}$; part 3 is about how big $\delta$ itself tends to be.
+
+```{python}
+#| eval: false
+threshold = 0.85   # tau, hospital 5's line, set before seeing results
+tipping_point = threshold - reweighted_5
+print(f"Tipping point: delta* = {tipping_point:+.3f}")
+```
+
+In one sentence, say what this tipping point means for hospital 5, in points of accuracy.
+
+**Your answer:** TODO
+
+## 3. How big is the gap usually? Leave one benchmark hospital out
+
+**Why this step:** the benchmark has three hospitals of its own. Pretend each one in turn is the new hospital. Reweight the other two to its colors, then compare with its own labels. The difference, its accuracy minus the reweighted prediction, is an estimate $\hat\delta$ of that hospital's $\delta$. This is cross-validation with hospitals as the folds: each fold measures how far off reweighting is at a hospital it has not seen. Each hospital has 300 patches, so sampling noise alone moves $\hat\delta$ by only about 2 points. Using these gaps for hospital 5 has an assumption of its own: that hospital 5 is like hospitals 1 to 3, another hospital from the same population. Keep part 1's histogram in mind.
+
+```{python}
+#| eval: false
+rows = []
+for hospital in [1, 2, 3]:
+    reference = benchmark[benchmark["hospital"] != hospital]   # the other two hospitals
+    held_out = benchmark[benchmark["hospital"] == hospital]    # pretend this one is new
+    predicted = reweight_to(reference, held_out)
+    actual = held_out["correct"].mean()
+    rows.append({"held-out hospital": hospital, "reweighted from the other two": predicted,
+                 "its own accuracy": actual, "delta": actual - predicted})
+leave_one_out = pd.DataFrame(rows)
+
+# Would hospital 5's decision survive a gap this big? It does if the gap is at least the tipping point.
+holds = []
+for delta in leave_one_out["delta"]:
+    holds.append("yes" if delta >= tipping_point else "no")
+leave_one_out["decision holds with this gap"] = holds
+display(leave_one_out.round(3))
+
+# The cross-validation summary: the average gap and how much the gaps vary
+print(f"Average gap: {leave_one_out['delta'].mean():+.3f}")
+print(f"SD of the gaps: {leave_one_out['delta'].std():.3f}")
+print(f"Tipping point:  {tipping_point:+.3f}")
+```
+
+The average gap is the cross-validation estimate of how far off reweighting is, on average, at a new hospital like hospitals 1 to 3. Compare it, and each hospital's gap, with the tipping point from part 2. Is the decision safe on average? For how many of the three held-out hospitals would it have held?
+
+Then use part 1: is hospital 5 like hospitals 1 to 3? What do these three gaps tell you about hospital 5's risk, and what can they not tell you?
+
+**Your answer:** TODO
+
+## 4. Make the call
+
+**Why this step:** in practice you would rarely trust a reweighted number without labeling some of the client's own patches. So the real questions are when you could skip the labels, and, when you can't, how many patches to label and which ones. Write your advice down before you see hospital 5's labels, as you would for a real hospital.
+
+1. Under what conditions would you use the reweighted estimate for a new hospital without labeling any of its patches? Think about what would have to be the same as at hospitals 1 to 3, and what parts 1 and 3 let you check.
+2. Which of your conditions does hospital 5 meet, as far as parts 1 to 3 can tell you? Which can no data here check?
+3. Make the call: use the model now, label some of hospital 5's patches first, or do not use it. If you choose to label first, run the code below for a starting size, then say how many patches you would ask for and from which color groups. Patches from one slide are related (Week 4), so treat the count as a minimum and spread the patches over many slides.
+
+```{python}
+#| eval: false
+# How many labeled patches would it take for a gap as big as the tipping point to show up?
+# A 95% margin of error for an accuracy p from n independent patches is about 1.96 * sqrt(p * (1 - p) / n).
+margin = abs(tipping_point)   # the margin of error should be smaller than the tipping point
+p = threshold                 # if the decision is close, hospital 5's accuracy is near its line
+n_needed = (1.96 / margin) ** 2 * p * (1 - p)
+print(f"Independent patches needed: about {n_needed:.0f}")
+```
+
+**Your answer:**
+
+1. Conditions: TODO
+2. Hospital 5: TODO
+3. The call: TODO
+
+## 5. Instructor run: hospital 5's labels
+
+**Why this step:** in part 4 you most likely asked hospital 5 to label some patches first. It has 300 labeled patches, and they do two jobs.
+
+First, they give the decision directly: hospital 5's estimated accuracy $\hat\theta_5$, with an interval, against its line $\tau=0.85$. Once there are labels, this replaces the reweighted estimate.
+
+Second, they show how far off reweighting was, and where. Part 2 defined $\delta$ by $\theta_5=\theta_{\text{rw}}+\delta$, so $\delta=\theta_5-\theta_{\text{rw}}$. Replacing each term by its estimate,
+
+$$\hat\delta=\hat\theta_5-\hat\theta_{\text{rw}}=\sum_k \hat c_k\,\bigl(\hat p_k^{(5)}-\hat p_k\bigr),$$
+
+where $\hat c_k$ is hospital 5's share of patches in color group $k$, $\hat p_k^{(5)}$ is its own accuracy there, and $\hat p_k$ is the benchmark's. So $\hat\delta$ is the group-by-group gap, averaged with hospital 5's shares. The two estimates come from different patches, so their variances add: $\text{SE}(\hat\delta)=\sqrt{\text{SE}(\hat\theta_5)^2+\text{SE}(\hat\theta_{\text{rw}})^2}$. If the interval for $\delta$ excludes 0, the labels reject the assumption reweighting made.
+
+```{python}
+#| eval: false
+# 1. The decision from the labels: hospital 5's accuracy with a Wilson interval, against its line
+right_5 = int(hospital_5["correct"].sum())
+actual_5 = right_5 / len(hospital_5)
+low_5, high_5 = proportion_confint(right_5, len(hospital_5), method="wilson")
+print(f"Hospital 5's accuracy: {actual_5:.3f} (95% interval {low_5:.3f} to {high_5:.3f}); its line is {threshold}")
+
+# 2. How far off reweighting was: delta hat and its interval (patches treated as independent)
+by_group = accuracy_by_group(benchmark_groups, benchmark["correct"].to_numpy())
+shares = {}
+for group in [0, 1, 2]:
+    shares[group] = np.mean(hospital_5_groups == group)
+estimate, se_reweighted, n_eff = reweight(by_group, shares)   # the same estimate as part 1, now with its SE
+se_actual = np.sqrt(actual_5 * (1 - actual_5) / len(hospital_5))
+delta_hat = actual_5 - reweighted_5
+se_delta = np.sqrt(se_actual**2 + se_reweighted**2)          # different patches, so the variances add
+print(f"delta hat: {delta_hat:+.3f} (95% interval {delta_hat - 1.96 * se_delta:+.3f} to {delta_hat + 1.96 * se_delta:+.3f})")
+
+# 3. Where it was off: each color third, the benchmark's accuracy against hospital 5's own
+rows = []
+for group in [0, 1, 2]:
+    in_group = hospital_5_groups == group
+    rows.append({"color group": names[group],
+                 "hospital 5 patches": int(in_group.sum()),
+                 "benchmark accuracy": benchmark["correct"].to_numpy()[benchmark_groups == group].mean(),
+                 "hospital 5 accuracy": hospital_5["correct"].to_numpy()[in_group].mean()})
+display(pd.DataFrame(rows).round(3))
+
+# 4. The track record: part 3's three held-out hospitals, and now hospital 5
+track_record = pd.DataFrame({
+    "hospital": list(leave_one_out["held-out hospital"]) + [5],
+    "its accuracy minus the reweighted prediction": list(leave_one_out["delta"]) + [delta_hat]})
+display(track_record.round(3))
+```
+
+Read the four outputs in order: the decision, how far off reweighting was, where it was off, and how hospital 5 compares with the benchmark's own hospitals.
+
+## 6. Stop and discuss
+
+1. Hospital 5's accuracy came out 0.3 points above its line. Did its 300 labeled patches settle the decision? Look at the interval. What should hospital 5 do with an answer this close to the line?
+2. Does the interval for $\delta$ include 0? What does that say about the assumption reweighting made, and in which color group did it fail?
+3. Reweighting by color moved the estimate by less than half a point, and the labels moved it by about 6 points. What could color tell hospital 5, and what could it not?
+4. Hospital 5 is now a fourth row in the track record. What would you tell the next hospital about how far off reweighting tends to be? Which of your part 4 conditions would you check first?
+
+## 7. Handoff: your team's sensitivity plan
+
+The Project Description (Section 3) says what your sensitivity analysis is: one variable that could make the AI system more or less accurate for your client than on the benchmark, analyzed with a mix curve if you can measure it or a tipping point if you cannot. Today was a worked example of both. Stain color was a variable you could measure, so you could reweight to hospital 5's mix of it. Whatever else differs at hospital 5, such as its staining protocol or its scanner, you could not measure, so you computed a tipping point. It is not a sensitivity analysis to rotate or blur your track's photos, unless you can say why your client's cases differ that way.
+
+Open your track's starter notebook, look at the table by group in section 5 and your track's datasheet, and draft your team's plan before you run any of it. In a few sentences:
+
+1. What is your variable? Why could it differ between the benchmark and your client, and which way would it push the AI system's accuracy?
+2. Can you measure it on the cases? If so, what range of client mixes can you defend? If not, how would you compute the tipping point, and how would you judge whether a gap that large is plausible?
+3. What result would change your recommendation? Write it before you run anything.
+
+**Your answer:** TODO
+
+## Exit ticket
+
+In one sentence: what does a tipping point of $-6$ points tell hospital 5, and what does it not tell it?

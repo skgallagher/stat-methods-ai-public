@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Lab 12: How Often Do Expert and AI Judges Agree?</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="lab_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lab_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="lab_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="lab_files/libs/quarto-html/popper.min.js"></script>
+<script src="lab_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="lab_files/libs/quarto-html/anchor.min.js"></script>
+<link href="lab_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lab_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lab_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="lab_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="lab_files/libs/bootstrap/bootstrap-138a6193a3bd40baf1e627da441a4734.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Lab 12: How Often Do Expert and AI Judges Agree?</h1>
+<p class="subtitle lead">Week 12 · Agreement corrected for chance, with expert and GPT-4 judgments of chatbot answers</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="the-situation" class="level2">
+<h2 class="anchored" data-anchor-id="the-situation">The situation</h2>
+<p>A team that runs a chatbot benchmark pays experts to compare chatbots’ answers, and it wants to know whether GPT-4 could replace one of the experts. Today the team looks at four kinds of questions: writing, roleplay, reasoning, and STEM. HW7 Problem 2 gives you the other four kinds and asks for the team’s recommendation.</p>
+<p>The data come from MT-Bench (<a href="https://arxiv.org/abs/2306.05685">Zheng et al.&nbsp;2023</a>; <a href="https://huggingface.co/datasets/lmsys/mt_bench_human_judgments">the judgments on Hugging Face</a>). The authors wrote 80 questions, ten in each of eight categories, and six chatbots answered each one. For a question, a turn of the conversation, and a pair of chatbots (an <strong>item</strong>), experts, mostly graduate students in the question’s field, read the two answers and voted for the better one or called a tie. Many items have one expert vote, and some have two to six. GPT-4 gave a verdict on every item. It was run twice at temperature 0, with the two answers in swapped positions, and when the two runs disagreed, the verdict was recorded as a tie.</p>
+<p>The experts are not an answer key. They are raters, and raters disagree. So the question today is not whether GPT-4 is right, but whether it agrees with an expert about as well as a second expert would. Lecture 12A’s tool for that is agreement corrected for chance, Cohen’s <span class="math inline">\(\kappa\)</span>.</p>
+</section>
+<section id="instructor-run-look-at-two-items-where-the-experts-split" class="level2">
+<h2 class="anchored" data-anchor-id="instructor-run-look-at-two-items-where-the-experts-split">1. Instructor run: look at two items where the experts split</h2>
+<p><strong>Why this step:</strong> before any <span class="math inline">\(\kappa\)</span>, read what the judges read. Both items below are reasoning questions, so each has a right answer.</p>
+<div id="a22ce151" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>judge_dir <span class="op">=</span> data_dir <span class="op">/</span> <span class="st">"llm_judges"</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>items <span class="op">=</span> pd.read_csv(judge_dir <span class="op">/</span> <span class="st">"items.csv"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>votes <span class="op">=</span> pd.read_csv(judge_dir <span class="op">/</span> <span class="st">"human_votes.csv"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>questions <span class="op">=</span> pd.read_csv(judge_dir <span class="op">/</span> <span class="st">"questions.csv"</span>, keep_default_na<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>answers <span class="op">=</span> pd.read_csv(judge_dir <span class="op">/</span> <span class="st">"answers.csv"</span>, keep_default_na<span class="op">=</span><span class="va">False</span>)   <span class="co"># keep any empty answer as ""</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>items <span class="op">=</span> items[items[<span class="st">"half"</span>] <span class="op">==</span> <span class="st">"lab"</span>].reset_index(drop<span class="op">=</span><span class="va">True</span>)   <span class="co"># writing, roleplay, reasoning, STEM; HW7 has the rest</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>votes <span class="op">=</span> votes.merge(items, on<span class="op">=</span><span class="st">"item_id"</span>)                        <span class="co"># one row per expert vote, with its item's details</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(items)<span class="sc">:,}</span><span class="ss"> items from </span><span class="sc">{</span>items[<span class="st">'question_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> questions in </span><span class="sc">{</span>items[<span class="st">'category'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> categories"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(votes)<span class="sc">:,}</span><span class="ss"> expert votes from </span><span class="sc">{</span>votes[<span class="st">'judge'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> experts; </span><span class="sc">{</span>(items[<span class="st">'n_human_votes'</span>] <span class="op">&gt;=</span> <span class="dv">2</span>)<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> items have 2 or more"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> answer_of(question_id, model, turn):</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""One chatbot's reply to one turn of one question."""</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    row <span class="op">=</span> answers[(answers[<span class="st">"question_id"</span>] <span class="op">==</span> question_id) <span class="op">&amp;</span> (answers[<span class="st">"model"</span>] <span class="op">==</span> model) <span class="op">&amp;</span> (answers[<span class="st">"turn"</span>] <span class="op">==</span> turn)]</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> row[<span class="st">"answer"</span>].iloc[<span class="dv">0</span>]</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_item(item_id, characters<span class="op">=</span><span class="dv">1000</span>):</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Print an item's question, both answers (cut at `characters`), the expert votes, and GPT-4's verdict."""</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    item <span class="op">=</span> items[items[<span class="st">"item_id"</span>] <span class="op">==</span> item_id].iloc[<span class="dv">0</span>]</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    question <span class="op">=</span> questions[questions[<span class="st">"question_id"</span>] <span class="op">==</span> item[<span class="st">"question_id"</span>]].iloc[<span class="dv">0</span>]</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Item </span><span class="sc">{</span>item_id<span class="sc">}</span><span class="ss">: question </span><span class="sc">{</span>item[<span class="st">'question_id'</span>]<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>item[<span class="st">'category'</span>]<span class="sc">}</span><span class="ss">), turn </span><span class="sc">{</span>item[<span class="st">'turn'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"The question:"</span>, question[<span class="ss">f"turn_</span><span class="sc">{</span>item[<span class="st">'turn'</span>]<span class="sc">}</span><span class="ss">"</span>][:characters])</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> label <span class="kw">in</span> [<span class="st">"model_1"</span>, <span class="st">"model_2"</span>]:</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">--- </span><span class="sc">{</span>label<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>item[label]<span class="sc">}</span><span class="ss"> ---"</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(answer_of(item[<span class="st">"question_id"</span>], item[label], item[<span class="st">"turn"</span>])[:characters])</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Expert votes:"</span>, votes[votes[<span class="st">"item_id"</span>] <span class="op">==</span> item_id][<span class="st">"vote"</span>].tolist())</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    agreed <span class="op">=</span> <span class="st">"the two orders agreed"</span> <span class="cf">if</span> item[<span class="st">"gpt4_orders_agree"</span>] <span class="cf">else</span> <span class="st">"the two orders disagreed"</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"GPT-4: </span><span class="sc">{</span>item[<span class="st">'gpt4_verdict'</span>]<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span>agreed<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">80</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>show_item(<span class="st">"j0701"</span>)   <span class="co"># David's sisters</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>show_item(<span class="st">"j0843"</span>)   <span class="co"># Suresh's shadow</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>For each item, work out the right answer yourself. Is either chatbot’s answer right, and is its reasoning right? Then look at the votes. What does a vote for one of these answers say about the answer, and what does it not say? Why might GPT-4’s verdict on the second item have depended on which answer it read first?</p>
+<p><strong>Your answer:</strong> TODO</p>
+<p>Now pick an item yourself. Change <code>category</code> to the kind of question you want to read, and run the cell. Change the seed in the last line to read another item.</p>
+<div id="011fa5c8" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Items where at least one expert voted for each chatbot</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>vote_sets <span class="op">=</span> votes.groupby(<span class="st">"item_id"</span>)[<span class="st">"vote"</span>].agg(<span class="bu">set</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>split_items <span class="op">=</span> items[items[<span class="st">"item_id"</span>].isin([i <span class="cf">for</span> i, s <span class="kw">in</span> vote_sets.items() <span class="cf">if</span> {<span class="st">"model_1"</span>, <span class="st">"model_2"</span>} <span class="op">&lt;=</span> s])]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(split_items[<span class="st">"category"</span>].value_counts().to_string())</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>category <span class="op">=</span> <span class="st">"writing"</span>   <span class="co"># change to "roleplay", "reasoning", or "stem"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>choices <span class="op">=</span> split_items.loc[split_items[<span class="st">"category"</span>] <span class="op">==</span> category, <span class="st">"item_id"</span>].to_numpy()</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>show_item(np.random.default_rng(<span class="dv">1</span>).choice(choices))   <span class="co"># change the 1 to read another item</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>What were the experts disagreeing about on your item? Would a second reading change your mind?</p>
+<p><strong>Your answer:</strong> TODO</p>
+</section>
+<section id="agreement-and-agreement-by-chance" class="level2">
+<h2 class="anchored" data-anchor-id="agreement-and-agreement-by-chance">2. Agreement and agreement by chance</h2>
+<p><strong>Why this step:</strong> two judges agree some of the time just by chance. Lecture 12A’s <span class="math inline">\(\kappa\)</span> asks how much of the gap between chance and perfect agreement they close: <span class="math display">\[\kappa=\frac{\text{observed agreement}-\text{chance agreement}}{1-\text{chance agreement}}.\]</span> Chance agreement is how often two judges would agree if each voted independently, at its own rates. HW7 Problem 1(a) works this out for two categories. Here there are three: model 1, model 2, and tie.</p>
+<p>The table puts GPT-4’s verdict on an item next to each expert vote on that item, so an item with three expert votes contributes three rows.</p>
+<div id="af70a4cf" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>gpt4_table <span class="op">=</span> pd.crosstab(votes[<span class="st">"gpt4_verdict"</span>], votes[<span class="st">"vote"</span>], margins<span class="op">=</span><span class="va">True</span>, margins_name<span class="op">=</span><span class="st">"total"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>gpt4_table.index.name, gpt4_table.columns.name <span class="op">=</span> <span class="st">"GPT-4's verdict"</span>, <span class="st">"expert's vote"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>display(gpt4_table)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Compute <span class="math inline">\(\kappa\)</span> for GPT-4 with an expert from this table, one step per line. <code>counts</code> is the table without the totals, as an array: rows are GPT-4’s verdict and columns the expert’s vote, each in the order model 1, model 2, tie. Fill in the four TODO lines and run the cell.</p>
+<div id="363cab76" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>CATEGORIES <span class="op">=</span> [<span class="st">"model_1"</span>, <span class="st">"model_2"</span>, <span class="st">"tie"</span>]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> table_of(first, second):</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Counts of each (first, second) pair of votes, with all three categories in the same order on both sides."""</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    counts <span class="op">=</span> pd.crosstab(np.asarray(first), np.asarray(second))</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> counts.reindex(index<span class="op">=</span>CATEGORIES, columns<span class="op">=</span>CATEGORIES, fill_value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> table_of(votes[<span class="st">"gpt4_verdict"</span>], votes[<span class="st">"vote"</span>]).to_numpy()</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> counts.<span class="bu">sum</span>()</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Observed agreement: the share of the n rows on the diagonal. np.trace(counts) adds up the diagonal.</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>observed <span class="op">=</span> <span class="va">None</span>   <span class="co"># </span><span class="al">TODO</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Each judge's share of each category: GPT-4's from the row totals, the experts' from the column totals.</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>gpt4_share <span class="op">=</span> counts.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>) <span class="op">/</span> n</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>expert_share <span class="op">=</span> <span class="va">None</span>   <span class="co"># </span><span class="al">TODO</span><span class="co">: like the line above, for the columns (axis=0)</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Chance agreement: GPT-4's share times the experts' share, added up over the three categories.</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>chance <span class="op">=</span> <span class="va">None</span>   <span class="co"># </span><span class="al">TODO</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Kappa, from Lecture 12A's formula.</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="va">None</span>   <span class="co"># </span><span class="al">TODO</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">any</span>(value <span class="kw">is</span> <span class="va">None</span> <span class="cf">for</span> value <span class="kw">in</span> [observed, expert_share, chance, k]):</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Fill in the four TODO lines, then run this cell again."</span>)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"GPT-4's shares: "</span>, gpt4_share.<span class="bu">round</span>(<span class="dv">3</span>), <span class="st">"</span><span class="ch">\n</span><span class="st">Experts' shares:"</span>, np.<span class="bu">round</span>(expert_share, <span class="dv">3</span>))</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"GPT-4 with an expert: agreement </span><span class="sc">{</span>observed<span class="sc">:.3f}</span><span class="ss">, chance </span><span class="sc">{</span>chance<span class="sc">:.3f}</span><span class="ss">, kappa </span><span class="sc">{</span>k<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Your four lines work for any square table, so they can become a function. <code>kappa_from_table</code> does the same steps. Check that it gives your numbers.</p>
+<div id="43a956ad" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> kappa_from_table(counts):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Observed agreement, chance agreement, and kappa from a square table of counts (no margins)."""</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    counts <span class="op">=</span> np.asarray(counts, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    shares <span class="op">=</span> counts <span class="op">/</span> counts.<span class="bu">sum</span>()</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    observed <span class="op">=</span> np.trace(shares)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    chance <span class="op">=</span> np.<span class="bu">sum</span>(shares.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>) <span class="op">*</span> shares.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>))   <span class="co"># row share times column share, added over categories</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> observed, chance, (observed <span class="op">-</span> chance) <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> chance)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"kappa_from_table gives: agreement </span><span class="sc">{:.3f}</span><span class="st">, chance </span><span class="sc">{:.3f}</span><span class="st">, kappa </span><span class="sc">{:.3f}</span><span class="st">"</span>.<span class="bu">format</span>(<span class="op">*</span>kappa_from_table(counts)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Now two experts on the same item. An item with three experts gives three pairs of experts, and an item with one expert gives none. A pair of experts has no “first” and “second” expert, so the table counts each pair both ways, once as (A, B) and once as (B, A). That makes the table symmetric, and the chance agreement uses the experts’ shares of all their votes together.</p>
+<div id="fdfe61d8" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Every pair of experts who judged the same item</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> item_id, group <span class="kw">in</span> votes.groupby(<span class="st">"item_id"</span>):</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    item_votes <span class="op">=</span> group[<span class="st">"vote"</span>].tolist()</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(item_votes)):</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i <span class="op">+</span> <span class="dv">1</span>, <span class="bu">len</span>(item_votes)):</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>            rows.append({<span class="st">"item_id"</span>: item_id, <span class="st">"question_id"</span>: group[<span class="st">"question_id"</span>].iloc[<span class="dv">0</span>],</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                         <span class="st">"category"</span>: group[<span class="st">"category"</span>].iloc[<span class="dv">0</span>], <span class="st">"first"</span>: item_votes[i], <span class="st">"second"</span>: item_votes[j]})</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>expert_pairs <span class="op">=</span> pd.DataFrame(rows)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(expert_pairs)<span class="sc">:,}</span><span class="ss"> pairs of experts on </span><span class="sc">{</span>expert_pairs[<span class="st">'item_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> items"</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> expert_table(pairs):</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""The symmetric table of expert pairs: each pair counted once each way."""</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    first <span class="op">=</span> np.concatenate([pairs[<span class="st">"first"</span>], pairs[<span class="st">"second"</span>]])</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    second <span class="op">=</span> np.concatenate([pairs[<span class="st">"second"</span>], pairs[<span class="st">"first"</span>]])</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> table_of(first, second)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> kappa_experts(pairs):</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> kappa_from_table(expert_table(pairs))</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> kappa_gpt4(expert_votes):</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> kappa_from_table(table_of(expert_votes[<span class="st">"gpt4_verdict"</span>], expert_votes[<span class="st">"vote"</span>]))</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>display(expert_table(expert_pairs).rename_axis(index<span class="op">=</span><span class="st">"one expert's vote"</span>, columns<span class="op">=</span><span class="st">"the other expert's vote"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Run <code>kappa_from_table</code> on the experts’ table, and compare with GPT-4.</p>
+<div id="580b8f4f" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>expert_result <span class="op">=</span> <span class="va">None</span>   <span class="co"># </span><span class="al">TODO</span><span class="co">: kappa_from_table applied to expert_table(expert_pairs)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> expert_result <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Fill in the TODO line, then run this cell again."</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> name, (observed, chance, k) <span class="kw">in</span> [(<span class="st">"Expert with expert"</span>, expert_result), (<span class="st">"GPT-4 with expert"</span>, kappa_gpt4(votes))]:</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">: agreement </span><span class="sc">{</span>observed<span class="sc">:.3f}</span><span class="ss">, chance </span><span class="sc">{</span>chance<span class="sc">:.3f}</span><span class="ss">, kappa </span><span class="sc">{</span>k<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Compare the two <span class="math inline">\(\kappa\)</span>’s. On these questions, does GPT-4 agree with an expert more or less than a second expert does? Why is it fair to compare GPT-4 with a second expert rather than with a perfect score?</p>
+<p><strong>Your answer:</strong> TODO</p>
+</section>
+<section id="the-question-is-the-unit" class="level2">
+<h2 class="anchored" data-anchor-id="the-question-is-the-unit">3. The question is the unit</h2>
+<p><strong>Why this step:</strong> each question appears in 30 items (2 turns × 15 pairs of chatbots), and items from one question share its text and its answers. So the votes are clustered, as Week 4’s camera bursts and Week 11’s repeated answers were. An interval should resample whole questions. To see what that changes, you will resample two ways: whole questions, and single items as if they were independent.</p>
+<p><code>resample_kappas</code> draws the units with replacement, recomputes both <span class="math inline">\(\kappa\)</span>’s and their difference, and repeats that <code>B</code> times. Run the cell as it is, which resamples questions. Then change <code>unit</code> to <code>"item_id"</code> and run it again. Each run is saved in <code>results</code>.</p>
+<div id="441abf95" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> {}   <span class="co"># one entry per unit you resample</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> resample_kappas(pairs, expert_votes, unit<span class="op">=</span><span class="st">"question_id"</span>, B<span class="op">=</span><span class="dv">2000</span>, seed<span class="op">=</span>SEED):</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Kappa for experts, kappa for GPT-4, and their difference, resampling whole units B times."""</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    rng <span class="op">=</span> np.random.default_rng(seed)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    pair_parts <span class="op">=</span> {u: part <span class="cf">for</span> u, part <span class="kw">in</span> pairs.groupby(unit)}</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    vote_parts <span class="op">=</span> {u: part <span class="cf">for</span> u, part <span class="kw">in</span> expert_votes.groupby(unit)}</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    ids <span class="op">=</span> np.array(<span class="bu">sorted</span>(vote_parts))</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    draws <span class="op">=</span> []</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(B):</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        drawn <span class="op">=</span> rng.choice(ids, size<span class="op">=</span><span class="bu">len</span>(ids), replace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        k_experts <span class="op">=</span> kappa_experts(pd.concat([pair_parts[u] <span class="cf">for</span> u <span class="kw">in</span> drawn <span class="cf">if</span> u <span class="kw">in</span> pair_parts], ignore_index<span class="op">=</span><span class="va">True</span>))[<span class="dv">2</span>]</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        k_gpt4 <span class="op">=</span> kappa_gpt4(pd.concat([vote_parts[u] <span class="cf">for</span> u <span class="kw">in</span> drawn], ignore_index<span class="op">=</span><span class="va">True</span>))[<span class="dv">2</span>]</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        draws.append((k_experts, k_gpt4, k_gpt4 <span class="op">-</span> k_experts))</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(draws)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>estimates <span class="op">=</span> [kappa_experts(expert_pairs)[<span class="dv">2</span>], kappa_gpt4(votes)[<span class="dv">2</span>]]</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>estimates.append(estimates[<span class="dv">1</span>] <span class="op">-</span> estimates[<span class="dv">0</span>])</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>NAMES <span class="op">=</span> [<span class="st">"expert with expert"</span>, <span class="st">"GPT-4 with expert"</span>, <span class="st">"difference, GPT-4 minus experts"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="62ff172c" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>unit <span class="op">=</span> <span class="st">"question_id"</span>   <span class="co"># after the first run, change to "item_id" and run again</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>results[unit] <span class="op">=</span> resample_kappas(expert_pairs, votes, unit<span class="op">=</span>unit)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>low, high <span class="op">=</span> np.percentile(results[unit], [<span class="fl">2.5</span>, <span class="fl">97.5</span>], axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>display(pd.DataFrame({<span class="st">"estimate"</span>: estimates, <span class="st">"SD"</span>: results[unit].std(axis<span class="op">=</span><span class="dv">0</span>), <span class="st">"2.5%"</span>: low, <span class="st">"97.5%"</span>: high},</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                     index<span class="op">=</span>NAMES).<span class="bu">round</span>(<span class="dv">3</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Once you have both runs, compute the design effect for each <span class="math inline">\(\kappa\)</span>: how many times larger the variance is when you resample questions than when you resample items, as in Lab 11.</p>
+<div id="95380b36" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(results) <span class="op">&lt;</span> <span class="dv">2</span>:</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Run the cell above with both units first."</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    design_effect <span class="op">=</span> <span class="va">None</span>   <span class="co"># </span><span class="al">TODO</span><span class="co">: square the ratio of the SDs, questions over items (results[...].std(axis=0) gives the SDs)</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> design_effect <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Fill in the TODO line, then run this cell again."</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(pd.Series(design_effect, index<span class="op">=</span>NAMES).<span class="bu">round</span>(<span class="dv">2</span>).to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Which way of resampling gives wider intervals, and by how much for GPT-4’s <span class="math inline">\(\kappa\)</span>? Why is the question the right unit? Then answer the team: can GPT-4 stand in for one expert on these questions? Use the interval for the difference.</p>
+<p><strong>Your answer:</strong> TODO</p>
+</section>
+<section id="where-do-the-judges-disagree" class="level2">
+<h2 class="anchored" data-anchor-id="where-do-the-judges-disagree">4. Where do the judges disagree?</h2>
+<p><strong>Why this step:</strong> an overall <span class="math inline">\(\kappa\)</span> averages over very different questions. A reasoning question usually has a right answer; a writing prompt usually does not.</p>
+<p>Start with one category. Keep the rows of <code>expert_pairs</code> in that category, and call <code>kappa_experts</code> and <code>kappa_gpt4</code> on them. Then change <code>category</code> and run it again.</p>
+<div id="7f92efa3" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>category <span class="op">=</span> <span class="st">"writing"</span>   <span class="co"># then try "reasoning", "roleplay", and "stem"</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>category_votes <span class="op">=</span> votes[votes[<span class="st">"category"</span>] <span class="op">==</span> category]</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>category_pairs <span class="op">=</span> <span class="va">None</span>   <span class="co"># </span><span class="al">TODO</span><span class="co">: the rows of expert_pairs in this category, as in the line above</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> category_pairs <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Fill in the TODO line, then run this cell again."</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>category<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span><span class="bu">len</span>(category_pairs)<span class="sc">}</span><span class="ss"> expert pairs, </span><span class="sc">{</span><span class="bu">len</span>(category_votes)<span class="sc">}</span><span class="ss"> expert votes"</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"experts' kappa </span><span class="sc">{</span>kappa_experts(category_pairs)[<span class="dv">2</span>]<span class="sc">:.3f}</span><span class="ss">, GPT-4's kappa </span><span class="sc">{</span>kappa_gpt4(category_votes)[<span class="dv">2</span>]<span class="sc">:.3f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The next cell repeats this for all four categories, with an interval for each difference (10 questions each).</p>
+<div id="327e251b" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> category <span class="kw">in</span> <span class="bu">sorted</span>(items[<span class="st">"category"</span>].unique()):</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    category_pairs <span class="op">=</span> expert_pairs[expert_pairs[<span class="st">"category"</span>] <span class="op">==</span> category]</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    category_votes <span class="op">=</span> votes[votes[<span class="st">"category"</span>] <span class="op">==</span> category]</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    k_experts <span class="op">=</span> kappa_experts(category_pairs)[<span class="dv">2</span>]</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    k_gpt4 <span class="op">=</span> kappa_gpt4(category_votes)[<span class="dv">2</span>]</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    low, high <span class="op">=</span> np.percentile(resample_kappas(category_pairs, category_votes, B<span class="op">=</span><span class="dv">1000</span>)[:, <span class="dv">2</span>], [<span class="fl">2.5</span>, <span class="fl">97.5</span>])</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    rows.append({<span class="st">"category"</span>: category, <span class="st">"questions"</span>: category_votes[<span class="st">"question_id"</span>].nunique(),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"expert pairs"</span>: <span class="bu">len</span>(category_pairs), <span class="st">"expert votes"</span>: <span class="bu">len</span>(category_votes),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"experts' kappa"</span>: k_experts, <span class="st">"GPT-4's kappa"</span>: k_gpt4,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>                 <span class="st">"difference"</span>: k_gpt4 <span class="op">-</span> k_experts, <span class="st">"2.5%"</span>: low, <span class="st">"97.5%"</span>: high})</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>by_category <span class="op">=</span> pd.DataFrame(rows).sort_values(<span class="st">"experts' kappa"</span>, ascending<span class="op">=</span><span class="va">False</span>).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>display(by_category.<span class="bu">round</span>(<span class="dv">3</span>))</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co"># The difference in kappa for each category, with its interval and a line at 0</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">3</span>))</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.arange(<span class="bu">len</span>(by_category))</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>ax.hlines(y, by_category[<span class="st">"2.5%"</span>], by_category[<span class="st">"97.5%"</span>], color<span class="op">=</span><span class="st">"#5b8db8"</span>, linewidth<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>ax.plot(by_category[<span class="st">"difference"</span>], y, <span class="st">"o"</span>, color<span class="op">=</span><span class="st">"#155a8a"</span>)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"#333333"</span>, linewidth<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(y)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>ax.set_yticklabels(by_category[<span class="st">"category"</span>])</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>ax.invert_yaxis()</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"GPT-4's kappa minus the experts' kappa, with 95</span><span class="sc">% i</span><span class="st">nterval"</span>)</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Where do experts agree with each other most, and least? Where does GPT-4 agree with experts less than they agree with each other, and where more? Give the denominators.</p>
+<p>You found this pattern after looking at four categories, and with 10 questions each the intervals are wide, so part of it may be luck (Week 5’s winner’s curse). The honest test is new questions. HW7’s half has math and coding, which have checkable answers, and humanities, which mostly does not. Write down what you predict HW7’s categories will show, before you see them.</p>
+<p><strong>Your answer:</strong> TODO</p>
+</section>
+<section id="does-the-order-of-the-answers-change-gpt-4s-verdict" class="level2">
+<h2 class="anchored" data-anchor-id="does-the-order-of-the-answers-change-gpt-4s-verdict">5. Does the order of the answers change GPT-4’s verdict?</h2>
+<p><strong>Why this step:</strong> GPT-4 judged every item twice, once with each answer first, at temperature 0. With the temperature at 0, the only thing that changed between the two runs was the order. When the two verdicts differ, the order changed the verdict: a <strong>flip</strong>.</p>
+<p>Fill in the flip rate and its standard error as if the 1,200 items were independent.</p>
+<div id="64275449" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>flipped <span class="op">=</span> <span class="op">~</span>items[<span class="st">"gpt4_orders_agree"</span>]   <span class="co"># True where the two orders gave different verdicts</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>flip_rate <span class="op">=</span> <span class="va">None</span>   <span class="co"># </span><span class="al">TODO</span><span class="co">: the share of items that flipped</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>naive_se <span class="op">=</span> <span class="va">None</span>    <span class="co"># </span><span class="al">TODO</span><span class="co">: sqrt(p(1 - p) / n), as if the 1,200 items were independent</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"flip rate:"</span>, flip_rate, <span class="st">" SE as if independent:"</span>, naive_se)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The next cell resamples questions, as in part 3, and compares the two standard errors.</p>
+<div id="303f4aca" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(SEED)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>question_ids <span class="op">=</span> np.array(<span class="bu">sorted</span>(items[<span class="st">"question_id"</span>].unique()))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>flip_parts <span class="op">=</span> {q: part[<span class="st">"gpt4_orders_agree"</span>].to_numpy() <span class="cf">for</span> q, part <span class="kw">in</span> items.groupby(<span class="st">"question_id"</span>)}</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>resampled_flips <span class="op">=</span> []</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2000</span>):</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    drawn <span class="op">=</span> rng.choice(question_ids, size<span class="op">=</span><span class="bu">len</span>(question_ids), replace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    resampled_flips.append(<span class="dv">1</span> <span class="op">-</span> np.concatenate([flip_parts[q] <span class="cf">for</span> q <span class="kw">in</span> drawn]).mean())</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>low, high <span class="op">=</span> np.percentile(resampled_flips, [<span class="fl">2.5</span>, <span class="fl">97.5</span>])</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"GPT-4's two orders disagree on </span><span class="sc">{</span>flipped<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss"> of </span><span class="sc">{</span><span class="bu">len</span>(items)<span class="sc">}</span><span class="ss"> items (95% interval </span><span class="sc">{</span>low<span class="sc">:.3f}</span><span class="ss"> to </span><span class="sc">{</span>high<span class="sc">:.3f}</span><span class="ss">)"</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"SE resampling questions: </span><span class="sc">{</span>np<span class="sc">.</span>std(resampled_flips)<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> flip_rate <span class="kw">is</span> <span class="va">None</span> <span class="kw">or</span> naive_se <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Fill in the two TODO lines above to compare with the SE as if items were independent."</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Flip rate </span><span class="sc">{</span>flip_rate<span class="sc">:.3f}</span><span class="ss">; SE as if items were independent </span><span class="sc">{</span>naive_se<span class="sc">:.4f}</span><span class="ss">; "</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"design effect </span><span class="sc">{</span>(np.std(resampled_flips) <span class="op">/</span> naive_se) <span class="op">**</span> <span class="dv">2</span><span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>by_question <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> items.groupby(<span class="st">"question_id"</span>)[<span class="st">"gpt4_orders_agree"</span>].mean()</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Flip rate for one question: from </span><span class="sc">{</span>by_question<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss"> to </span><span class="sc">{</span>by_question<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Flip rate by category:"</span>)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>((<span class="dv">1</span> <span class="op">-</span> items.groupby(<span class="st">"category"</span>)[<span class="st">"gpt4_orders_agree"</span>].mean()).<span class="bu">round</span>(<span class="dv">3</span>).to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Why is the design effect so far above 1? Compare the flip rates by category with part 4’s <span class="math inline">\(\kappa\)</span>’s: which category flips least, and do experts agree well on it? What does that say about the difference between a judge that is consistent and a judge that agrees with people?</p>
+<p>MT-Bench recorded a flip as a tie, so these data show how often the order changed the verdict, but not which answer GPT-4 favored, the first or the second. What would you need to keep from each pair of runs to test for a preference for the first answer? (HW7 Problem 1(e) has that design.)</p>
+<p><strong>Your answer:</strong> TODO</p>
+</section>
+<section id="stop-and-discuss" class="level2">
+<h2 class="anchored" data-anchor-id="stop-and-discuss">6. Stop and discuss</h2>
+<ol type="1">
+<li>A teammate writes: “GPT-4 agrees with our experts 65.5% of the time, so it is 65.5% accurate.” What is wrong with the sentence? Use David’s sisters.</li>
+<li>GPT-4’s <span class="math inline">\(\kappa\)</span> with an expert is about the same as an expert’s with another expert. Is GPT-4 then a good judge? What else would you want to check before replacing an expert?</li>
+<li>In part 3, resampling questions widened the interval for each <span class="math inline">\(\kappa\)</span> more than for their difference. Why might the difference be less affected? (Think of Week 5’s pairing: both <span class="math inline">\(\kappa\)</span>’s are computed on the same questions.)</li>
+<li>The experts are graduate students voting on questions the MT-Bench authors wrote. Who is this <span class="math inline">\(\kappa\)</span> about, and what would the team need before it trusts the number for its own benchmark (Week 9)?</li>
+</ol>
+</section>
+<section id="handoff-your-project" class="level2">
+<h2 class="anchored" data-anchor-id="handoff-your-project">7. Handoff: your project</h2>
+<p>Every track has a judge or a label that someone, or something, produced. In a few sentences, for your team’s track:</p>
+<ol type="1">
+<li><strong>Human preferences (Track 3).</strong> Your judge saw every pair in both orders. Make the 2×2 table of its verdicts by order, as in HW7 Problem 1(e): how often does it flip, and does it favor the first response? Then what is the judge’s <span class="math inline">\(\kappa\)</span> with the human preference, resampling posts?</li>
+<li><strong>Instruction following (Track 4).</strong> What is the judge’s <span class="math inline">\(\kappa\)</span> with the rule checker, resampling prompts? Which of the two is your reference, and how would you know whether it is right?</li>
+<li><strong>Food or pet tagging (Tracks 1 and 2).</strong> The dataset’s labels are a rater too (Week 2). On which cases would a second labeler most likely disagree, and how would that change your accuracy?</li>
+</ol>
+<p>Add one row to the design table your Milestone 2 outline started in Lab 11: what your track’s reference is, and how reliable it is.</p>
+<p><strong>Your answer:</strong> TODO</p>
+</section>
+<section id="exit-ticket" class="level2">
+<h2 class="anchored" data-anchor-id="exit-ticket">Exit ticket</h2>
+<p>In one sentence: why does <span class="math inline">\(\kappa\)</span> subtract the agreement expected by chance, and why does its interval resample questions rather than votes?</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

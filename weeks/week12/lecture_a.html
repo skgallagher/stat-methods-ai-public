@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="lecture_a_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lecture_a_files/libs/quarto-html/tabby.min.js"></script>
+<script src="lecture_a_files/libs/quarto-html/popper.min.js"></script>
+<script src="lecture_a_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="lecture_a_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lecture_a_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="lecture_a_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.9.38">
+
+  <meta name="author" content="Shannon Gallagher">
+  <title>Week 12A: Can We Trust the Judge?</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="lecture_a_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="lecture_a_files/libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="lecture_a_files/libs/revealjs/dist/theme/quarto-0427d8d92a431aa6a6430e53ec02a470.css">
+  <link rel="stylesheet" href="lecture.css">
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+  <link href="lecture_a_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="lecture_a_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="lecture_a_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="lecture_a_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Week 12A: Can We Trust the Judge?</h1>
+  <p class="subtitle">Agreement beyond chance, the reliability of several judges, and the order of the answers</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Shannon Gallagher 
+</div>
+</div>
+</div>
+
+</section>
+<section id="the-grader-is-part-of-the-score" class="slide level2 smaller">
+<h2>The grader is part of the score</h2>
+<p>Two city staff members read the same 100 chatbot answers.</p>
+<p>Each marked every answer <strong>helpful</strong> or <strong>not helpful</strong>.</p>
+<ul>
+<li>Staff member A marked 60 helpful. Staff member B marked 70.</li>
+<li>So is the chatbot helpful 60% of the time, or 70%?</li>
+<li>With no answer key, someone has to judge: a person or a model.</li>
+<li>Today: how far can we trust a judge?</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. The running example is Pittsburgh’s city chatbot from 11A (potholes, trash pickup, snow-emergency parking, sinkholes). Many of its answers have no answer key: “Is this answer helpful to a resident?” needs someone to judge it. Two staff members read the same 100 answers and marked each helpful or not. A says 60, B says 70. The chatbot did not change; the grader did. All numbers for the city are made up for the lecture; say so. Thursday’s lab has real data: experts and GPT-4 judging chatbot answers on MT-Bench.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="this-week-we-check-the-judge" class="slide level2 smaller compact-table">
+<h2>This week we check the judge</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Weeks</th>
+<th>The question</th>
+<th>What we choose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>4 and 5</td>
+<td>How precise is a score? Which model is better?</td>
+<td>nothing; the key was given</td>
+</tr>
+<tr class="even">
+<td>9 and 10</td>
+<td>Does the score carry over to the client?</td>
+<td>nothing; the cases were given</td>
+</tr>
+<tr class="odd">
+<td>11</td>
+<td>How should the evaluation be run?</td>
+<td>questions, answers, randomization</td>
+</tr>
+<tr class="even">
+<td><strong>12</strong></td>
+<td><strong>Can we trust the judge that grades the answers?</strong></td>
+<td><strong>which judges, how many, which order</strong></td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>About 2 minutes. Weeks 4 and 5 scored answers against a key someone else wrote. Week 11 designed the evaluation. This week the key itself is a measurement: a person or a model decides what counts as right, and we ask how much to trust it. The project’s Tracks 3 and 4 are about exactly this: an LLM judge against human preferences, and an LLM judge against a rule checker.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="recap-raters-and-repeated-answers" class="slide level2 smaller">
+<h2>Recap: raters and repeated answers</h2>
+<ul>
+<li>Week 2: five raters labeled each sentence; their votes split.</li>
+<li>Week 11: <span class="math inline">\rho</span> measured how alike two answers to one question are.</li>
+<li>Today: how alike are two judges of one answer?</li>
+</ul>
+<aside class="notes">
+<p>About 1 minute. Week 2’s DynaSent raters looked at vote patterns, not at agreement corrected for chance; that is new today. Week 11’s <span class="math inline">\rho=\tau^2/(\tau^2+\sigma^2)</span> comes back in Question 2 with raters in place of answers.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="todays-plan" class="slide level2 smaller">
+<h2>Today’s plan</h2>
+<ol type="1">
+<li>How often do two judges agree beyond chance?</li>
+<li>How reliable is the average of several judges?</li>
+<li>Does the order of the answers change the verdict?</li>
+<li>Does agreement mean the judge is right?</li>
+</ol>
+<p>Thursday’s lab: Questions 1 and 3 on MT-Bench, with experts and GPT-4.</p>
+<aside class="notes">
+<p>About 1 minute. HW7 Problem 1 follows the same four questions with new numbers; Problem 2 uses MT-Bench’s other half.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section>
+<section id="question-1-how-often-do-two-judges-agree-beyond-chance" class="title-slide slide level1 center">
+<h1>Question 1: how often do two judges agree beyond chance?</h1>
+
+</section>
+<section id="two-staff-graded-the-same-100-answers" class="slide level2 smaller">
+<h2>Two staff graded the same 100 answers</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">B: helpful</th>
+<th style="text-align: right;">B: not helpful</th>
+<th style="text-align: right;">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>A: helpful</strong></td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">60</td>
+</tr>
+<tr class="even">
+<td><strong>A: not helpful</strong></td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">40</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">100</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>They agree on <span class="math inline">54+24=78</span> answers: 78%.</li>
+<li>Is 78% good? It depends on how often they would agree by chance.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. Read the table with the room: the diagonal is agreement, the off-diagonal cells are disagreements. The margins are each grader’s own rate, 60% and 70% from the first slide.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="two-ways-to-agree" class="slide level2 smaller">
+<h2>Two ways to agree</h2>
+<p><span class="math display">P(\text{agree})=P(\text{both helpful})+P(\text{both not helpful})</span></p>
+<ul>
+<li>The two ways cannot both happen, so their probabilities add.</li>
+<li>Each is a <strong>joint</strong> probability: a cell on the table’s diagonal.</li>
+<li>Observed: <span class="math inline">0.54+0.24=0.78</span>.</li>
+<li>The <strong>margins</strong> are each grader’s own rate: A 0.60, B 0.70 helpful.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. Start from the definition of agreement: the event “they agree” is the union of “both helpful” and “both not helpful,” which are disjoint, so the probabilities add. The joint probabilities are the diagonal cells divided by 100. The margins are the row and column totals divided by 100. Chance agreement, next, keeps the margins and changes only how the joint is built from them.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="chance-assumes-independence" class="slide level2 smaller">
+<h2>Chance assumes independence</h2>
+<p><span class="math display">
+\begin{aligned}
+P(\text{agree by chance})&amp;=P(\text{both helpful})+P(\text{both not helpful})\\
+&amp;=\textcolor{#8f1025}{P(\text{A helpful})\,P(\text{B helpful})}+\textcolor{#8f1025}{P(\text{A not})\,P(\text{B not})}\\
+&amp;=0.60\times0.70+0.40\times0.30\\
+&amp;=0.42+0.12\\
+&amp;=0.54
+\end{aligned}
+</span></p>
+<ul>
+<li>The red step is the assumption: A’s and B’s grades are <strong>independent</strong>.</li>
+<li>Then each joint probability is the product of the margins.</li>
+<li>Independent graders, at their own rates, would agree on 54% of answers.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. Go line by line. Line 1 is the last slide’s split into two disjoint ways. Line 2 is the only assumption: if the two grades are independent, then <span class="math inline">P(\text{A helpful and B helpful})=P(\text{A helpful})\,P(\text{B helpful})</span>, and the same for “not helpful.” Independent means knowing A’s grade tells you nothing about B’s: graders who never read the answer and each flipped a weighted coin, A’s coin landing helpful 60% of the time and B’s 70%. Lines 3 and 4 put in the margins. The real graders are not independent, which is the point: they agree on 78%, not 54%. HW7 Problem 1(a)(ii) asks for these steps with its own table.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="chance-as-a-table-of-expected-counts" class="slide level2 smaller">
+<h2>Chance as a table of expected counts</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">B: helpful</th>
+<th style="text-align: right;">B: not helpful</th>
+<th style="text-align: right;">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>A: helpful</strong></td>
+<td style="text-align: right;">54 (42)</td>
+<td style="text-align: right;">6 (18)</td>
+<td style="text-align: right;">60</td>
+</tr>
+<tr class="even">
+<td><strong>A: not helpful</strong></td>
+<td style="text-align: right;">16 (28)</td>
+<td style="text-align: right;">24 (12)</td>
+<td style="text-align: right;">40</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">100</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>In parentheses: the counts if the grades were independent.</li>
+<li>Each is row total × column total ÷ 100, as in a chi-square test.</li>
+<li>On the diagonal: 78 observed, 54 expected by chance.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. For example, <span class="math inline">60\times70/100=42</span>: 60 answers A calls helpful, and an independent B would call 70% of them helpful. These are the expected counts of the chi-square test of independence from intro statistics. The graders agree on 24 more answers than chance; kappa, next, compares that 24 with the 46 they could have added at most (<span class="math inline">100-54</span>).</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="kappa-agreement-beyond-chance" class="slide level2 smaller">
+<h2>Kappa: agreement beyond chance</h2>
+<p><span class="math display">\kappa=\frac{\text{agreement}-\text{chance agreement}}{1-\text{chance agreement}}=\frac{0.78-0.54}{1-0.54}=\frac{0.24}{0.46}=0.52</span></p>
+<ul>
+<li><span class="math inline">\kappa=1</span>: they agree on every answer.</li>
+<li><span class="math inline">\kappa=0</span>: no better than two independent graders.</li>
+<li><span class="math inline">\kappa&lt;0</span>: worse than chance.</li>
+</ul>
+<p class="compact-note">
+Cohen (1960), “A coefficient of agreement for nominal scales.”
+</p>
+<aside class="notes">
+<p>About 3 minutes. The denominator is the most they could gain over chance, 0.46; they gained 0.24 of it, about half. Avoid labels such as “moderate” or “substantial” for ranges of kappa: they are conventions, and kappa depends on how common each category is, as the next slide shows. Cohen, J. (1960), <em>Educational and Psychological Measurement</em> 20(1), 37–46.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="agreement-alone-can-mislead" class="slide level2 smaller compact-table">
+<h2>Agreement alone can mislead</h2>
+<p>Staff flag 10 of 200 answers as unsafe. A judge calls every answer safe.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">Judge: safe</th>
+<th style="text-align: right;">Judge: unsafe</th>
+<th style="text-align: right;">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Staff: safe</strong></td>
+<td style="text-align: right;">190</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">190</td>
+</tr>
+<tr class="even">
+<td><strong>Staff: unsafe</strong></td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">200</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">
+\begin{aligned}
+\text{agreement}&amp;=190/200=0.95\\
+\text{chance}&amp;=P(\text{staff safe})\,P(\text{judge safe})\\
+&amp;\quad+P(\text{staff unsafe})\,P(\text{judge unsafe})\\
+&amp;=0.95\times1+0.05\times0=0.95\\
+\kappa&amp;=(0.95-0.95)/(1-0.95)=0
+\end{aligned}
+</span></p>
+<ul>
+<li>The judge never reads an answer, and it still agrees 95% of the time.</li>
+</ul>
+<p class="compact-note">
+Feinstein and Cicchetti (1990), “High agreement but low kappa.”
+</p>
+<aside class="notes">
+<p>About 3 minutes. Build it from the table. Agreement is the diagonal: 190 safe-safe and 0 unsafe-unsafe. For chance, use the margins as on the “Chance assumes independence” slide: the staff say safe 95% of the time and unsafe 5%; the judge says safe 100% of the time and unsafe 0%. So chance agreement is <span class="math inline">0.95\times1+0.05\times0=0.95</span>, the same as the observed agreement, and kappa’s numerator is 0. A judge that always gives the same answer agrees exactly as often as chance predicts, so its kappa is always 0. The judge never reads an answer, and its agreement looks excellent. Kappa subtracts what the shares alone give. The flip side: kappa can be low when agreement is high, if one category is rare, so report agreement, the shares, and kappa together. Feinstein, A. R., and Cicchetti, D. V. (1990), <em>Journal of Clinical Epidemiology</em> 43(6), 543–549. HW7 1(b) is the same idea with a judge that always says yes.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="check" class="slide level2 smaller">
+<h2>Check</h2>
+<p>Two graders read 50 answers: both yes on 35, only A on 5, only B on 2, both no on 8.</p>
+<ol type="1">
+<li>Find agreement, chance agreement, and <span class="math inline">\kappa</span>.</li>
+<li>A third grader gives every answer the same grade A gives. Find its <span class="math inline">\kappa</span> with A.</li>
+</ol>
+<div class="fragment">
+<ol type="1">
+<li>Agreement 0.86, chance 0.644, <span class="math inline">\kappa=0.61</span>.</li>
+<li>Agreement 1, chance <span class="math inline">0.80^2+0.20^2=0.68</span>, so <span class="math inline">\kappa=0.32/0.32=1</span>.</li>
+</ol>
+</div>
+<aside class="notes">
+<p>About 4 minutes. Agreement <span class="math inline">43/50=0.86</span>. A says yes on <span class="math inline">35+5=40</span> of 50 (0.80) and B on <span class="math inline">35+2=37</span> (0.74), so chance is <span class="math inline">0.80\times0.74+0.20\times0.26=0.592+0.052=0.644</span>, and <span class="math inline">\kappa=(0.86-0.644)/(1-0.644)=0.216/0.356=0.61</span>. Question 2: the third grader copies A, so it says yes on 0.80 of answers too, and chance agreement is <span class="math inline">0.80\times0.80+0.20\times0.20=0.64+0.04=0.68</span>. They agree on every answer, so the numerator and denominator are both <span class="math inline">1-0.68</span>, and <span class="math inline">\kappa=1</span>. Perfect agreement gives <span class="math inline">\kappa=1</span> whatever the shares; the previous slide showed the other end, <span class="math inline">\kappa=0</span>.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="compare-a-judge-with-a-second-rater" class="slide level2 smaller compact-table">
+<h2>Compare a judge with a second rater</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 42%">
+<col style="width: 57%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Chatbot answers to 120 residents’ questions</th>
+<th style="text-align: right;"><span class="math inline">\kappa</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Staff member with staff member</td>
+<td style="text-align: right;">0.52</td>
+</tr>
+<tr class="even">
+<td>LLM judge with a staff member</td>
+<td style="text-align: right;">0.48</td>
+</tr>
+<tr class="odd">
+<td>Difference, judge minus staff (95% interval)</td>
+<td style="text-align: right;"><span class="math inline">-0.04</span> (<span class="math inline">-0.13</span> to <span class="math inline">0.05</span>)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Staff disagree with each other too, so <span class="math inline">\kappa=1</span> is the wrong target.</li>
+<li>Compare the judge’s <span class="math inline">\kappa</span> with staff to staff’s <span class="math inline">\kappa</span> with each other.</li>
+<li>This judge could be up to 0.13 worse than a second staff member, or 0.05 better.</li>
+<li>The interval resamples residents’ questions (Weeks 4B and 11).</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. Made-up numbers. Staff members disagree with each other (<span class="math inline">\kappa=0.52</span>), so no judge can be expected to agree with one staff member perfectly. The fair comparison is with a second staff member: if the judge’s <span class="math inline">\kappa</span> with a staff member is about the same as two staff members’ <span class="math inline">\kappa</span> with each other, the judge can stand in for one more staff member. It can also come out higher: a judge that tracks what most staff would say can agree with one staff member more than a second staff member does, so the interval runs both ways. Several answers come from the same resident’s question and share its difficulty, so the interval resamples residents’ questions, as Week 4B resampled passages and Week 11 resampled questions. Thursday’s lab and HW7 Problem 2 make this comparison for GPT-4 on MT-Bench.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-kappa-says-about-two-raters" class="slide level2 smaller compact-table">
+<h2>What kappa says about two raters</h2>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th><span class="math inline">\kappa</span></th>
+<th>The two raters’ grades</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>always the same</td>
+</tr>
+<tr class="even">
+<td>between 0 and 1</td>
+<td>the same more often than chance</td>
+</tr>
+<tr class="odd">
+<td>0</td>
+<td>independent: one grade says nothing about the other</td>
+</tr>
+<tr class="even">
+<td>below 0</td>
+<td>the same less often than chance</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Independent grades are bad: both raters read the same answer.</li>
+<li>Good raters’ grades depend on each other through the answer.</li>
+<li>But their mistakes should not depend on each other. That is Question 2.</li>
+<li>High <span class="math inline">\kappa</span> means they agree, not that they are right. That is Question 4.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. The summary of Question 1, and the bridge to Question 2. Independence shows up twice today, and students should hear the difference. In the chance model, the grades themselves are independent; that is what two raters who ignored the answer would look like, so it is the baseline a good pair of raters should beat, and <span class="math inline">\kappa</span> measures by how much. A rater who gives every answer the same grade (the always-safe judge) is independent of anyone, which is why its <span class="math inline">\kappa</span> was 0. Good raters’ grades are dependent, because both depend on the same answer: in Question 2’s model, both ratings depend on the answer’s quality <span class="math inline">\mu_i</span>. What we want independent is their mistakes, given the answer. That is what makes averaging several raters work, and it fails when raters share a bias (all prefer longer answers, Question 4) or are copies of each other (a judge asked twice at temperature 0). Last bullet: <span class="math inline">\kappa=1</span> says two raters always agree; it does not say they are right, which Question 4 takes up.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="question-2-how-reliable-is-the-average-of-several-judges" class="title-slide slide level1 center">
+<h1>Question 2: how reliable is the average of several judges?</h1>
+
+</section>
+<section id="a-rating-is-a-noisy-measurement" class="slide level2 smaller">
+<h2>A rating is a noisy measurement</h2>
+<p>The chatbot writes the answers. Now staff score each answer on a scale, such as 1 to 5.</p>
+<ul>
+<li>Each answer <span class="math inline">i</span> has a true quality <span class="math inline">\mu_i</span>. Answers differ, with variance <span class="math inline">\tau^2</span>.</li>
+<li>Each rater’s score misses the true quality a little, with variance <span class="math inline">\sigma^2</span>.</li>
+<li>Given the answer, different raters’ misses are independent.</li>
+</ul>
+<p><span class="math display">\operatorname{Var}(\mu_i)=\tau^2,\qquad y_{i1},\dots,y_{ir}\mid\mu_i\ \text{independent, mean}\ \mu_i,\ \text{variance}\ \sigma^2</span></p>
+<ul>
+<li>This is Week 4B’s model, with an answer in place of a passage.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. Ratings here are scores, such as 1 to 5, or votes coded as numbers. <span class="math inline">\tau^2</span> is how much the answers really differ; <span class="math inline">\sigma^2</span> is how much raters differ on the same answer. The model assumes raters are unbiased: given the answer, each rating has mean <span class="math inline">\mu_i</span>. Question 4 comes back to what happens when that fails.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="two-raters-correlation-is-rho" class="slide level2 smaller">
+<h2>Two raters’ correlation is <span class="math inline">\rho</span></h2>
+<p><span class="math display">\operatorname{Cov}(y_{i1},y_{i2})=\operatorname{Var}(\mu_i)=\tau^2,\qquad \rho=\frac{\tau^2}{\tau^2+\sigma^2}</span></p>
+<ul>
+<li>Raters of the same answer share its quality, so their scores move together.</li>
+<li>Their covariance is <span class="math inline">\tau^2</span>, by the law of total covariance, as in Week 4B.</li>
+<li>For the city, <span class="math inline">\tau^2=0.3</span> and <span class="math inline">\sigma^2=0.7</span>, so <span class="math inline">\rho=0.3</span>.</li>
+<li><span class="math inline">\rho</span> is the reliability of a single rating.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. The steps, as in Week 4B: given <span class="math inline">\mu_i</span> the two ratings are independent, so the within-answer covariance is 0, and the covariance of the conditional means is <span class="math inline">\operatorname{Cov}(\mu_i,\mu_i)=\tau^2</span>. Each rating has variance <span class="math inline">\tau^2+\sigma^2</span> by the law of total variance. HW7 1(c)(i) asks for these steps with its own numbers; do not write them out here. In measurement, <span class="math inline">\rho</span> is the intraclass correlation (Shrout and Fleiss 1979).</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="average-more-raters-and-reliability-rises" class="slide level2 smaller">
+<h2>Average more raters, and reliability rises</h2>
+<div id="734c2d38" class="cell" data-fig-height="2.8" data-fig-width="9" data-execution_count="2">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_a_files/figure-revealjs/cell-3-output-1.png" width="852" height="259"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><span class="math display">\text{reliability}=\frac{\tau^2}{\operatorname{Var}(\bar y_i)}=\frac{\tau^2}{\tau^2+\sigma^2/r}=\frac{r\rho}{1+(r-1)\rho}</span></p>
+<ul>
+<li>A score averages <span class="math inline">r</span> raters. The last form is Spearman–Brown.</li>
+<li>For the city, one rater gives 0.30, two give 0.46, five give 0.68, and 0.8 takes 10.</li>
+</ul>
+<aside class="notes">
+<p>About 4 minutes. Reliability is the share of the average’s variance that comes from real differences between answers. <span class="math inline">\operatorname{Var}(\bar y_i)=\tau^2+\sigma^2/r</span> comes from the law of total variance, exactly as 11A’s <span class="math inline">\operatorname{Var}(\hat\theta)</span> did with one question. The last step is algebra; HW7 1(c)(ii) asks for it. Values: 0.30, 0.46, 0.56, 0.63, 0.68 for 1 to 5 raters, 0.81 for 10. Solving <span class="math inline">r\rho/(1+(r-1)\rho)\ge0.8</span> gives <span class="math inline">r\ge0.8(0.7)/(0.3\times0.2)=9.3</span>, so 10. Spearman, C. (1910), and Brown, W. (1910), both <em>British Journal of Psychology</em> 3(3).</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-a-reliability-of-0.8-means" class="slide level2 smaller">
+<h2>What a reliability of 0.8 means</h2>
+<div id="ca76e32b" class="cell" data-fig-height="2.4" data-fig-width="9" data-execution_count="3">
+<div class="cell-output cell-output-display">
+<div>
+<figure>
+<p><img data-src="lecture_a_files/figure-revealjs/cell-4-output-1.png" width="854" height="221"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>Each dot is an answer. Two different panels of 10 raters scored all 200.</li>
+<li>A panel’s score for an answer is the average of its 10 ratings.</li>
+<li>On the left, the two panels’ scores correlate 0.80. That is the reliability.</li>
+<li>On the right, one panel’s scores and the true quality correlate 0.90.</li>
+<li>The truth has no rater noise, so the right plot lines up better, at about <span class="math inline">\sqrt{0.8}</span>.</li>
+<li>0.8 is a convention, not a law. Ask for more when one score decides something.</li>
+</ul>
+<p class="compact-note">
+Usual source for 0.7, 0.8, and 0.9: Nunnally (1978). See also Lance, Butts, and Michels (2006).
+</p>
+<aside class="notes">
+<p>About 3 minutes. The plots are simulated from the city’s model, with <span class="math inline">\tau^2=0.3</span>, <span class="math inline">\sigma^2=0.7</span>, and 10 raters per panel, so a panel’s reliability is <span class="math inline">10(0.3)/(1+9(0.3))=0.81</span>. With seed 2027 the sample correlations are 0.80 and 0.90.</p>
+<p>What is being averaged: each of a panel’s 10 raters gives the answer a rating, and the panel’s score is the average of those 10 ratings. The two panels are different people rating the same answers.</p>
+<p>Left plot. Two panels agree only because they rate the same answers; the rest is which raters each panel happened to get. The correlation between two panels’ scores is the reliability. In the model the two scores share only <span class="math inline">\mu_i</span>, so their covariance is <span class="math inline">\tau^2</span> and their correlation is <span class="math inline">\tau^2/(\tau^2+\sigma^2/r)</span>. This is test–retest reliability.</p>
+<p>Right plot. The true quality has no rater noise, so a panel’s score lines up with it better than with another noisy score. In the model <span class="math inline">\operatorname{Cov}(\bar y_i,\mu_i)=\tau^2</span>, so the correlation is <span class="math inline">\tau^2/\sqrt{\tau^2(\tau^2+\sigma^2/r)}=\sqrt{\text{reliability}}</span>. Put the other way, reliability is the <span class="math inline">R^2</span> of the score on the true quality, the share of the scores’ variance that comes from real differences between answers. Signal over signal plus noise, not signal over noise (<span class="math inline">\tau^2/(\sigma^2/r)</span> would be 4 here).</p>
+<p>Why 0.8. It is a convention from psychological testing. The usual citation is Nunnally (1978), <em>Psychometric Theory</em>, 2nd ed., and Nunnally and Bernstein (1994), 3rd ed.: about 0.7 for early research, 0.8 for basic research comparing groups, and 0.9 or more when a score decides something about one person. I have not checked the exact pages. Lance, C. E., Butts, M. M., and Michels, L. C. (2006), “The sources of four commonly reported cutoff criteria: What did they really say?”, <em>Organizational Research Methods</em> 9(2), 202–220, show that the 0.7 cutoff is often cited for more than Nunnally said. For the city, flagging one answer for review calls for about 0.9. Comparing two chatbots’ average quality over many answers needs less, because averaging over answers also averages out rater noise (the “Two goals” slide).</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="averaging-needs-different-raters" class="slide level2 smaller">
+<h2>Averaging needs different raters</h2>
+<p>Could the city get 10 ratings cheaply by asking one LLM judge 10 times?</p>
+<ul>
+<li>At temperature 0, it gives the same rating every time, so 10 calls are one rating.</li>
+<li>At a higher temperature, its ratings vary, like a person rating the same answer twice.</li>
+<li>Averaging those calls smooths that variation but keeps the judge’s own leanings.</li>
+<li>Different people, models, or prompts average out each other’s leanings.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. Yes, the point is that averaging needs different raters. A rater’s miss has two parts: a leaning that rater brings to every answer (harsher than most, or fond of long answers), and variation from one occasion to the next. A person who rates the same answer twice, or an LLM judge called twice at a temperature above 0, varies only in the second part; the leaning is the same on every call. Averaging repeated ratings from one rater shrinks the occasion part but not the leaning, so their mistakes are correlated, and Spearman–Brown’s <span class="math inline">r</span> would overstate the reliability. At temperature 0 there is no occasion part at all, and ten calls give one rating. In the model, <span class="math inline">\sigma^2</span> is the variance across different raters, so <span class="math inline">r</span> counts different raters. This is Week 11’s temperature point from the other side: there, repeated answers varied because the model sampled. Even different models can share leanings (all prefer longer answers, Question 4), so a panel of models is worth less than its size suggests. HW7’s stretch problem tests whether a panel of experts beats one expert.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="more-answers-or-more-ratings" class="slide level2 smaller compact-table">
+<h2>More answers, or more ratings?</h2>
+<p>The city wants its chatbot’s average helpfulness, with $500 for grading.</p>
+<ul>
+<li>Collecting and preparing one chatbot answer to grade costs $6.</li>
+<li>Each answer is rated by one or more different raters, at $1 per rating.</li>
+<li>More ratings per answer leaves money for fewer answers.</li>
+<li>Every choice is unbiased for the same average, so pick the smallest SE.</li>
+</ul>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Week 11</th>
+<th>Today</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>a question</td>
+<td>a chatbot answer</td>
+</tr>
+<tr class="even">
+<td>a sampled answer to that question</td>
+<td>a rating of that answer</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math display">\operatorname{Var}(\text{average helpfulness})=\frac{1}{n}\Bigl(\tau^2+\frac{\sigma^2}{r}\Bigr),\qquad \text{cost}=n\,(\$6+r\times\$1)</span></p>
+<aside class="notes">
+<p>About 3 minutes. Set the scene before any formula. The city wants one number, the chatbot’s average helpfulness over residents’ questions. Why the smallest SE: whatever the split between answers and ratings, the average of the scores has the same expected value, the chatbot’s true average helpfulness, so every design is unbiased for the same target. They differ only in how much the estimate varies, so the design with the smallest SE gives the narrowest interval for the same $500, as in Week 11’s budget problem. To get it, staff collect chatbot answers (draw a resident’s question, record the answer, remove names), about $6 each, and pay raters $1 per rating. Every answer must be rated at least once; the choice is whether to rate each answer several times or to rate more answers once. This is Week 11’s budget problem with new names: an answer here plays the role of a question in Week 11, and a rating plays the role of a sampled answer. <span class="math inline">n</span> is the number of answers and <span class="math inline">r</span> the ratings per answer. The variance formula is Week 11’s, with <span class="math inline">\tau^2</span> the real differences between answers and <span class="math inline">\sigma^2</span> the rater noise.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="about-four-ratings-per-answer-is-best" class="slide level2 smaller compact-table">
+<h2>About four ratings per answer is best</h2>
+<p><span class="math display">r^\ast=\sqrt{\frac{\sigma^2}{\tau^2}\times\frac{\text{cost of an answer}}{\text{cost of a rating}}}=\sqrt{\frac{0.7}{0.3}\times\frac{\$6}{\$1}}=3.7</span></p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Ratings per answer, <span class="math inline">r</span></th>
+<th style="text-align: right;">Answers $500 buys</th>
+<th style="text-align: right;">SE of the average helpfulness</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">71</td>
+<td style="text-align: right;">0.119</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">0.102</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">0.098</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">0.109</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Each row spends the $500 on as many answers as it can.</li>
+<li>One rating each buys the most answers, but every score is noisy.</li>
+<li>Ten ratings each leaves too few answers.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. <span class="math inline">r^\ast</span> is Week 11’s rule, written in words because the names changed. Week 11’s cost of a question is now the cost of an answer, and Week 11’s cost of an answer is now the cost of a rating. Each row buys <span class="math inline">n=\lfloor500/(6+r)\rfloor</span> answers, and the SE is <span class="math inline">\sqrt{(0.3+0.7/r)/n}</span>. The best is <span class="math inline">r=4</span>, near <span class="math inline">r^\ast=3.7</span>; 3 ratings gives 0.0985.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="two-goals-need-two-designs" class="slide level2 smaller compact-table">
+<h2>Two goals need two designs</h2>
+<p>The chatbot writes the answers, and raters score them.</p>
+<p>The city could use those scores for two different jobs.</p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>What the city wants</th>
+<th>For example</th>
+<th>Raters per answer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>a trustworthy score for each single chatbot answer</td>
+<td>flag one bad chatbot answer for staff to fix</td>
+<td>10, for a reliability of 0.81</td>
+</tr>
+<tr class="even">
+<td>the chatbot’s average helpfulness over many residents’ questions</td>
+<td>decide whether the chatbot is helpful enough to launch</td>
+<td>about 4, with the rest of the $500 spent on more answers</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>The first job uses each answer’s score on its own, so that score must be reliable.</li>
+<li>The second job averages over many answers, which also averages out rater noise.</li>
+<li>So the second job needs fewer raters per answer and more answers.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. The numbers are the city’s from the last few slides. For the first job, Spearman–Brown says 10 raters give each answer’s average score a reliability of 0.81. For the second job, the budget table says about 4 ratings per answer gives the smallest SE for the chatbot’s average helpfulness. The difference comes from what is averaged. One answer’s score averages only its own raters, so its rater noise shrinks only with more raters. The chatbot’s average helpfulness averages over all <span class="math inline">n</span> answers, so rater noise shrinks with <span class="math inline">n</span> as well, and the real differences between answers, <span class="math inline">\tau^2/n</span>, become the larger part of the variance. HW7 1(d)(iii) asks for this contrast with its own numbers.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="check-1" class="slide level2 smaller">
+<h2>Check</h2>
+<p>Two raters’ scores of the same answer correlate 0.5, so <span class="math inline">\rho=0.5</span>.</p>
+<ol type="1">
+<li>What is the reliability of the average of 2 raters?</li>
+<li>How many raters does a reliability of 0.9 take?</li>
+<li>If <span class="math inline">\sigma^2=\tau^2</span> and an answer costs 4 ratings, how many ratings per answer?</li>
+</ol>
+<div class="fragment">
+<ol type="1">
+<li><span class="math inline">2(0.5)/(1+0.5)=0.67</span>.</li>
+<li><span class="math inline">r\ge0.9(0.5)/(0.5\times0.1)=9</span>.</li>
+<li><span class="math inline">\sqrt{1\times4}=2</span>.</li>
+</ol>
+</div>
+<aside class="notes">
+<p>About 3 minutes. For question 2, solve <span class="math inline">r\rho/(1+(r-1)\rho)\ge R</span> for <span class="math inline">r</span>, which gives <span class="math inline">r\ge R(1-\rho)/\bigl(\rho(1-R)\bigr)</span>.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="question-3-does-the-order-of-the-answers-change-the-verdict" class="title-slide slide level1 center">
+<h1>Question 3: does the order of the answers change the verdict?</h1>
+
+</section>
+<section id="a-judge-reads-one-answer-first" class="slide level2 smaller">
+<h2>A judge reads one answer first</h2>
+<p>The city is choosing between two versions of its chatbot, A and B.</p>
+<ul>
+<li>For each question, an LLM judge reads both versions’ answers and picks one.</li>
+<li>The judge has to read one answer first.</li>
+<li>Swap the two answers and ask again. If the verdict changes, that is a <strong>flip</strong>.</li>
+<li>At temperature 0 nothing else changed, so the order caused the flip.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. Many LLM judges compare two answers rather than grading one. At temperature 0 the same input gives the same output, so if the verdict changes when only the order changes, the order caused it. A flip cannot be blamed on sampling.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="so-show-every-pair-in-both-orders" class="slide level2 smaller compact-table">
+<h2>So show every pair in both orders</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Design term</th>
+<th>The city’s check</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Unit</td>
+<td>a resident’s question, with version A’s and version B’s answers</td>
+</tr>
+<tr class="even">
+<td>Treatment</td>
+<td>the order, A first or B first</td>
+</tr>
+<tr class="odd">
+<td>Block</td>
+<td>the pair of answers, which gets both orders</td>
+</tr>
+<tr class="even">
+<td>Held constant</td>
+<td>the prompt, the model version, temperature 0</td>
+</tr>
+<tr class="odd">
+<td>Response</td>
+<td>which version the judge picks</td>
+</tr>
+<tr class="even">
+<td>Randomization</td>
+<td>the order of the calls</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Each pair is compared with itself, so how hard its question is cancels.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. This is 11A’s design table. The order is crossed with the pair, as 11A crossed prompt wording with questions.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="verdicts-by-order-form-a-paired-table" class="slide level2 smaller compact-table">
+<h2>Verdicts by order form a paired table</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 27%">
+<col style="width: 36%">
+<col style="width: 36%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>200 pairs</th>
+<th style="text-align: right;">B shown first, judge picks A</th>
+<th style="text-align: right;">B shown first, judge picks B</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>A shown first, judge picks A</strong></td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">24</td>
+</tr>
+<tr class="even">
+<td><strong>A shown first, judge picks B</strong></td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">96</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>On 166 pairs the judge picked the same version both times.</li>
+<li>On 34 pairs, 17%, the verdict flipped with the order.</li>
+<li>On 24 of them it picked whichever version it read first, and on 10 the second.</li>
+<li>This is Week 5’s paired table, with the order in place of the model.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. Made-up numbers. Top right: A when A is first and B when B is first, so the judge picked whichever it read first (24). Bottom left: the one it read second (10). Week 5A’s leaderboard table had two models where this has two orders. The flip rate is <span class="math inline">34/200=0.17</span>, with SE <span class="math inline">\sqrt{0.17\times0.83/200}=0.027</span> if the pairs were independent.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="does-the-judge-favor-the-first-answer" class="slide level2 smaller">
+<h2>Does the judge favor the first answer?</h2>
+<p><span class="math display">
+\begin{aligned}
+P(\text{picks A}\mid\text{A first})&amp;=(70+24)/200=0.47\\
+P(\text{picks A}\mid\text{B first})&amp;=(70+10)/200=0.40\\
+\text{order effect}&amp;=0.47-0.40=(24-10)/200=0.07
+\end{aligned}
+</span></p>
+<ul>
+<li>Only the 34 flips carry evidence about the order, as in Week 5.</li>
+<li>If the order did not matter, each flip would go either way with probability 1/2.</li>
+<li>McNemar’s test gives <span class="math inline">z=(24-10)/\sqrt{34}=2.40</span> and <span class="math inline">p\approx0.02</span>.</li>
+<li>So yes. This judge favors the answer it reads first.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. The order effect is the paired difference in proportions from Week 5A, <span class="math inline">(n_{01}-n_{10})/n</span>, with the order in place of the model; its paired SE is 0.029. The 166 pairs with the same verdict both times appear in both probabilities and cancel. Normal approximation <span class="math inline">p=0.016</span>; exact binomial <span class="math inline">p=0.024</span>. McNemar, Q. (1947), <em>Psychometrika</em> 12(2), 153–157.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="why-not-pick-one-order-at-random" class="slide level2 smaller">
+<h2>Why not pick one order at random?</h2>
+<ul>
+<li>Always showing A first makes a first-answer preference look like a better A.</li>
+<li>One random order per pair is fair on average, but noisier.</li>
+<li>With one call per pair, you never see a flip.</li>
+<li>Showing both orders compares each pair with itself.</li>
+</ul>
+<p class="compact-note">
+Zheng et al.&nbsp;(2023, Section 3.4) describe both designs.
+</p>
+<aside class="notes">
+<p>About 3 minutes. If version A is always shown first, a 7-point first-position preference looks like a better version A. Randomizing one order per pair removes that bias on average, because the push from position lands on both versions equally often, but it stays in each verdict as noise, and no single pair shows whether its verdict depends on the order. Showing both orders blocks on the pair (11A, “Pairing is blocking”), and every flip is visible. Zheng et al.&nbsp;describe swapping the order and calling a disagreement a tie, or assigning positions at random. Box, Hunter, and Hunter’s boys’ shoes (Statistics for Experimenters, Section 3.2) is the same idea: each boy wears both materials, one per foot; here each pair gets both orders.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="medical-trials-call-this-a-crossover" class="slide level2 smaller compact-table">
+<h2>Medical trials call this a crossover</h2>
+<p>In a crossover trial, each patient gets two treatments, one after the other.</p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Crossover trial</th>
+<th>LLM judge</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>two treatments</td>
+<td>two answers</td>
+</tr>
+<tr class="even">
+<td>first period, second period</td>
+<td>shown first, shown second</td>
+</tr>
+<tr class="odd">
+<td>half get AB, half get BA</td>
+<td>A first, B first</td>
+</tr>
+<tr class="even">
+<td>period effect</td>
+<td>position bias</td>
+</tr>
+</tbody>
+</table>
+<p class="compact-note">
+Hills and Armitage (1979). Jones and Kenward (2015), Chapter 2. Sports models call it home-field advantage (Davidson and Beaver 1977).
+</p>
+<aside class="notes">
+<p>About 3 minutes. In a two-period crossover trial each patient gets both treatments, one per period, and half get AB and half BA, so a period effect cancels. A judge sees both answers, one per position, and showing both orders balances the position. A caution: in crossover trials, McNemar’s test on discordant pairs is a test of the treatment, assuming no period effect. Here the two orders are what we compare within each pair, so the same test checks the period (position) effect. Hills, M., and Armitage, P. (1979), <em>British Journal of Clinical Pharmacology</em> 8(1), 7–20; Jones, B., and Kenward, M. G. (2015), <em>Design and Analysis of Cross-Over Trials</em>, 3rd ed., Chapter 2, “Binary Data.” Bradley–Terry models for paired comparisons add an order term for the home team: Davidson, R. R., and Beaver, R. J. (1977), <em>Biometrics</em> 33(4), 693–702. More in <code>instructor_only/week12/references.md</code>.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="pairs-from-one-question-flip-together" class="slide level2 smaller">
+<h2>Pairs from one question flip together</h2>
+<ul>
+<li>In Thursday’s data, each question gives 30 pairs of answers to judge.</li>
+<li>Pairs from the same question tend to flip together.</li>
+<li>So an interval for the flip rate should resample questions, as for kappa.</li>
+<li>Which pairs would you expect to flip most often?</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. On MT-Bench, each question appears in 30 items, 2 turns times 15 pairs of chatbots. Take answers to the last question before saying anything. The one to reach is pairs whose two answers are close in quality, where small things, including the order, decide the verdict. Pairs with one clearly better answer rarely flip. So a flip rate depends on the mix of comparisons, like any average over a mix (Week 9). Thursday’s lab measures the flip rate on MT-Bench and its design effect; HW7 2(d) looks at how it depends on how close the two chatbots are.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="check-2" class="slide level2 smaller">
+<h2>Check</h2>
+<p>Another judge compares two versions on 150 questions, in both orders. It picks A both times on 60, B both times on 63, the version it read first on 9, and the one it read second on 18.</p>
+<ol type="1">
+<li>Find the flip rate and its SE, as if the pairs were independent.</li>
+<li>Find <span class="math inline">z</span>. Which position does the judge favor, and how sure are you?</li>
+</ol>
+<div class="fragment">
+<ol type="1">
+<li>27 flips out of 150 is 0.18, with SE <span class="math inline">\sqrt{0.18\times0.82/150}=0.031</span>.</li>
+<li><span class="math inline">z=(9-18)/\sqrt{27}=-1.73</span>. It leans toward the second answer, but <span class="math inline">p\approx0.08</span>.</li>
+</ol>
+</div>
+<aside class="notes">
+<p>About 4 minutes. The exact binomial p-value is 0.12. Not significant at 5%, but not evidence that the order does not matter either; 27 flips is little to go on.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section></section>
+<section>
+<section id="question-4-does-agreement-mean-the-judge-is-right" class="title-slide slide level1 center">
+<h1>Question 4: does agreement mean the judge is right?</h1>
+
+</section>
+<section id="two-judges-can-agree-and-be-wrong" class="slide level2 smaller">
+<h2>Two judges can agree and be wrong</h2>
+<ul>
+<li>Suppose the staff and the LLM judge both tend to prefer longer answers.</li>
+<li>Then they agree with each other, even when the longer answer is worse.</li>
+<li>Agreement measures reliability. Being right is validity.</li>
+<li>Thursday’s lab starts with a question where both chatbots’ answers are wrong.</li>
+</ul>
+<aside class="notes">
+<p>About 3 minutes. Kappa and Spearman–Brown measure how consistently judges agree, not whether they are right. In Question 2’s model, raters were unbiased given the answer; a shared preference for length is a bias they all share, and averaging more raters does not remove it. In Thursday’s first item both chatbots’ answers are wrong and the experts split their votes; a judge that picks either one agrees with an expert half the time.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="check-against-the-truth" class="slide level2 smaller">
+<h2>Check against the truth</h2>
+<ul>
+<li>If answers can be checked, compare the judge with the key.</li>
+<li>If not, change something the judge should ignore, and see if verdicts move.</li>
+<li>For example, lengthen an answer without adding anything.</li>
+<li>If the judge’s own model wrote one of the answers, check whether it favors that one.</li>
+</ul>
+<p class="compact-note">
+Zheng et al.&nbsp;(2023, Section 3.3) name position, verbosity, and self-enhancement biases.
+</p>
+<aside class="notes">
+<p>About 3 minutes. Where an answer can be checked, compare the judge with the key, not just with people. Where it cannot, design an experiment that changes one thing the judge should ignore, such as length or order, and see whether the verdict moves. That is the same treatment-and-block design as Question 3. HW7 2(e) checks whether experts and GPT-4 both prefer the longer answer. In Thursday’s second item, GPT-4 judges an answer GPT-4 wrote.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="the-machine-learning-names" class="slide level2 smaller compact-table">
+<h2>The machine-learning names</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Statistics</th>
+<th>Machine learning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>a rater</td>
+<td>LLM-as-a-judge</td>
+</tr>
+<tr class="even">
+<td>agreement beyond chance with people</td>
+<td>human agreement, alignment with humans</td>
+</tr>
+<tr class="odd">
+<td>a period (order) effect</td>
+<td>position bias</td>
+</tr>
+<tr class="even">
+<td>a shared preference for length</td>
+<td>verbosity bias</td>
+</tr>
+<tr class="odd">
+<td>a rater favoring its own model</td>
+<td>self-enhancement bias</td>
+</tr>
+<tr class="even">
+<td>the average of several raters</td>
+<td>a jury or panel of judges</td>
+</tr>
+</tbody>
+</table>
+<aside class="notes">
+<p>About 1 minute. The ideas come first; the names are how students will find them in papers. Zheng et al.&nbsp;(2023) named the three biases. Many machine-learning papers report raw agreement with humans, not kappa, and with ties or a common category that overstates it (Question 1).</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="writing-it-up" class="slide level2 smaller">
+<h2>Writing it up</h2>
+<blockquote>
+<p>On chatbot answers to 120 residents’ questions, the LLM judge agreed with a staff member about as well as two staff members agreed with each other (<span class="math inline">\kappa</span> 0.48 against 0.52; difference <span class="math inline">-0.04</span>, 95% interval <span class="math inline">-0.13</span> to <span class="math inline">0.05</span>, resampling questions). Shown each pair in both orders, it changed its verdict on 17% of pairs, and it favored the answer it read first.</p>
+</blockquote>
+<ul>
+<li>Compare the judge with a second rater, and give an interval.</li>
+<li>Resample questions. Give the flip rate and which position wins.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. Made-up numbers from today’s slides. A report that gives only raw agreement, or only one order, leaves out what a reader needs.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="your-project" class="slide level2 smaller">
+<h2>Your project</h2>
+<ul>
+<li>If your track is human preferences, your judge saw both orders. Make the 2×2 table.</li>
+<li>If it is instruction following, find the judge’s <span class="math inline">\kappa</span> with the rule checker.</li>
+<li>If it is food or pet tagging, the dataset’s labels are a rater too.</li>
+<li>In your Milestone 2 design table, say what your reference is and how reliable it is.</li>
+</ul>
+<aside class="notes">
+<p>About 2 minutes. Track 3’s judge is stored in both orders (<code>v1</code> and <code>v2</code>), so the verdicts-by-order table and McNemar’s test apply directly; the judge’s kappa with the human preference should resample posts. Track 4’s judge is compared with a rule checker; which one is the reference, and is it right? Tracks 1 and 2 come back to Week 2’s point that labels are measurements. Thursday’s lab handoff asks each team for this.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="what-we-did-today" class="slide level2 smaller">
+<h2>What we did today</h2>
+<ol type="1">
+<li>Kappa measures agreement beyond chance.</li>
+<li>A judge should be compared with a second rater, resampling questions.</li>
+<li>Averaging more raters raises reliability, as Spearman–Brown says.</li>
+<li>Showing both orders reveals flips and which position the judge favors.</li>
+<li>Agreement is not validity, so check the judge against the truth where you can.</li>
+</ol>
+<aside class="notes">
+<p>About 1 minute.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+</section>
+<section id="thursday" class="slide level2 smaller">
+<h2>Thursday</h2>
+<ul>
+<li>Lecture 12B, then Lab 12 on experts and GPT-4 judging MT-Bench.</li>
+<li>Then work time on your project.</li>
+<li>HW7 is out today and due Tue Apr 13. Milestone 2 was due today.</li>
+<li>Read Zheng et al.&nbsp;(2023), Sections 3.3 and 4.2.</li>
+</ul>
+<aside class="notes">
+<p>About 1 minute. Checkpoint 10 opens after Thursday’s class.</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside>
+
+</section></section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="lecture_a_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="lecture_a_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="lecture_a_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="lecture_a_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
