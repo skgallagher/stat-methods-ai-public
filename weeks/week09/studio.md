@@ -6,7 +6,7 @@ After the guided lab, the rest of class is for your team's project. Today the wh
 
 Open your track's starter notebook in Colab from the course website, like every other notebook. Its first cell downloads your track's data from the course Box folder, checks that the download is complete, and unpacks it. If the download does not work, the cell tells you how to upload the zip yourself.
 
-Every member runs the notebook on their own laptop. A team where one person types and three watch has trouble in the oral, where anyone can be asked about any part of the project.
+Every member runs the notebook on their own laptop. A team where one person types and three watch has trouble in the oral presentation, where anyone can be asked about any part of the project.
 
 The holdout stays sealed. Everything today uses the analysis cases. Write your answers in text cells in the notebook. Short sentences in your own words are fine; today is for shaping ideas, not polishing them.
 

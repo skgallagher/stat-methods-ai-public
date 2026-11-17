@@ -33,7 +33,7 @@ It has five parts: **the problem**, **who the numbers are about**, **EDA**, **id
 Milestone 2 adds results to the same outline, and Milestone 3 adds the recommendation. The final slides and video then tell the whole story.
 
 ::: notes
-About 2 minutes. Do not restate the list's details or the points; send students to the two documents. Instructor decision, Oct 20: the milestones are working outlines so that the writing stays the team's own; the storyboard, the video, and the oral are where the story gets told.
+About 2 minutes. Do not restate the list's details or the points; send students to the two documents. Instructor decision, Oct 20: the milestones are working outlines so that the writing stays the team's own; the storyboard, the video, and the oral presentation are where the story gets told.
 :::
 
 ## Example: the partner park's problem {.smaller}
