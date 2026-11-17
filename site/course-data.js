@@ -8,7 +8,9 @@ const courseLinks = {
   siteHome: "https://www.stat.cmu.edu/~sgallagh/courses/stat-ai-spring-2027/",
   // GitHub Pages serves the public repo, so HTML slides render in the browser.
   pagesBase: "https://skgallagher.github.io/stat-methods-ai-public",
-  projectDataBox: "https://cmu.box.com/s/9jzjm8u9wc9kmkmewsoi9ciekbkf5c2k"
+  // The Box folder "Stat-AI Spring 2027 project data" (CMU sign-in). The starters download
+  // its zips through their own open links, listed in the starters and in box_downloads.json.
+  projectDataBox: "https://cmu.box.com/s/mvwydnvoc3ymlq3jusan0p9kkbank1s7"
 };
 
 const siteSettings = {
