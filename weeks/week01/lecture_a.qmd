@@ -164,8 +164,8 @@ Every homework and the final project follow these five stages.
 | Component | Weight |
 |---|---:|
 | Homework (seven, lowest dropped) | 15% |
-| Weekly checkpoints (eleven, lowest two dropped) | 20% |
-| Midterm, in class Thursday, March 4 | 25% |
+| Weekly checkpoints (eleven, lowest two dropped) | 15% |
+| Midterm, in class Thursday, March 4 | 30% |
 | Final project, including peer assessment | 40% |
 
 Homework is where you practice, with AI where it is allowed. Checkpoints, the midterm, and the project's oral presentation are where you show the reasoning is your own.

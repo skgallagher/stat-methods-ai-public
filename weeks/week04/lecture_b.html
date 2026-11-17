@@ -256,7 +256,7 @@ The same design effect applies to an accuracy. In HW4 you derive it for camera-t
 </section>
 <section id="what-rho-does-to-400-questions" class="slide level2 smaller">
 <h2>What <span class="math inline">\rho</span> does to 400 questions</h2>
-<div id="6e60e10e" class="cell" data-fig-height="3.6" data-fig-width="10" data-execution_count="1">
+<div id="1d096c11" class="cell" data-fig-height="3.6" data-fig-width="10" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -270,7 +270,7 @@ The same design effect applies to an accuracy. In HW4 you derive it for camera-t
 <section id="fixing-the-coverage" class="slide level2 smaller">
 <h2>Fixing the coverage</h2>
 <p>The interval on the last slide misses because its standard error pretends the 400 questions are independent. The bootstrap estimates the sampling distribution by <strong>resampling the data the same way they were sampled</strong>. The benchmark sampled passages, and each passage brought its questions with it.</p>
-<div id="d0a6b015" class="cell" data-fig-height="2.9" data-fig-width="9" data-execution_count="2">
+<div id="24d25c3e" class="cell" data-fig-height="2.9" data-fig-width="9" data-execution_count="2">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -327,23 +327,23 @@ The same design effect applies to an accuracy. In HW4 you derive it for camera-t
 <tbody>
 <tr class="odd">
 <td>Food tagging</td>
-<td>one image</td>
-<td>No.&nbsp;Nothing links images, so treat them as independent.</td>
+<td>one photo</td>
+<td>No.&nbsp;Nothing links the photos, so treat them as independent.</td>
 </tr>
 <tr class="even">
 <td>Pet tagging</td>
-<td>one image</td>
-<td>No, same as Food.</td>
+<td>one photo</td>
+<td>A few. Eleven photos appear twice, and both copies share a <code>photo_group</code>.</td>
 </tr>
 <tr class="odd">
 <td>Human preferences</td>
-<td>one judge verdict</td>
-<td>Yes, if you judge each pair in both orders, since the two verdicts share a pair. A few pairs also come from the same Reddit post.</td>
+<td>one pair</td>
+<td>Yes. The 900 pairs come from 791 Reddit posts. The judge also saw each pair in both orders, and those two verdicts share a pair.</td>
 </tr>
 <tr class="even">
 <td>Instruction following</td>
-<td>one instruction check</td>
-<td>Yes. Each response gets several checks, and each prompt has several responses.</td>
+<td>one response</td>
+<td>Yes. Each prompt has two responses.</td>
 </tr>
 </tbody>
 </table>

@@ -109,7 +109,7 @@ About 2 minutes. Using MegaDetector means people stop reviewing the photos it ca
 1. **Choices you could have made differently:** the client's mix, which $Z$, how many groups, the decision rule. Thinking and counting the client's cases pin these down, with no labels. *Today.*
 2. **An assumption you cannot check without new data:** that accuracy within each group carries over to the client. Only labels from the client settle it. *Thursday.*
 
-Both ask the same question: **does the decision change?** Milestone 1, due today, asked for the assumption most likely to threaten your conclusion. This week turns it into a variable you can vary or bound.
+Both ask the same question: **does the decision change?** Milestone 1, due today, asked what could most go wrong. This week turns that into a variable you can vary or bound.
 
 ::: notes
 About 2 minutes. Epidemiology has done both kinds for a long time. Cornfield et al. (1959) asked how strong a hidden confounder would have to be to explain away the link between smoking and lung cancer, an early sensitivity analysis of the second kind; epidemiologists now call this quantitative bias analysis (Lash, Fox, and Fink 2009). The second kind is the one that failed for the partner park and for hospitals 4 and 5. It needs a different tool, a sensitivity parameter, which is Thursday's lecture and lab. Thursday also asks when you could skip labeling the client's cases (rarely) and how many to label. Neither kind is about perturbing the inputs: rotating or blurring images tests the model, not the conclusion, unless the client's cases really differ that way.

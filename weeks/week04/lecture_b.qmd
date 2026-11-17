@@ -219,10 +219,10 @@ With bursts of three photos and $\rho = 0.4$, the design effect is $1 + 2(0.4) =
 
 | Track | One scored item | Clusters? |
 |---|---|---|
-| Food tagging | one image | No. Nothing links images, so treat them as independent. |
-| Pet tagging | one image | No, same as Food. |
-| Human preferences | one judge verdict | Yes, if you judge each pair in both orders, since the two verdicts share a pair. A few pairs also come from the same Reddit post. |
-| Instruction following | one instruction check | Yes. Each response gets several checks, and each prompt has several responses. |
+| Food tagging | one photo | No. Nothing links the photos, so treat them as independent. |
+| Pet tagging | one photo | A few. Eleven photos appear twice, and both copies share a `photo_group`. |
+| Human preferences | one pair | Yes. The 900 pairs come from 791 Reddit posts. The judge also saw each pair in both orders, and those two verdicts share a pair. |
+| Instruction following | one response | Yes. Each prompt has two responses. |
 
 For Food and Pets, today's other lessons matter more. Per-class and per-breed counts are small, so those intervals are wide, and cat-or-dog accuracy is near 1, where Wald fails.
 
