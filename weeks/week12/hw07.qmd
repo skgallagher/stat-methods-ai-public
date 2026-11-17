@@ -18,6 +18,7 @@ format:
 | **Points** | 100: Problem 1 (45), Problem 2 (40, including a 5-point stretch), Problem 3 (15) |
 | **Expected time** | About 5 hours after Labs 11 and 12. Contact course staff if setup or debugging alone takes more than 30 minutes. |
 | **Reading** | Zheng et al. (2023), ["Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena"](https://arxiv.org/abs/2306.05685), Section 3.3 (position and verbosity bias) and Section 4.2 (agreement between GPT-4 and humans). |
+| **Sources** | Cohen (1960), ["A Coefficient of Agreement for Nominal Scales"](https://doi.org/10.1177/001316446002000104), *Educational and Psychological Measurement*; Spearman (1910), ["Correlation Calculated from Faulty Data"](https://doi.org/10.1111/j.2044-8295.1910.tb00206.x), and Brown (1910), ["Some Experimental Results in the Correlation of Mental Abilities"](https://doi.org/10.1111/j.2044-8295.1910.tb00207.x), both in *British Journal of Psychology* |
 | **AI policy** | No AI for Problem 1. AI is allowed in Problem 2. In Problem 3 you use an AI assistant as a judge. Submit the AI-use record at the end. |
 | **Working file** | `hw07_starter.ipynb`. The PDF is a read-only copy of the prompt. |
 | **Submit** | Notebook PDF and completed `.ipynb` in one Gradescope submission. |
@@ -30,7 +31,7 @@ Problem 1 works a small grading example by hand. Problem 2 uses MT-Bench (Zheng 
 
 # Problem 1 - Two raters, many raters, and a budget (45 points, no AI)
 
-Show your work. A correct number without the steps behind it earns little credit.
+Show your work. A correct number without the steps behind it earns little credit. Part (a) uses Cohen's (1960) kappa, and part (c) derives the Spearman–Brown formula (Spearman 1910; Brown 1910).
 
 A tutoring company's chatbot answers students' math questions. Two staff members, A and B, each read the same 200 answers and mark each one acceptable or not:
 

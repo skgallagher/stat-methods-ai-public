@@ -18,6 +18,7 @@ format:
 | **Points** | 100: Problem 1 (45), Problem 2 (40), Problem 3 (15) |
 | **Expected time** | About 5 hours after Labs 9 and 10. Contact course staff if setup or debugging alone takes more than 30 minutes. |
 | **Reading** | Steegen, Tuerlinckx, Gelman, and Vanpaemel (2016), ["Increasing Transparency Through a Multiverse Analysis"](https://doi.org/10.1177/1745691616658637), *Perspectives on Psychological Science*, the introduction and the worked example. Optional, if you did not read it for Week 9: Recht, Roelofs, Schmidt, and Shankar (2019), ["Do ImageNet Classifiers Generalize to ImageNet?"](https://proceedings.mlr.press/v97/recht19a.html), Sections 1 and 2. |
+| **Sources** | Mohanty, Hughes, and Salathé (2016), ["Using Deep Learning for Image-Based Plant Disease Detection"](https://doi.org/10.3389/fpls.2016.01419), *Frontiers in Plant Science*; Kish (1965), *Survey Sampling*, Wiley |
 | **AI policy** | No AI for Problem 1. AI is allowed in Problem 2 and required in Problem 3. Submit the AI-use record at the end. |
 | **Working file** | `hw06_starter.ipynb`. The PDF is a read-only copy of the prompt. |
 | **Submit** | Notebook PDF and completed `.ipynb` in one Gradescope submission. |
@@ -32,7 +33,7 @@ Problem 2 uses formulas from Problem 1, so do Problem 1 first.
 
 # Problem 1 - Reweighting a plant-disease app (45 points, no AI)
 
-Show your work. A correct number without the steps behind it earns little credit.
+Show your work. A correct number without the steps behind it earns little credit. The setting is loosely based on Mohanty, Hughes, and Salathé (2016), whose plant-disease classifier, trained on lab photos of single leaves on plain backgrounds, was about 31% accurate on photos from other sources. The numbers below are made up. The effective sample size in (a)(iii) is from Kish (1965).
 
 An app looks at a photo of a leaf and says whether the plant is diseased. Its benchmark has 1,000 labeled photos: 800 taken in a lab on a plain background, where the app is right on 768, and 200 taken in a field, where it is right on 160. A farmers' cooperative wants to use the app. Its members take most of their photos in the field on their phones, and a survey of members suggests that about 70% of their photos will be field photos, somewhere between 60% and 80%. Before seeing any results, the cooperative decided to adopt the app only if its accuracy on the cooperative's photos is at least 85%.
 

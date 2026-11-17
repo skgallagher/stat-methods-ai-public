@@ -18,6 +18,7 @@ format:
 | **Points** | 100: Problem 1 (46), Problem 2 (39), Problem 3 (15) |
 | **Expected time** | About 4 hours after Lab 5. Contact course staff if setup or debugging alone takes more than 30 minutes. |
 | **Reading** | Miller (2024), ["Adding Error Bars to Evals"](https://arxiv.org/abs/2411.00640), Section 4. Optional: Agresti, *An Introduction to Categorical Data Analysis* (3rd ed.), Section 8.1; Wasserman, *All of Statistics*, Section 10.1, the examples comparing two prediction algorithms; Smith and Winkler (2006), ["The Optimizer's Curse"](https://doi.org/10.1287/mnsc.1050.0451), on the winner's curse; Singh et al. (2025), ["The Leaderboard Illusion"](https://arxiv.org/abs/2504.20879), abstract and the section on private testing |
+| **Sources** | Agresti (2019), *An Introduction to Categorical Data Analysis*, 3rd ed., Wiley; McNemar (1947), ["Note on the Sampling Error of the Difference Between Correlated Proportions or Percentages"](https://doi.org/10.1007/BF02295996), *Psychometrika*; Fisher (1935), ["The Logic of Inductive Inference"](https://doi.org/10.2307/2342435), *Journal of the Royal Statistical Society*; D'Agostino, Massaro, and Sullivan (2003), ["Non-inferiority Trials: Design Concepts and Issues"](https://doi.org/10.1002/sim.1425), *Statistics in Medicine* |
 | **AI policy** | No AI for Problem 1. AI is allowed in Problem 2 and required in Problem 3. Submit the AI-use record at the end. |
 | **Working file** | `hw05_starter.ipynb`. The PDF is a read-only copy of the prompt. |
 | **Submit** | Notebook PDF and completed `.ipynb` in one Gradescope submission. |
@@ -34,7 +35,7 @@ Problems 2 and 3 use your results from Problem 1, so do Problem 1 first.
 
 # Problem 1 - Comparing two models on the same questions (46 points, no AI)
 
-Show your work. A correct number without the steps behind it earns little credit. Part (a) is adapted from Agresti (2019), Section 8.1, and part (b) from Agresti (2019), Chapter 2. Part (c) uses the non-inferiority setup common in drug trials.
+Show your work. A correct number without the steps behind it earns little credit. Part (a) is adapted from Agresti (2019), Section 8.1, and uses McNemar's (1947) test. Part (b) is adapted from Agresti (2019), Chapter 2, and uses Fisher's (1935) exact test. Part (c) uses the non-inferiority setup common in drug trials, as described by D'Agostino, Massaro, and Sullivan (2003).
 
 Throughout, two models, A and B, answer the same $n$ questions. Record each question in a $2\times2$ table:
 
