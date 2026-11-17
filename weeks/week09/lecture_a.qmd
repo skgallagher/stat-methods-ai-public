@@ -105,10 +105,11 @@ Compare the `day_night` column with the photos themselves:
 | night | **9** | 78 |
 
 - 21 of the 27 infrared "day" photos are stamped in the 12 o'clock hour: most likely just after midnight, stored as noon.
+- The Week 1 baseline and Lab 4's night accuracy both used this column.
 - A model sees pixels, so we take the variable to condition on from the photo itself, not from the clock.
 
 ::: notes
-About 3 minutes. Six more of the infrared "day" photos are early-morning photos taken in low light. Infrared is detected from the pixels: an infrared photo's three color channels are nearly equal (average channel difference under 3, against at least 4.6 for every color photo, so the split is clean). The 9 "night" photos in color were stamped at 3 am, 6 pm, and 7 pm; some cameras use a color flash, and 6 to 7 pm can still be light. This is a real error in the source timestamps, found Oct 6. Your project's metadata deserve the same check against the cases themselves.
+About 3 minutes. Six more of the infrared "day" photos are early-morning photos taken in low light. Infrared is detected from the pixels: an infrared photo's three color channels are nearly equal (average channel difference under 3, against at least 4.6 for every color photo, so the split is clean). The 9 "night" photos in color were stamped at 3 am, 6 pm, and 7 pm; some cameras use a color flash, and 6 to 7 pm can still be light. This is a real error in the source timestamps, found Oct 6. Ask the room what it did to work we already did: the Week 1 baseline's `night_indicator` feature is wrong for those 21 photos (15 of the 108 it was fit on), and Lab 4's held-out night accuracy counted two night bursts (cct0124–0126 and the bobcat cct0154–0156) as day, so its "7 night sequences" are really 9. Your project's metadata deserve the same check against the cases themselves.
 :::
 
 ## Conditioning on what we can see {.smaller}
@@ -456,7 +457,7 @@ About 3 minutes. Exact: 0.0475 + 0.76 = 0.8075. Either reason in part 2 earns cr
 
 - Your groups are your $Z$. Your client probably has a different mix of them than the benchmark does.
 - Thursday you choose a mix for your client and reweight your AI system's accuracy to it.
-- The Project Description, Section 3, says where the two populations and the direction of the difference go in Milestone 1.
+- Milestone 1 in the Project Description says where the two populations and the direction of the difference go.
 
 ::: notes
 About 2 minutes. Do not tell teams what their client's mix is; choosing and defending it is part of their Introduction. The Food and Pet tracks group by the right answer (dish, breed), like the empty-photo slide; the two text tracks group by type of case, like color and infrared.
