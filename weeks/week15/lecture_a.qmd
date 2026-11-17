@@ -1,0 +1,67 @@
+---
+title: "Week 15: What Should a Careful Person Believe?"
+subtitle: "Oral presentations · Tue Apr 27 to Fri Apr 30"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+---
+
+## This week: oral presentations {.smaller}
+
+Every team has one oral presentation this week, in the slot it signed up for. Some slots are in class on Tuesday and Thursday, and the rest are outside class through Friday.
+
+There is no lab, homework, or checkpoint this week. After your oral presentation, the last thing to do is the peer assessment, due on the date in Canvas.
+
+Thursday's class ends with five minutes for everyone.
+
+::: notes
+About 1 minute, before the first team on each day. Show slides 1–3 on Tuesday and Thursday, then start the oral presentations. Slide 4 is only for the last five minutes of Thursday, after the last in-class oral presentation, so Thursday fits about seven ten-minute slots instead of eight. The longer synthesis from the July deck was dropped on Oct 20 (archived as `instructor_only/archive_old_schedule/week15_lecture_a_synthesis_2026-10-20.qmd`).
+:::
+
+## How the oral presentations run {.smaller}
+
+Each oral presentation takes five to seven minutes. I have watched your video and read Milestone 3, so the questions are about your work.
+
+Any member may be asked about any part of the project. The rubric checks that the understanding is spread across the team, not held by one person.
+
+It is a conversation, not a second presentation. "We don't know, and here is how we would find out" is a good answer when it is true.
+
+If it is not your slot, you can work quietly in the back or come only for your slot. The Oral presentation section of the Project Rubric says how the oral presentation is graded.
+
+::: notes
+About 2 minutes. This is a reminder, not news: every rule here was posted in Week 14. Say out loud that any member may be asked about any part, because one person answering everything is the most common failure and the rubric's Shared ownership row checks it. Do not restate points here. Grade each team in the 30 seconds after its slot; grading from memory at the end does not work.
+:::
+
+## What a strong answer sounds like {.smaller}
+
+In Week 14 you wrote down the strongest objections to your argument and practiced answering them. The questions will sound like these.
+
+| The question | A strong answer |
+|----------------------|----------------------------------------|
+| "The benchmark isn't your client's population." | "Right, so our numbers describe the benchmark. Here is the check we would run on the client's own cases." |
+| "Your interval includes zero. Why recommend it?" | "The client only needed it to be no worse, and the lower bound is inside the margin they set." |
+| "Some of your cases aren't independent." | "Right, so we resampled whole groups, and the interval got wider." |
+
+Saying "we can't tell yet, and here is what would settle it" earns credit. Claiming more than the evidence shows loses it.
+
+::: notes
+About 2 minutes, and meant to lower anxiety honestly. The second exchange is the Lab 5 story from the Description's storyboard; the third is Weeks 4 and 5 (resample the cluster: photos from one camera, questions from one task, pairs from one Reddit post). Students who wrote down their critic's objections in Week 14 have already practiced their best answers. Say plainly that the Responsiveness row rewards honest uncertainty and penalizes defending a claim the evidence does not support.
+:::
+
+## One sentence to keep {.smaller}
+
+The whole course comes down to one habit: when someone shows you a number, ask what would have to be true for it to mean what they say it means.
+
+An accuracy is an estimate, a confidence is a claim, and a benchmark is a sample. A conclusion is only as strong as the sensitivity analysis it survived, and "the AI said so" is not evidence.
+
+Please fill out the course evaluation. This project-first design is new, and your honest read will shape next spring.
+
+Thank you. It was a privilege to think this carefully with you.
+
+::: notes
+About 5 minutes, Thursday only, after the last in-class oral presentation. Say the first sentence slowly; it is the one thing worth remembering in five years. Keep the goodbye short.
+:::

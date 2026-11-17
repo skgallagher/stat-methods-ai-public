@@ -17,7 +17,7 @@ const siteSettings = {
   // "beta": show Weeks 1 through betaThroughWeek with every link open, for testers.
   moduleReleaseMode: "beta",
   previewWeek: 2,
-  betaThroughWeek: 12
+  betaThroughWeek: 15
 };
 
 // Helpers so each week below stays short.
@@ -122,9 +122,25 @@ const weeklyMaterials = [
     homework: { label: "HW7", due: "Apr 13", pdf: `${courseLinks.publicBlob}/weeks/week12/hw07.pdf`, links: notebook("weeks/week12/hw07_starter.ipynb", "2027-04-08"), openDate: "2027-04-08" },
     data: [dataRelease("MT-Bench judgments data", "llm_judges")]
   },
-  { week: 13, dates: "Apr 13", publishDate: "2027-04-11", topic: "Human-centered and responsible AI", note: "Guest lecture Tue · no class Thu (Spring Carnival)" },
-  { week: 14, dates: "Apr 20 / 22", publishDate: "2027-04-18", topic: "Statistical argument and recommendation", note: "Project Milestone 3 due Apr 20" },
-  { week: 15, dates: "Apr 27 / 29", publishDate: "2027-04-25", topic: "Oral defenses and course synthesis", note: "Slides and video due Sun Apr 25" }
+  {
+    week: 13, dates: "Apr 13", publishDate: "2027-04-11",
+    topic: "Human-centered and responsible AI",
+    note: "Guest lecture by Carol J. Smith Tue · no class Thu (Spring Carnival)",
+    slides: [{ label: "Guest lecture and readings", href: `${courseLinks.publicBlob}/weeks/week13/guest_lecture.md` }]
+  },
+  {
+    week: 14, dates: "Apr 20 / 22", publishDate: "2027-04-18",
+    topic: "Writing in your own voice",
+    note: "Project Milestone 3 due Apr 20 · storyboard feedback and team meetings Thu",
+    slides: slides("week14"),
+    lab: [{ label: "Work session guide", href: `${courseLinks.publicBlob}/weeks/week14/studio.md` }]
+  },
+  {
+    week: 15, dates: "Apr 27 / 29", publishDate: "2027-04-25",
+    topic: "Oral presentations",
+    note: "Slides and video due Sun Apr 25",
+    slides: [{ label: "Tue / Thu", href: `${courseLinks.pagesBase}/weeks/week15/lecture_a.html` }]
+  }
 ];
 
 const projectDocs = [

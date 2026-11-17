@@ -1,0 +1,158 @@
+---
+title: "Week 14B: Giving a Better Presentation"
+subtitle: "Storyboard feedback and five-minute team meetings · Thu Apr 22"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+## Today's plan {.smaller}
+
+- Your storyboard is back on paper, with my comments.
+- First, ten minutes on giving a better presentation.
+- Then each team meets with me for about five minutes, in team order.
+- While you wait, work through the list on the last slide.
+
+<p class="compact-note">Slides and video are due Sunday at 11:59 pm. Every requirement is in the Project Description, and all grading is in the Project Rubric. These slides add none.</p>
+
+::: notes
+About 1 minute. Hand back the printed storyboards as students come in, so they can read the comments during the opener.
+
+Say the meeting order out loud and keep a timer. With 15 teams there is room for about four and a half minutes each if the meetings start by 11:08, so the teaching has to stay short.
+:::
+
+## Four problems to look for in your storyboard {.smaller}
+
+- A Results title that names a topic ("Calibration") instead of stating a claim.
+- A title with no number, or a number with no interval.
+- A result the Discussion never uses.
+- One quantity with two names, such as "accuracy" on one slide and "performance" on the next.
+
+Find each one in your own storyboard before your meeting.
+
+::: notes
+About 2 minutes. Before class, replace or reorder these with the problems you actually saw while commenting on the storyboards. Read each one aloud and give an anonymous example if you have one.
+
+These are the same breaks the title test catches (Tuesday's Part 2). The fix for each is in the title: state the claim, give its number with its interval, cut what the Discussion does not use, and pick one name.
+:::
+
+## Make every figure readable at video size {.smaller}
+
+```{python}
+#| fig-width: 10
+#| fig-height: 3.3
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Lab 5's data: whether each model got each BIG-Bench Hard question right.
+correct = pd.read_csv("../../data/course/llm_bbh/correct.csv")
+llama = 100 * correct["llama31_8b"].mean()
+qwen = 100 * correct["qwen25_7b"].mean()
+
+# Lab 5's task bootstrap (seed 2027, B = 2000): resample whole tasks,
+# keep both models' results together, and recompute Qwen minus Llama.
+per_task = correct.groupby("task").agg(n=("qwen25_7b", "size"),
+                                       qwen=("qwen25_7b", "sum"),
+                                       llama=("llama31_8b", "sum"))
+task_names = np.sort(correct["task"].unique())
+per_task = per_task.loc[task_names]
+rng = np.random.default_rng(2027)
+differences = np.zeros(2000)
+for b in range(2000):
+    drawn = rng.choice(task_names, size=len(task_names), replace=True)
+    rows = per_task.loc[drawn]
+    differences[b] = 100 * (rows["qwen"].sum() - rows["llama"].sum()) / rows["n"].sum()
+lower, upper = np.quantile(differences, [0.025, 0.975])
+
+fig, (bad, good) = plt.subplots(1, 2, figsize=(10, 3.3), gridspec_kw={"width_ratios": [1, 1.6]})
+
+# Hard to read: tiny text, code names, no units, a cut-off axis, no interval.
+bad.bar(["llama31_8b", "qwen25_7b"], [llama, qwen], color=["#9aa4b2", "#5f6b7a"])
+bad.set_ylim(49, 55)
+bad.set_ylabel("acc", fontsize=6)
+bad.set_title("Accuracy comparison", fontsize=7)
+bad.tick_params(labelsize=6)
+
+# Readable: the difference with its interval, a line at zero, units, large text.
+good.errorbar([qwen - llama], [0], xerr=[[qwen - llama - lower], [upper - qwen + llama]],
+              fmt="o", color="#c41230", markersize=10, capsize=8, linewidth=3)
+good.axvline(0, color="#252525", linestyle="--", linewidth=1.5)
+good.set_xlim(-4, 9)
+good.set_ylim(-1, 1)
+good.set_yticks([])
+good.set_xlabel("Qwen minus Llama, accuracy (points)", fontsize=15)
+good.tick_params(axis="x", labelsize=14)
+label = f"+{qwen - llama:.1f}  (95% interval {lower:+.1f} to {upper:+.1f})".replace("-", "−")
+good.text(0.4, 0.35, label, ha="left", fontsize=14)
+good.text(0.15, -0.75, "no difference", fontsize=13, color="#252525")
+good.spines[["top", "right", "left"]].set_visible(False)
+
+fig.text(0.19, 1.0, "Hard to read at video size", ha="center", fontsize=14, color="#667085")
+fig.text(0.68, 1.0, "Readable at video size", ha="center", fontsize=14, color="#667085")
+plt.tight_layout()
+plt.show()
+```
+
+- Use large text. If it is hard to read on a phone, it is hard to read in your video.
+- Label axes in words, with units. Show the interval, and a line at zero for a difference.
+- Give each figure one message, and state it in the slide title.
+
+::: notes
+About 3 minutes. Both panels show the same Lab 5 comparison. Ask the room what is wrong with the left one before listing anything: the text is too small, the labels are code names, "acc" has no units, the axis starts at 49 so a 2.9-point gap looks huge, and there is no interval.
+
+The right panel shows the one thing the decision needs: the difference, 2.9 points, with its task-bootstrap 95% interval (−0.6 to +6.6 points, computed here with Lab 5's function and seed), against a line at zero. Its slide title would be the claim from the Lab 5 storyboard: "The gap varies by task: the 95% interval runs from −0.6 to +6.6 points, so Qwen is not shown to be better."
+
+The Rubric's "Figures and format" row is where this is graded.
+:::
+
+## Talk to your client {.smaller}
+
+- Narrate in your own words. Keep notes as keywords, not a script.
+- A script read aloud sounds like one. An AI-written script sounds like Gemini's IMRaD.
+- Say each number slowly, then say what it means for the client.
+- Hand off with a sentence that links two claims: "That 2.9-point gap is an average. Next, how much it changes from task to task."
+
+::: notes
+About 2 minutes. This is Tuesday's theme applied to the voice track. Ask a volunteer to read a sentence from Gemini's Introduction aloud ("As artificial intelligence permeates professional and academic spheres...") and the room will hear the problem.
+
+The handoff example is from the Lab 5 story. "Now our next speaker will talk about calibration" starts over; a linking sentence keeps one story.
+:::
+
+## Five minutes goes fast {.smaller}
+
+- The Description suggests about one minute each for the Introduction, Methods, and Discussion, and two for Results.
+- Rehearse with a timer. A run that takes 6:30 today will not shrink by Sunday.
+- If you are over, cut a slide. Do not talk faster.
+- Move what you cut to the appendix, ready for the oral presentation.
+- Record in a quiet room with the microphone close, and do a test upload before Saturday.
+
+::: notes
+About 2 minutes. The time split is the Description's (Section 5). The usual problem is a long Methods section; the listener needs only enough to trust the Results.
+
+The deadline has no extensions because the instructor watches every video before writing each team's oral presentation questions. The most common failure is a last-hour export or upload problem, so Saturday is the real deadline.
+:::
+
+## While you wait for your meeting {.smaller}
+
+1. Read my comments, and fix your slide titles first.
+2. Read only your titles to a neighboring team. Can they say your recommendation?
+3. Give that team your full five minutes, with a timer. They name one thing to cut.
+4. Draw a card and explain it for 90 seconds: the baseline, the main comparison, calibration, the sensitivity analysis, or how you used AI.
+5. Before you leave, each of you finishes this sentence on an exit ticket: "The part of our project I would be weakest defending is \_\_\_."
+
+<p class="compact-note">Slides and video: Sun Apr 25, 11:59 pm, no extensions. Oral presentations: Apr 27–30, in your team's sign-up slot. The work-session guide has the weekend checklist.</p>
+
+::: notes
+Leave this slide up during the meetings.
+
+The card drill finds the member who cannot explain a part while there are still four days to fix it; any member may be asked about any part in the oral presentation. Read the exit tickets Friday. They point to fair questions for the oral presentation, aimed at the team's understanding rather than at catching anyone out.
+:::

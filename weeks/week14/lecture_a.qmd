@@ -1,0 +1,526 @@
+---
+title: "Week 14A: Writing in Your Own Voice"
+subtitle: "IMRaD, editing an AI draft, and the storyboard · Tue Apr 20"
+author: "Shannon Gallagher"
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    css: lecture.css
+    html-math-method: katex
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+## Today's plan {.smaller}
+
+Today is about your own voice. In the oral presentation you defend your argument without help, so today you write it yourselves.
+
+1. Summarize the course in IMRaD format, and critique an AI's answer to a lazy prompt.
+2. Plan a five-minute talk with IMRaD and one claim per slide.
+3. Write your team's storyboard, without AI.
+
+Please close AI tools for today. The only AI text you will see is on my screen.
+
+<p class="compact-note">Milestone 3 is due tonight. What it contains is in the Project Description, and how it is graded is in the Project Rubric. These slides add no requirements.</p>
+
+::: notes
+About 2 minutes. Timing: about 40 minutes for Parts 1 and 2 and about 35 for Part 3, the storyboard, which is the part that cannot be cut.
+
+Say early that this is not an anti-AI class. Students have used AI all semester, and they may use it on their slides after today. The point is that AI is a tool for an argument the team already owns, and today is when the team makes that argument.
+:::
+
+## Why your own words {.smaller}
+
+- In the oral presentation, any of you may be asked about any slide, and there is no AI in the room.
+- **You** are responsible for being a respectful, productive member of your project team. AI is not.
+- Writing is a way of clarifying your thoughts and positions. Writing the claims together is how your team finds out what it believes, and where it disagrees.
+- Your client wants an expert **human** opinion.
+- AI homogenizes writing. You want to stand out in a world that looks the same.
+
+::: notes
+About 3 minutes. Ask the room first: "What do you lose if an AI writes your talk?" Then show the bullets.
+
+The responsibility bullet: an AI can draft a slide, but it cannot show up to a team meeting, keep a promise to a teammate, or answer for the work. The peer assessment asks teammates about exactly these things.
+
+The writing bullet matters most for today's workshop. Teams that split the work often find, when they write the titles together, that two members would recommend different things. Better to find that today than in the oral presentation.
+
+The last bullet comes back with evidence on slide 8: in Doshi and Hauser (2024), stories written with AI ideas were more similar to each other than stories written alone. The Description's own rule (Section 4) is that AI may help write but cannot be the only writer or editor.
+:::
+
+# Part 1: Summarize the course in IMRaD format and critique a lazy AI prompt
+
+## Write this course as an IMRaD {.smaller}
+
+On paper, alone, without AI. A few sentences for each part. Eight minutes.
+
+- **Introduction.** Did this course teach you useful skills to evaluate AI, and to use AI tools safely and effectively to do it? What would you tell an employer, or write on a graduate school application?
+- **Methods.** What statistical techniques did you learn, and what AI tools did you examine? How did you decide whether you had learned something?
+- **Results.** What did you learn? Give at least one concrete example.
+- **Discussion.** Was the course effective? What were its limitations, and what would be better next time?
+
+Then read your Results to your neighbor.
+
+::: notes
+About 9 minutes: 8 to write, 1 to share. The course is the study, and each student is the researcher evaluating it. Walk around while they write.
+
+Introduction: push for a sentence they would actually say to an employer, with a skill in it ("I can tell whether a model's 3-point lead is real"), not "I learned a lot about AI."
+
+Methods has two halves. The techniques and tools are the course content: paired comparisons, intervals that resample clusters, calibration, sensitivity analysis, rater agreement; CLIP, Llama, Qwen, Phi, the LLM judges, and the AI assistants they used on homework. The second question is the interesting one: how do you know you learned it? Good answers name evidence, such as doing it without AI on the midterm or a checkpoint, catching an AI's mistake on a homework, or explaining it to a teammate.
+
+Results: if a student is stuck, ask which lab result surprised them, or which mistake they would now catch. One example from this deck's own story: in Lab 5, resampling whole tasks showed that Qwen's 2.9-point lead was not clearly better, even though McNemar's test said it was.
+
+Discussion: tell students honest criticism is welcome and is good practice for the course evaluation in Week 15.
+
+With permission, note a few strong Results to read aloud, without names, in Week 15's closing minutes. Do not collect the papers.
+:::
+
+## A one-minute prompt to an AI {.smaller}
+
+I gave Gemini the same four questions in a lazy prompt, the kind that takes a minute:
+
+> summarize my statistical evaluation of AI class as an imrad. intro: did it teach me useful skills to evaluate AI and use AI tools safely and effectively? what would i tell an employer or grad school? methods: what stats techniques did i learn, what AI tools did i examine, how did i know i learned something? results: what did i learn, with a concrete example. discussion: was it effective, what were the limitations, what would be better next time?
+
+Its answer is on the next six slides, word for word. As we read, ask what is true about our course, what is made up, and what only you could have written.
+
+::: notes
+About 1 minute. The idea comes from a colleague's class: have an AI answer a lazy, one-minute prompt, and let the class critique the result. The prompt has the same four parts as slide 5, so the two versions answer the same questions.
+
+The answer on the next six slides is one run of Gemini 3.5 Flash-Lite, signed out (no account or history), on Nov 17, 2026, in about ten seconds. It was not cherry-picked. The record, with the prompt and the full answer, is in `instructor_only/week14/gemini_lazy_prompt_2026-11-17.md`. If you want, run the prompt live as well; the answer changes from run to run, which is itself worth pointing out.
+
+Before showing it, ask two or three students to read their whole IMRaD aloud, so the room hears the human versions first.
+:::
+
+## Gemini's Introduction {.smaller}
+
+::: {.ai-output}
+[Abstract Evaluation: Statistical and Applied Proficiency in Artificial Intelligence Education]{.ai-heading}
+
+[Introduction]{.ai-heading}
+
+As artificial intelligence permeates professional and academic spheres, the ability to critically evaluate model outputs and deploy tools securely is paramount. This evaluation examines whether the AI course successfully equipped the student with rigorous skills to assess AI performance, recognize failure modes, and utilize AI technologies safely and effectively.
+:::
+
+<p class="compact-note">Gemini 3.5 Flash-Lite, signed out, Nov 17, 2026. Copied word for word.</p>
+
+::: notes
+About 1 minute each for the six Gemini slides. Read it aloud, then ask: is any of this false? Is any of it about us?
+
+Listen for: "permeates," "paramount," and "rigorous" sound important and say nothing anyone could check. "Utilize" is in the Description's word table. "The student" is third person: the answer is about someone, not by anyone. Compare a student sentence such as "I can tell whether a model's 3-point lead is real."
+:::
+
+## Gemini's Introduction, continued {.smaller}
+
+::: {.ai-output}
+**Value Proposition for Employers and Graduate Programs:**
+
+- **For Employers:** Demonstrates a data-driven approach to AI integration—moving beyond basic prompt engineering to empirical validation, risk mitigation, and quality assurance.
+- **For Graduate Schools:** Highlights strong quantitative competencies, an understanding of algorithmic bias and uncertainty, and the methodological rigor required for advanced computational research.
+:::
+
+<p class="compact-note">Gemini 3.5 Flash-Lite, signed out, Nov 17, 2026. Copied word for word.</p>
+
+::: notes
+Ask: would a recruiter remember either line? Each could describe any quantitative course. Neither names a skill someone could test in an interview, a dataset, or a result. "Methodological rigor" is a claim about yourself that only examples can support.
+:::
+
+## Gemini's Methods {.smaller}
+
+::: {.ai-output}
+[Methods]{.ai-heading}
+
+To assess the efficacy of the curriculum, the learning process was broken down into three core components: statistical instrumentation, tool examination, and validation metrics.
+
+- **Statistical Techniques Learned:**
+  - Hypothesis testing and confidence interval estimation to evaluate model reliability.
+  - Performance metrics (precision, recall, F<sub>1</sub> score, and ROC-AUC) for classification and generation tasks.
+  - Error analysis and residual evaluation to identify systemic model failures and bias.
+:::
+
+<p class="compact-note">Gemini 3.5 Flash-Lite, signed out, Nov 17, 2026. Copied word for word.</p>
+
+::: notes
+Ask: which of these did we do, and what is missing? Hypothesis tests and intervals, yes. But the list could come from any machine-learning course, and it misses what made this one different: comparing two systems on the same cases, intervals that resample whole tasks or cameras, calibration, a sensitivity analysis that names one variable, agreement between raters and judges.
+:::
+
+## Gemini's Methods, continued {.smaller}
+
+::: {.ai-output}
+- **AI Tools Examined:** Large Language Models (LLMs), AI-assisted code generation environments, and automated data analysis assistants.
+- **Measurement of Learning:** Learning was verified through empirical benchmarking assignments, comparative trials between human and AI outputs, and controlled stress-testing of tool limitations under edge-case prompts.
+:::
+
+<p class="compact-note">Gemini 3.5 Flash-Lite, signed out, Nov 17, 2026. Copied word for word.</p>
+
+::: notes
+No model is named (CLIP, Llama, Qwen, Phi), and no dataset.
+
+"Measurement of Learning" is the interesting line, because slide 5 asked students the same question. Gemini's answer is in the passive voice ("was verified") and never mentions the midterm, the checkpoints, or the oral presentation.
+:::
+
+## Gemini's Results {.smaller}
+
+::: {.ai-output}
+[Results]{.ai-heading}
+
+The evaluation demonstrated a measurable shift from passive tool adoption to critical, quantitatively grounded utilization.
+
+- **Primary Findings:** The course established that raw AI output is frequently overconfident and requires statistical validation before operational deployment. Students acquired the capability to establish performance baselines and quantify error bounds.
+- **Concrete Example:** In a comparative text-classification task, an LLM was used to categorize customer feedback. By constructing a **confusion matrix** and calculating precision-recall curves, the evaluation uncovered a high false-positive rate for niche technical queries. Applying a statistical threshold filter based on token confidence scores successfully reduced hallucination rates by 35%, transforming an unreliable tool output into a dependable preprocessing pipeline.
+:::
+
+<p class="compact-note">Gemini 3.5 Flash-Lite, signed out, Nov 17, 2026. Copied word for word.</p>
+
+::: notes
+This is the slide to spend time on. Ask: did this happen? It did not. Gemini was asked for a concrete example of what you learned, and it invented one, because your semester was not in the prompt.
+
+Then read it as a statistician. A 35% reduction of what, out of how many cases, with what interval, against what baseline? "Hallucination rates" in a classification task mixes two ideas. "A measurable shift" was never measured. "Students acquired the capability" is a claim about people it never met.
+
+If a student notices that customer-feedback classification sounds like the CFPB complaints from Weeks 2 and 6, that is a coincidence: Gemini was signed out and had no access to the course.
+:::
+
+## Gemini's Discussion {.smaller}
+
+::: {.ai-output}
+[Discussion]{.ai-heading}
+
+- **Effectiveness:** The curriculum proved highly effective. By embedding statistical evaluation directly into AI workflows, it demystified black-box models and instilled a healthy skepticism toward automated outputs.
+- **Limitations:** The evaluation was constrained by static testing environments and curated datasets, which do not fully replicate the messy, distribution-shifted reality of production environments or live research data.
+- **Future Improvements:** Future iterations of this evaluation framework would benefit from incorporating streaming data pipelines, automated evaluation scripts (LLM-as-a-judge frameworks backed by statistical significance testing), and adversarial testing protocols to stress-test model robustness.
+:::
+
+<p class="compact-note">Gemini 3.5 Flash-Lite, signed out, Nov 17, 2026. Copied word for word.</p>
+
+::: notes
+Ask: how does Gemini know the course was "highly effective"? It does not. Students who wrote "I'm not sure, but I could do X on the midterm without help" were more honest.
+
+Give it credit for the limitation: curated benchmarks really do differ from a client's messy data. That is distribution shift, Week 9, and it is true of this course's datasets too. The future improvements are plausible but generic; we did study LLM judges, in Week 12. "Robustness" is in the word table.
+:::
+
+## What Gemini did well, and what it got wrong {.smaller}
+
+:::: {.columns}
+::: {.column width="45%"}
+**Did well**
+
+::: {.incremental}
+- It used IMRaD and answered every question.
+- It reads smoothly and is easy to skim.
+- Its limitation is real: curated benchmarks are not a client's data.
+- It took about ten seconds.
+:::
+:::
+
+::: {.column width="55%"}
+**Got wrong**
+
+::: {.incremental}
+- It invented the example and the 35%.
+- The 35% has no count, no interval, and no baseline.
+- It called the course "highly effective" with no evidence.
+- Its techniques could be from any course, and it named no model.
+- "The student," "was verified," "utilize": it is nobody's voice.
+:::
+:::
+::::
+
+<p class="compact-note">The revision example in Milestone 3 (Description, Section 4) is this kind of critique, done on an AI draft of a passage from your project.</p>
+
+::: notes
+About 3 minutes. Ask the room for each column before revealing the items one at a time.
+
+The point to land: the AI wrote fluent, organized text quickly, and nearly everything specific in it was made up. Everything a reader would actually want (what you did, what you found, how sure you are) had to come from you. That is the case for writing your own claims, and for checking every number an AI puts in your draft.
+:::
+
+## Why the AI's version could be about any course {.smaller}
+
+A language model writes one token at a time. Each token is a draw given the prompt and the tokens before it (Week 11):
+
+$$P(w_1,\ldots,w_n\mid\text{prompt})=\prod_{k=1}^{n}P(w_k\mid\text{prompt},w_1,\ldots,w_{k-1}).$$
+
+- Everyone in this room could send the same prompt, so everyone gets draws from the same distribution.
+- Your semester is not in the prompt, so a sentence with "53.7%" in it is unlikely.
+- Putting your numbers in the prompt helps. You still choose which numbers matter, and that choice is the argument.
+
+::: notes
+About 3 minutes. This is Week 11A's temperature slide again, used to explain writing rather than answers to math problems. A token is a word or a piece of a word.
+
+The first bullet is the key: the same prompt gives draws from the same conditional distribution, so thirty students asking an AI for "what I learned" get thirty versions of roughly the same text. Their own sentences are draws from thirty different semesters.
+
+Chat models are also tuned on human feedback, which tends to narrow that distribution further. Padmakumar and He (2024, ICLR), "Does Writing with Language Models Reduce Content Diversity?", found that essays co-written with InstructGPT were less diverse than essays written alone, and that essays co-written with the base GPT-3 model were not. The loss came mostly from the text the model contributed.
+
+The third bullet leads to the storyboard: choosing which numbers matter, and saying each one at the strength its interval allows, is what the slide titles do.
+:::
+
+## Two studies of writing with AI {.smaller .compact-table}
+
+| | Doshi and Hauser (2024) | Kosmyna et al. (2025) |
+|:---------|:-------------------------------|:-------------------------------|
+| Writers | 293 adults recruited online in the UK | 54 students and staff from five Boston-area universities |
+| Design | Randomly assigned: no AI, one idea from GPT-4, or up to five | Randomly assigned: ChatGPT, a search engine, or no tools |
+| Task | An eight-sentence short story | An essay in 20 minutes |
+| Found | Stories with AI ideas were rated more creative, and were more similar to each other | Minutes later, 0 of 18 in the ChatGPT group quoted their essay correctly, against 16 of 18 with no tools |
+| Status | Pre-registered, peer reviewed | Preprint, not peer reviewed |
+
+<p class="compact-note">Doshi and Hauser (2024), <em>Science Advances</em> 10(28), eadn5290. Kosmyna et al. (2025), "Your Brain on ChatGPT," arXiv:2506.08872, Session 1 interviews.</p>
+
+::: notes
+About 3 minutes. Read these as you would read any evaluation of an AI system: who, what was randomized, what was measured.
+
+Doshi and Hauser: writers could ask GPT-4 for story ideas; 88% of writers in the AI conditions asked at least once. Separate readers (600 of them) rated the stories without knowing which had AI help. Ideas from AI raised novelty ratings by about 5% (one idea) to 8% (five ideas), mostly for the less creative writers. Similarity was measured by text embeddings: each story's cosine similarity to the other stories in its condition was higher with AI ideas. The authors' summary: more creative for each writer, less variety for the group.
+
+Kosmyna et al.: participants were randomly assigned, balanced on age and gender, and wrote essays on SAT prompts; the LLM group used OpenAI's GPT-4o. Of the 54, 49 were students and the rest post-docs, research scientists, or engineers at the universities. Right after the first session they were asked to quote a sentence from the essay they had just written. In the search-engine group, 15 of 18 quoted correctly. The same study also used EEG; we are only using the quoting result.
+
+The point for the class is the Kosmyna result: if you cannot quote your own slides, you will struggle in the oral presentation.
+:::
+
+## Check {.smaller}
+
+In Kosmyna et al., 0 of 18 writers using ChatGPT quoted their own essay correctly, and 16 of 18 writing without tools did.
+
+1. The authors ran a one-way ANOVA. Which Week 5 test fits a 2×2 table of counts?
+2. Give two reasons to be careful before applying this result to your project.
+
+::: {.fragment}
+1. Fisher's exact test. Its two-sided p-value is about $4\times10^{-8}$, so with a gap this large the choice of test does not change the answer.
+2. It is one small preprint from five universities. And a writer who pasted ChatGPT's text may never have read it closely, so the quote test partly measures who wrote the sentences.
+:::
+
+::: notes
+About 3 minutes, in pairs.
+
+(1) The outcome is yes or no for each person, in two groups, so it is a 2×2 table: ChatGPT 0 correct and 18 not, no tools 16 correct and 2 not. Fisher's exact test, two-sided: p = 4.2 × 10⁻⁸ (computed Nov 17, 2026, from the hypergeometric probabilities). The authors' ANOVA compared all three groups, F(2, 51) = 53.21. Treating 0/1 outcomes with an ANOVA is a rough approximation, but the effect is so large that any reasonable test agrees.
+
+(2) Other good answers: 18 per group; people from Boston-area universities (47 of 54 from MIT, Wellesley, and Harvard), not a general population; a 20-minute essay is not a semester project; the interview questions differed by group, so the interviewers knew each person's group. The construct answer is the best one: if the ChatGPT group copied text, a failed quote is partly a measure of authorship, not memory. That is exactly what the oral presentation checks: can you explain the slide you are showing?
+:::
+
+# Part 2: Plan a five-minute talk with IMRaD and one claim per slide
+
+## A five-minute talk spends its time like an abstract {.smaller .compact-table}
+
+| | An abstract (CMU's IMRD Cheat Sheet) | Your talk (the Description) |
+|:-------------|:------:|:------:|
+| Introduction | 25% | under 1 minute |
+| Methods | 25% | about 1 minute |
+| Results | 35% | about 2 minutes |
+| Discussion | 15% | about 1 minute |
+
+- Results get the most time in both.
+- The cheat sheet calls Methods "the least-read section." Say only what the listener needs to trust the Results.
+- The cheat sheet says Methods are usually written in the passive voice. In a talk, say "we resampled whole tasks," not "tasks were resampled."
+
+<p class="compact-note">IMRD Cheat Sheet, Communication Support, CMU Student Academic Success Center: cmu.edu/student-success.</p>
+
+::: notes
+About 2 minutes. The cheat sheet is written for papers; the Description adapts it to a five-minute talk. A talk is close to a spoken abstract: about one minute per section, with two for Results.
+
+The talk gives the Discussion a little more than the abstract's 15%, because a client's talk ends with a decision, and the Introduction ends with a one-sentence preview of that decision.
+
+The passive-voice point is today's theme. "Tasks were resampled" hides who did the work and who has to defend it. "We" is the team's voice.
+
+Link for the slide deck or Canvas: https://www.cmu.edu/student-success/other-resources/resource-descriptions/imrd.html (the "IMRD Cheat Sheet" and "IMRD Cheat Sheet (with examples)" PDFs).
+:::
+
+## Results report the finding, and the Discussion says what it means {.smaller .compact-table}
+
+The cheat sheet's steps for reporting a result, with the Lab 5 story:
+
+| The cheat sheet's step | Lab 5 |
+|:---------------------------|:-----------------------------------------------|
+| Point to the figure and state the main trend | Qwen answered 2.9 points more questions correctly than Llama. |
+| Support it with data | 53.7% against 50.8% on the same 5,761 questions. Because the gap varies by task, the 95% interval runs from −0.6 to +6.6 points. |
+| Note exceptions | Qwen did worse than random guessing on all three object-tracking tasks. |
+| State the bottom line | Switch to Qwen, and send object-tracking questions elsewhere. |
+
+Your Results titles are the first step, with the number from the second. The bottom line can wait for the Discussion.
+
+::: notes
+About 3 minutes. The cheat sheet splits Results into "report" (state the trend, support it, note exceptions) and "comment" (explain it, compare to other work, state the bottom line), and says the comment can go in the Discussion. Our storyboards do the same: Results titles report, and the Discussion makes the decision.
+
+The cheat sheet's own example is a spam filter: "Table 3 shows that Spam Filter A correctly filtered more junk emails than Filter B," then the percentages. Point out that the example has no interval; our version always does.
+
+All numbers are the Description's Lab 5 storyboard (recomputed Oct 12, 2026, from data/course/llm_bbh): Llama 50.8%, Qwen 53.7%, 5,761 questions in 24 tasks, task-bootstrap 95% interval −0.6 to +6.6 points.
+:::
+
+## Each slide states one claim in its title {.smaller}
+
+<div class="mock-title"><span class="mock-label">Topic title</span>Accuracy by task</div>
+
+::: {.fragment}
+<div class="mock-title mock-claim"><span class="mock-label">Claim title</span>Qwen gets 133 of 750 object-tracking questions right, fewer than the 169 that random guessing would.</div>
+:::
+
+```{python}
+#| fig-width: 10
+#| fig-height: 3.4
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Lab 5's data: whether each model got each BIG-Bench Hard question right.
+data_folder = "../../data/course/llm_bbh/"
+correct = pd.read_csv(data_folder + "correct.csv")
+questions = pd.read_csv(data_folder + "questions.csv")
+
+# Qwen's accuracy in each task, and the accuracy of guessing at random.
+by_task = correct.groupby("task")[["qwen25_7b"]].mean()
+by_task["guessing"] = 1 / questions.groupby("task")["n_options"].first()
+by_task["above_guessing"] = 100 * (by_task["qwen25_7b"] - by_task["guessing"])
+by_task = by_task.sort_values("above_guessing")
+by_task["tracking"] = by_task.index.str.startswith("tracking_shuffled_objects")
+
+fig, ax = plt.subplots(figsize=(10, 3.4))
+x = np.arange(len(by_task))
+colors = np.where(by_task["tracking"], "#c41230", "#7d8696")
+ax.vlines(x, 0, by_task["above_guessing"], colors=colors, linewidth=2)
+ax.scatter(x, by_task["above_guessing"], color=colors, s=50, zorder=3)
+ax.axhline(0, color="#252525", linewidth=1)
+ax.text(len(by_task) - 0.5, -2.5, "random guessing", ha="right", va="top", fontsize=13, color="#252525")
+
+number_of_objects = {"tracking_shuffled_objects_three_objects": "3",
+                     "tracking_shuffled_objects_five_objects": "5",
+                     "tracking_shuffled_objects_seven_objects": "7"}
+for i, task in enumerate(by_task.index):
+    if task in number_of_objects:
+        ax.text(i, by_task.loc[task, "above_guessing"] - 3, number_of_objects[task],
+                ha="center", va="top", fontsize=12, color="#8f1025")
+ax.text(2.8, -11, "object-tracking tasks\n(number of objects)", ha="left", va="center", fontsize=13, color="#8f1025")
+
+ax.set_xticks([])
+ax.set_xlim(-0.8, len(by_task) - 0.2)
+ax.set_ylim(-22, 64)
+ax.set_yticks([0, 20, 40, 60])
+ax.set_ylabel("Qwen's accuracy minus\nguessing (points)", fontsize=13)
+ax.set_xlabel("the 24 BBH tasks, sorted", fontsize=13)
+ax.tick_params(axis="y", labelsize=12)
+ax.spines[["top", "right", "bottom"]].set_visible(False)
+ax.grid(axis="y", color="#e4e7ec", linewidth=0.8)
+ax.set_axisbelow(True)
+plt.tight_layout()
+plt.show()
+```
+
+One idea per slide. The title states it with its number, and the figure is the evidence.
+
+::: notes
+About 3 minutes. Show the slide with only the topic title and ask what it says. Collect a few answers; they will differ. Then reveal the claim title. The topic title leaves the listener to find the point, and they may find a different one. The claim title says what to see, so the figure becomes evidence the listener can check.
+
+Numbers, with 250 questions per task: Qwen is right on 24.0% of the three-object questions (guessing gives 33.3%), 16.0% of the five-object questions (20.0%), and 13.2% of the seven-object questions (14.3%). Pooled over the 750 questions, Qwen gets 133 right where guessing would average about 169 (250 × (1/3 + 1/5 + 1/7) = 169.0; z about −3.2). Alone, only the three-object task is clearly below guessing (one-sided p = 0.0008; five objects 0.06; seven objects 0.35), which is why the title gives the pooled count. The Description's storyboard (slide 9) words the same finding as "Qwen does worse than random guessing on all three object-tracking tasks"; both are claims, and this one carries its number.
+
+Llama gets 181 of the 750 right, about what guessing gives. That is why the recommendation routes these questions elsewhere rather than to Llama.
+
+The writing lesson: if you cannot write a figure's claim title, the figure is not ready, or it does not belong in the talk. If a slide needs two claims in its title, it is two slides.
+:::
+
+## The title test on the Lab 5 storyboard {.smaller .storyboard}
+
+The Lab 5 story as a storyboard, titles only:
+
+| Section | Slide title |
+|:--------|:-------------------------------------------------------------------------|
+| **Introduction** | 1\. A product team built its tool on Llama 3.1 8B and asks whether to switch to Qwen 2.5 7B, an open model of similar size. |
+| | 2\. Switching takes work, so the team will keep Llama if it is no more than 1 point less accurate than Qwen. |
+| | 3\. Our answer: switch to Qwen, but not for tasks that track objects. |
+| **Methods** | 4\. Both models answered the same 5,761 multiple-choice questions from 24 BIG-Bench Hard tasks, so we compare them question by question. |
+| | 5\. Questions in a task share a format and a skill, so we resample whole tasks to measure uncertainty. |
+| **Results** | 6\. Qwen answered 2.9 points more questions correctly than Llama (53.7% versus 50.8%). |
+| | 7\. The gap varies by task: the 95% interval runs from −0.6 to +6.6 points, so Qwen is not shown to be better. |
+| | 8\. Llama is not shown to be within 1 point of Qwen: it could be up to 6.0 points worse (one-sided 95% bound). |
+| | 9\. Qwen does worse than random guessing on all three object-tracking tasks. |
+| **Discussion** | 10\. Recommendation: switch to Qwen, and route object-tracking questions elsewhere. |
+| | 11\. Before launch, test both models on the team's own questions; these benchmark questions are public and may be in the models' training data. |
+
+Slide 9 is in Results because slide 10 uses it. A figure no later slide uses would not be.
+
+<p class="compact-note">From the Project Description, Section 3, which also lists the figure or table each slide shows.</p>
+
+::: notes
+About 4 minutes. Read the eleven titles aloud slowly, without commentary. Then ask three questions that the titles alone should answer. What is the team deciding? What do we recommend? What would make us doubt it?
+
+Points to draw out. Slide 3 previews the answer. Slides 6 to 9 answer the Introduction's question in order: is Qwen more accurate, is Llama close enough to keep, and where does Qwen fail. Slide 7 keeps the inconvenient result rather than hiding it. Slides 7 and 8 both say "not shown," and slide 2's rule says which one decides. Slide 10 uses slides 8 and 9. Slide 11 is the largest limitation and the next data worth collecting.
+
+:::
+
+# Part 3: Write your team's storyboard without AI
+
+## Your team writes its storyboard now, without AI {.smaller .storyboard}
+
+You just wrote the course as an IMRaD. Now write your project the same way, one slide title at a time. The Description's example storyboard (Section 3) shows the shape.
+
+**Allowed:** your milestones, your notebook's numbers and figures, paper, a plain shared document.<br>
+**Not allowed:** any AI tool, including the assistants built into Colab and Google Docs.
+
+One row per slide, in order:
+
+| # | Section | Title: a full-sentence claim | Shown | Presents |
+|:--|:------|:-----------------------------------------------------------|:--------|:--------|
+| 6 | Results | Qwen answered 2.9 points more questions correctly than Llama (53.7% versus 50.8%). | Paired table | Speaker 2 |
+| 7 | Results | The gap varies by task: the 95% interval runs from −0.6 to +6.6 points, so Qwen is not shown to be better. | Gap by task | Speaker 2 |
+| 8 | Results | Llama is not shown to be within 1 point of Qwen: it could be up to 6.0 points worse (one-sided 95% bound). | Bootstrap histogram | Speaker 3 |
+
+<p class="compact-note">Attach the storyboard to Milestone 3 as you wrote it today. After class, use any tools you like to improve it.</p>
+
+::: notes
+About 2 minutes. Why no AI: the sequence of titles is the team's argument, and the oral presentation asks every member to defend it without help. Writing it together also brings disagreements inside the team to the surface while they are cheap to fix.
+
+The three rows are from the Description's storyboard. Teams write names where the example says "Speaker 2."
+
+Paper works well, and so does a plain shared document. The assistants built into Colab and Google Docs count as AI. Do not police by suspicion; what you see at each table during class is the evidence.
+:::
+
+## Write the storyboard backward, from the answer {.smaller .compact-table}
+
+| Time | Step | Done when |
+|:-------|:-----------------------------------------------|:---------------------------|
+| 4 min | **The answer.** Write your recommendation in one sentence. | every member agrees with it |
+| 5 min | **Discussion.** The recommendation and its conditions, the largest limitation, what would change it. | one to three titles |
+| 4 min | **Introduction.** The client and the decision, the question, the preview of the answer. | the last title previews the answer |
+| 9 min | **Results.** One title per finding, in the order the Introduction asks. Write what each slide shows. | each title has its number and its uncertainty |
+| 4 min | **Methods.** Only what a listener needs to trust the Results. | everything else is on an appendix list |
+| 3 min | **Who presents.** Assign slides, and write the sentence that hands off at each change of speaker. | each speaker knows their slides |
+| 4 min | **Title test.** Read your titles aloud to a neighboring team. | they can tell you your decision and your recommendation |
+
+Finished early? Write the strongest objection to your recommendation, and the appendix slide that answers it.
+
+::: notes
+About 33 minutes. Keep a timer on screen or call the times.
+
+Writing backward works because every section answers to the recommendation. Once the team agrees on it, the Discussion follows, the Introduction sets it up, and the Results are whatever the Discussion needs. Teams that start with Methods spend the session describing their data.
+
+If a team cannot agree on the one-sentence answer in four minutes, that is the most useful thing it will learn today. Stay with that team.
+
+For the title test, pair neighboring teams. The listening team hears only the titles, with no slides or figures.
+
+The "finished early" step is preparation for the oral presentation: the instructor's questions will be the strongest objections, so teams that write them down now have rehearsed.
+:::
+
+## While you write, every team gets these questions {.smaller}
+
+1. From your titles alone, what is the client's decision, and what do you recommend?
+2. Which question in your Introduction does each Results title answer?
+3. Does each Results title have its number, with its interval or its denominator?
+4. Which later slide uses each figure?
+5. Does any title claim more than its interval allows?
+6. Does each quantity keep one name?
+7. Would you say each title to the client in those words?
+
+::: notes
+Leave this slide up during the workshop. Circulate and ask each team at least the first two questions, and the last one.
+
+Common problems: Results titles that are topics ("Sensitivity analysis"); a Results slide that answers a question the Introduction never asked; a sensitivity result that never reaches the recommendation; one quantity under two names ("accuracy" and "agreement"); titles in a voice nobody would speak aloud.
+:::
+
+## Tonight and Thursday {.smaller}
+
+- Tonight, submit Milestone 3, with the storyboard attached as you wrote it today.
+- On Thursday, you get your storyboard back on paper with my comments, and each team meets with me for five minutes. Bring slides built from the storyboard.
+- Slides and video are due Sunday at 11:59 pm, with no extensions.
+- Oral presentations run Apr 27 to 30, in your team's sign-up slot.
+
+Upload the video on Saturday, and do a test upload before then.
+
+::: notes
+About 2 minutes. Say the dates aloud. The video deadline has no extensions because the instructor watches every video before writing the questions for each team's oral presentation. The most common failure is a last-hour export or upload problem, so a Saturday upload is the real deadline.
+:::
