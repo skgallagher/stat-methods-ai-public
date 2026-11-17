@@ -109,9 +109,11 @@ function renderProjectDocs() {
   const list = document.querySelector("[data-project-docs]");
   if (!list) return;
   list.innerHTML = projectDocs.map((doc) => {
-    const action = doc.href
-      ? link({ label: doc.actionLabel || "Open", href: doc.href, openDate: doc.openDate })
-      : `<span class="locked">Coming later</span>`;
+    const action = doc.links
+      ? linkList(doc.links)
+      : doc.href
+        ? link({ label: doc.actionLabel || "Open", href: doc.href, openDate: doc.openDate })
+        : `<span class="locked">Coming later</span>`;
     return `<li><strong>${doc.label}.</strong> ${doc.status} ${action}</li>`;
   }).join("");
 }

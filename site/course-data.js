@@ -162,5 +162,15 @@ const projectDocs = [
     actionLabel: "Box folder",
     openDate: "2027-03-14",
     status: "Data and cached AI outputs for all four tracks, one zip per track. Opens at the end of spring break, when teams and tracks are posted."
+  },
+  {
+    label: "Starter notebooks",
+    status: "One Colab notebook per track; its first cell downloads that track's data. Opens at the end of spring break, with the data.",
+    links: [
+      { label: "Food tagging", href: `${courseLinks.colabBase}/project/tracks/track_1_food/starter.ipynb`, openDate: "2027-03-14" },
+      { label: "Pet tagging", href: `${courseLinks.colabBase}/project/tracks/track_2_pets/starter.ipynb`, openDate: "2027-03-14" },
+      { label: "Human preferences", href: `${courseLinks.colabBase}/project/tracks/track_3_preferences/starter.ipynb`, openDate: "2027-03-14" },
+      { label: "Instruction following", href: `${courseLinks.colabBase}/project/tracks/track_4_instructions/starter.ipynb`, openDate: "2027-03-14" }
+    ]
   }
 ];
