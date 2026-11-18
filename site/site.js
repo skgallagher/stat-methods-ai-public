@@ -100,7 +100,7 @@ function renderSchedule() {
       : "";
     const note = item.note ? `<span class="small">${item.note}</span>` : "";
     return `
-      <tr class="${classes}">
+      <tr class="${classes}" id="week-${item.week}">
         <td class="week">${item.week}</td>
         <td class="dates">${item.dates}</td>
         <td class="topic">${item.topic}${note}${data}</td>
@@ -109,6 +109,10 @@ function renderSchedule() {
         <td class="links" data-label="Homework">${released ? homeworkCell(item.homework) : ""}</td>
       </tr>`;
   }).join("");
+
+  // Canvas links to one week as modules.html#week-5; the rows exist only now.
+  const target = window.location.hash && document.getElementById(window.location.hash.slice(1));
+  if (target) target.scrollIntoView();
 
   const mode = document.querySelector("[data-release-mode]");
   if (mode && siteSettings.moduleReleaseMode === "beta") {

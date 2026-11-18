@@ -275,11 +275,13 @@ td.links {
   white-space: nowrap;
 }
 
-tr.current td {
+tr.current td,
+tr:target td {
   background: var(--soft);
 }
 
-tr.current td.week {
+tr.current td.week,
+tr:target td.week {
   box-shadow: inset 3px 0 0 var(--accent);
 }
 
