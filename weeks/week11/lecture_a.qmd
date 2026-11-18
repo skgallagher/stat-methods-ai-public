@@ -646,7 +646,7 @@ About 1 minute.
 ## Thursday {.smaller}
 
 - Lecture 11B, then Lab 11: the nonprofit's check as an experiment.
-- Then work time on the Milestone 2 outline, due Tue Apr 6.
+- Then work time on the Milestone 2 outline, due Sun Apr 11.
 - Reading: Miller (2024), "Adding Error Bars to Evals," Section 3.
 - HW6 was due today. Checkpoint 9 opens after Thursday's class.
 

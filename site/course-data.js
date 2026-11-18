@@ -118,7 +118,7 @@ const weeklyMaterials = [
   {
     week: 12, dates: "Apr 6 / 8", publishDate: "2027-04-04",
     topic: "LLM judges as measurement instruments",
-    note: "Project Milestone 2 due Apr 6",
+    note: "Project Milestone 2 due Sun Apr 11",
     slides: slides("week12"),
     lab: notebook("weeks/week12/lab_starter.ipynb", "2027-04-08"),
     homework: { label: "HW7", due: "Apr 13", pdf: `${courseLinks.publicBlob}/weeks/week12/hw07.pdf`, links: notebook("weeks/week12/hw07_starter.ipynb", "2027-04-08"), openDate: "2027-04-08" },

@@ -164,7 +164,7 @@ Shannon Gallagher
 <ul>
 <li>About 15 minutes: Lab 11’s design, and how to design any evaluation.</li>
 <li>About 30 minutes on Lab 11, with me.</li>
-<li>The rest of class: your team’s Milestone 2 outline, due Tue Apr 6.</li>
+<li>The rest of class: your team’s Milestone 2 outline, due Sun Apr 11.</li>
 </ul>
 <aside class="notes">
 <p>About 1 minute.</p>
@@ -392,7 +392,7 @@ Adapted from Coleman and Montgomery’s (1993) pre-design guide sheet for planne
 The steps of experimentation in Coleman and Montgomery (1993), Table 1. For step 4: “Block what you can; randomize what you cannot,” attributed to George Box.
 </p>
 <aside class="notes">
-<p>About 3 minutes. Coleman and Montgomery’s Table 1 lists the steps as recognition and statement of the problem, choice of factors and levels, selection of the response variables, choice of experimental design, conduction of the experiment, data analysis, and conclusions and recommendations; the first three are the planning phase. For step 4, a small pilot (say 20 questions with 5 answers each) gives a rough <span class="math inline">\tau^2</span> and <span class="math inline">\sigma^2</span>, enough to pick <span class="math inline">r</span> because the SE curve is flat near its minimum (Tuesday). Box’s mantra is quoted widely; Pashley and Miratrix (2020) discuss when blocking pays. Ask the room to run the steps for one track in a minute: for Track 3, the decision is whether the judge can stand in for human preferences; the unit is a pair, grouped by Reddit post; the judge saw both orders, so order is crossed with the pair; the answers are deterministic, so replication is across pairs and posts; and the comparison and its interval are written before the holdout is opened.</p>
+<p>About 3 minutes. Coleman and Montgomery’s Table 1 lists the steps as recognition and statement of the problem, choice of factors and levels, selection of the response variables, choice of experimental design, conduction of the experiment, data analysis, and conclusions and recommendations; the first three are the planning phase. For step 4, a small pilot (say 20 questions with 5 answers each) gives a rough <span class="math inline">\tau^2</span> and <span class="math inline">\sigma^2</span>, enough to pick <span class="math inline">r</span> because the SE curve is flat near its minimum (Tuesday). Box’s mantra is quoted widely; Pashley and Miratrix (2020) discuss when blocking pays. Ask the room to run the steps for one track in a minute: for Track 3, the decision is whether the judge can stand in for human preferences; the unit is a pair, grouped by Reddit post; the judge saw both orders, so order is crossed with the pair; the answers are deterministic, so replication is across pairs and posts; and the comparison and its interval are planned before the team looks at the results.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -430,28 +430,28 @@ The steps of experimentation in Coleman and Montgomery (1993), Table 1. For step
 <td>a photo</td>
 <td>CLIP and the fitted baseline</td>
 <td>none listed</td>
-<td>the 20% holdout</td>
+<td>the training/evaluation split</td>
 </tr>
 <tr class="even">
 <td>Pet tagging</td>
 <td>a photo</td>
 <td>CLIP and the fitted baseline</td>
 <td>repeated photos</td>
-<td>holdout, by photo group</td>
+<td>the split, by photo group</td>
 </tr>
 <tr class="odd">
 <td>Human preferences</td>
 <td>a pair</td>
 <td>the judge and the baselines</td>
 <td>pairs from one post</td>
-<td>holdout by post; order</td>
+<td>the split, by post; order</td>
 </tr>
 <tr class="even">
 <td>Instruction following</td>
 <td>a response</td>
 <td>the judge and the baseline</td>
 <td>2 responses per prompt</td>
-<td>holdout, by prompt</td>
+<td>the split, by prompt</td>
 </tr>
 </tbody>
 </table>
@@ -461,7 +461,7 @@ The steps of experimentation in Coleman and Montgomery (1993), Table 1. For step
 <li>Every interval should resample the related groups.</li>
 </ul>
 <aside class="notes">
-<p>About 3 minutes. From each track’s datasheet and system card. Food: 1,440 photos, a seeded random 20% holdout (seed 2027); no repeated photos are listed, but confusable dishes are a different issue. Pets: 11 pairs of repeated photos, so the holdout was drawn by <code>photo_group</code> and intervals should resample groups. Preferences: 900 pairs from 791 Reddit posts, holdout by post; the judge was run in both response orders, so order is crossed with the pair, which is Week 12’s starting point. Instructions: two responses to each of 150 prompts, holdout by prompt (5 per family); the rule checker is the reference the judge is checked against. In every track the systems used deterministic decoding (or, for CLIP, no sampling), so there is no within-case replication to measure; that is a fixed setting of each system, worth saying. Do not restate Milestone 2’s requirements; the Project Description has them.</p>
+<p>About 3 minutes. From each track’s datasheet and system card. Each starter sets aside about a quarter of the cases for evaluation (seed 2027), keeping related cases on one side; there is no holdout (Nov 18). Food: 1,440 photos; no repeated photos are listed, but confusable dishes are a different issue. Pets: 11 pairs of repeated photos, so the split is by <code>photo_group</code> and intervals should resample groups. Preferences: 900 pairs from 791 Reddit posts, split by post; the judge was run in both response orders, so order is crossed with the pair, which is Week 12’s starting point. Instructions: two responses to each of 150 prompts, split by prompt; the rule checker is the reference the judge is checked against. In every track the systems used deterministic decoding (or, for CLIP, no sampling), so there is no within-case replication to measure; that is a fixed setting of each system, worth saying. Do not restate Milestone 2’s requirements; the Project Description has them.</p>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;

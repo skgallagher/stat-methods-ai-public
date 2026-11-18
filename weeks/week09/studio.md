@@ -8,15 +8,15 @@ Open your track's starter notebook in Colab from the course website, like every 
 
 Every member runs the notebook on their own laptop. A team where one person types and three watch has trouble in the oral presentation, where anyone can be asked about any part of the project.
 
-The holdout stays sealed. Everything today uses the analysis cases. Write your answers in text cells in the notebook. Short sentences in your own words are fine; today is for shaping ideas, not polishing them.
+Write your answers in text cells in the notebook. Short sentences in your own words are fine; today is for shaping ideas, not polishing them.
 
 ## 1. Load your track
 
 **Why this step:** before any number means anything, you need to know what one row is and how many rows you have.
 
-Run the first code cell (starter section 1). It finds your track's folder or unpacks the zip, then prints how many analysis cases there are, how many are sealed in the holdout, and how the analysis cases are split into training and evaluation cases.
+Run the first code cell (starter section 1). It finds your track's folder or unpacks the zip, then prints how many cases there are and how they are split into training and evaluation cases.
 
-What is one unit in your track: a photo, a pair of responses, or a response? How many analysis units are there, and how many are in the holdout? Does anything in your track come in groups, such as two responses to one prompt or several pairs from one Reddit post? The datasheet says.
+What is one unit in your track: a photo, a pair of responses, or a response? How many units are there? Does anything in your track come in groups, such as two responses to one prompt or several pairs from one Reddit post? The datasheet says.
 
 **Your answer:**
 

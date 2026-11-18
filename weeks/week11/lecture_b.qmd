@@ -18,7 +18,7 @@ execute:
 
 - About 15 minutes: Lab 11's design, and how to design any evaluation.
 - About 30 minutes on Lab 11, with me.
-- The rest of class: your team's Milestone 2 outline, due Tue Apr 6.
+- The rest of class: your team's Milestone 2 outline, due Sun Apr 11.
 
 ::: notes
 About 1 minute.
@@ -114,24 +114,24 @@ About 3 minutes. Coleman, D. E., and Montgomery, D. C. (1993), "A Systematic App
 <p class="compact-note">The steps of experimentation in Coleman and Montgomery (1993), Table 1. For step 4: "Block what you can; randomize what you cannot," attributed to George Box.</p>
 
 ::: notes
-About 3 minutes. Coleman and Montgomery's Table 1 lists the steps as recognition and statement of the problem, choice of factors and levels, selection of the response variables, choice of experimental design, conduction of the experiment, data analysis, and conclusions and recommendations; the first three are the planning phase. For step 4, a small pilot (say 20 questions with 5 answers each) gives a rough $\tau^2$ and $\sigma^2$, enough to pick $r$ because the SE curve is flat near its minimum (Tuesday). Box's mantra is quoted widely; Pashley and Miratrix (2020) discuss when blocking pays. Ask the room to run the steps for one track in a minute: for Track 3, the decision is whether the judge can stand in for human preferences; the unit is a pair, grouped by Reddit post; the judge saw both orders, so order is crossed with the pair; the answers are deterministic, so replication is across pairs and posts; and the comparison and its interval are written before the holdout is opened.
+About 3 minutes. Coleman and Montgomery's Table 1 lists the steps as recognition and statement of the problem, choice of factors and levels, selection of the response variables, choice of experimental design, conduction of the experiment, data analysis, and conclusions and recommendations; the first three are the planning phase. For step 4, a small pilot (say 20 questions with 5 answers each) gives a rough $\tau^2$ and $\sigma^2$, enough to pick $r$ because the SE curve is flat near its minimum (Tuesday). Box's mantra is quoted widely; Pashley and Miratrix (2020) discuss when blocking pays. Ask the room to run the steps for one track in a minute: for Track 3, the decision is whether the judge can stand in for human preferences; the unit is a pair, grouped by Reddit post; the judge saw both orders, so order is crossed with the pair; the answers are deterministic, so replication is across pairs and posts; and the comparison and its interval are planned before the team looks at the results.
 :::
 
 ## Your project is an experiment too {.smaller .compact-table}
 
 | Track | Unit | Treatments, on the same cases | Related groups | Randomized |
 |------------------------|----------------|----------------------------------|--------------------------|----------------------------|
-| Food tagging | a photo | CLIP and the fitted baseline | none listed | the 20% holdout |
-| Pet tagging | a photo | CLIP and the fitted baseline | repeated photos | holdout, by photo group |
-| Human preferences | a pair | the judge and the baselines | pairs from one post | holdout by post; order |
-| Instruction following | a response | the judge and the baseline | 2 responses per prompt | holdout, by prompt |
+| Food tagging | a photo | CLIP and the fitted baseline | none listed | the training/evaluation split |
+| Pet tagging | a photo | CLIP and the fitted baseline | repeated photos | the split, by photo group |
+| Human preferences | a pair | the judge and the baselines | pairs from one post | the split, by post; order |
+| Instruction following | a response | the judge and the baseline | 2 responses per prompt | the split, by prompt |
 
 - Every track has one cached answer per case: the replicates are cases.
 - Each case gets every system, so each case is a block.
 - Every interval should resample the related groups.
 
 ::: notes
-About 3 minutes. From each track's datasheet and system card. Food: 1,440 photos, a seeded random 20% holdout (seed 2027); no repeated photos are listed, but confusable dishes are a different issue. Pets: 11 pairs of repeated photos, so the holdout was drawn by `photo_group` and intervals should resample groups. Preferences: 900 pairs from 791 Reddit posts, holdout by post; the judge was run in both response orders, so order is crossed with the pair, which is Week 12's starting point. Instructions: two responses to each of 150 prompts, holdout by prompt (5 per family); the rule checker is the reference the judge is checked against. In every track the systems used deterministic decoding (or, for CLIP, no sampling), so there is no within-case replication to measure; that is a fixed setting of each system, worth saying. Do not restate Milestone 2's requirements; the Project Description has them.
+About 3 minutes. From each track's datasheet and system card. Each starter sets aside about a quarter of the cases for evaluation (seed 2027), keeping related cases on one side; there is no holdout (Nov 18). Food: 1,440 photos; no repeated photos are listed, but confusable dishes are a different issue. Pets: 11 pairs of repeated photos, so the split is by `photo_group` and intervals should resample groups. Preferences: 900 pairs from 791 Reddit posts, split by post; the judge was run in both response orders, so order is crossed with the pair, which is Week 12's starting point. Instructions: two responses to each of 150 prompts, split by prompt; the rule checker is the reference the judge is checked against. In every track the systems used deterministic decoding (or, for CLIP, no sampling), so there is no within-case replication to measure; that is a fixed setting of each system, worth saying. Do not restate Milestone 2's requirements; the Project Description has them.
 :::
 
 ## After the lab: your Milestone 2 outline {.smaller}
