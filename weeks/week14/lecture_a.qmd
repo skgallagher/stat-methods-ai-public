@@ -19,7 +19,7 @@ execute:
 Today is about your own voice. In the oral presentation you defend your argument without help, so today you write it yourselves.
 
 1. Summarize the course in IMRaD format, and critique an AI's answer to a lazy prompt.
-2. Plan a five-minute talk with IMRaD and one claim per slide.
+2. Plan an eight-minute talk with IMRaD and one claim per slide.
 3. Write your team's storyboard, without AI.
 
 Please close AI tools for today. The only AI text you will see is on my screen.
@@ -296,27 +296,27 @@ About 3 minutes, in pairs.
 (2) Other good answers: 18 per group; people from Boston-area universities (47 of 54 from MIT, Wellesley, and Harvard), not a general population; a 20-minute essay is not a semester project; the interview questions differed by group, so the interviewers knew each person's group. The construct answer is the best one: if the ChatGPT group copied text, a failed quote is partly a measure of authorship, not memory. That is exactly what the oral presentation checks: can you explain the slide you are showing?
 :::
 
-# Part 2: Plan a five-minute talk with IMRaD and one claim per slide
+# Part 2: Plan an eight-minute talk with IMRaD and one claim per slide
 
-## A five-minute talk spends its time like an abstract {.smaller .compact-table}
+## An eight-minute talk spends its time like an abstract {.smaller .compact-table}
 
 | | An abstract (CMU's IMRD Cheat Sheet) | Your talk (the Description) |
 |:-------------|:------:|:------:|
-| Introduction | 25% | under 1 minute |
-| Methods | 25% | about 1 minute |
-| Results | 35% | about 2 minutes |
+| Introduction | 25% | about 1 minute |
+| Methods | 25% | about 2 minutes |
+| Results | 35% | about 3 minutes |
 | Discussion | 15% | about 1 minute |
 
 - Results get the most time in both.
-- The cheat sheet calls Methods "the least-read section." Say only what the listener needs to trust the Results.
+- The cheat sheet calls Methods "the least-read section." Yours is two or three slides, at least half on the data and what EDA showed.
 - The cheat sheet says Methods are usually written in the passive voice. In a talk, say "we resampled whole tasks," not "tasks were resampled."
 
 <p class="compact-note">IMRD Cheat Sheet, Communication Support, CMU Student Academic Success Center: cmu.edu/student-success.</p>
 
 ::: notes
-About 2 minutes. The cheat sheet is written for papers; the Description adapts it to a five-minute talk. A talk is close to a spoken abstract: about one minute per section, with two for Results.
+About 2 minutes. The cheat sheet is written for papers; the Description adapts it to an eight-minute talk of five to eight slides: about a minute for the one-slide Introduction, two for Methods, three for Results, and a minute for the one-slide Discussion.
 
-The talk gives the Discussion a little more than the abstract's 15%, because a client's talk ends with a decision, and the Introduction ends with a one-sentence preview of that decision.
+Compared with the abstract, the talk spends less on the Introduction, a single slide that ends with a one-sentence preview of the decision, and more on Results. Half of Methods is the data and what exploratory analysis showed, which the instructor added on Nov 18.
 
 The passive-voice point is today's theme. "Tasks were resampled" hides who did the work and who has to defend it. "We" is the team's voice.
 
@@ -407,7 +407,7 @@ One idea per slide. The title states it with its number, and the figure is the e
 ::: notes
 About 3 minutes. Show the slide with only the topic title and ask what it says. Collect a few answers; they will differ. Then reveal the claim title. The topic title leaves the listener to find the point, and they may find a different one. The claim title says what to see, so the figure becomes evidence the listener can check.
 
-Numbers, with 250 questions per task: Qwen is right on 24.0% of the three-object questions (guessing gives 33.3%), 16.0% of the five-object questions (20.0%), and 13.2% of the seven-object questions (14.3%). Pooled over the 750 questions, Qwen gets 133 right where guessing would average about 169 (250 × (1/3 + 1/5 + 1/7) = 169.0; z about −3.2). Alone, only the three-object task is clearly below guessing (one-sided p = 0.0008; five objects 0.06; seven objects 0.35), which is why the title gives the pooled count. The Description's storyboard (slide 9) words the same finding as "Qwen does worse than random guessing on all three object-tracking tasks"; both are claims, and this one carries its number.
+Numbers, with 250 questions per task: Qwen is right on 24.0% of the three-object questions (guessing gives 33.3%), 16.0% of the five-object questions (20.0%), and 13.2% of the seven-object questions (14.3%). Pooled over the 750 questions, Qwen gets 133 right where guessing would average about 169 (250 × (1/3 + 1/5 + 1/7) = 169.0; z about −3.2). Alone, only the three-object task is clearly below guessing (one-sided p = 0.0008; five objects 0.06; seven objects 0.35), which is why the title gives the pooled count. The Description's storyboard (slide 6) words the same finding as "Qwen does worse than random guessing on all three object-tracking tasks"; both are claims, and this one carries its number.
 
 Llama gets 181 of the 750 right, about what guessing gives. That is why the recommendation routes these questions elsewhere rather than to Llama.
 
@@ -420,26 +420,22 @@ The Lab 5 story as a storyboard, titles only:
 
 | Section | Slide title |
 |:--------|:-------------------------------------------------------------------------|
-| **Introduction** | 1\. A product team built its tool on Llama 3.1 8B and asks whether to switch to Qwen 2.5 7B, an open model of similar size. |
-| | 2\. Switching takes work, so the team will keep Llama if it is no more than 1 point less accurate than Qwen. |
-| | 3\. Our answer: switch to Qwen, but not for tasks that track objects. |
-| **Methods** | 4\. Both models answered the same 5,761 multiple-choice questions from 24 BIG-Bench Hard tasks, so we compare them question by question. |
-| | 5\. Questions in a task share a format and a skill, so we resample whole tasks to measure uncertainty. |
-| **Results** | 6\. Qwen answered 2.9 points more questions correctly than Llama (53.7% versus 50.8%). |
-| | 7\. The gap varies by task: the 95% interval runs from −0.6 to +6.6 points, so Qwen is not shown to be better. |
-| | 8\. Llama is not shown to be within 1 point of Qwen: it could be up to 6.0 points worse (one-sided 95% bound). |
-| | 9\. Qwen does worse than random guessing on all three object-tracking tasks. |
-| **Discussion** | 10\. Recommendation: switch to Qwen, and route object-tracking questions elsewhere. |
-| | 11\. Before launch, test both models on the team's own questions; these benchmark questions are public and may be in the models' training data. |
+| **Introduction** | 1\. A product team built its tool on Llama 3.1 8B and will keep it if it is shown to be no more than 1 point less accurate than Qwen 2.5 7B, an open model of similar size. |
+| **Methods** | 2\. Random guessing gets between 5% and 50% of a task right, because the 24 BIG-Bench Hard tasks have 2 to 19 answer choices per question. |
+| | 3\. Both models answered the same 5,761 questions, so we compare them question by question and resample whole tasks to measure uncertainty. |
+| **Results** | 4\. Qwen answered 2.9 points more questions correctly than Llama (53.7% versus 50.8%). |
+| | 5\. Llama could be up to 6.0 points worse than Qwen (one-sided 95% bound), so it is not shown to be within the 1-point margin. |
+| | 6\. Qwen does worse than random guessing on all three object-tracking tasks. |
+| **Discussion** | 7\. Recommendation: switch to Qwen, send object-tracking questions elsewhere, and test both models on the team's own questions before launch. |
 
-Slide 9 is in Results because slide 10 uses it. A figure no later slide uses would not be.
+Slide 6 is in Results because slide 7 uses it. A figure no later slide uses would not be.
 
 <p class="compact-note">From the Project Description, Section 3, which also lists the figure or table each slide shows.</p>
 
 ::: notes
-About 4 minutes. Read the eleven titles aloud slowly, without commentary. Then ask three questions that the titles alone should answer. What is the team deciding? What do we recommend? What would make us doubt it?
+About 4 minutes. Read the seven titles aloud slowly, without commentary. Then ask three questions that the titles alone should answer. What is the team deciding? What do we recommend? What would make us doubt it?
 
-Points to draw out. Slide 3 previews the answer. Slides 6 to 9 answer the Introduction's question in order: is Qwen more accurate, is Llama close enough to keep, and where does Qwen fail. Slide 7 keeps the inconvenient result rather than hiding it. Slides 7 and 8 both say "not shown," and slide 2's rule says which one decides. Slide 10 uses slides 8 and 9. Slide 11 is the largest limitation and the next data worth collecting.
+Points to draw out. Slide 1 is the whole Introduction; its last line, on the slide, previews the answer. Slide 2 is the exploratory analysis, and it changes the plan: each task's accuracy has to be read against its own chance rate, which slide 6 uses. Slides 4 to 6 answer the Introduction's question in order: is Qwen more accurate, is Llama close enough to keep, and where does Qwen fail. Slide 5 tests the margin set on slide 1; the two-sided interval (−0.6 to +6.6 points) is shown on that slide but is not its title, because the margin decides. Slide 7 uses slides 5 and 6, and its last clause is the next data worth collecting.
 
 :::
 
@@ -456,9 +452,9 @@ One row per slide, in order:
 
 | # | Section | Title: a full-sentence claim | Shown | Presents |
 |:--|:------|:-----------------------------------------------------------|:--------|:--------|
-| 6 | Results | Qwen answered 2.9 points more questions correctly than Llama (53.7% versus 50.8%). | Paired table | Speaker 2 |
-| 7 | Results | The gap varies by task: the 95% interval runs from −0.6 to +6.6 points, so Qwen is not shown to be better. | Gap by task | Speaker 2 |
-| 8 | Results | Llama is not shown to be within 1 point of Qwen: it could be up to 6.0 points worse (one-sided 95% bound). | Bootstrap histogram | Speaker 3 |
+| 4 | Results | Qwen answered 2.9 points more questions correctly than Llama (53.7% versus 50.8%). | Paired table | Speaker 2 |
+| 5 | Results | Llama could be up to 6.0 points worse than Qwen (one-sided 95% bound), so it is not shown to be within the 1-point margin. | Gap by task | Speaker 3 |
+| 6 | Results | Qwen does worse than random guessing on all three object-tracking tasks. | Accuracy and chance by task | Speaker 3 |
 
 <p class="compact-note">Attach the storyboard to Milestone 3 as you wrote it today. After class, use any tools you like to improve it.</p>
 
@@ -475,10 +471,10 @@ Paper works well, and so does a plain shared document. The assistants built into
 | Time | Step | Done when |
 |:-------|:-----------------------------------------------|:---------------------------|
 | 4 min | **The answer.** Write your recommendation in one sentence. | every member agrees with it |
-| 5 min | **Discussion.** The recommendation and its conditions, the largest limitation, what would change it. | one to three titles |
-| 4 min | **Introduction.** The client and the decision, the question, the preview of the answer. | the last title previews the answer |
-| 9 min | **Results.** One title per finding, in the order the Introduction asks. Write what each slide shows. | each title has its number and its uncertainty |
-| 4 min | **Methods.** Only what a listener needs to trust the Results. | everything else is on an appendix list |
+| 5 min | **Discussion.** The recommendation and its conditions, the largest limitation, what would change it. | one title |
+| 4 min | **Introduction.** The client and the decision, the question, the preview of the answer. | one title, and the slide ends with the preview |
+| 9 min | **Results.** One title per finding, in the order the Introduction asks. Write what each slide shows. | one to three titles, each with its number and its uncertainty |
+| 4 min | **Methods.** A slide on the data and what exploratory analysis showed, then one on the whole experiment. | two or three titles, at least half on the data |
 | 3 min | **Who presents.** Assign slides, and write the sentence that hands off at each change of speaker. | each speaker knows their slides |
 | 4 min | **Title test.** Read your titles aloud to a neighboring team. | they can tell you your decision and your recommendation |
 

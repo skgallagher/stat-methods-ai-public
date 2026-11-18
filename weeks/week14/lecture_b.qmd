@@ -127,16 +127,16 @@ About 2 minutes. This is Tuesday's theme applied to the voice track. Ask a volun
 The handoff example is from the Lab 5 story. "Now our next speaker will talk about calibration" starts over; a linking sentence keeps one story.
 :::
 
-## Five minutes goes fast {.smaller}
+## Eight minutes goes fast {.smaller}
 
-- The Description suggests about one minute each for the Introduction, Methods, and Discussion, and two for Results.
-- Rehearse with a timer. A run that takes 6:30 today will not shrink by Sunday.
+- The Description suggests about a minute each for the Introduction and the Discussion, two for Methods, and three for Results.
+- Rehearse with a timer. A run that takes 9:30 today will not shrink by Sunday.
 - If you are over, cut a slide. Do not talk faster.
 - Move what you cut to the appendix, ready for the oral presentation.
 - Record in a quiet room with the microphone close, and do a test upload before Saturday.
 
 ::: notes
-About 2 minutes. The time split is the Description's (Section 5). The usual problem is a long Methods section; the listener needs only enough to trust the Results.
+About 2 minutes. The time split and the slide counts are the Description's (Final presentation). The usual problem is a long Methods section. Methods is two or three slides, at least half on the data and what exploratory analysis showed, and one on the whole experiment.
 
 The deadline has no extensions because the instructor watches every video before writing each team's oral presentation questions. The most common failure is a last-hour export or upload problem, so Saturday is the real deadline.
 :::
@@ -145,7 +145,7 @@ The deadline has no extensions because the instructor watches every video before
 
 1. Read my comments, and fix your slide titles first.
 2. Read only your titles to a neighboring team. Can they say your recommendation?
-3. Give that team your full five minutes, with a timer. They name one thing to cut.
+3. Give that team your full eight minutes, with a timer. They name one thing to cut.
 4. Draw a card and explain it for 90 seconds: the baseline, the main comparison, calibration, the sensitivity analysis, or how you used AI.
 5. Before you leave, each of you finishes this sentence on an exit ticket: "The part of our project I would be weakest defending is \_\_\_."
 

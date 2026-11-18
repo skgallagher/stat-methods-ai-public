@@ -15,7 +15,7 @@ Today you get your storyboard back on paper, with comments, and your team meets 
 
 1. **Read the comments** on your storyboard, and fix your slide titles first.
 2. **Title test.** Read only your slide titles, in order, to a neighboring team. The listeners say what your recommendation is and which title lost them.
-3. **Timed run.** Give that team your full five minutes, with a timer. They name **one cut**. Then swap.
+3. **Timed run.** Give that team your full eight minutes, with a timer. They name **one cut**. Then swap.
 4. **Cards.** Each member draws a card below and explains it for 90 seconds, without notes.
 5. **Exit ticket.** Before you leave, each member fills one in on their own.
 
@@ -32,7 +32,7 @@ Each member, separately: "The part of our project I would be weakest defending i
 - [ ] The slide titles pass the title test, and every number matches across the slides, the narration, and Milestone 3
 - [ ] Every figure is readable at video size, with labeled axes, units, and its interval
 - [ ] The narration is in your own words, from notes rather than a script
-- [ ] A full run takes five minutes or less
+- [ ] A full run takes eight minutes or less
 - [ ] Appendix slides are ready, including the AI-use slide
 - [ ] Video uploaded by **Saturday**, per Canvas instructions; do a test upload earlier in the week
 - [ ] Every member can explain every card
