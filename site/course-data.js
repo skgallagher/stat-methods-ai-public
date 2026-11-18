@@ -143,7 +143,7 @@ const weeklyMaterials = [
   {
     week: 15, dates: "Apr 27 / 29", publishDate: "2027-04-25",
     topic: "Oral presentations",
-    note: "Slides and video due Sun Apr 25",
+    note: "Slides and video due Sun Apr 25 · peer assessment due Fri Apr 30",
     slides: [{ label: "Tue / Thu", href: `${courseLinks.pagesBase}/weeks/week15/lecture_a.html` }]
   }
 ];
