@@ -14,7 +14,7 @@ format:
 
 | | |
 |---|---|
-| **Out / due** | Tue Feb 16 / Tue Feb 23, 11:59pm |
+| **Out / due** | Sun Feb 14, 1pm / Tue Feb 23, 11:59pm |
 | **Points** | 100: Problem 1 (46), Problem 2 (39), Problem 3 (15) |
 | **Expected time** | About 4 hours after Lab 5. Contact course staff if setup or debugging alone takes more than 30 minutes. |
 | **Reading** | Miller (2024), ["Adding Error Bars to Evals"](https://arxiv.org/abs/2411.00640), Section 4. Optional: Agresti, *An Introduction to Categorical Data Analysis* (3rd ed.), Section 8.1; Wasserman, *All of Statistics*, Section 10.1, the examples comparing two prediction algorithms; Smith and Winkler (2006), ["The Optimizer's Curse"](https://doi.org/10.1287/mnsc.1050.0451), on the winner's curse; Singh et al. (2025), ["The Leaderboard Illusion"](https://arxiv.org/abs/2504.20879), abstract and the section on private testing |

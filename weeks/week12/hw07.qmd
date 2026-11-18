@@ -14,7 +14,7 @@ format:
 
 | | |
 |---|---|
-| **Out / due** | Tue Apr 6 / Tue Apr 13, 11:59pm |
+| **Out / due** | Sun Apr 4, 1pm / Tue Apr 13, 11:59pm |
 | **Points** | 100: Problem 1 (45), Problem 2 (40, including a 5-point stretch), Problem 3 (15) |
 | **Expected time** | About 5 hours after Labs 11 and 12. Contact course staff if setup or debugging alone takes more than 30 minutes. |
 | **Reading** | Zheng et al. (2023), ["Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena"](https://arxiv.org/abs/2306.05685), Section 3.3 (position and verbosity bias) and Section 4.2 (agreement between GPT-4 and humans). |

@@ -6,7 +6,7 @@ format: pdf
 
 | | |
 |---|---|
-| **Out / due** | Tue Jan 26 / Tue Feb 2, 11:59pm |
+| **Out / due** | Sun Jan 24, 1pm / Tue Feb 2, 11:59pm |
 | **Points** | 100: Problem 1 (50), Problem 2 (30), Problem 3 (20) |
 | **Expected time** | About 5 hours after completing Lab 2; contact course staff if setup/debugging alone exceeds 30 minutes |
 | **Reading** | Plank, paper pp. 1–5; DynaSent Figure 1 and §§3.3–3.4, 4.2–4.5; Shalizi, “Some basic math about averaging” and “Exchangeable variables and random limits for averages”; the short Statistical Proof Book proof of the law of total covariance; Bishop & Bishop Chapter 5 and Exercise 5.1 as technical support |

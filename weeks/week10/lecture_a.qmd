@@ -554,7 +554,7 @@ About 2 minutes.
 ## Thursday and HW6 {.smaller}
 
 - **Thursday:** the assumption no choice of $Z$ can check, as a sensitivity parameter with a tipping point, and when to label. Then Lab 10 on hospital 5.
-- **HW6** is out today, due Tue Mar 30. Problem 1 is a flip point in the client's mix, Problem 2 a sensitivity table for hospital 4, and Problem 3 sensitivity analysis versus model shopping.
+- **HW6** came out Sunday and is due Tue Mar 30. Problem 1 is a flip point in the client's mix, Problem 2 a sensitivity table for hospital 4, and Problem 3 sensitivity analysis versus model shopping.
 - **Checkpoint 8** opens after Thursday's class.
 
 ::: notes

@@ -6,7 +6,7 @@ format: pdf
 
 | | |
 |---|---|
-| **Out / due** | Tue Jan 19 / Tue Jan 26, 11:59pm |
+| **Out / due** | Sun Jan 17, 1pm / Tue Jan 26, 11:59pm |
 | **Points** | 100: Problem 1 (50), Problem 2 (30), Problem 3 (20) |
 | **Expected time** | About 4–5 hours after completing Lab 1; contact course staff if setup/debugging alone exceeds 30 minutes |
 | **Reading** | Optional: Breiman (2001), pp. 199–208 and one discussant. Bishop & Bishop neural-network sections as reference. |

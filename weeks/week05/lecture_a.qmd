@@ -491,7 +491,7 @@ About 2 minutes.
 
 **Thursday:** benchmark questions come in tasks, so are the disagreements really independent? Picking the best of several tries overstates it, and accuracy is not the only cost. Then Lab 5 on BIG-Bench Hard.
 
-**HW5** is out today and due Tue Feb 23.
+**HW5** came out Sunday and is due Tue Feb 23.
 
 **Reading:** Miller (2024), ["Adding Error Bars to Evals"](https://arxiv.org/abs/2411.00640), Section 4: comparing models, unpaired and paired.
 

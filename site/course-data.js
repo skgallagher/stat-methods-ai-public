@@ -40,7 +40,7 @@ const weeklyMaterials = [
     topic: "From regression to neural networks",
     slides: slides("week01"),
     lab: notebook("weeks/week01/lab_starter.ipynb", "2027-01-21"),
-    homework: { label: "HW1", due: "Jan 26", pdf: `${courseLinks.publicBlob}/weeks/week01/hw01.pdf`, links: notebook("weeks/week01/hw01_starter.ipynb", "2027-01-21"), openDate: "2027-01-21" },
+    homework: { label: "HW1", due: "Jan 26", pdf: `${courseLinks.publicBlob}/weeks/week01/hw01.pdf`, links: notebook("weeks/week01/hw01_starter.ipynb", "2027-01-17T13:00"), openDate: "2027-01-17T13:00" },
     data: [dataRelease("Camera Traps data", "camera_traps")]
   },
   {
@@ -48,7 +48,7 @@ const weeklyMaterials = [
     topic: "Data as measurement: labels and repeated judgments",
     slides: slides("week02"),
     lab: notebook("weeks/week02/lab.ipynb", "2027-01-28"),
-    homework: { label: "HW2", due: "Feb 2", pdf: `${courseLinks.publicBlob}/weeks/week02/hw02.pdf`, links: notebook("weeks/week02/hw02_starter.ipynb", "2027-01-28"), openDate: "2027-01-28" },
+    homework: { label: "HW2", due: "Feb 2", pdf: `${courseLinks.publicBlob}/weeks/week02/hw02.pdf`, links: notebook("weeks/week02/hw02_starter.ipynb", "2027-01-24T13:00"), openDate: "2027-01-24T13:00" },
     data: [dataRelease("DynaSent data", "dynasent")]
   },
   {
@@ -56,7 +56,7 @@ const weeklyMaterials = [
     topic: "Evaluation design: estimands, splits, and AI-assisted workflow",
     slides: slides("week03"),
     lab: notebook("weeks/week03/lab_starter.ipynb", "2027-02-04"),
-    homework: { label: "HW3", due: "Feb 9", pdf: `${courseLinks.publicBlob}/weeks/week03/hw03.pdf`, links: notebook("weeks/week03/hw03_starter.ipynb", "2027-02-04"), openDate: "2027-02-04" },
+    homework: { label: "HW3", due: "Feb 9", pdf: `${courseLinks.publicBlob}/weeks/week03/hw03.pdf`, links: notebook("weeks/week03/hw03_starter.ipynb", "2027-01-31T13:00"), openDate: "2027-01-31T13:00" },
     data: [dataRelease("CFPB data", "cfpb"), dataRelease("GitHub issues data", "github_issues")]
   },
   {
@@ -64,7 +64,7 @@ const weeklyMaterials = [
     topic: "Benchmark performance as estimation",
     slides: slides("week04"),
     lab: notebook("weeks/week04/lab_starter.ipynb", "2027-02-11"),
-    homework: { label: "HW4", due: "Feb 16", pdf: `${courseLinks.publicBlob}/weeks/week04/hw04.pdf`, links: notebook("weeks/week04/hw04_starter.ipynb", "2027-02-11"), openDate: "2027-02-11" },
+    homework: { label: "HW4", due: "Feb 16", pdf: `${courseLinks.publicBlob}/weeks/week04/hw04.pdf`, links: notebook("weeks/week04/hw04_starter.ipynb", "2027-02-07T13:00"), openDate: "2027-02-07T13:00" },
     data: [dataRelease("Camera Traps data", "camera_traps")]
   },
   {
@@ -72,7 +72,7 @@ const weeklyMaterials = [
     topic: "Paired system comparison",
     slides: slides("week05"),
     lab: notebook("weeks/week05/lab_starter.ipynb", "2027-02-18"),
-    homework: { label: "HW5", due: "Feb 23", pdf: `${courseLinks.publicBlob}/weeks/week05/hw05.pdf`, links: notebook("weeks/week05/hw05_starter.ipynb", "2027-02-18"), openDate: "2027-02-18" },
+    homework: { label: "HW5", due: "Feb 23", pdf: `${courseLinks.publicBlob}/weeks/week05/hw05.pdf`, links: notebook("weeks/week05/hw05_starter.ipynb", "2027-02-14T13:00"), openDate: "2027-02-14T13:00" },
     data: [dataRelease("BIG-Bench Hard data", "llm_bbh")]
   },
   {
@@ -104,7 +104,7 @@ const weeklyMaterials = [
     note: "Project Milestone 1 due Mar 23",
     slides: slides("week10"),
     lab: notebook("weeks/week10/lab_starter.ipynb", "2027-03-25"),
-    homework: { label: "HW6", due: "Mar 30", pdf: `${courseLinks.publicBlob}/weeks/week10/hw06.pdf`, links: notebook("weeks/week10/hw06_starter.ipynb", "2027-03-25"), openDate: "2027-03-25" },
+    homework: { label: "HW6", due: "Mar 30", pdf: `${courseLinks.publicBlob}/weeks/week10/hw06.pdf`, links: notebook("weeks/week10/hw06_starter.ipynb", "2027-03-21T13:00"), openDate: "2027-03-21T13:00" },
     data: [dataRelease("Camelyon17 data", "camelyon17")]
   },
   {
@@ -121,7 +121,7 @@ const weeklyMaterials = [
     note: "Project Milestone 2 due Sun Apr 11",
     slides: slides("week12"),
     lab: notebook("weeks/week12/lab_starter.ipynb", "2027-04-08"),
-    homework: { label: "HW7", due: "Apr 13", pdf: `${courseLinks.publicBlob}/weeks/week12/hw07.pdf`, links: notebook("weeks/week12/hw07_starter.ipynb", "2027-04-08"), openDate: "2027-04-08" },
+    homework: { label: "HW7", due: "Apr 13", pdf: `${courseLinks.publicBlob}/weeks/week12/hw07.pdf`, links: notebook("weeks/week12/hw07_starter.ipynb", "2027-04-04T13:00"), openDate: "2027-04-04T13:00" },
     data: [dataRelease("MT-Bench judgments data", "llm_judges")]
   },
   {

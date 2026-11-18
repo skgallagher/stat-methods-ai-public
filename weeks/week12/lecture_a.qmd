@@ -637,7 +637,7 @@ About 1 minute.
 
 - Lecture 12B, then Lab 12 on experts and GPT-4 judging MT-Bench.
 - Then work time on your project.
-- HW7 is out today and due Tue Apr 13. Milestone 2 is due Sunday, Apr 11.
+- HW7 came out Sunday and is due Tue Apr 13. Milestone 2 is due Sunday, Apr 11.
 - Read Zheng et al. (2023), Sections 3.3 and 4.2.
 
 ::: notes

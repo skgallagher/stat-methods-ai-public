@@ -12,7 +12,7 @@ format:
 
 | | |
 |---|---|
-| **Out / due** | Tue Feb 2 / Tue Feb 9, 11:59pm |
+| **Out / due** | Sun Jan 31, 1pm / Tue Feb 9, 11:59pm |
 | **Points** | 100: Problem 1 (50), Problem 2 (30), Problem 3 (20) |
 | **Expected time** | About 5 hours after completing Lab 3; contact course staff if setup/debugging alone exceeds 30 minutes |
 | **Reading** | Mitchell et al., [“Model Cards for Model Reporting”](https://arxiv.org/abs/1810.03993), Section 4, especially intended use, metrics, evaluation data, and caveats |

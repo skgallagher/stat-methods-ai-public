@@ -19,17 +19,42 @@ function isReleased(item, today = new Date()) {
   return new Date(`${item.publishDate}T00:00:00`) <= today;
 }
 
+// "2027-02-14" means midnight in Pittsburgh; "2027-02-14T13:00" means 1 pm there.
+// The offset is found from the time zone, so dates after daylight saving starts are right too.
+function easternTime(dateString) {
+  const [day, time = "00:00"] = dateString.split("T");
+  const standard = new Date(`${day}T${time}:00-05:00`);
+  const hourThere = Number(new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    hourCycle: "h23",
+    timeZone: "America/New_York"
+  }).format(standard));
+  const hourWanted = Number(time.split(":")[0]);
+  return hourThere === hourWanted ? standard : new Date(standard.getTime() - 60 * 60 * 1000);
+}
+
+// "Sun Feb 14" for a date, "Sun Feb 14, 1 pm" for a date with a time.
 function formatDate(dateString) {
-  return new Intl.DateTimeFormat("en-US", {
+  const hasTime = dateString.includes("T");
+  const instant = hasTime ? easternTime(dateString) : new Date(`${dateString}T12:00:00-05:00`);
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
     month: "short",
     day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hourCycle: "h12",
     timeZone: "America/New_York"
-  }).format(new Date(`${dateString}T12:00:00-05:00`));
+  }).formatToParts(instant).map((part) => [part.type, part.value]));
+  const date = `${parts.weekday} ${parts.month} ${parts.day}`;
+  if (!hasTime) return date;
+  const minutes = parts.minute === "00" ? "" : `:${parts.minute}`;
+  return `${date}, ${parts.hour}${minutes} ${parts.dayPeriod.toLowerCase()}`;
 }
 
 function isOpen(openDate, today = new Date()) {
   if (!openDate || siteSettings.moduleReleaseMode === "beta") return true;
-  return new Date(`${openDate}T00:00:00-05:00`) <= today;
+  return easternTime(openDate) <= today;
 }
 
 function link(item) {
