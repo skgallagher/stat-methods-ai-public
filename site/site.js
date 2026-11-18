@@ -70,8 +70,12 @@ function linkList(items) {
   return items.map(link).join(" · ");
 }
 
+// A week's homework is one entry or a list of them (Week 1 has HW0 and HW1).
 function homeworkCell(hw) {
   if (!hw) return "";
+  if (Array.isArray(hw)) {
+    return hw.map((entry) => `<div class="homework-item">${homeworkCell(entry)}</div>`).join("");
+  }
   if (!isOpen(hw.openDate)) {
     return `<span class="locked">${hw.label}</span><span class="small">opens ${formatDate(hw.openDate)}</span>`;
   }

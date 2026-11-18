@@ -40,7 +40,10 @@ const weeklyMaterials = [
     topic: "From regression to neural networks",
     slides: slides("week01"),
     lab: notebook("weeks/week01/lab_starter.ipynb", "2027-01-21"),
-    homework: { label: "HW1", due: "Jan 26", pdf: `${courseLinks.publicBlob}/weeks/week01/hw01.pdf`, links: notebook("weeks/week01/hw01_starter.ipynb", "2027-01-17T13:00"), openDate: "2027-01-17T13:00" },
+    homework: [
+      { label: "HW0", due: "Thu Jan 21", pdf: `${courseLinks.publicBlob}/weeks/week00/hw00.pdf`, links: notebook("weeks/week00/hw00_colab_gradescope_check.ipynb", "2027-01-17T13:00"), openDate: "2027-01-17T13:00" },
+      { label: "HW1", due: "Jan 26", pdf: `${courseLinks.publicBlob}/weeks/week01/hw01.pdf`, links: notebook("weeks/week01/hw01_starter.ipynb", "2027-01-17T13:00"), openDate: "2027-01-17T13:00" }
+    ],
     data: [dataRelease("Camera Traps data", "camera_traps")]
   },
   {

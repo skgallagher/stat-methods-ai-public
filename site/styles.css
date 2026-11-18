@@ -298,6 +298,10 @@ tr.break td {
   color: #9aa0a6;
 }
 
+.homework-item + .homework-item {
+  margin-top: 0.5rem;
+}
+
 .release-mode {
   color: var(--muted);
   font-size: 0.92rem;

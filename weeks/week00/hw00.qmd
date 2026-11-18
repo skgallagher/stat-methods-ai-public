@@ -1,0 +1,34 @@
+---
+title: "HW0: Colab and Gradescope Check"
+subtitle: "Statistical Evaluation of AI · Spring 2027"
+format: pdf
+fontsize: 10pt
+geometry: margin=0.7in
+---
+
+| | |
+|---|---|
+| **Out / due** | Sun Jan 17, 1pm / Thu Jan 21, 11:59pm |
+| **Points** | 0; required submission rehearsal |
+| **Expected time** | About 20 minutes |
+| **Working file** | Complete all work in `hw00_colab_gradescope_check.ipynb`; this PDF is a read-only checklist. |
+| **Submit** | Completed notebook PDF + completed `.ipynb` in the HW0 Gradescope practice assignment. |
+
+This is a workflow rehearsal, not a statistics test. Staff check only that both files open, the notebook runs from top to bottom, LaTeX renders, code output is visible, and the chosen typed or handwritten response format exports correctly.
+
+# Checklist
+
+1. Open the supplied notebook in Colab, save a copy in your Google Drive, and rename it `lastname_firstname_hw00.ipynb`.
+2. Enter your name and run the setup cell.
+3. Edit a Markdown cell containing inline and display LaTeX.
+4. Complete and run the short sample-mean code; keep the printed result and figure visible.
+5. Compute the assigned mean. Either type the derivation in Markdown/LaTeX or insert a clear scan or photograph; add the required typed statistical conclusion in either case. Handwriting is welcome but never required.
+6. Restart the runtime and run every cell from top to bottom.
+7. Export the completed notebook to `lastname_firstname_hw00.pdf` and download `lastname_firstname_hw00.ipynb`.
+8. Open both downloaded files, confirm the required work appears, and upload both to the practice assignment.
+
+If you choose handwriting and image insertion fails, submit a clearly labeled `hw00_handwritten.pdf`. Do not use a third-party PDF-merging website.
+
+# Completion standard
+
+Staff will mark the rehearsal complete or identify the exact workflow problem to repair before HW1. Statistical correctness is not graded.
